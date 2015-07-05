@@ -1,0 +1,23 @@
+﻿<Window x:Class="在线阅读.View.SetWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置" Height="500" Width="500" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded"  Icon="/在线阅读;component/Images/reader.ico">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        
+        <ListBox x:Name="MenuList" MouseDoubleClick="MenuList_MouseDoubleClick">
+            <ListBoxItem Content="常规"/>
+            <ListBoxItem Content="正则表达式"/>
+        </ListBox>
+        <GridSplitter Grid.Row="0" Grid.Column="0" Width="2"/>
+        <Frame x:Name="PageFrame" Grid.Row="0" Grid.Column="1" Margin="2" NavigationUIVisibility="Hidden"/>
+        <Button x:Name="SavaBtn" Grid.Row="1" Grid.Column="1" Content="保存" Height="40" MaxWidth="200" MinWidth="100" Click="SavaBtn_Click"/>
+    </Grid>
+</Window>
