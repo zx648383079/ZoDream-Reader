@@ -1,0 +1,214 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>在线阅读</name>
+    </assembly>
+    <members>
+        <member name="F:在线阅读.Model.NowBookRegex">
+            <summary>
+            存储正则表达式
+            </summary>
+        </member>
+        <member name="F:在线阅读.Model.Books">
+            <summary>
+            储存列表
+            </summary>
+        </member>
+        <member name="F:在线阅读.Model.Url">
+            <summary>
+            储存主页的网址
+            </summary>
+        </member>
+        <member name="F:在线阅读.Model.index">
+            <summary>
+            储存当前阅读的进度
+            </summary>
+        </member>
+        <member name="M:在线阅读.BookRegex.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            小说的正则表达式
+            </summary>
+            <param name="web">网站域名</param>
+            <param name="name">书名：正则表达式中必须包含"name"</param>
+            <param name="chapter">章节名及网址：正则表达式中必须包含"title"、"url>"</param>
+            <param name="content">正文：正则表达式中必须包含"content"</param>
+        </member>
+        <member name="P:在线阅读.BookRegex.Web">
+            <summary>
+            网站域名
+            </summary>
+        </member>
+        <member name="P:在线阅读.BookRegex.Name">
+            <summary>
+            书名：正则表达式中必须包含"name"
+            </summary>
+        </member>
+        <member name="P:在线阅读.BookRegex.Chapter">
+            <summary>
+            章节名及网址：正则表达式中必须包含"title"、"url>"
+            </summary>
+        </member>
+        <member name="P:在线阅读.BookRegex.Content">
+            <summary>
+            正文：正则表达式中必须包含"content"
+            </summary>
+        </member>
+        <member name="T:在线阅读.RegexPage">
+            <summary>
+            Interaction logic for RegexPage.xaml
+            </summary>
+            <summary>
+            RegexPage
+            </summary>
+        </member>
+        <member name="M:在线阅读.RegexPage.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:在线阅读.SetWindow">
+            <summary>
+            Interaction logic for SetWindow.xaml
+            </summary>
+            <summary>
+            SetWindow
+            </summary>
+        </member>
+        <member name="M:在线阅读.SetWindow.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:在线阅读.SystemPage">
+            <summary>
+            Interaction logic for SystemPage.xaml
+            </summary>
+            <summary>
+            SystemPage
+            </summary>
+        </member>
+        <member name="M:在线阅读.SystemPage.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:在线阅读.UserMethod.ToColor(System.String)">
+            <summary>
+            将blend的8位颜色值转为color  
+            </summary>  
+            <param name="color"></param>  
+            <returns></returns>  
+        </member>
+        <member name="M:在线阅读.UserMethod.SavaRegex(System.Collections.Generic.List{在线阅读.BookRegex})">
+            <summary>
+            保存正则法则
+            </summary>
+            <param name="bookRegex"></param>
+        </member>
+        <member name="M:在线阅读.UserMethod.LoadRegex">
+            <summary>
+            载入正则表达式
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:在线阅读.UserMethod.GetUrl(System.String,System.String)">
+            <summary>
+            取网址
+            </summary>
+            <param name="newUrl">新网址</param>
+            <param name="oldUrl">老网址，匹配域名</param>
+            <returns></returns>
+        </member>
+        <member name="M:在线阅读.UserMethod.GetWeb(System.String)">
+            <summary>
+            提取网址
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:在线阅读.UserMethod.GetHtmlContent(System.String,System.String)">
+            <summary/>
+            获取源代码
+            <param name="url"></param>
+            <param name="encoding"></param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:在线阅读.UserMethod.GetEncoding(System.String)" -->
+        <member name="M:在线阅读.UserMethod.GetList">
+            <summary>
+            得到目录
+            </summary>
+        </member>
+        <member name="M:在线阅读.UserMethod.GetContent(System.String)">
+            <summary>
+            取正文
+            </summary>
+            <param name="url"></param>
+        </member>
+        <member name="M:在线阅读.UserMethod.DownBook(System.Int32,System.Int32)">
+            <summary>
+            保存文本
+            </summary>
+            <param name="index">开始位置</param>
+            <param name="count">个数</param>
+        </member>
+        <member name="M:在线阅读.UserMethod.GetRegex(System.Collections.Generic.List{在线阅读.BookRegex})">
+            <summary>
+            取相关网站的正则表达式
+            </summary>
+            <param name="regexs"></param>
+        </member>
+        <member name="T:在线阅读.App">
+            <summary>
+            Interaction logic for App.xaml
+            </summary>
+            <summary>
+            App
+            </summary>
+        </member>
+        <member name="M:在线阅读.App.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:在线阅读.App.Main">
+            <summary>
+            Application Entry Point.
+            </summary>
+        </member>
+        <member name="T:在线阅读.MainWindow">
+            <summary>
+            Interaction logic for MainWindow.xaml
+            </summary>
+            <summary>
+            MainWindow
+            </summary>
+        </member>
+        <member name="M:在线阅读.MainWindow.Get">
+            <summary>
+            加载文件
+            </summary>
+        </member>
+        <member name="M:在线阅读.MainWindow.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:在线阅读.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:在线阅读.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:在线阅读.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+    </members>
+</doc>

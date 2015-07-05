@@ -1,0 +1,1 @@
+﻿www.23wx小说\<dd\>\<h1\>(?<name>.*?)\</h1\>\</dd\>小说\<td class="L"\>\<a href="(?<url>\d*\.html?)"\>(?<name>[\s\S]*?)\</a\>小说\<dd id="contents"\>(?<content>[\s\S]*?)\</dd\>

@@ -1,0 +1,58 @@
+﻿<Page x:Class="在线阅读.RegexPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="300"
+	Title="RegexPage" Loaded="Page_Loaded">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ListView x:Name="RegexListView" Height="200" MouseDoubleClick="RegexListView_MouseDoubleClick">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="网站" Width="100" DisplayMemberBinding="{Binding Path=Web}"/>
+                    <GridViewColumn Header="书名" Width="200" DisplayMemberBinding="{Binding Path=Name}"/>
+                    <GridViewColumn Header="章节名及网址" Width="200" DisplayMemberBinding="{Binding Path=Chapter}"/>
+                    <GridViewColumn Header="正文" Width="200" DisplayMemberBinding="{Binding Path=Content}"/>
+                </GridView>
+            </ListView.View>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="添加" Click="MenuItem_Click"/>
+                    <MenuItem Header="删除" Click="MenuItem_Click"/>
+                </ContextMenu>
+            </ListView.ContextMenu>
+        </ListView>
+        <ScrollViewer x:Name="ScrollGrid" Grid.Row="1" VerticalScrollBarVisibility="Auto" Opacity="0">
+            <Grid Height="200">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="网站：" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="书名：" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="章节名及网址：" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="正文：" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                
+                <TextBox x:Name="WebTb" MaxLines="1" Grid.Column="1" Grid.Row="0"/>
+                <TextBox x:Name="NameTb" MaxLines="1" Grid.Column="1" Grid.Row="1"/>
+                <TextBox x:Name="ChapterTb" MaxLines="1" Grid.Column="1" Grid.Row="2"/>
+                <TextBox x:Name="ContentTb" MaxLines="1" Grid.Column="1" Grid.Row="3"/>
+                
+                <Button x:Name="SavaBtn" Content="保存" Grid.Row="4" Grid.Column="1" Width="100" Height="40" Click="SavaBtn_Click"/>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>
