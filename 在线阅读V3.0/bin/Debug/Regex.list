@@ -1,0 +1,3 @@
+﻿www.23wx.com小说\<td class="L"\>\<a href="(?<url>\d*\.html?)"\>(?<name>[\s\S]*?)\</a\>小说\<dd id="contents"\>(?<content>[\s\S]*?)\</dd\>小说\<[\s\S]*?\>替换\n的值&nbsp;替换 的值\s{4,}替换\n\n    的值
+www.silukee.com小说.*\<li\>\<a style=".*" href="(?<url>[\w/]*?\.html)"\>(?<name>.*?)\</a\>\</li\>.*小说\<div class="cont"\>(?<content>[\s\S]*?)\<script type="text/javascript" src="/js/chaptererror.js"\>小说\<[\s\S]*?\>替换\n的值&nbsp;替换 的值\s{4,}替换\n\n    的值
+www.45zw.com小说\<li\>\<a href="(?<url>.*?)" title=".*?"\>(?<name>.*?)\</a\>\</li\>小说\<div id="content"\>(?<content>[\s\S]*?)\<div class="adsgg"\>小说\<script\>[\s\S]*?\</script\>替换的值\<[\s\S]*?\>替换\n的值&nbsp;替换 的值\s{4,}替换\n\n    的值
