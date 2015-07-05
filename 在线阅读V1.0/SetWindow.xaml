@@ -1,0 +1,54 @@
+﻿<Window x:Class="在线阅读.SetWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置" Height="300" Width="300" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Icon="reader.ico">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="标题：" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBlock Text="正文：" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
+        <TextBlock Text="上一章：" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+        <TextBlock Text="下一章：" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
+
+        <TextBox x:Name="TitleTb" Grid.Column="1" Grid.Row="0" MaxLines="1"/>
+        <TextBox x:Name="ContentTb" Grid.Column="1" Grid.Row="1" MaxLines="1"/>
+        <TextBox x:Name="BeforeTb" Grid.Column="1" Grid.Row="2" MaxLines="1"/>
+        <TextBox x:Name="NextTb" Grid.Column="1" Grid.Row="3" MaxLines="1"/>
+        <Grid Grid.Row="4" Grid.ColumnSpan="2" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="50"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="字体：" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock Text="字体大小：" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <ComboBox x:Name="FontComboBox" VerticalAlignment="Center" Grid.Column="1" Margin="0,5"/>
+            <TextBox x:Name="FontSizeTb" Grid.Column="3" MaxLines="1"/>
+        </Grid>
+        <Grid Grid.Row="5" Grid.ColumnSpan="2" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="字体颜色" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="2" Text="背景颜色" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBox x:Name="FontColorTb" Grid.Column="1" MaxLines="1" LostFocus="FontColorTb_LostFocus"/>
+            <TextBox x:Name="BackgroundTb" Grid.Column="3" MaxLines="1" LostFocus="BackgroudTb_LostFocus"/>
+        </Grid>
+        <Button x:Name="SavaBtn" Grid.Row="6" Grid.Column="1" Content="保存" Click="SavaBtn_Click"/>
+    </Grid>
+</Window>
