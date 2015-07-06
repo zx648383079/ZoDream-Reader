@@ -30,7 +30,7 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
-                        <Image Grid.RowSpan="2" Source="E:\VS2013\WPF\正则提取\在线阅读\Images\book.png" Width="100"  Stretch="Fill"/>
+                        <Image Grid.RowSpan="2" Source="/在线阅读;component/Images/book.png" Width="100"  Stretch="Fill"/>
                         <Border Grid.Row="0" HorizontalAlignment="Right" CornerRadius="5" BorderBrush="Red" BorderThickness="2">
                             <TextBlock Text="{Binding Path=Index}" FontSize="12" Foreground="White" Background="Red"/>
                         </Border>

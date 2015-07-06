@@ -45,3 +45,4 @@ D:\Documents\GitHub\WPF-Web-And-Txt-Reader\在线阅读\obj\Debug\在线阅读.P
 D:\Documents\GitHub\WPF-Web-And-Txt-Reader\在线阅读\obj\Debug\在线阅读.csproj.GenerateResource.Cache
 D:\Documents\GitHub\WPF-Web-And-Txt-Reader\在线阅读\bin\Debug\在线阅读.exe
 D:\Documents\GitHub\WPF-Web-And-Txt-Reader\在线阅读\bin\Debug\在线阅读.pdb
+D:\Documents\GitHub\WPF-Web-And-Txt-Reader\在线阅读\obj\Debug\在线阅读.csprojResolveAssemblyReference.cache

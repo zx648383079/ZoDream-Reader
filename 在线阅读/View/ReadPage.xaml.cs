@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using 在线阅读.Class;
@@ -55,7 +56,7 @@ namespace 在线阅读.View
                     SetWindow set = new SetWindow();
                     if (set.ShowDialog() == true)
                     {
-                        LoadSet();
+
                     }
                     break;
                 case "下载本章":
@@ -77,7 +78,7 @@ namespace 在线阅读.View
                     }
                     break;
                 case "复制":
-                    Clipboard.SetData(DataFormats.Text, ContentTb.SelectedText);//复制内容到剪切板
+                    Clipboard.SetData(DataFormats.Text, PageViewer.Selection);//复制内容到剪切板
                     break;
                 case "隐藏列表":
                     ListGrid.Width = 0;
@@ -101,8 +102,14 @@ namespace 在线阅读.View
             }
             if (e.Key == Key.W || e.Key == Key.Up)
             {
-                ContentTb.LineDown();
-                ContentTb.PageUp();
+                if (PageViewer.CanGoToPreviousPage)
+                {
+                    PageViewer.PreviousPage();
+                }
+                else
+                {
+                    GoBefore();
+                }
             }
             if (e.Key == Key.D || e.Key == Key.Right)
             {
@@ -110,8 +117,14 @@ namespace 在线阅读.View
             }
             if (e.Key == Key.S || e.Key == Key.Down)
             {
-                ContentTb.LineUp();         //换页时留一行
-                ContentTb.PageDown();
+                if (PageViewer.CanGoToNextPage)
+                {
+                    PageViewer.NextPage();
+                }
+                else
+                {
+                    GoNext();
+                }
             }
         }
 
@@ -138,7 +151,6 @@ namespace 在线阅读.View
                 UrlTb.Text = Model.BookModels[0].FileName;
             }
             _method.GetRegex(_method.LoadRegex());
-            LoadSet();
             LoadChapter();
             LoadContent();
         }
@@ -148,20 +160,7 @@ namespace 在线阅读.View
             Model.BookModels[0].Index = ChapterListBox.SelectedIndex;
             LoadContent();
         }
-
-        /// <summary>
-        /// 加载设置
-        /// </summary>
-        private void LoadSet()
-        {
-            string[] body = _method.LoadBody();
-
-            ContentTb.FontSize = int.Parse(body[1]);
-            ContentTb.FontFamily = new FontFamily(body[0]);
-            ContentTb.Foreground = new SolidColorBrush(_method.ToColor(body[2])); ;
-            ContentTb.Background = new SolidColorBrush(_method.ToColor(body[3]));
-
-        }
+        
 
         /// <summary>
         /// 上一章
@@ -175,9 +174,8 @@ namespace 在线阅读.View
             }
             else
             {
-                ContentTb.Text = "已到最前！！";
+                ShowText("已到最前！！");
             }
-            ContentTb.ScrollToHome();
         }
 
         /// <summary>
@@ -192,9 +190,8 @@ namespace 在线阅读.View
             }
             else
             {
-                ContentTb.Text = "已到最后！！";
+                ShowText("已到最后！！");
             }
-            ContentTb.ScrollToHome();
         }
         /// <summary>
         /// 加载内容
@@ -211,11 +208,34 @@ namespace 在线阅读.View
             {
                 UrlTb.Text = book.Url;
             }
-            ContentTb.Text = _method.GetContent();
+            ShowText(_method.GetContent());
             ChapterListBox.SelectedIndex = Model.BookModels[0].Index;
-           
+
         }
-        
+        /// <summary>
+        /// 把内容显示到空间中
+        /// </summary>
+        /// <param name="text"></param>
+        private void ShowText(string text)
+        {
+            FlowDocument document = new FlowDocument();
+
+            Paragraph paragraph = new Paragraph();
+
+            paragraph.Inlines.Add(new Run(text));
+
+            string[] body = _method.LoadBody();
+            document.FontSize = int.Parse(body[1]);
+            document.FontFamily = new FontFamily(body[0]);
+            document.Foreground = new SolidColorBrush(_method.ToColor(body[2]));
+            document.Background = new SolidColorBrush(_method.ToColor(body[3]));
+
+            document.Blocks.Add(paragraph);
+
+            PageViewer.Document = document;
+        }
+
+
         /// <summary>
         /// 加载目录
         /// </summary>

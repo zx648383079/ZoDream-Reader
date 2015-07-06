@@ -107,7 +107,8 @@ namespace 在线阅读.Class
 
             HttpWebRequest request = null;
             HttpWebResponse response = null;
-            StreamReader reader = null;
+
+            Stream stream=null;
             try
             {
                 request = (HttpWebRequest)WebRequest.Create(_fileName);
@@ -117,10 +118,29 @@ namespace 在线阅读.Class
                 if (response.StatusCode == HttpStatusCode.OK && response.ContentLength < 1024 * 1024)
                 {
                     if (response.ContentEncoding != null && response.ContentEncoding.Equals("gzip", StringComparison.InvariantCultureIgnoreCase))
-                        reader = new StreamReader(new GZipStream(response.GetResponseStream(), CompressionMode.Decompress),GetEncoding(response));
+                    {
+                        stream = new GZipStream(response.GetResponseStream(), CompressionMode.Decompress);
+                    }
+                        
                     else
-                        reader = new StreamReader(response.GetResponseStream(), GetEncoding(response));
-                    string html = reader.ReadToEnd();
+                    {
+                        stream =response.GetResponseStream();
+                    }
+                    #region 把网络流转成内存流
+                    MemoryStream ms = new MemoryStream();
+                    byte[] buffer = new byte[1024];
+
+                    while (true)
+                    {
+                        int sz = stream.Read(buffer, 0, 1024);
+                        if (sz == 0) break;
+                        ms.Write(buffer, 0, sz);
+                    }
+                    #endregion
+
+                    byte[] bytes = ms.ToArray();
+
+                    string html = GetEncoding(bytes, response.CharacterSet).GetString(bytes);
                     return html;
                 }
             }
@@ -134,8 +154,8 @@ namespace 在线阅读.Class
                     response.Close();
                     response = null;
                 }
-                if (reader != null)
-                    reader.Close();
+                if (stream != null)
+                    stream.Close();
                 if (request != null)
                     request = null;
             }
@@ -145,27 +165,22 @@ namespace 在线阅读.Class
         /// <summary>
         /// 获取HTML网页的编码
         /// </summary>
-        /// <param name="response"></param>
+        /// <param name="bytes"></param>
+        /// <param name="charSet"></param>
         /// <returns></returns>
-        private Encoding GetEncoding(HttpWebResponse response)
+        private Encoding GetEncoding(byte[] bytes,string charSet)
         {
-            StreamReader reader;
-
-            if (response.ContentEncoding != null && response.ContentEncoding.Equals("gzip", StringComparison.InvariantCultureIgnoreCase))
-                reader = new StreamReader(new GZipStream(response.GetResponseStream(), CompressionMode.Decompress));
-            else
-                reader = new StreamReader(response.GetResponseStream(), Encoding.ASCII);
-            string html = reader.ReadToEnd();
+            string html = Encoding.Default.GetString(bytes);
             Regex reg_charset = new Regex(@"charset\b\s*=\s*(?<charset>[^""]*)");
             if (reg_charset.IsMatch(html))
             {
 
                 return Encoding.GetEncoding(reg_charset.Match(html).Groups["charset"].Value);
             }
-            else if (response.CharacterSet != String.Empty)
+            else if (charSet != String.Empty)
             {
 
-                return Encoding.GetEncoding(response.CharacterSet);
+                return Encoding.GetEncoding(charSet);
             }
             else
                 return Encoding.Default;

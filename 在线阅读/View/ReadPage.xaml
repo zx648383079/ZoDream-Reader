@@ -29,17 +29,16 @@
             </ListBox>
         </Grid>
         <Grid Grid.Column="1" Margin="2,0">
-            <TextBox x:Name="ContentTb" IsReadOnly="True" TextWrapping="Wrap" Padding="20,40,20,0" VerticalScrollBarVisibility="Auto"
-                 Background="#FF25EA25" BorderBrush="{x:Null}" KeyUp="ContentTb_KeyUp">
-                <TextBox.ContextMenu>
+            <FlowDocumentPageViewer Name="PageViewer" Margin="0,30,0,0">
+                <FlowDocumentPageViewer.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="复制" Click="MenuItem_Click"/>
                         <MenuItem Header="显示列表" Click="MenuItem_Click"/>
                         <MenuItem Header="设置" Click="MenuItem_Click"/>
                         <MenuItem Header="返回" Click="MenuItem_Click"/>
                     </ContextMenu>
-                </TextBox.ContextMenu>
-            </TextBox>
+                </FlowDocumentPageViewer.ContextMenu>
+            </FlowDocumentPageViewer>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
