@@ -22,3 +22,7 @@ E:\VS2013\WPF\正则提取\在线阅读\obj\Debug\View\ReadPage.g.cs
 E:\VS2013\WPF\正则提取\在线阅读\obj\Debug\View\RegexPage.g.cs
 E:\VS2013\WPF\正则提取\在线阅读\obj\Debug\View\SetWindow.g.cs
 E:\VS2013\WPF\正则提取\在线阅读\obj\Debug\View\SystemPage.g.cs
+D:\Documents\GitHub\WPF-Web-And-Txt-Reader\在线阅读\bin\Debug\在线阅读.exe.config
+D:\Documents\GitHub\WPF-Web-And-Txt-Reader\在线阅读\bin\Debug\在线阅读.XML
+D:\Documents\GitHub\WPF-Web-And-Txt-Reader\在线阅读\obj\Debug\在线阅读.exe
+D:\Documents\GitHub\WPF-Web-And-Txt-Reader\在线阅读\obj\Debug\在线阅读.pdb
