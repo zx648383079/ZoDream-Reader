@@ -1,0 +1,48 @@
+﻿<Window x:Class="ZoDream.Reader.View.WebRulesView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ignore="http://www.galasoft.ch/ignore"
+        mc:Ignorable="d ignore"
+        Title="站点规则管理"
+        DataContext="{Binding WebRules, Source={StaticResource Locator}}" Icon="/ZoDream.Reader;component/Images/reader.ico" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/ZoDream.Reader;component/Skins/MainSkin.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <ListView x:Name="Lists" ItemsSource="{Binding RulesList}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="站点" Width="200" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Header="网址" Width="200" DisplayMemberBinding="{Binding Url}"/>
+                    <GridViewColumn Header="目录开始标志" Width="200" DisplayMemberBinding="{Binding Path=CatalogBegin}"/>
+                    <GridViewColumn Header="目录结束标志" Width="200" DisplayMemberBinding="{Binding Path=CatalogEnd}"/>
+                    <GridViewColumn Header="章节开始标志" Width="200" DisplayMemberBinding="{Binding Path=ChapterBegin}"/>
+                    <GridViewColumn Header="章节结束标志" Width="200" DisplayMemberBinding="{Binding Path=ChapterEnd}"/>
+                    <GridViewColumn Header="替换" Width="200" DisplayMemberBinding="{Binding Path=Replace}"/>
+                    <GridViewColumn Header="作者开始标志" Width="200" DisplayMemberBinding="{Binding Path=AuthorBegin}"/>
+                    <GridViewColumn Header="作者结束标志" Width="200" DisplayMemberBinding="{Binding Path=AuthorEnd}"/>
+                    <GridViewColumn Header="简介开始标志" Width="200" DisplayMemberBinding="{Binding Path=DescriptionBegin}"/>
+                    <GridViewColumn Header="简介结束标志" Width="200" DisplayMemberBinding="{Binding Path=DescriptionEnd}"/>
+                    <GridViewColumn Header="封面开始标志" Width="200" DisplayMemberBinding="{Binding Path=CoverBegin}"/>
+                    <GridViewColumn Header="封面结束标志" Width="200" DisplayMemberBinding="{Binding Path=CoverEnd}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <StackPanel Style="{StaticResource HorizontalPanel}" Grid.Row="1">
+            <Button Content="新增" Command="{Binding AddCommand}"/>
+            <Button Content="修改" Command="{Binding EditCommand}" CommandParameter="{Binding ElementName=Lists,Path=SelectedIndex}"/>
+            <Button Content="删除" Command="{Binding DeleteCommand}" CommandParameter="{Binding ElementName=Lists,Path=SelectedIndex}"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,7 +1,0 @@
-﻿<NavigationWindow x:Class="在线阅读.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="在线阅读" Height="350" Width="525" WindowStartupLocation="CenterScreen" Icon="Images/reader.ico"
-        TextOptions.TextFormattingMode="Display" Closing="NavigationWindow_Closing" MinHeight="350" MinWidth="525"
-                  ShowsNavigationUI="False" Source="View\BookPage.xaml" Navigating="NavigationWindow_Navigating">
-</NavigationWindow>

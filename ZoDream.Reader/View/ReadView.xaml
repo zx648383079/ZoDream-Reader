@@ -1,0 +1,31 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:zodream="clr-namespace:ZoDream.Reader.Controls"
+        xmlns:ignore="http://www.galasoft.ch/ignore"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:Custom="http://www.galasoft.ch/mvvmlight" x:Class="ZoDream.Reader.View.ReadView"
+        mc:Ignorable="d ignore"
+        DataContext="{Binding Read, Source={StaticResource Locator}}" 
+        Icon="/ZoDream.Reader;component/Images/reader.ico" 
+        WindowStartupLocation="CenterScreen"
+        Title="{Binding Title}"
+        Closing="{Binding CloseCommand}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ListBox Name="Lists" ItemsSource="{Binding ChaptersList}" DisplayMemberPath="Name">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <Custom:EventToCommand Command="{Binding ChooseCommand}" CommandParameter="{Binding ElementName=Lists,Path=SelectedIndex}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListBox>
+        <GridSplitter Width="2"/>
+        <FlowDocumentPageViewer Grid.Column="1" Document="{Binding Content}"/>
+        <zodream:Ring Grid.ColumnSpan="2" Visibility="{Binding RingVisibility}"/>
+    </Grid>
+</Window>
