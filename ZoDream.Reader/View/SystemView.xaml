@@ -8,5 +8,36 @@
         DataContext="{Binding System, Source={StaticResource Locator}}" Icon="/ZoDream.Reader;component/Images/reader.ico" WindowStartupLocation="CenterScreen">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="背景色："/>
+        <TextBox x:Name="Backgroud" Text="#fff" Grid.Row="0" Grid.Column="1"/>
+        <TextBlock Text="字体：" Grid.Row="1" Grid.Column="0" />
+        <ComboBox x:Name="FontFamily" Grid.Column="1" SelectedIndex="0" Grid.Row="1" ItemsSource="{Binding FontFamilys}" DisplayMemberPath="Name"/>
+        <TextBlock Text="字号：" Grid.Row="2" Grid.Column="0" />
+        <TextBox x:Name="FontSize" Text="32" Grid.Column="1" Grid.Row="2"/>
+        <TextBlock Text="字体粗细：" Grid.Row="3" Grid.Column="0" />
+        <TextBox x:Name="FontWeight" Text="300" Grid.Column="1" Grid.Row="3"/>
+        <TextBlock Text="前景色：" Grid.Row="4" Grid.Column="0" />
+        <TextBox x:Name="Color" Text="#000" Grid.Column="1" Grid.Row="4"/>
+        <TextBox Grid.Row="5" Text="111111111111111" 
+                 Background="{Binding ElementName=Backgroud,Path=Text}" 
+                 FontFamily="{Binding ElementName=FontFamily,Path=Text}"
+                 FontSize="{Binding ElementName=FontSize,Path=Text}"
+                 FontWeight="{Binding ElementName=FontWeight,Path=Text}"
+                 Foreground="{Binding ElementName=Color,Path=Text}"
+                 Grid.ColumnSpan="2" Grid.Column="0"/>
+        <Button Content="保存" Grid.Row="6" Grid.Column="1"/>
     </Grid>
 </Window>

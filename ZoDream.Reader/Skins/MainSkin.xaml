@@ -1,8 +1,32 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:zodream="clr-namespace:ZoDream.Reader.Controls"
+                    xmlns:input="clr-namespace:System.Windows.Input;assembly=PresentationCore"
                     xmlns:converter="clr-namespace:ZoDream.Reader.Converter">
     <converter:ImageConverter x:Key="ImageConverter"/>
+    <converter:VisibilityConverter x:Key="VisibilityConverter"/>
+
+    <RoutedUICommand x:Key="Copy">
+        input:ApplicationCommands.Copy
+    </RoutedUICommand>
+
+    <RoutedUICommand x:Key="SelectAll">
+        input:ApplicationCommands.SelectAll
+    </RoutedUICommand>
+
+    <Style x:Key="Navigation" TargetType="Button">
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+        <Setter Property="FontSize" Value="50"/>
+        <Setter Property="Opacity" Value="0.3"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Margin" Value="0 0 0 30"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Opacity" Value="0.7"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 
     <Style TargetType="zodream:Ring">
         <Setter Property="Background" Value="White"/>
@@ -22,6 +46,10 @@
 
     <Style TargetType="Button">
         <Setter Property="Padding" Value="10 5"/>
+    </Style>
+
+    <Style TargetType="FlowDocumentPageViewer">
+        <Setter Property="MaxZoom" Value="700"/>
     </Style>
 
     <Style x:Key="BookList" TargetType="ListBox">
@@ -70,7 +98,7 @@
                                         </DoubleAnimationUsingKeyFrames>
                                         <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"  Storyboard.TargetProperty="(FrameworkElement.Height)">
                                             <SplineDoubleKeyFrame KeyTime="00:00:00.0020000" Value="0"/>
-                                            <SplineDoubleKeyFrame KeyTime="00:00:00.3450000" Value="250"/>
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.3450000" Value="300"/>
                                         </DoubleAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </BeginStoryboard>
@@ -100,6 +128,9 @@
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Foreground" TargetName="MenuIcon" Value="#fc0"/>
+                        </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" TargetName="MenuIcon" Value="#fff"/>
                         </Trigger>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Data.SQLite;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
@@ -7,6 +8,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using ZoDream.Reader.Helper;
+using ZoDream.Reader.Helper.Http;
 using ZoDream.Reader.Model;
 
 namespace ZoDream.Reader.ViewModel
@@ -21,12 +23,18 @@ namespace ZoDream.Reader.ViewModel
     {
         private NotificationMessageAction<BookItem> _readItem;
 
+        private NotificationMessageAction _readViewer;
+
         private BookItem _book;
         /// <summary>
         /// Initializes a new instance of the ReadViewModel class.
         /// </summary>
         public ReadViewModel()
         {
+            Messenger.Default.Register<NotificationMessageAction>(this, "readViewer", m =>
+            {
+                _readViewer = m;
+            });
             Messenger.Default.Register<NotificationMessageAction<BookItem>>(this, "read", m =>
             {
                 _readItem = m;
@@ -46,7 +54,11 @@ namespace ZoDream.Reader.ViewModel
                 {
                     if (reader.HasRows)
                     {
-                        ChaptersList.Add(new ChapterItem(reader));
+                        var item = new ChapterItem(reader);
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            ChaptersList.Add(item);
+                        });
                     }
                 }
                 reader.Close();
@@ -62,10 +74,19 @@ namespace ZoDream.Reader.ViewModel
             var chapter = ChaptersList[_book.Index];
             Title = chapter.Name;
             var content = Convert.ToString(DatabaseHelper.Find<ChapterItem>("Content", $"Id = {chapter.Id}"));
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                _setConent(content);
+            });
+        }
+
+        private void _setConent(string content)
+        {
             var paragraph = new Paragraph();
             paragraph.Inlines.Add(new Run(content));
             Content.Blocks.Clear();
             Content.Blocks.Add(paragraph);
+            _readViewer.Execute();
         }
 
         private void _getContent()
@@ -189,6 +210,7 @@ namespace ZoDream.Reader.ViewModel
 
         private void ExecuteChooseCommand(int index)
         {
+            if (index == _book.Index) return;
             _book.Index = index;
             _getContent();
         }
@@ -202,14 +224,95 @@ namespace ZoDream.Reader.ViewModel
         {
             get
             {
-                return _closeCommand
-                    ?? (_closeCommand = new RelayCommand(ExecuteCloseCommand));
+                return _closeCommand ?? (_closeCommand = new RelayCommand(
+                    ExecuteCloseCommand));
             }
         }
 
         private void ExecuteCloseCommand()
         {
             _readItem.Execute(_book);
+        }
+
+        private RelayCommand _updateCommand;
+
+        /// <summary>
+        /// Gets the UpdateCommand.
+        /// </summary>
+        public RelayCommand UpdateCommand
+        {
+            get
+            {
+                return _updateCommand
+                    ?? (_updateCommand = new RelayCommand(ExecuteUpdateCommand));
+            }
+        }
+
+        private void ExecuteUpdateCommand()
+        {
+            if (_book.Source == BookSources.本地) return;
+            RingVisibility = Visibility.Visible;
+            Task.Factory.StartNew(() =>
+            {
+                DatabaseHelper.Open();
+                var rule = DatabaseHelper.GetRule(_book.Url);
+                var chapter = ChaptersList[_book.Index];
+                var html = new Html();
+                html.SetUrl(chapter.Url);
+                var content = html.Match(rule.ChapterBegin, rule.ChapterEnd).GetText(rule.Replace);
+                DatabaseHelper.Update<ChapterItem>(
+                    "Content = @content", 
+                    $"Id = {chapter.Id}",
+                    new SQLiteParameter("@content", content));
+                DatabaseHelper.Close();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _setConent(content);
+                });
+                RingVisibility = Visibility.Collapsed;
+            });
+        }
+
+        private RelayCommand _previousCommand;
+
+        /// <summary>
+        /// Gets the PreviousCommand.
+        /// </summary>
+        public RelayCommand PreviousCommand
+        {
+            get
+            {
+                return _previousCommand
+                    ?? (_previousCommand = new RelayCommand(ExecutePreviousCommand));
+            }
+        }
+
+        private void ExecutePreviousCommand()
+        {
+            if (_book.Index < 1) return;
+            _book.Index --;
+            _getContent();
+        }
+
+        private RelayCommand _nextCommand;
+
+        /// <summary>
+        /// Gets the NextCommand.
+        /// </summary>
+        public RelayCommand NextCommand
+        {
+            get
+            {
+                return _nextCommand
+                    ?? (_nextCommand = new RelayCommand(ExecuteNextCommand));
+            }
+        }
+
+        private void ExecuteNextCommand()
+        {
+            if (_book.Index > ChaptersList.Count - 2) return;
+            _book.Index ++;
+            _getContent();
         }
     }
 }

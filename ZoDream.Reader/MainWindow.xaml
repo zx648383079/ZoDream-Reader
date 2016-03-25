@@ -4,7 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ignore="http://www.galasoft.ch/ignore"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:Custom="http://www.galasoft.ch/mvvmlight" x:Class="ZoDream.Reader.MainWindow"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:custom="http://www.galasoft.ch/mvvmlight"
+        xmlns:controls="clr-namespace:ZoDream.Reader.Controls"
+        x:Class="ZoDream.Reader.MainWindow"
         mc:Ignorable="d ignore"
         Height="400"
         Width="600"
@@ -27,6 +30,7 @@
         <ListBox x:Name="BooksList" Style="{StaticResource BookList}" ItemsSource="{Binding BooksList}">
             <ListBox.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="更新" Icon="&#xe72C;" Command="{Binding UpdateCommand}" CommandParameter="{Binding SelectedIndex, ElementName=BooksList}"/>
                     <MenuItem Header="添加" Icon="&#xE109;" Command="{Binding AddCommand}"/>
                     <MenuItem Header="删除" Icon="&#xE107;" Command="{Binding DeleteCommand}" CommandParameter="{Binding SelectedIndex, ElementName=BooksList}"/>
                     <MenuItem Header="导出" Icon="&#xE159;" Command="{Binding ExportCommand}" CommandParameter="{Binding SelectedIndex, ElementName=BooksList}"/>
@@ -37,9 +41,10 @@
             </ListBox.ContextMenu>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDoubleClick">
-                    <Custom:EventToCommand Command="{Binding ReadCommand}" CommandParameter="{Binding ElementName=BooksList,Path=SelectedIndex}"/>
+                    <custom:EventToCommand Command="{Binding ReadCommand}" CommandParameter="{Binding ElementName=BooksList,Path=SelectedIndex}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ListBox>
+        <controls:Ring Visibility="{Binding RingVisibility}"/>
     </Grid>
 </Window>

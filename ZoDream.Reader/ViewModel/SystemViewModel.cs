@@ -1,4 +1,6 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System;
+using System.Drawing;
+using GalaSoft.MvvmLight;
 
 namespace ZoDream.Reader.ViewModel
 {
@@ -15,6 +17,36 @@ namespace ZoDream.Reader.ViewModel
         /// </summary>
         public SystemViewModel()
         {
+            _loadFont();
+        }
+
+        private void _loadFont()
+        {
+            System.Drawing.Text.InstalledFontCollection font = new System.Drawing.Text.InstalledFontCollection();
+            FontFamilys = font.Families;
+        }
+
+        /// <summary>
+        /// The <see cref="FontFamilys" /> property's name.
+        /// </summary>
+        public const string FontFamilysPropertyName = "FontFamilys";
+
+        private Array _fontFamilys;
+
+        /// <summary>
+        /// Sets and gets the FontFamilys property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public Array FontFamilys
+        {
+            get
+            {
+                return _fontFamilys;
+            }
+            set
+            {
+                Set(FontFamilysPropertyName, ref _fontFamilys, value);
+            }
         }
     }
 }

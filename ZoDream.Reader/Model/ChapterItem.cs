@@ -60,7 +60,7 @@ namespace ZoDream.Reader.Model
         {
             Id = reader.GetInt32(0);
             Name = reader.GetString(1);
-            Url = reader.GetString(2);
+            Url = reader[2].ToString();
         }
     }
 }

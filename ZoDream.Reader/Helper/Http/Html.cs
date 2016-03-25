@@ -6,7 +6,7 @@ using ZoDream.Reader.Model;
 
 namespace ZoDream.Reader.Helper.Http
 {
-    class Html
+    public class Html
     {
         private string _html;
 
@@ -98,14 +98,13 @@ namespace ZoDream.Reader.Helper.Http
         /// </summary>
         /// <param name="replace"></param>
         /// <returns></returns>
-        public Html Replace(string replace)
+        public void Replace(string replace)
         {
             var ms = Regex.Matches(replace, @"([^(=|\|\|)]+)(=([^(=|\|\|)]*))?");
             foreach (Match match in ms)
             {
                 _html = Regex.Replace(_html, match.Groups[1].Value, match.Groups[3].Value, RegexOptions.IgnoreCase);
             }
-            return this;
         }
 
         public List<string> GetLinks()
@@ -141,13 +140,27 @@ namespace ZoDream.Reader.Helper.Http
             return Regex.Match(_html, pattern);
         }
 
-        public string GetText()
+        /// <summary>
+        /// 获取文本
+        /// </summary>
+        /// <param name="replace">自定义的替换</param>
+        /// <returns></returns>
+        public string GetText(string replace = null)
         {  
             _html = ReplaceHtml(_html);
             //替换掉 < 和 > 标记
-            _html = _html.Replace("<", "");
-            _html = _html.Replace(">", "");
-            _html = _html.Replace("/r/n", "");
+            //_html = _html.Replace("<", "");
+            //_html = _html.Replace(">", "");
+            if (!string.IsNullOrWhiteSpace(replace))
+            {
+                Replace(replace);
+            }
+            // 替换被转义的
+            _html = _html.Replace("\\n", "\n");
+            _html = _html.Replace("\\xa1", "\xa1");
+            _html = _html.Replace("\\xa2", "\xa2");
+            _html = _html.Replace("\\xa3", "\xa3");
+            _html = _html.Replace("\\xa9", "\xa9");
             //返回去掉_html标记的字符串
             return _html;
         }

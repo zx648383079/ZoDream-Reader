@@ -96,6 +96,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\System.Data.SQLite\2015\bin\System.Data.SQLite.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
@@ -117,7 +118,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ReadViewer.cs" />
     <Compile Include="Converter\ImageConverter.cs" />
+    <Compile Include="Converter\VisibilityConverter.cs" />
     <Compile Include="Converter\WebsiteConverter.cs" />
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="Helper\DatabaseHelper.cs" />
@@ -129,6 +132,7 @@
     <Compile Include="Helper\Http\UserAgents.cs" />
     <Compile Include="Helper\LocalHelper.cs" />
     <Compile Include="Helper\Local\TxtEncoder.cs" />
+    <Compile Include="Helper\StringHelper.cs" />
     <Compile Include="Helper\UrlHelper.cs" />
     <Compile Include="Model\BookItem.cs" />
     <Compile Include="Model\BookKinds.cs" />
@@ -162,6 +166,9 @@
     </Compile>
     <Compile Include="View\ReadView.xaml.cs">
       <DependentUpon>ReadView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ReadViewerView.xaml.cs">
+      <DependentUpon>ReadViewerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\SystemView.xaml.cs">
       <DependentUpon>SystemView.xaml</DependentUpon>
@@ -199,6 +206,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ReadViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\AddBookView.xaml">
       <SubType>Form</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -212,6 +227,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ReadView.xaml">
+      <SubType>Form</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ReadViewerView.xaml">
       <SubType>Form</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

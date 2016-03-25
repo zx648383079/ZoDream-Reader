@@ -115,6 +115,7 @@ namespace ZoDream.Reader.Helper
                 if (Regex.IsMatch(line, pattern))
                 {
                     WriteTemp(content.ToString(), name);
+                    content.Clear();
                     name = DateTime.Now.ToFileTime().ToString();
                     bookChapters.Add(new ChapterItem(line, name));
                 }

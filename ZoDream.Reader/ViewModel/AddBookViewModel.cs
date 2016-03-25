@@ -296,7 +296,7 @@ namespace ZoDream.Reader.ViewModel
                     {
                         var html = new Html();
                         html.SetUrl(chapter.Url);
-                        LocalHelper.WriteTemp(html.Match(rule.ChapterBegin, rule.ChapterEnd).Replace(rule.Replace).GetText(), chapter.Content);
+                        LocalHelper.WriteTemp(html.Match(rule.ChapterBegin, rule.ChapterEnd).GetText(rule.Replace), chapter.Content);
                     });
                     while (!result.IsCompleted)
                     {
@@ -306,7 +306,6 @@ namespace ZoDream.Reader.ViewModel
                 DbTransaction trans = conn.BeginTransaction();
                 try
                 {
-                    var command = conn.CreateCommand();
                     foreach (var chapter in chapters)
                     {
                         DatabaseHelper.Insert<ChapterItem>(

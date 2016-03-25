@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace ZoDream.Reader.View
 {
@@ -13,6 +14,10 @@ namespace ZoDream.Reader.View
         public ReadView()
         {
             InitializeComponent();
+            Messenger.Default.Send(new NotificationMessageAction(null, () =>
+            {
+                ReadViewer.FirstPage();
+            }), "readViewer");
         }
     }
 }

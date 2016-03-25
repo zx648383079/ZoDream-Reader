@@ -68,7 +68,7 @@ namespace ZoDream.Reader.Helper.Http
 
         private void _setProperty(WebRequest request)
         {
-            request.Timeout = 10000;
+            request.Timeout = 600000;
             var headers = new WebHeaderCollection
             {
                 {HttpRequestHeader.AcceptEncoding, "gzip, deflate"},

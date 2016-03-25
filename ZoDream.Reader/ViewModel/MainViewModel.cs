@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using ZoDream.Reader.Helper;
+using ZoDream.Reader.Helper.Http;
 using ZoDream.Reader.Model;
 using ZoDream.Reader.View;
 
@@ -27,17 +31,26 @@ namespace ZoDream.Reader.ViewModel
         /// </summary>
         public MainViewModel()
         {
-            DatabaseHelper.Open();
-            var reader = DatabaseHelper.Select<BookItem>("*", "ORDER BY Time DESC");
-            while (reader.Read())
+            RingVisibility = Visibility.Visible;
+            Task.Factory.StartNew(() =>
             {
-                if (reader.HasRows)
+                DatabaseHelper.Open();
+                var reader = DatabaseHelper.Select<BookItem>("*", "ORDER BY Time DESC");
+                while (reader.Read())
                 {
-                    BooksList.Add(new BookItem(reader));
+                    if (reader.HasRows)
+                    {
+                        var item = new BookItem(reader);
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            BooksList.Add(item);
+                        });
+                    }
                 }
-            }
-            reader.Close();
-            DatabaseHelper.Close();
+                reader.Close();
+                DatabaseHelper.Close();
+                RingVisibility = Visibility.Collapsed;
+            });
         }
 
         /// <summary>
@@ -63,6 +76,28 @@ namespace ZoDream.Reader.ViewModel
             }
         }
 
+        /// <summary>
+        /// The <see cref="RingVisibility" /> property's name.
+        /// </summary>
+        public const string RingVisibilityPropertyName = "RingVisibility";
+
+        private Visibility _ringVisibility = Visibility.Collapsed;
+
+        /// <summary>
+        /// Sets and gets the RingVisibily property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public Visibility RingVisibility
+        {
+            get
+            {
+                return _ringVisibility;
+            }
+            set
+            {
+                Set(RingVisibilityPropertyName, ref _ringVisibility, value);
+            }
+        }
 
         private RelayCommand _addCommand;
 
@@ -83,7 +118,10 @@ namespace ZoDream.Reader.ViewModel
             new AddBookView().Show();
             Messenger.Default.Send(new NotificationMessageAction<BookItem>(null, item =>
             {
-                 BooksList.Add(item);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    BooksList.Add(item);
+                });
             }), "book");
         }
 
@@ -104,14 +142,22 @@ namespace ZoDream.Reader.ViewModel
         private void ExecuteDeleteCommand(int index)
         {
             if (index < 0 || index >= BooksList.Count) return;
-            DatabaseHelper.Open();
-            var row = DatabaseHelper.Delete<BookItem>($"Id = {BooksList[index].Id}");
-            DatabaseHelper.Delete<ChapterItem>($"BookId = {BooksList[index].Id}");
-            DatabaseHelper.Close();
-            if (row > 0)
+            RingVisibility = Visibility.Visible;
+            Task.Factory.StartNew(() =>
             {
-                BooksList.RemoveAt(index);
-            }
+                DatabaseHelper.Open();
+                var row = DatabaseHelper.Delete<BookItem>($"Id = {BooksList[index].Id}");
+                DatabaseHelper.Delete<ChapterItem>($"BookId = {BooksList[index].Id}");
+                DatabaseHelper.Close();
+                if (row > 0)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        BooksList.RemoveAt(index);
+                    });
+                }
+                RingVisibility = Visibility.Collapsed;
+            });
         }
 
         private RelayCommand _websiteCommand;
@@ -168,6 +214,7 @@ namespace ZoDream.Reader.ViewModel
 
         private void ExecuteSystemCommand()
         {
+            //new ReadViewerView().Show();
             new SystemView().Show();
         }
 
@@ -221,6 +268,7 @@ namespace ZoDream.Reader.ViewModel
         private void ExecuteExportCommand(int index)
         {
             if (index < 0 || index >= BooksList.Count) return;
+            RingVisibility = Visibility.Visible;
             var file = LocalHelper.ChooseSaveFile(BooksList[index].Name);
             if (file == null) return;
             Task.Factory.StartNew(() =>
@@ -240,6 +288,71 @@ namespace ZoDream.Reader.ViewModel
                 reader.Close();
                 writer.Close();
                 DatabaseHelper.Close();
+                RingVisibility = Visibility.Collapsed;
+            });
+        }
+
+        private RelayCommand<int> _updateCommand;
+
+        /// <summary>
+        /// Gets the UpdateCommand.
+        /// </summary>
+        public RelayCommand<int> UpdateCommand
+        {
+            get
+            {
+                return _updateCommand
+                    ?? (_updateCommand = new RelayCommand<int>(ExecuteUpdateCommand));
+            }
+        }
+
+        private void ExecuteUpdateCommand(int index)
+        {
+            if (index < 0 || index >= BooksList.Count || BooksList[index].Source == BookSources.本地) return;
+            RingVisibility = Visibility.Visible;
+            Task.Factory.StartNew(() =>
+            {
+                var item = BooksList[index];
+                var conn = DatabaseHelper.Open();
+                var rule = DatabaseHelper.GetRule(item.Url);
+                var chapters = HttpHelper.GetChapters(item, rule, new Html().SetUrl(item.Url));
+                var length = chapters.Count;
+                if (item.Count < length)
+                {
+                    var result = Parallel.For((long) item.Count, length, i =>
+                    {
+                        var chapter = chapters[Convert.ToInt32(i)];
+                        var html = new Html();
+                        html.SetUrl(chapter.Url);
+                        LocalHelper.WriteTemp(html.Match(rule.ChapterBegin, rule.ChapterEnd).GetText(rule.Replace), chapter.Content);
+                    });
+                    while (!result.IsCompleted)
+                    {
+                        Thread.Sleep(1000);
+                    }
+                    DbTransaction trans = conn.BeginTransaction();
+                    try
+                    {
+                        for (var i = item.Count; i < length; i++)
+                        {
+                            var chapter = chapters[i];
+                            DatabaseHelper.Insert<ChapterItem>(
+                                "Name, Content, BookId, Url",
+                                "@Name, @Content, @BookId, @Url",
+                                new SQLiteParameter("@Name", chapter.Name),
+                                new SQLiteParameter("@Content", LocalHelper.ReadTemp(chapter.Content)),
+                                new SQLiteParameter("@BookId", item.Id),
+                                new SQLiteParameter("@Url", chapter.Url));
+                        }
+                        trans.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        trans.Rollback();
+                    }
+                }
+                DatabaseHelper.Close();
+                RingVisibility = Visibility.Collapsed;
             });
         }
 
