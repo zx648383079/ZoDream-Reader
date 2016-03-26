@@ -127,11 +127,11 @@
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Foreground" TargetName="MenuIcon" Value="#fc0"/>
-                        </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" TargetName="MenuIcon" Value="#fff"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Foreground" TargetName="MenuIcon" Value="#ff0"/>
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>

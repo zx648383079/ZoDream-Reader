@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Data.SQLite;
+using System.Speech.Synthesis;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
@@ -367,6 +368,47 @@ namespace ZoDream.Reader.ViewModel
             if (result == true)
             {
                 _reset();
+            }
+        }
+
+        private readonly SpeechSynthesizer _speecher = new SpeechSynthesizer();
+
+
+        /// <summary>
+            /// The <see cref="Speech" /> property's name.
+            /// </summary>
+        public const string SpeechPropertyName = "Speech";
+
+        private bool _speech = false;
+
+        /// <summary>
+        /// Sets and gets the Speech property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool Speech
+        {
+            get
+            {
+                return _speech;
+            }
+            set
+            {
+                Set(SpeechPropertyName, ref _speech, value);
+                _changedSpeech();
+            }
+        }
+
+        private void _changedSpeech()
+        {
+            if (Speech)
+            {
+                var content = ((Run)((Paragraph)Content.Blocks.FirstBlock).Inlines.FirstInline).Text;
+                _speecher.SelectVoiceByHints(VoiceGender.Female);
+                _speecher.SpeakAsync(content);
+            }
+            else
+            {
+                _speecher.SpeakAsyncCancelAll();
             }
         }
     }
