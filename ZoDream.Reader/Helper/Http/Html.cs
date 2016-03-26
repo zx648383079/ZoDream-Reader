@@ -32,15 +32,31 @@ namespace ZoDream.Reader.Helper.Http
         /// </summary>
         /// <param name="pattern"></param>
         /// <returns></returns>
-        public Html Match(string pattern)
+        public Html Narrow(string pattern)
         {
             _html = Regex.Match(_html, pattern).Value;
             return this;
         }
 
-        public Html Match(string begin, string end)
+        /// <summary>
+        /// 缩小范围
+        /// </summary>
+        /// <param name="begin"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public Html Narrow(string begin, string end)
         {
-            return Match(begin + @"[\s\S]+?" + end);
+            return Narrow(begin + @"[\s\S]+?" + end);
+        }
+
+        public bool IsMatch(string pattern)
+        {
+            return Regex.IsMatch(_html, pattern);
+        }
+
+        public Match Match(string pattern)
+        {
+            return Regex.Match(_html, pattern, RegexOptions.IgnoreCase);
         }
 
         public MatchCollection Matches(string pattern)
@@ -50,12 +66,12 @@ namespace ZoDream.Reader.Helper.Http
 
         public string GetMatch(string pattern, string tag)
         {
-            return Regex.Match(_html, pattern).Groups[tag].Value;
+            return Match(pattern).Groups[tag].Value;
         }
 
         public string GetMatch(string pattern, int tag)
         {
-            return Regex.Match(_html, pattern).Groups[tag].Value;
+            return Match(pattern).Groups[tag].Value;
         }
 
         public string GetCover(string begin, string end)

@@ -27,7 +27,7 @@ namespace ZoDream.Reader.Helper
         {
             var chapters = new List<ChapterItem>(); ;
             var ms =
-                html.Match(rule.CatalogBegin, rule.CatalogEnd)
+                html.Narrow(rule.CatalogBegin, rule.CatalogEnd)
                     .Matches(@"<a[^<>]+?href=""?(?<href>[^""<>\s]+)[^<>]*>(?<title>[\s\S]+?)</a>");
             foreach (Match match in ms)
             {

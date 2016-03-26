@@ -32,7 +32,14 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="背景色："/>
-        <TextBox x:Name="Backgroud" Text="{Binding Background}" Grid.Row="0" Grid.Column="1"/>
+        <Grid  Grid.Row="0" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="Backgroud" Text="{Binding Background}"/>
+            <Button Grid.Column="1" Content="..." Command="{Binding OpenCommand}"/>
+        </Grid>
         <TextBlock Text="字体：" Grid.Row="1" Grid.Column="0" />
         <ComboBox x:Name="FontFamily" Grid.Column="1" SelectedItem="{Binding FontFamily}" Grid.Row="1" ItemsSource="{Binding FontFamilys}" DisplayMemberPath="Name"/>
         <TextBlock Text="字号：" Grid.Row="2" Grid.Column="0" />
@@ -43,7 +50,7 @@
         <TextBox x:Name="Color" Text="{Binding Foreground}" Grid.Column="1" Grid.Row="4"/>
         <TextBox Style="{StaticResource TextArea}" AcceptsReturn="True" AcceptsTab="True" 
                  Grid.Row="5" Text="111111111111111" 
-                 Background="{Binding ElementName=Backgroud,Path=Text}" 
+                 Background="{Binding ElementName=Backgroud,Path=Text,Converter={StaticResource BackgroundConverter}}" 
                  FontFamily="{Binding ElementName=FontFamily,Path=Text}"
                  FontSize="{Binding ElementName=FontSize,Path=Text}"
                  FontWeight="{Binding ElementName=FontWeight,Path=Text}"

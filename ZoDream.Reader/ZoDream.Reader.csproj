@@ -119,6 +119,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\ReadViewer.cs" />
+    <Compile Include="Converter\BackgroundConverter.cs" />
     <Compile Include="Converter\ImageConverter.cs" />
     <Compile Include="Converter\VisibilityConverter.cs" />
     <Compile Include="Converter\WebsiteConverter.cs" />

@@ -324,7 +324,7 @@ namespace ZoDream.Reader.ViewModel
                         var chapter = chapters[Convert.ToInt32(i)];
                         var html = new Html();
                         html.SetUrl(chapter.Url);
-                        LocalHelper.WriteTemp(html.Match(rule.ChapterBegin, rule.ChapterEnd).GetText(rule.Replace), chapter.Content);
+                        LocalHelper.WriteTemp(html.Narrow(rule.ChapterBegin, rule.ChapterEnd).GetText(rule.Replace), chapter.Content);
                     });
                     while (!result.IsCompleted)
                     {

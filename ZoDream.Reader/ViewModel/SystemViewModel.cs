@@ -185,6 +185,30 @@ namespace ZoDream.Reader.ViewModel
             }
         }
 
+        private RelayCommand _openCommand;
+
+        /// <summary>
+        /// Gets the OpenCommand.
+        /// </summary>
+        public RelayCommand OpenCommand
+        {
+            get
+            {
+                return _openCommand
+                    ?? (_openCommand = new RelayCommand(ExecuteOpenCommand));
+            }
+        }
+
+        private void ExecuteOpenCommand()
+        {
+            var file = LocalHelper.ChooseFile("图片|*.jpg;*.jpeg;*.png;*.bmp");
+            if (string.IsNullOrEmpty(file))
+            {
+                return;
+            }
+            Background = file;
+        }
+
         private RelayCommand _saveCommand;
 
         /// <summary>
