@@ -215,7 +215,7 @@ namespace ZoDream.Reader.ViewModel
         private void ExecuteSystemCommand()
         {
             //new ReadViewerView().Show();
-            new SystemView().Show();
+            new SystemView().ShowDialog();
         }
 
 

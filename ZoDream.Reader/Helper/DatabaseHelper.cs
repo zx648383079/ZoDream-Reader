@@ -36,18 +36,21 @@ namespace ZoDream.Reader.Helper
 
         public static void Init()
         {
-            //SqLiteHelper2.CreateCommand(
+            //SqLiteHelper.CreateCommand(
             //    "CREATE TABLE IF NOT EXISTS BookItem ( Id INTEGER PRIMARY KEY AUTOINCREMENT, Name VARCHAR(100) UNIQUE, Image VARCHAR(100), Description VARCHAR(255), Author VARCHAR(45), Source VARCHAR(20) DEFAULT '本地', Kind VARCHAR(45) DEFAULT '其他', Url VARCHAR(255), `Index` INT DEFAULT 0, Count INT, Time DATETIME);"
             //    ).ExecuteNonQuery();
-            //SqLiteHelper2.CreateCommand(
+            //SqLiteHelper.CreateCommand(
             //    "CREATE TABLE IF NOT EXISTS ChapterItem (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name VARCHAR(100), Content TEXT NULL, BookId INT, Url VARCHAR(255));"
             //    ).ExecuteNonQuery();
-            //SqLiteHelper2.CreateCommand(
+            //SqLiteHelper.CreateCommand(
             //    "CREATE TABLE IF NOT EXISTS WebsiteItem (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name VARCHAR(100) UNIQUE, Url VARCHAR(255) UNIQUE);"
             //    ).ExecuteNonQuery();
-            //SqLiteHelper2.CreateCommand(
+            //SqLiteHelper.CreateCommand(
             //    "CREATE TABLE IF NOT EXISTS WebRuleItem (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name VARCHAR(100) UNIQUE, Url VARCHAR(255) UNIQUE, CatalogBegin VARCHAR(100), CatalogEnd VARCHAR(100), ChapterBegin VARCHAR(100), ChapterEnd VARCHAR(100), Replace TEXT NULL, AuthorBegin VARCHAR(100), AuthorEnd VARCHAR(100), DescriptionBegin VARCHAR(100), DescriptionEnd VARCHAR(100), CoverBegin VARCHAR(100), CoverEnd VARCHAR(100));"
             //    ).ExecuteNonQuery();
+            SqLiteHelper.CreateCommand(
+                "CREATE TABLE IF NOT EXISTS OptionItem (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name VARCHAR(100) UNIQUE, Value Text);"
+                ).ExecuteNonQuery();
         }
 
         public static SQLiteConnection Open()

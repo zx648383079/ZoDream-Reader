@@ -49,7 +49,6 @@
     </Style>
 
     <Style TargetType="FlowDocumentPageViewer">
-        <Setter Property="MaxZoom" Value="700"/>
     </Style>
 
     <Style x:Key="BookList" TargetType="ListBox">
@@ -94,7 +93,7 @@
                                     <Storyboard>
                                         <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"  Storyboard.TargetProperty="(FrameworkElement.Width)">
                                             <SplineDoubleKeyFrame KeyTime="00:00:00.0020000" Value="0"/>
-                                            <SplineDoubleKeyFrame KeyTime="00:00:00.3450000" Value="120"/>
+                                            <SplineDoubleKeyFrame KeyTime="00:00:00.3450000" Value="150"/>
                                         </DoubleAnimationUsingKeyFrames>
                                         <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"  Storyboard.TargetProperty="(FrameworkElement.Height)">
                                             <SplineDoubleKeyFrame KeyTime="00:00:00.0020000" Value="0"/>

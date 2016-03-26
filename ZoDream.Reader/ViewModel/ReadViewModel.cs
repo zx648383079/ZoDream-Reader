@@ -4,12 +4,14 @@ using System.Data.SQLite;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Media;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using ZoDream.Reader.Helper;
 using ZoDream.Reader.Helper.Http;
 using ZoDream.Reader.Model;
+using ZoDream.Reader.View;
 
 namespace ZoDream.Reader.ViewModel
 {
@@ -23,7 +25,7 @@ namespace ZoDream.Reader.ViewModel
     {
         private NotificationMessageAction<BookItem> _readItem;
 
-        private NotificationMessageAction _readViewer;
+        private NotificationMessageAction<int> _readViewer;
 
         private BookItem _book;
         /// <summary>
@@ -31,7 +33,7 @@ namespace ZoDream.Reader.ViewModel
         /// </summary>
         public ReadViewModel()
         {
-            Messenger.Default.Register<NotificationMessageAction>(this, "readViewer", m =>
+            Messenger.Default.Register<NotificationMessageAction<int>>(this, "readViewer", m =>
             {
                 _readViewer = m;
             });
@@ -49,6 +51,7 @@ namespace ZoDream.Reader.ViewModel
             Task.Factory.StartNew(() =>
             {
                 DatabaseHelper.Open();
+                SystemHelper.Open();
                 var reader = DatabaseHelper.Select<ChapterItem>("Id,Name,Url", $"WHERE BookId = {_book.Id}");
                 while (reader.Read())
                 {
@@ -84,9 +87,9 @@ namespace ZoDream.Reader.ViewModel
         {
             var paragraph = new Paragraph();
             paragraph.Inlines.Add(new Run(content));
-            Content.Blocks.Clear();
+            Content = new FlowDocument();
+            _reset();
             Content.Blocks.Add(paragraph);
-            _readViewer.Execute();
         }
 
         private void _getContent()
@@ -99,6 +102,15 @@ namespace ZoDream.Reader.ViewModel
                 DatabaseHelper.Close();
                 RingVisibility = Visibility.Collapsed;
             });
+        }
+
+        private void _reset()
+        {
+            Content.FontFamily = SystemHelper.GetFontFamily("FontFamily");
+            Content.Background = SystemHelper.GetBrush("Background");
+            Content.FontSize = SystemHelper.GetInt("FontSize");
+            Content.FontWeight = SystemHelper.GetFontWeight("FontWeight");
+            Content.Foreground = new SolidColorBrush(SystemHelper.GetColor("Foreground"));
         }
 
         /// <summary>
@@ -129,7 +141,7 @@ namespace ZoDream.Reader.ViewModel
         /// </summary>
         public const string ContentPropertyName = "Content";
 
-        private FlowDocument _content = new FlowDocument();
+        private FlowDocument _content;
 
         /// <summary>
         /// Sets and gets the Content property.
@@ -313,6 +325,49 @@ namespace ZoDream.Reader.ViewModel
             if (_book.Index > ChaptersList.Count - 2) return;
             _book.Index ++;
             _getContent();
+        }
+
+        private RelayCommand _openWebCommand;
+
+        /// <summary>
+        /// Gets the OpenWebCommand.
+        /// </summary>
+        public RelayCommand OpenWebCommand
+        {
+            get
+            {
+                return _openWebCommand
+                    ?? (_openWebCommand = new RelayCommand(ExecuteOpenWebCommand));
+            }
+        }
+
+        private void ExecuteOpenWebCommand()
+        {
+            if (_book.Source == BookSources.本地) return;
+            LocalHelper.OpenBrowser(ChaptersList[_book.Index].Url);
+        }
+
+        private RelayCommand _systemCommand;
+
+        /// <summary>
+        /// Gets the SystemCommand.
+        /// </summary>
+        public RelayCommand SystemCommand
+        {
+            get
+            {
+                return _systemCommand
+                    ?? (_systemCommand = new RelayCommand(ExecuteSystemCommand));
+            }
+        }
+
+        private void ExecuteSystemCommand()
+        {
+            var result = new SystemView().ShowDialog();
+            if (result == true)
+            {
+                _reset();
+            }
         }
     }
 }

@@ -155,5 +155,15 @@ namespace ZoDream.Reader.Helper
             File.Delete(file);
             return content;
         }
+
+        public static bool OpenBrowser(string url)
+        {
+            var key = Registry.ClassesRoot.OpenSubKey(@"http\shell\open\command\");
+            if (key == null) return false;
+            var s = key.GetValue("").ToString();
+            string browserpath = null;
+            browserpath = s.StartsWith("\"") ? s.Substring(1, s.IndexOf('\"', 1) - 1) : s.Substring(0, s.IndexOf(" ", StringComparison.Ordinal));
+            return Process.Start(browserpath, url) != null;
+        }
     }
 }

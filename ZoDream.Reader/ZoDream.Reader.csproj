@@ -133,6 +133,7 @@
     <Compile Include="Helper\LocalHelper.cs" />
     <Compile Include="Helper\Local\TxtEncoder.cs" />
     <Compile Include="Helper\StringHelper.cs" />
+    <Compile Include="Helper\SystemHelper.cs" />
     <Compile Include="Helper\UrlHelper.cs" />
     <Compile Include="Model\BookItem.cs" />
     <Compile Include="Model\BookKinds.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="Model\DataItem.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
+    <Compile Include="Model\OptionItem.cs" />
     <Compile Include="Model\WebRuleItem.cs" />
     <Compile Include="Model\WebsiteItem.cs" />
     <Compile Include="Controls\Ring.xaml.cs">

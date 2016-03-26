@@ -14,9 +14,10 @@ namespace ZoDream.Reader.View
         public ReadView()
         {
             InitializeComponent();
-            Messenger.Default.Send(new NotificationMessageAction(null, () =>
+            Messenger.Default.Send(new NotificationMessageAction<int>(null, index =>
             {
-                ReadViewer.FirstPage();
+                if (!ReadViewer.CanGoToPage(index)) return;
+                ReadViewer.GoToPage(index);
             }), "readViewer");
         }
     }

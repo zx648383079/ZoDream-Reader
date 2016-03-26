@@ -43,6 +43,8 @@
                     <MenuItem Header="全选" Icon="&#xe8b3;" Command="{StaticResource SelectAll}" CommandTarget="{Binding ElementName=ReadViewer}"/>
                     <MenuItem Header="更新" Icon="&#xe72C;" Command="{Binding UpdateCommand}"/>
                     <MenuItem x:Name="ShowLists" Icon="&#xe299;" Header="章节" IsCheckable="True" IsChecked="False"/>
+                    <MenuItem Header="浏览器" Icon="&#xe909;" Command="{Binding OpenWebCommand}"/>
+                    <MenuItem Header="设置" Icon="&#xE115;" Command="{Binding SystemCommand}"/>
                 </ContextMenu>
             </FlowDocumentPageViewer.ContextMenu>
         </FlowDocumentPageViewer>
