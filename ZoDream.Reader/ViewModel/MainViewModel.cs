@@ -35,19 +35,26 @@ namespace ZoDream.Reader.ViewModel
             Task.Factory.StartNew(() =>
             {
                 DatabaseHelper.Open();
-                var reader = DatabaseHelper.Select<BookItem>("*", "ORDER BY Time DESC");
-                while (reader.Read())
+                try
                 {
-                    if (reader.HasRows)
+                    var reader = DatabaseHelper.Select<BookItem>("*", "ORDER BY Time DESC");
+                    while (reader.Read())
                     {
-                        var item = new BookItem(reader);
-                        Application.Current.Dispatcher.Invoke(() =>
+                        if (reader.HasRows)
                         {
-                            BooksList.Add(item);
-                        });
+                            var item = new BookItem(reader);
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                BooksList.Add(item);
+                            });
+                        }
                     }
+                    reader.Close();
                 }
-                reader.Close();
+                catch (Exception)
+                {
+                    DatabaseHelper.Init();
+                }
                 DatabaseHelper.Close();
                 RingVisibility = Visibility.Collapsed;
             });
