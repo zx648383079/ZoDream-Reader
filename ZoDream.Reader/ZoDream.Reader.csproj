@@ -130,6 +130,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="ZoDream.Helper">
+      <HintPath>..\..\WPF-ZoDream\ZoDream.Helper\ZoDream.Helper\bin\Debug\ZoDream.Helper.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -137,21 +140,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\ReadViewer.cs" />
-    <Compile Include="Converter\BackgroundConverter.cs" />
     <Compile Include="Converter\ImageConverter.cs" />
-    <Compile Include="Converter\VisibilityConverter.cs" />
     <Compile Include="Converter\WebsiteConverter.cs" />
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="Helper\DatabaseHelper.cs" />
     <Compile Include="Helper\Database\SqLiteHelper.cs" />
     <Compile Include="Helper\HttpHelper.cs" />
-    <Compile Include="Helper\Http\Accepts.cs" />
-    <Compile Include="Helper\Http\Html.cs" />
-    <Compile Include="Helper\Http\Request.cs" />
-    <Compile Include="Helper\Http\UserAgents.cs" />
     <Compile Include="Helper\LocalHelper.cs" />
-    <Compile Include="Helper\Local\TxtEncoder.cs" />
-    <Compile Include="Helper\StringHelper.cs" />
     <Compile Include="Helper\SystemHelper.cs" />
     <Compile Include="Helper\UrlHelper.cs" />
     <Compile Include="Model\BookItem.cs" />

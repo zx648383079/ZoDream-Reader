@@ -10,9 +10,10 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using ZoDream.Reader.Helper;
-using ZoDream.Reader.Helper.Http;
 using ZoDream.Reader.Model;
 using ZoDream.Reader.View;
+using ZoDream.Helper.Http;
+using ZoDream.Helper.Local;
 
 namespace ZoDream.Reader.ViewModel
 {
@@ -345,7 +346,7 @@ namespace ZoDream.Reader.ViewModel
         private void ExecuteOpenWebCommand()
         {
             if (_book.Source == BookSources.本地) return;
-            LocalHelper.OpenBrowser(ChaptersList[_book.Index].Url);
+            Open.OpenBrowser(ChaptersList[_book.Index].Url);
         }
 
         private RelayCommand _systemCommand;

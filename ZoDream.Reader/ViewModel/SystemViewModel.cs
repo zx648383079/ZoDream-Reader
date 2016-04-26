@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using ZoDream.Reader.Helper;
 using ZoDream.Reader.Model;
+using ZoDream.Helper.Local;
 
 namespace ZoDream.Reader.ViewModel
 {
@@ -201,7 +202,7 @@ namespace ZoDream.Reader.ViewModel
 
         private void ExecuteOpenCommand()
         {
-            var file = LocalHelper.ChooseFile("图片|*.jpg;*.jpeg;*.png;*.bmp");
+            var file = Open.ChooseFile("图片|*.jpg;*.jpeg;*.png;*.bmp");
             if (string.IsNullOrEmpty(file))
             {
                 return;

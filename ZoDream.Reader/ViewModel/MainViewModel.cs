@@ -11,9 +11,10 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using ZoDream.Reader.Helper;
-using ZoDream.Reader.Helper.Http;
 using ZoDream.Reader.Model;
 using ZoDream.Reader.View;
+using ZoDream.Helper.Local;
+using ZoDream.Helper.Http;
 
 namespace ZoDream.Reader.ViewModel
 {
@@ -276,7 +277,7 @@ namespace ZoDream.Reader.ViewModel
         {
             if (index < 0 || index >= BooksList.Count) return;
             RingVisibility = Visibility.Visible;
-            var file = LocalHelper.ChooseSaveFile(BooksList[index].Name);
+            var file = Open.ChooseSaveFile(BooksList[index].Name);
             if (file == null) return;
             Task.Factory.StartNew(() =>
             {

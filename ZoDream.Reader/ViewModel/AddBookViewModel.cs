@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,11 +9,11 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using ZoDream.Reader.Helper;
-using ZoDream.Reader.Helper.Database;
-using ZoDream.Reader.Helper.Http;
 using ZoDream.Reader.Model;
 using System.Data.Common;
 using System.Diagnostics;
+using ZoDream.Helper.Http;
+using ZoDream.Helper.Local;
 
 namespace ZoDream.Reader.ViewModel
 {
@@ -348,7 +346,7 @@ namespace ZoDream.Reader.ViewModel
 
         private void ExecuteOpenCommand()
         {
-            var file = LocalHelper.ChooseFile();
+            var file = Open.ChooseFile();
             if (string.IsNullOrEmpty(file))
             {
                 return;

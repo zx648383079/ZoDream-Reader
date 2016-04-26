@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using ZoDream.Reader.Helper.Http;
+using ZoDream.Helper.Http;
 using ZoDream.Reader.Model;
 
 namespace ZoDream.Reader.Helper

@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using ZoDream.Reader.Helper.Database;
 using ZoDream.Reader.Model;
 
@@ -27,7 +21,7 @@ namespace ZoDream.Reader.Helper
                     dir = "x86";
                     break;
             }
-            var files = LocalHelper.GetAllFile(AppDomain.CurrentDomain.BaseDirectory + "\\" + dir);
+            var files = ZoDream.Helper.Local.Open.GetAllFile(AppDomain.CurrentDomain.BaseDirectory + "\\" + dir);
             foreach (var file in files)
             {
                 File.Copy(file, file.Replace($"\\{dir}", ""), true);
