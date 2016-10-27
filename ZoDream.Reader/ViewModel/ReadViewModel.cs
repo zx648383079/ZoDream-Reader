@@ -271,9 +271,10 @@ namespace ZoDream.Reader.ViewModel
                 DatabaseHelper.Open();
                 var rule = DatabaseHelper.GetRule(_book.Url);
                 var chapter = ChaptersList[_book.Index];
-                var html = new Html();
+                var html = new HtmlExpand();
                 html.SetUrl(chapter.Url);
-                var content = html.Narrow(rule.ChapterBegin, rule.ChapterEnd).GetText(rule.Replace);
+                html.Narrow(rule.ChapterBegin, rule.ChapterEnd);
+                var content = html.GetText(rule.Replace);
                 DatabaseHelper.Update<ChapterItem>(
                     "Content = @content", 
                     $"Id = {chapter.Id}",

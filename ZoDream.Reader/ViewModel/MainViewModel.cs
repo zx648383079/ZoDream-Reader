@@ -323,16 +323,17 @@ namespace ZoDream.Reader.ViewModel
                 var item = BooksList[index];
                 var conn = DatabaseHelper.Open();
                 var rule = DatabaseHelper.GetRule(item.Url);
-                var chapters = HttpHelper.GetChapters(item, rule, new Html().SetUrl(item.Url));
+                var chapters = HttpHelper.GetChapters(item, rule, (HtmlExpand)new HtmlExpand().SetUrl(item.Url));
                 var length = chapters.Count;
                 if (item.Count < length)
                 {
                     var result = Parallel.For((long) item.Count, length, i =>
                     {
                         var chapter = chapters[Convert.ToInt32(i)];
-                        var html = new Html();
+                        var html = new HtmlExpand();
                         html.SetUrl(chapter.Url);
-                        LocalHelper.WriteTemp(html.Narrow(rule.ChapterBegin, rule.ChapterEnd).GetText(rule.Replace), chapter.Content);
+                        LocalHelper.WriteTemp(
+                            ((HtmlExpand)html.Narrow(rule.ChapterBegin, rule.ChapterEnd)).GetText(rule.Replace), chapter.Content);
                     });
                     while (!result.IsCompleted)
                     {

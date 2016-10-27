@@ -60,7 +60,6 @@ namespace ZoDream.Reader.Helper
             var writer = new StreamWriter(fs, Encoding.UTF8);
             writer.Write(content);
             writer.Close();
-            fs.Close();
         }
 
         public static string ReadTemp(string name)
@@ -69,8 +68,16 @@ namespace ZoDream.Reader.Helper
             var reader = new StreamReader(file, Encoding.UTF8);
             var content = reader.ReadToEnd();
             reader.Close();
-            File.Delete(file);
+            //File.Delete(file);
             return content;
+        }
+
+        public static void WriteLog(string message)
+        {
+            var fs = new FileStream(TempDir + "log.txt", FileMode.Append);
+            var writer = new StreamWriter(fs, Encoding.UTF8);
+            writer.WriteLine(message);
+            writer.Close();
         }
     }
 }

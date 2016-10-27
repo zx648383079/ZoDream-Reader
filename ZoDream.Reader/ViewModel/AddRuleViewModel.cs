@@ -25,7 +25,20 @@ namespace ZoDream.Reader.ViewModel
                 _addItem = m;
                 if (m.Sender != null)
                 {
-                    
+                    WebRuleItem item = m.Sender as WebRuleItem;
+                    Name = item.Name;
+                    Url = item.Url;
+                    CatalogBegin = item.CatalogBegin;
+                    CatalogEnd = item.CatalogEnd;
+                    ChapterBegin = item.ChapterBegin;
+                    ChapterEnd = item.ChapterEnd;
+                    Replace = item.Replace;
+                    AuthorBegin = item.AuthorBegin;
+                    AuthorEnd = item.AuthorEnd;
+                    DescriptionBegin = item.DescriptionBegin;
+                    DescriptionEnd = item.DescriptionEnd;
+                    CoverBegin = item.CoverBegin;
+                    CoverEnd = item.CoverEnd;
                 }
             });
         }

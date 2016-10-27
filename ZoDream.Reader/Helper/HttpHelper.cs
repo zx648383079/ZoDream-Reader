@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using ZoDream.Helper.Http;
 using ZoDream.Reader.Model;
 
 namespace ZoDream.Reader.Helper
@@ -9,19 +8,28 @@ namespace ZoDream.Reader.Helper
     {
         public static List<ChapterItem> GetBook(ref BookItem item, WebRuleItem rule)
         {
-            var html = new Html();
+            var html = new HtmlExpand();
             html.SetUrl(item.Url);
-            item.Image = html.GetCover(rule.CoverBegin, rule.CoverEnd);
-            item.Author = html.GetAuthor(rule.AuthorBegin, rule.AuthorEnd);
-            item.Description = html.GetDescription(rule.DescriptionBegin, rule.DescriptionEnd);
+            if (!string.IsNullOrWhiteSpace(rule.CoverBegin) || !string.IsNullOrWhiteSpace(rule.CoverEnd))
+            {
+                item.Image = html.GetCover(rule.CoverBegin, rule.CoverEnd);
+            }
+            if (!string.IsNullOrWhiteSpace(rule.AuthorBegin) || !string.IsNullOrWhiteSpace(rule.AuthorEnd))
+            {
+                item.Author = html.GetAuthor(rule.AuthorBegin, rule.AuthorEnd);
+            }
+            if (!string.IsNullOrWhiteSpace(rule.DescriptionBegin) || !string.IsNullOrWhiteSpace(rule.DescriptionEnd))
+            {
+                item.Description = html.GetDescription(rule.DescriptionBegin, rule.DescriptionEnd);
+            }
             var chapters = GetChapters(item, rule, html);
             item.Count = chapters.Count;
             return chapters;
         }
 
-        public static List<ChapterItem> GetChapters(BookItem item, WebRuleItem rule, Html html)
+        public static List<ChapterItem> GetChapters(BookItem item, WebRuleItem rule, HtmlExpand html)
         {
-            var chapters = new List<ChapterItem>(); ;
+            var chapters = new List<ChapterItem>();
             var ms =
                 html.Narrow(rule.CatalogBegin, rule.CatalogEnd)
                     .Matches(@"<a[^<>]+?href=""?(?<href>[^""<>\s]+)[^<>]*>(?<title>[\s\S]+?)</a>");

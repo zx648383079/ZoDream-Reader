@@ -14,6 +14,8 @@ using System.Data.Common;
 using System.Diagnostics;
 using ZoDream.Helper.Http;
 using ZoDream.Helper.Local;
+using System.IO;
+using System.Text;
 
 namespace ZoDream.Reader.ViewModel
 {
@@ -239,68 +241,111 @@ namespace ZoDream.Reader.ViewModel
         {
             if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Url)) return;
             RingVisibility = Visibility.Visible;
-            
             Task.Factory.StartNew(() =>
             {
-                var item = new BookItem(Name, Source, Kind, Url);
-                var conn = DatabaseHelper.Open();
-                var count = DatabaseHelper.Find<BookItem>("count(Name)", "Name = @name", new SQLiteParameter("@name", item.Name));
-                if (Convert.ToInt32(count) > 0)
+                _begin();
+            });
+        }
+
+        private void _begin()
+        {
+            var item = new BookItem(Name, Source, Kind, Url);
+            var conn = DatabaseHelper.Open();
+            var count = DatabaseHelper.Find<BookItem>("count(Name)", "Name = @name", new SQLiteParameter("@name", item.Name));
+            if (Convert.ToInt32(count) > 0)
+            {
+                DatabaseHelper.Close();
+                _showMessage("书名存在，请更改！");
+                RingVisibility = Visibility.Collapsed;
+                return;
+            }
+            var chapters = new List<ChapterItem>();
+
+            var watch = new Stopwatch();
+            watch.Start();
+            var rule = new WebRuleItem();
+            if (item.Source == BookSources.网络)
+            {
+                rule = DatabaseHelper.GetRule(item.Url);
+                if (rule == null)
                 {
                     DatabaseHelper.Close();
-                    _showMessage("书名存在，请更改！");
+                    _showMessage("网站规则不存在，请添加！");
                     RingVisibility = Visibility.Collapsed;
+                    watch.Stop();
                     return;
                 }
-                var chapters = new List<ChapterItem>();
-                
-                var watch = new Stopwatch();
-                watch.Start();
-                WebRuleItem rule = new WebRuleItem();
-                if (item.Source == BookSources.网络)
-                {
-                    rule = DatabaseHelper.GetRule(item.Url);
-                    if (rule == null)
-                    {
-                        DatabaseHelper.Close();
-                        _showMessage("网站规则不存在，请添加！");
-                        RingVisibility = Visibility.Collapsed;
-                        watch.Stop();
-                        return;
-                    }
-                    chapters.AddRange(HttpHelper.GetBook(ref item, rule));
-                }
-                else
-                {
-                    chapters.AddRange(LocalHelper.GetChapters(item.Url));
-                }
-                var id = DatabaseHelper.InsertId<BookItem>(
-                    "Name, Image, Description, Author, Source, Kind, Url, `Index`, Count, Time",
-                    "@name,@image,@description,@author,@source,@kind, @url, @index, @count, @time",
-                    new SQLiteParameter("@name", item.Name),
-                    new SQLiteParameter("@image", item.Image),
-                    new SQLiteParameter("@description", item.Description),
-                    new SQLiteParameter("@author", item.Author),
-                    new SQLiteParameter("@source", item.Source),
-                    new SQLiteParameter("@kind", item.Kind),
-                    new SQLiteParameter("@url", item.Url),
-                    new SQLiteParameter("@index", item.Index),
-                    new SQLiteParameter("@count", item.Count),
-                    new SQLiteParameter("@time", item.Time));
-                LocalHelper.CreateTempDir();
-                if (item.Source == BookSources.网络)
-                {
-                    var result = Parallel.ForEach<ChapterItem>(chapters, chapter =>
-                    {
-                        var html = new Html();
-                        html.SetUrl(chapter.Url);
-                        LocalHelper.WriteTemp(html.Narrow(rule.ChapterBegin, rule.ChapterEnd).GetText(rule.Replace), chapter.Content);
-                    });
-                    while (!result.IsCompleted)
-                    {
-                        Thread.Sleep(1000);
-                    }
-                }
+                chapters.AddRange(HttpHelper.GetBook(ref item, rule));
+            }
+            else
+            {
+                chapters.AddRange(LocalHelper.GetChapters(item.Url));
+            }
+            var id = DatabaseHelper.InsertId<BookItem>(
+                "Name, Image, Description, Author, Source, Kind, Url, `Index`, Count, Time",
+                "@name,@image,@description,@author,@source,@kind, @url, @index, @count, @time",
+                new SQLiteParameter("@name", item.Name),
+                new SQLiteParameter("@image", item.Image),
+                new SQLiteParameter("@description", item.Description),
+                new SQLiteParameter("@author", item.Author),
+                new SQLiteParameter("@source", item.Source),
+                new SQLiteParameter("@kind", item.Kind),
+                new SQLiteParameter("@url", item.Url),
+                new SQLiteParameter("@index", item.Index),
+                new SQLiteParameter("@count", item.Count),
+                new SQLiteParameter("@time", item.Time));
+            LocalHelper.CreateTempDir();
+            //if (item.Source == BookSources.网络)
+            //{
+
+            //    var result = Parallel.ForEach<ChapterItem>(chapters, chapter =>
+            //    {
+            //        var i = 0;
+            //        if (File.Exists(LocalHelper.TempDir + chapter.Content))
+            //        {
+            //            return;
+            //        }
+            //        OneBegin:
+            //        var html = new HtmlExpand();
+            //        try
+            //        {
+            //            html.SetUrl(chapter.Url);  // 超时
+            //            html.Narrow(rule.ChapterBegin, rule.ChapterEnd);
+            //            LocalHelper.WriteTemp(
+            //                html.GetText(rule.Replace), chapter.Content);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            if (i < 5)
+            //            {
+            //                Thread.Sleep(20000);
+            //                goto OneBegin;
+            //            }
+            //            LocalHelper.WriteLog(
+            //                $"{ex.Message} 网址 {chapter.Url}");
+            //        }
+
+            //    });
+            //    while (!result.IsCompleted)
+            //    {
+            //        Thread.Sleep(1000);
+            //    }
+            //}
+            
+            var writer = new StreamWriter($"{LocalHelper.TempDir}{Name}.txt", false, Encoding.UTF8);
+            foreach (var chapter in chapters)
+            {
+                writer.WriteLine(chapter.Name);
+                writer.WriteLine();
+                writer.WriteLine(LocalHelper.ReadTemp(chapter.Content));
+                writer.WriteLine();
+                writer.WriteLine();
+            }
+            writer.Close();
+            
+            
+            try
+            {
                 DbTransaction trans = conn.BeginTransaction();
                 try
                 {
@@ -316,18 +361,25 @@ namespace ZoDream.Reader.ViewModel
                     }
                     trans.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     trans.Rollback();
+                    LocalHelper.WriteLog(ex.Message);
                     _showMessage("章节插入失败，已进行回滚！");
                 }
-                DatabaseHelper.Close();
-                _addItem.Execute(item);
-                RingVisibility = Visibility.Collapsed;
-                Name = Url = string.Empty;
-                watch.Stop();
-                _showMessage("执行完成！耗时：" + watch.Elapsed);
-            });
+            }
+            catch (Exception ex)
+            {
+                LocalHelper.WriteLog(ex.Message);
+            }
+
+            
+            DatabaseHelper.Close();
+            _addItem.Execute(item);
+            RingVisibility = Visibility.Collapsed;
+            Name = Url = string.Empty;
+            watch.Stop();
+            _showMessage("执行完成！耗时：" + watch.Elapsed);
         }
 
         private RelayCommand _openCommand;
