@@ -275,7 +275,7 @@ namespace ZoDream.Reader.ViewModel
                     watch.Stop();
                     return;
                 }
-                chapters.AddRange(HttpHelper.GetBook(ref item, rule));
+                chapters.AddRange(Helper.HttpHelper.GetBook(ref item, rule));
             }
             else
             {

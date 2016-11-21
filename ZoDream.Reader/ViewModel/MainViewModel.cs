@@ -323,7 +323,7 @@ namespace ZoDream.Reader.ViewModel
                 var item = BooksList[index];
                 var conn = DatabaseHelper.Open();
                 var rule = DatabaseHelper.GetRule(item.Url);
-                var chapters = HttpHelper.GetChapters(item, rule, (HtmlExpand)new HtmlExpand().SetUrl(item.Url));
+                var chapters = Helper.HttpHelper.GetChapters(item, rule, (HtmlExpand)new HtmlExpand().SetUrl(item.Url));
                 var length = chapters.Count;
                 if (item.Count < length)
                 {
