@@ -74,7 +74,8 @@ namespace ZoDream.Reader.ViewModel
 
         private void ExecuteAddCommand()
         {
-            new AddRuleView().Show();
+            var view = new AddRuleView();
+            view.Show();
             Messenger.Default.Send(new NotificationMessageAction<WebRuleItem>(null, item =>
             {
                 DatabaseHelper.Open();
@@ -99,7 +100,9 @@ namespace ZoDream.Reader.ViewModel
                 if (row > 0)
                 {
                     RulesList.Add(item);
+                    view.Close();
                 }
+                
             }), "rule");
         }
 
@@ -120,7 +123,8 @@ namespace ZoDream.Reader.ViewModel
         private void ExecuteEditCommand(int index)
         {
             if (index < 0 || index >= RulesList.Count) return;
-            new AddRuleView().Show();
+            var view = new AddRuleView();
+            view.Show();
             Messenger.Default.Send(new NotificationMessageAction<WebRuleItem>(RulesList[index], null, item =>
             {
                 item.Id = RulesList[index].Id;
@@ -147,6 +151,7 @@ namespace ZoDream.Reader.ViewModel
                 {
                     RulesList[index] = item;
                 }
+                view.Close();
             }), "rule");
         }
 

@@ -109,10 +109,11 @@ namespace ZoDream.Reader.ViewModel
         private void _reset()
         {
             Content.FontFamily = SystemHelper.GetFontFamily("FontFamily");
-            Content.Background = SystemHelper.GetBrush("Background");
-            Content.FontSize = SystemHelper.GetInt("FontSize");
+            Content.Background = SystemHelper.GetBrush("Background", "#fff");
+            var size = SystemHelper.GetInt("FontSize");
+            Content.FontSize = size < 5 ? 16 : size;
             Content.FontWeight = SystemHelper.GetFontWeight("FontWeight");
-            Content.Foreground = new SolidColorBrush(SystemHelper.GetColor("Foreground"));
+            Content.Foreground = new SolidColorBrush(SystemHelper.GetColor("Foreground", "#333"));
         }
 
         /// <summary>

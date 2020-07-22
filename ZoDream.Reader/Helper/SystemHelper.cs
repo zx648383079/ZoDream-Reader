@@ -74,9 +74,9 @@ namespace ZoDream.Reader.Helper
             return Options.ContainsKey(key) ? Convert.ToInt32(Options[key]) : 0;
         }
 
-        public static Color GetColor(string key)
+        public static Color GetColor(string key, string defaul = "")
         {
-            return StringHelper.ToColor(Get(key));
+            return StringHelper.ToColor(Get(key, defaul));
         }
 
         public static FontFamily GetFontFamily(string key)
@@ -97,14 +97,17 @@ namespace ZoDream.Reader.Helper
             return new SolidColorBrush(GetColor(key));
         }
 
-        public static Brush GetBrush(string key)
+        public static Brush GetBrush(string key, string defaul = "")
         {
-            var value = Get(key);
+            var value = Get(key, defaul);
             if (string.IsNullOrEmpty(value) || value[0] == '#' || value.IndexOf(',') > 0)
             {
-                return GetSolidColorBrush(key);
+                return new SolidColorBrush(StringHelper.ToColor(value));
             }
-            return GetImageBrush(key);
+            return new ImageBrush
+            {
+                ImageSource = new BitmapImage(new Uri(value))
+            };
         }
 
         public static FontWeight GetFontWeight(string key)

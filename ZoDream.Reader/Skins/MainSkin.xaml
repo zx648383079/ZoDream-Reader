@@ -2,10 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:zodream="clr-namespace:ZoDream.Reader.Controls"
                     xmlns:input="clr-namespace:System.Windows.Input;assembly=PresentationCore"
-                    xmlns:converter="clr-namespace:ZoDream.Reader.Converter"
-                    xmlns:helper="clr-namespace:ZoDream.Helper.Converter;assembly=ZoDream.Helper">
+                    xmlns:converter="clr-namespace:ZoDream.Reader.Converter">
     <converter:ImageConverter x:Key="ImageConverter"/>
-    <helper:VisibilityConverter x:Key="VisibilityConverter"/>
+    <converter:VisibilityConverter x:Key="VisibilityConverter"/>
 
     <RoutedUICommand x:Key="Copy">
         input:ApplicationCommands.Copy

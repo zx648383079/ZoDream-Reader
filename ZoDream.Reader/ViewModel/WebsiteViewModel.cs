@@ -74,7 +74,8 @@ namespace ZoDream.Reader.ViewModel
 
         private void ExecuteAddCommand()
         {
-            new AddWebView().Show();
+            var view = new AddWebView();
+            view.Show();
             Messenger.Default.Send(new NotificationMessageAction<WebsiteItem>(null, item =>
             {
                 DatabaseHelper.Open();
@@ -86,6 +87,7 @@ namespace ZoDream.Reader.ViewModel
                 {
                     WesitesList.Add(item);
                 }
+                view.Close();
             }), "web");
         }
 
@@ -106,7 +108,8 @@ namespace ZoDream.Reader.ViewModel
         private void ExecuteEditCommand(int index)
         {
             if (index < 0 || index >= WesitesList.Count) return;
-            new AddWebView().Show();
+            var view = new AddWebView();
+            view.Show();
             Messenger.Default.Send(new NotificationMessageAction<WebsiteItem>(WesitesList[index], null, item =>
             {
                 item.Id = WesitesList[index].Id;
@@ -119,6 +122,7 @@ namespace ZoDream.Reader.ViewModel
                 {
                     WesitesList[index] = item;
                 }
+                view.Close();
             }), "web");
         }
 

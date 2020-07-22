@@ -263,6 +263,7 @@ namespace ZoDream.Reader.ViewModel
 
             var watch = new Stopwatch();
             watch.Start();
+            LocalHelper.CreateTempDir();
             var rule = new WebRuleItem();
             if (item.Source == BookSources.网络)
             {
@@ -294,44 +295,46 @@ namespace ZoDream.Reader.ViewModel
                 new SQLiteParameter("@index", item.Index),
                 new SQLiteParameter("@count", item.Count),
                 new SQLiteParameter("@time", item.Time));
-            LocalHelper.CreateTempDir();
-            //if (item.Source == BookSources.网络)
-            //{
 
-            //    var result = Parallel.ForEach<ChapterItem>(chapters, chapter =>
-            //    {
-            //        var i = 0;
-            //        if (File.Exists(LocalHelper.TempDir + chapter.Content))
-            //        {
-            //            return;
-            //        }
-            //        OneBegin:
-            //        var html = new HtmlExpand();
-            //        try
-            //        {
-            //            html.SetUrl(chapter.Url);  // 超时
-            //            html.Narrow(rule.ChapterBegin, rule.ChapterEnd);
-            //            LocalHelper.WriteTemp(
-            //                html.GetText(rule.Replace), chapter.Content);
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            if (i < 5)
-            //            {
-            //                Thread.Sleep(20000);
-            //                goto OneBegin;
-            //            }
-            //            LocalHelper.WriteLog(
-            //                $"{ex.Message} 网址 {chapter.Url}");
-            //        }
+            if (item.Source == BookSources.网络)
+            {
+                _showMessage("章节下载中", 0);
+                var chapterLength = chapters.Count;
+                var result = Parallel.ForEach<ChapterItem>(chapters, chapter =>
+                {
+                    var i = 0;
+                    if (File.Exists(LocalHelper.TempDir + chapter.Content))
+                    {
+                        return;
+                    }
+                OneBegin:
+                    var html = new HtmlExpand();
+                    try
+                    {
+                        html.SetUrl(chapter.Url);  // 超时
+                        html.Narrow(rule.ChapterBegin, rule.ChapterEnd);
+                        LocalHelper.WriteTemp(
+                            html.GetText(rule.Replace), chapter.Content);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (i < 5)
+                        {
+                            Thread.Sleep(20000);
+                            goto OneBegin;
+                        }
+                        LocalHelper.WriteLog(
+                            $"{ex.Message} 网址 {chapter.Url}");
+                    }
 
-            //    });
-            //    while (!result.IsCompleted)
-            //    {
-            //        Thread.Sleep(1000);
-            //    }
-            //}
-            
+                });
+                while (!result.IsCompleted)
+                {
+                    Thread.Sleep(1000);
+                }
+                _showMessage("章节下载成功，导入中");
+            }
+
             var writer = new StreamWriter($"{LocalHelper.TempDir}{Name}.txt", false, Encoding.UTF8);
             foreach (var chapter in chapters)
             {
@@ -411,12 +414,16 @@ namespace ZoDream.Reader.ViewModel
             }
         }
 
-        private void _showMessage(string message)
+        private void _showMessage(string message, int second = 3)
         {
             Message = message;
+            if (second < 1)
+            {
+                return;
+            }
             Task.Factory.StartNew(() =>
             {
-                Thread.Sleep(3000);
+                Thread.Sleep(second * 1000);
                 Message = string.Empty;
             });
         }
