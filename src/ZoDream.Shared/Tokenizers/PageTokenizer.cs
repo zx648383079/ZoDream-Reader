@@ -97,7 +97,7 @@ namespace ZoDream.Shared.Tokenizers
 
         #region 缓存数据
 
-        public IList<PagePositionItem> CachePages { get; private set; }
+        public IList<PagePositionItem> CachePages { get; private set; } = new List<PagePositionItem>();
         /// <summary>
         /// 当前页码
         /// </summary>
@@ -179,7 +179,7 @@ namespace ZoDream.Shared.Tokenizers
                     {
                         x = 0;
                         y += fontH;
-                        if (y > maxH)
+                        if (y >= maxH)
                         {
                             y = 0;
                             page.End = new PositionItem(position, i - 1);
@@ -193,7 +193,8 @@ namespace ZoDream.Shared.Tokenizers
                     x += fontW;
                 }
                 y += fontH;
-                if (y > maxH)
+                x = 0;
+                if (y >= maxH)
                 {
                     y = 0;
                     page.End = new PositionItem(Content.Position, 0);
@@ -223,12 +224,13 @@ namespace ZoDream.Shared.Tokenizers
             {
                 return data;
             }
-            Content.Position = begin.Position;
+            Content.Position = begin.Position >= 0 ? begin.Position : 0;
             var maxH = PageInnerHeight;
             var maxW = PageInnerWidth;
             var fontH = FontSize + LineSpace;
             var x = .0;
             var y = .0;
+            var offset = begin.Offset;
             while (true)
             {
                 var position = Content.Position;
@@ -237,7 +239,8 @@ namespace ZoDream.Shared.Tokenizers
                 {
                     break;
                 }
-                int i = data.Data.Count < 1 ? begin.Offset : 0;
+                int i = data.Data.Count < 1 ? offset : 0;
+                var isEnd = false;
                 for (; i < line.Length; i++)
                 {
                     var code = line[i];
@@ -246,9 +249,10 @@ namespace ZoDream.Shared.Tokenizers
                     {
                         x = 0;
                         y += fontH;
-                        if (y > maxH)
+                        if (y >= maxH)
                         {
                             data.End = new PositionItem(position, i - 1);
+                            isEnd = true;
                             break;
                         }
                     }
@@ -260,8 +264,18 @@ namespace ZoDream.Shared.Tokenizers
                     });
                     x += fontW;
                 }
+                if (isEnd)
+                {
+                    break;
+                }
+                if (data.Data.Count < 1)
+                {
+                    offset -= line.Length;
+                    continue;
+                }
                 y += fontH;
-                if (y > maxH)
+                x = 0;
+                if (y >= maxH)
                 {
                     data.End = new PositionItem(Content.Position, 0);
                     break;
@@ -289,6 +303,7 @@ namespace ZoDream.Shared.Tokenizers
                 var page = GetPage(position);
                 ResetPage(PageX(i), PageY(i), ref page);
                 items.Add(page);
+                position = page.End + 1;
             }
             return items;
         }
@@ -414,6 +429,7 @@ namespace ZoDream.Shared.Tokenizers
         public void Dispose()
         {
             Content?.Dispose();
+            CachePages.Clear();
         }
     }
 }

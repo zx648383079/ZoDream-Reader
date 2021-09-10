@@ -24,6 +24,12 @@ namespace ZoDream.Shared.Interfaces
         void Draw(IEnumerable<PageItem> pages);
 
         /// <summary>
+        /// 使用过渡动画切换
+        /// </summary>
+        /// <param name="pages"></param>
+        void Swap(IEnumerable<PageItem> pages);
+
+        /// <summary>
         /// 清空页面内容
         /// </summary>
         void Flush();

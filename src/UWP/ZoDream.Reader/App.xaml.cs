@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using ZoDream.Reader.ViewModels;
 
 namespace ZoDream.Reader
 {
@@ -58,6 +59,7 @@ namespace ZoDream.Reader
                 // 将框架放在当前窗口中
                 Window.Current.Content = rootFrame;
             }
+            ViewModel.RootFrame = rootFrame;
 
             if (e.PrelaunchActivated == false)
             {
@@ -96,5 +98,8 @@ namespace ZoDream.Reader
             //TODO: 保存应用程序状态并停止任何后台活动
             deferral.Complete();
         }
+
+
+        public static MainViewModel ViewModel { get; } = new MainViewModel();
     }
 }

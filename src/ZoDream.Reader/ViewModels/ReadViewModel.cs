@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Reader.Models;
-using ZoDream.Reader.Renders;
+using ZoDream.Shared.Renders;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels

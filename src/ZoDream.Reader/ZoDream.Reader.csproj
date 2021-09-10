@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Assets\reader.ico</ApplicationIcon>
   </PropertyGroup>

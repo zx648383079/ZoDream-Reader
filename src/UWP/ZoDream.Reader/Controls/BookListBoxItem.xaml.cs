@@ -1,33 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Navigation;
 using ZoDream.Reader.Events;
 using ZoDream.Reader.Models;
 
+//https://go.microsoft.com/fwlink/?LinkId=234236 上介绍了“用户控件”项模板
+
 namespace ZoDream.Reader.Controls
 {
-    /// <summary>
-    /// BookListBoxItem.xaml 的交互逻辑
-    /// </summary>
-    public partial class BookListBoxItem : UserControl
+    public sealed partial class BookListBoxItem : UserControl
     {
         public BookListBoxItem()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
-        public event ActionItemEventHandler? OnAction;
+        public event ActionItemEventHandler OnAction;
 
         public BookItem Source
         {
@@ -47,27 +47,21 @@ namespace ZoDream.Reader.Controls
         private void RefreshSource()
         {
             CoverImg.Source = ToImg(Source?.Cover);
-            NameTb.Text = Source == null || string.IsNullOrWhiteSpace(Source.Name) ? "[未知]" : Source.Name; 
+            NameTb.Text = Source == null || string.IsNullOrWhiteSpace(Source.Name) ? "[未知]" : Source.Name;
         }
 
-        public static BitmapImage ToImg(string? value)
+        public static BitmapImage ToImg(string value)
         {
             var imageUrl = value;
             if (string.IsNullOrEmpty(imageUrl))
             {
                 imageUrl = BookItem.RandomCover();
             }
-            if (!imageUrl.StartsWith("http") && !imageUrl.StartsWith("ms-appx:"))
+            if (!imageUrl.StartsWith("http") && !imageUrl.StartsWith("pack:"))
             {
-                imageUrl = string.Concat("ms-appx:///", imageUrl);
+                imageUrl = string.Concat("pack://application:,,,/", imageUrl);
             }
             return new BitmapImage(new Uri(imageUrl, UriKind.Absolute));
-        }
-
-        private void MoreBtn_Click(object sender, RoutedEventArgs e)
-        {
-            MoreMenu.IsOpen = !MoreMenu.IsOpen;
-            e.Handled = true;
         }
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
@@ -80,7 +74,7 @@ namespace ZoDream.Reader.Controls
             OnAction?.Invoke(this, Source, ActionEvent.DELETE);
         }
 
-        private void MainBox_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void MainBox_Tapped(object sender, TappedRoutedEventArgs e)
         {
             OnAction?.Invoke(this, Source, ActionEvent.CLICK);
         }

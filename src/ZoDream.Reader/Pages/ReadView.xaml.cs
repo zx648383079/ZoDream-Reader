@@ -29,6 +29,7 @@ namespace ZoDream.Reader.Pages
         }
 
         public ReadViewModel ViewModel = new ReadViewModel();
+        private bool isBooted = false;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -39,6 +40,7 @@ namespace ZoDream.Reader.Pages
             PageRender.FontSize = ViewModel.Tokenizer.FontSize;
             PageRender.Flush();
             PageRender.Draw(ViewModel.Tokenizer.Get());
+            isBooted = true;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -54,8 +56,7 @@ namespace ZoDream.Reader.Pages
                 // 不能向前了
                 return;
             }
-            PageRender.Flush();
-            PageRender.Draw(items);
+            PageRender.Swap(items);
         }
 
         private void PageRender_OnNext(object sender)
@@ -66,8 +67,20 @@ namespace ZoDream.Reader.Pages
                 // 没有更多了
                 return;
             }
+            PageRender.Swap(items);
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (!isBooted)
+            {
+                return;
+            }
+            ViewModel.Tokenizer.Width = PageRender.ActualWidth;
+            ViewModel.Tokenizer.Height = PageRender.ActualHeight;
+            ViewModel.Tokenizer.Refresh();
             PageRender.Flush();
-            PageRender.Draw(items);
+            PageRender.Draw(ViewModel.Tokenizer.Get());
         }
     }
 }

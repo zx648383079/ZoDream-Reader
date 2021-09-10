@@ -9,6 +9,7 @@
         Title="阅读" Height="450" Width="800" 
         Loaded="Window_Loaded"
         Unloaded="Window_Unloaded"
+        SizeChanged="Window_SizeChanged"
         WindowStartupLocation="CenterScreen" WindowState="Maximized">
 
     <Grid>

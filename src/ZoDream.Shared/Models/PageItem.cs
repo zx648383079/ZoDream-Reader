@@ -23,5 +23,15 @@ namespace ZoDream.Shared.Models
         {
             return ((IEnumerable)Data).GetEnumerator();
         }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var item in Data)
+            {
+                sb.Append(item.Code);
+            }
+            return sb.ToString();
+        }
     }
 }

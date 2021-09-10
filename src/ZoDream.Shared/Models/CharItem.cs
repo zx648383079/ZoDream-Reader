@@ -11,5 +11,10 @@ namespace ZoDream.Shared.Models
         public double X { get; set; }
 
         public double Y { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Code} X:{X},Y:{Y}";
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,6 +59,7 @@ namespace ZoDream.Reader.Controls
 
         public void Draw(PageItem page)
         {
+            Debug.WriteLine($"{page.Begin}-{page.End}");
             foreach (var item in page)
             {
                 Draw(item);
@@ -113,6 +115,12 @@ namespace ZoDream.Reader.Controls
                     OnNext?.Invoke(this);
                 }
             }
+        }
+
+        public void Swap(IEnumerable<PageItem> pages)
+        {
+            Flush();
+            Draw(pages);
         }
     }
 }
