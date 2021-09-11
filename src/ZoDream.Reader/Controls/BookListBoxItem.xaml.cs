@@ -46,23 +46,10 @@ namespace ZoDream.Reader.Controls
 
         private void RefreshSource()
         {
-            CoverImg.Source = ToImg(Source?.Cover);
+            CoverImg.Source = Utils.Converter.ToImg(Source?.Cover);
             NameTb.Text = Source == null || string.IsNullOrWhiteSpace(Source.Name) ? "[未知]" : Source.Name; 
         }
 
-        public static BitmapImage ToImg(string? value)
-        {
-            var imageUrl = value;
-            if (string.IsNullOrEmpty(imageUrl))
-            {
-                imageUrl = BookItem.RandomCover();
-            }
-            if (!imageUrl.StartsWith("http") && !imageUrl.StartsWith("ms-appx:"))
-            {
-                imageUrl = string.Concat("ms-appx:///", imageUrl);
-            }
-            return new BitmapImage(new Uri(imageUrl, UriKind.Absolute));
-        }
 
         private void MoreBtn_Click(object sender, RoutedEventArgs e)
         {

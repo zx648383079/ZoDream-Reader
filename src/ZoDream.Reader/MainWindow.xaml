@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:ZoDream.Reader"
         xmlns:control="clr-namespace:ZoDream.Reader.Controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="MainWindow" Height="450" Width="800" 
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded">
     <Grid>
         <control:ActionListBox x:Name="BookListBox" 
                                Items="{Binding BookItems}" 

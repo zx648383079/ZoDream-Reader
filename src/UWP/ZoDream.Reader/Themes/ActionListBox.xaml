@@ -9,7 +9,9 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <GridView x:Name="PART_Container"/>
+                        <ScrollViewer>
+                            <Canvas x:Name="PART_Container"/>
+                        </ScrollViewer>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

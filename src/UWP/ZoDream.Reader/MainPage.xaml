@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <NavigationView>
+    <NavigationView BackRequested="NavigationView_BackRequested">
         <NavigationView.MenuItems>
             <NavigationViewItem Icon="Home" Content="我的书架"/>
         </NavigationView.MenuItems>

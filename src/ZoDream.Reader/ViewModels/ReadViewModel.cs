@@ -30,7 +30,7 @@ namespace ZoDream.Reader.ViewModels
                 {
                     return;
                 }
-                Tokenizer.Content = new StreamIterator(value.FileName);
+                Tokenizer.Content = new StreamIterator(App.ViewModel.GetFileName(book));
             }
         }
 

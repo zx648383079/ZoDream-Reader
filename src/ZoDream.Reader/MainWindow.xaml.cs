@@ -30,7 +30,7 @@ namespace ZoDream.Reader
             DataContext = ViewModel;
         }
 
-        public MainViewModel ViewModel = new MainViewModel();
+        public MainViewModel ViewModel = App.ViewModel;
 
         private void BookListBox_OnAdd(object sender)
         {
@@ -73,6 +73,11 @@ namespace ZoDream.Reader
                 var page = new ReadView(item);
                 page.ShowDialog();
             }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Load();
         }
     }
 }

@@ -28,7 +28,7 @@
                    TextAlignment="Center"
                    TextWrapping="Wrap"
                    HorizontalAlignment="Center"/>
-        <Button x:Name="MoreBtn"  Content="&#xE10C;"  FontFamily="{CustomResource IconFontFamily}"
+        <Button x:Name="MoreBtn"  Content="&#xE10C;"  FontFamily="{StaticResource IconFontFamily}"
                 Background="Transparent"
                 Foreground="#777"
                 FontSize="30"

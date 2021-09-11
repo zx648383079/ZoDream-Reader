@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ZoDream.Reader.ViewModels;
 
 namespace ZoDream.Reader
 {
@@ -13,7 +14,7 @@ namespace ZoDream.Reader
     /// </summary>
     public partial class App : Application
     {
-
+        public static MainViewModel ViewModel = new MainViewModel();
         public static void ChangeTheme()
         {
             ResourceDictionary dict = new ResourceDictionary();

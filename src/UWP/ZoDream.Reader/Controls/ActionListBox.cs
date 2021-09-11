@@ -17,12 +17,13 @@ using ZoDream.Reader.Models;
 
 namespace ZoDream.Reader.Controls
 {
-    [TemplatePart(Name = "PART_Container", Type = typeof(GridView))]
+    [TemplatePart(Name = "PART_Container", Type = typeof(Panel))]
     public sealed class ActionListBox : Control
     {
         public ActionListBox()
         {
             this.DefaultStyleKey = typeof(ActionListBox);
+            this.SizeChanged += (_, __) => RefreshSize();
         }
 
         private Panel boxContianer;
@@ -48,8 +49,6 @@ namespace ZoDream.Reader.Controls
         {
             (d as ActionListBox).MoveActionButton();
         }
-
-
 
         public IEnumerable<BookItem> Items
         {
@@ -118,6 +117,29 @@ namespace ZoDream.Reader.Controls
                 book.Source = data[j];
             }
             MoveActionButton();
+            RefreshSize();
+        }
+
+        private void RefreshSize()
+        {
+            if (boxContianer == null || !(boxContianer is Canvas))
+            {
+                return;
+            }
+            var x = .0;
+            var y = .0;
+            var maxW = this.ActualWidth;
+            foreach (var item in boxContianer.Children)
+            {
+                Canvas.SetLeft(item, x);
+                Canvas.SetTop(item, y);
+                x += ItemWidth;
+                if (x >=  maxW - 20)
+                {
+                    x = 0;
+                    y += ItemHeight;
+                }
+            }
         }
 
         private void BindListener()
@@ -167,7 +189,7 @@ namespace ZoDream.Reader.Controls
                 {
                     OnAdd?.Invoke(this);
                 };
-                if (ActionOnBefore)
+                if (ActionOnBefore && boxContianer.Children.Count > 0)
                 {
                     boxContianer.Children.Insert(0, button);
                 }

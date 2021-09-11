@@ -6,11 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Reader.Models;
+using ZoDream.Reader.Repositories;
 
 namespace ZoDream.Reader.ViewModels
 {
     public class MainViewModel: BindableBase
     {
+        private Database database = new Database();
+        private Disk disk = new Disk();
 
         private ObservableCollection<BookItem> bookItems = new ObservableCollection<BookItem>();
 
@@ -20,6 +23,14 @@ namespace ZoDream.Reader.ViewModels
             set => Set(ref bookItems, value);
         }
 
+        public void Load()
+        {
+            var items = database.GetBookList();
+            foreach (var item in items)
+            {
+                BookItems.Add(item);
+            }
+        }
         public void Load(IEnumerable<string> fileNames)
         {
             foreach (var item in fileNames)
@@ -30,16 +41,22 @@ namespace ZoDream.Reader.ViewModels
 
         public void Load(string fileName)
         {
-            var info = new FileInfo(fileName);
-            if (!info.Exists)
+            if (!disk.AddTxt(fileName, out var bookFile, out var Name))
             {
                 return;
             }
-            BookItems.Add(new BookItem()
+            var item = new BookItem()
             {
-                Name = info.Name.Replace(info.Extension, ""),
-                FileName = fileName,
-            });
+                Name = Name,
+                FileName = bookFile,
+            };
+            database.AddBook(item);
+            BookItems.Add(item);
+        }
+
+        public string GetFileName(BookItem book)
+        {
+            return disk.TxtFileName(book.FileName);
         }
     }
 }

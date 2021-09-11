@@ -8,11 +8,14 @@ namespace ZoDream.Reader.Models
 {
     public class BookItem
     {
+        public int Id { get; set; }
         public string Name { get; set; }
 
         public string Cover { get; set; }
 
         public string FileName { get; set; }
+
+        public long Position { get; set; } = 0;
 
         public static string RandomCover()
         {
