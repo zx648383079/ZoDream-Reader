@@ -88,7 +88,9 @@ namespace ZoDream.Shared.Tokenizers
             {
                 return FontWidth(2);
             }
-            if ((code >= 48 && code <= 57) || (code >= 65 && code <= 90))
+            if (code == 46 ||
+                (code >= 48 && code <= 57) 
+                || (code >= 64 && code <= 90))
             {
                 return FontWidth(.5);
             }

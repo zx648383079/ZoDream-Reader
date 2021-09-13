@@ -30,9 +30,20 @@
                      DisplayMemberPath="Title" 
                      MouseDoubleClick="ChapterListBox_MouseDoubleClick"/>
 
-            <StackPanel Orientation="Vertical" 
+            <StackPanel Orientation="Vertical"
+                        Background="White"
                         Grid.Column="2">
+                <TextBlock Text="字体"/>
+                <ComboBox/>
+                <TextBlock Text="字体大小"/>
+                <control:NumberInput Value="28"/>
+                <TextBlock Text="背景颜色"/>
                 
+                <TextBlock Text="文字颜色"/>
+                <TextBlock Text="翻页效果"/>
+                <TextBlock Text="自动翻页"/>
+                <TextBlock Text="语音朗读"/>
+                <control:SwitchInput OffLabel="关" OnLabel="开"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">
