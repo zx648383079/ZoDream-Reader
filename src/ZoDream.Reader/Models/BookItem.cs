@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Models
 {
@@ -15,7 +16,7 @@ namespace ZoDream.Reader.Models
 
         public string FileName { get; set; }
 
-        public long Position { get; set; } = 0;
+        public PositionItem Position { get; set; } = new PositionItem();
 
         public static string RandomCover()
         {

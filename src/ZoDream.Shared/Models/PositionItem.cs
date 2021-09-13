@@ -10,6 +10,13 @@ namespace ZoDream.Shared.Models
 
         public int Offset { get; set; }
 
+        public PositionItem(string s)
+        {
+            var args = s.Split(',');
+            Position = int.Parse(args[0]);
+            Offset = args.Length > 1 ? int.Parse(args[1]) : 0;
+        }
+
         public PositionItem(long position = 0, int offset = 0)
         {
             Position = position;
@@ -21,10 +28,10 @@ namespace ZoDream.Shared.Models
             return Position == target.Position && Offset == target.Offset;
         }
 
-
+        
         public override string ToString()
         {
-            return $"{Position}>>{Offset}";
+            return $"{Position},{Offset}";
         }
 
         public static PositionItem operator +(PositionItem position, int offset)

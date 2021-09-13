@@ -58,8 +58,11 @@ namespace ZoDream.Reader.Controls
 
         public void Draw(PageItem page)
         {
-            renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
+            if (renderTarget == null)
+            {
+                renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
                    (float)DrawerCanvas.ActualHeight, 96);
+            }
             var font = new CanvasTextFormat();
             font.FontFamily = FontFamily.ToString();
             font.FontSize = (float)FontSize;
@@ -83,6 +86,7 @@ namespace ZoDream.Reader.Controls
             var font = new CanvasTextFormat();
             font.FontFamily = FontFamily.ToString();
             font.FontSize = (float)FontSize;
+            var color = ColorHelper.FromArgb(255, 0, 0, 0);
             using (var ds = renderTarget.CreateDrawingSession())
             {
                 ds.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
@@ -92,7 +96,7 @@ namespace ZoDream.Reader.Controls
                     {
                         ds.DrawText(item.Code.ToString(), 
                             new Vector2((float)item.X, (float)item.Y), 
-                            ColorHelper.FromArgb(255, 0, 0, 0), font);
+                            color, font);
                     }
                 }
             }
@@ -159,6 +163,12 @@ namespace ZoDream.Reader.Controls
                     OnNext?.Invoke(this);
                 }
             }
+        }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            renderTarget = null;
+            DrawerCanvas.Invalidate();
         }
     }
 }

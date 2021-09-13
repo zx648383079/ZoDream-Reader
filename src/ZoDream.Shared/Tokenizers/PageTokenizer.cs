@@ -109,6 +109,7 @@ namespace ZoDream.Shared.Tokenizers
 
         #endregion
 
+        #region 对章节的操作
         public IList<ChapterPositionItem> GetChapters()
         {
             var items = new List<ChapterPositionItem>();
@@ -117,7 +118,7 @@ namespace ZoDream.Shared.Tokenizers
                 return items;
             }
             Content.Position = 0;
-            var regex = new Regex(@"^[\s]{0,6}第?[\s]*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?[\s\S]{0,20}$");
+            var regex = new Regex(@"^(正文)?[\s]{0,6}第?[\s]*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?[\s\S]{0,20}$");
             while (true)
             {
                 var postion = Content.Position;
@@ -141,6 +142,40 @@ namespace ZoDream.Shared.Tokenizers
             }
             return items;
         }
+
+        public int GetChapter(IEnumerable<ChapterPositionItem> items, PositionItem position)
+        {
+            return GetChapter(items, position.Position);
+        }
+
+        public int GetChapter(IEnumerable<ChapterPositionItem> items, long position)
+        {
+            ChapterPositionItem? data = null;
+            var resIndex = -1;
+            var i = -1;
+            foreach (var item in items)
+            {
+                i++;
+                if (item.Position > position)
+                {
+                    break;
+                }
+                if (item.Position == position)
+                {
+                    return i;
+                }
+                if (data == null || data.Position < item.Position)
+                {
+                    resIndex = i;
+                    data = item;
+                }
+            }
+            return resIndex;
+        }
+
+        #endregion
+
+
 
         public IList<PagePositionItem> GetPages()
         {
@@ -369,7 +404,7 @@ namespace ZoDream.Shared.Tokenizers
             for (int i = CachePages.Count  - 1; i >= 0; i--)
             {
                 var item = CachePages[i];
-                if (item.Begin.Position < position && item.Begin.Offset <= offset)
+                if (item.Begin.Position <= position && item.Begin.Offset <= offset)
                 {
                     Page = i;
                     return;

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using ZoDream.Reader.Models;
+using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -54,7 +55,7 @@ namespace ZoDream.Reader.Repositories
                         Name = reader.GetString(1),
                         Cover = reader.GetString(2),
                         FileName = reader.GetString(3),
-                        Position = reader.GetInt32(4),
+                        Position = new PositionItem(reader.GetString(4)),
                     });
                 }
             }
@@ -74,7 +75,7 @@ namespace ZoDream.Reader.Repositories
             command.Parameters.AddWithValue(":name", item.Name);
             command.Parameters.AddWithValue(":cover", item.Cover);
             command.Parameters.AddWithValue(":file", item.FileName);
-            command.Parameters.AddWithValue(":position", item.Position);
+            command.Parameters.AddWithValue(":position", item.Position.ToString());
             command.Parameters.AddWithValue(":time", DateTime.Now);
             command.ExecuteNonQuery();
             var query = connection.CreateCommand();
@@ -92,12 +93,12 @@ namespace ZoDream.Reader.Repositories
             command.CommandText =
                 @"UPDATE Book 
                     SET Name=:name,
-                        Cover=:cover,Position=:position,UpdatedAt=:time)
+                        Cover=:cover,Position=:position,UpdatedAt=:time
                   WHERE Id=:id";
             command.Parameters.AddWithValue(":name", item.Name);
             command.Parameters.AddWithValue(":cover", item.Cover);
             command.Parameters.AddWithValue(":id", item.Id);
-            command.Parameters.AddWithValue(":position", item.Position);
+            command.Parameters.AddWithValue(":position", item.Position.ToString());
             command.Parameters.AddWithValue(":time", DateTime.Now);
             command.ExecuteNonQuery();
         }

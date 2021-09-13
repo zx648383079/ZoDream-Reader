@@ -58,5 +58,10 @@ namespace ZoDream.Reader.ViewModels
         {
             return disk.TxtFileName(book.FileName);
         }
+
+        internal void Update(BookItem book)
+        {
+            database.UpdateBook(book);
+        }
     }
 }

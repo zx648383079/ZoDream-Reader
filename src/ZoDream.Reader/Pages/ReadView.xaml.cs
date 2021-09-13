@@ -26,6 +26,7 @@ namespace ZoDream.Reader.Pages
             InitializeComponent();
             DataContext = ViewModel;
             ViewModel.Book = book;
+            Title = book.Name;
         }
 
         public ReadViewModel ViewModel = new ReadViewModel();
@@ -37,10 +38,12 @@ namespace ZoDream.Reader.Pages
             ViewModel.Tokenizer.Height = PageRender.ActualHeight;
             ViewModel.Tokenizer.ColumnCount = 2;
             ViewModel.Tokenizer.Refresh();
+            ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
             PageRender.FontSize = ViewModel.Tokenizer.FontSize;
             PageRender.Flush();
             PageRender.Draw(ViewModel.Tokenizer.Get());
             isBooted = true;
+            ViewModel.Load();
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -57,6 +60,10 @@ namespace ZoDream.Reader.Pages
                 return;
             }
             PageRender.Swap(items);
+            ViewModel.Book.Position = items[0].Begin;
+            ViewModel.ReloadChapter();
+            App.ViewModel.Update(ViewModel.Book);
+            
         }
 
         private void PageRender_OnNext(object sender)
@@ -68,6 +75,9 @@ namespace ZoDream.Reader.Pages
                 return;
             }
             PageRender.Swap(items);
+            ViewModel.Book.Position = items[0].Begin;
+            ViewModel.ReloadChapter();
+            App.ViewModel.Update(ViewModel.Book);
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -81,6 +91,35 @@ namespace ZoDream.Reader.Pages
             ViewModel.Tokenizer.Refresh();
             PageRender.Flush();
             PageRender.Draw(ViewModel.Tokenizer.Get());
+        }
+
+        private void MoreBtn_Click(object sender, RoutedEventArgs e)
+        {
+            MorePanel.Visibility = MorePanel.Visibility == Visibility.Visible ? 
+                Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void ChapterListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var i = ChapterListBox.SelectedIndex;
+            if (i < -1)
+            {
+                return;
+            }
+            MorePanel.Visibility = Visibility.Collapsed;
+            var chapter = ViewModel.ChapterItems[i];
+            ViewModel.ChapterTitle = chapter.Title;
+            ViewModel.Tokenizer.SetPage(chapter);
+            var items = ViewModel.Tokenizer.Get();
+            if (items.Count < 1)
+            {
+                // 没有更多了
+                return;
+            }
+            PageRender.Flush();
+            PageRender.Draw(items);
+            ViewModel.Book.Position = items[0].Begin;
+            App.ViewModel.Update(ViewModel.Book);
         }
     }
 }

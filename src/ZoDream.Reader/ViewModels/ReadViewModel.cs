@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Reader.Models;
+using ZoDream.Shared.Models;
 using ZoDream.Shared.Renders;
 using ZoDream.Shared.Tokenizers;
 
@@ -34,14 +35,55 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
+        private string chapterTitle = string.Empty;
 
-        private ObservableCollection<ChapterItem> chapterItems = new ObservableCollection<ChapterItem>();
+        public string ChapterTitle
+        {
+            get => chapterTitle;
+            set => Set(ref chapterTitle, value);
+        }
 
-        public ObservableCollection<ChapterItem> ChapterItems
+        private ObservableCollection<ChapterPositionItem> chapterItems = new ObservableCollection<ChapterPositionItem>();
+
+        public ObservableCollection<ChapterPositionItem> ChapterItems
         {
             get => chapterItems;
             set => Set(ref chapterItems, value);
         }
 
+        public void Load()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                var items = Tokenizer.GetChapters();
+                if (items == null)
+                {
+                    return;
+                }
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    foreach (var item in items)
+                    {
+                        if (item == null)
+                        {
+                            continue;
+                        }
+                        ChapterItems.Add(item);
+                    }
+                    ReloadChapter();
+                });
+                
+            });
+        }
+
+        public void ReloadChapter()
+        {
+            var i = Tokenizer.GetChapter(ChapterItems, Book.Position);
+            if (i < 0)
+            {
+                return;
+            }
+            ChapterTitle = ChapterItems[i].Title;
+        }
     }
 }

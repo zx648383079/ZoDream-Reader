@@ -1,4 +1,7 @@
-﻿using System;
+﻿using SharpDX.Direct2D1;
+using SharpDX.DirectWrite;
+using SharpDX.Mathematics.Interop;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ZoDream.Reader.Drawing;
 using ZoDream.Reader.Events;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
@@ -29,58 +33,65 @@ namespace ZoDream.Reader.Controls
             InitializeComponent();
         }
 
-
-        private int KidIndex = -1;
+        private SharpDX.Direct2D1.RenderTarget? renderTarget;
         private Point lastMousePoint = new Point(0, 0);
+        private IEnumerable<PageItem>? lastPage;
+        private bool lastBooted = false;
 
         public event ControlEventHandler? OnPrevious;
         public event ControlEventHandler? OnNext;
 
-        private TextBlock GetTextBlock(int i)
-        {
-            if (DrawerCanvas.Children.Count > i)
-            {
-                return DrawerCanvas.Children[i] as TextBlock;
-            }
-            var tb = new TextBlock();
-            DrawerCanvas.Children.Add(tb);
-            return tb;
-        }
-
         public void Draw(CharItem item)
         {
-            var tb = GetTextBlock(++ KidIndex);
-            tb.Text = item.Code.ToString();
-            tb.FontFamily = FontFamily;
-            tb.FontSize = FontSize;
-            Canvas.SetLeft(tb, item.X);
-            Canvas.SetTop(tb, item.Y);
+            
         }
 
         public void Draw(PageItem page)
         {
-            Debug.WriteLine($"{page.Begin}-{page.End}");
-            foreach (var item in page)
-            {
-                Draw(item);
-            }
+            
         }
 
         public void Draw(IEnumerable<PageItem> pages)
         {
-            foreach (var item in pages)
+            lastPage = pages;
+            lastBooted = false;
+            if (renderTarget == null)
             {
-                Draw(item);
+                renderTarget = DrawerCanvas.CreateRenderTarget();
             }
+            if (renderTarget == null)
+            {
+                return;
+            }
+            lastBooted = true;
+            var dwriteFactory = new SharpDX.DirectWrite.Factory();
+            var font = new TextFormat(dwriteFactory, FontFamily.ToString(), (float)FontSize);
+            var color = new SharpDX.Direct2D1.SolidColorBrush(renderTarget, ColorHelper.FromArgb(255, 0, 0, 0));
+            renderTarget.BeginDraw();
+            renderTarget.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
+            foreach (var page in pages)
+            {
+                foreach (var item in page.Data)
+                {
+                    renderTarget.DrawText(item.Code.ToString(), font, 
+                        new RawRectangleF((float)item.X, (float)item.Y, int.MaxValue, int.MaxValue),
+                        color);
+                }
+            }
+            renderTarget.EndDraw();
+            DrawerCanvas.Invalidate();
         }
 
         public void Flush()
         {
-            KidIndex = -1;
-            foreach (var item in DrawerCanvas.Children)
+            if (renderTarget == null)
             {
-                (item as TextBlock).Text = string.Empty;
+                return;
             }
+            renderTarget.BeginDraw();
+            renderTarget.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
+            renderTarget.EndDraw();
+            DrawerCanvas.Invalidate();
         }
 
         private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
@@ -121,6 +132,23 @@ namespace ZoDream.Reader.Controls
         {
             Flush();
             Draw(pages);
+        }
+
+        private void DrawerCanvas_Draw(object sender)
+        {
+            if (renderTarget == null)
+            {
+                return;
+            }
+            DrawerCanvas.DrawImage(renderTarget);
+        }
+
+        private void DrawerCanvas_CreateResources(object sender)
+        {
+            if (lastPage != null && !lastBooted)
+            {
+                Draw(lastPage);
+            }
         }
     }
 }
