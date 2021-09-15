@@ -10,13 +10,15 @@
     d:DesignWidth="400"
     Unloaded="UserControl_Unloaded" 
     SizeChanged="UserControl_SizeChanged"
+    
     ManipulationStarted="UserControl_ManipulationStarted"
-    ManipulationCompleted="UserControl_ManipulationCompleted">
+    ManipulationCompleted="UserControl_ManipulationCompleted" 
+    PointerPressed="UserControl_PointerPressed" 
+    PointerReleased="UserControl_PointerReleased">
     <Grid>
         <win2d:CanvasControl x:Name="DrawerCanvas" 
                              Draw="DrawerCanvas_Draw" 
                              CreateResources="DrawerCanvas_CreateResources">
-            
         </win2d:CanvasControl>
     </Grid>
 </UserControl>

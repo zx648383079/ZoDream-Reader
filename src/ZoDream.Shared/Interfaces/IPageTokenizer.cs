@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using ZoDream.Shared.Models;
 
 namespace ZoDream.Shared.Interfaces
@@ -13,12 +14,12 @@ namespace ZoDream.Shared.Interfaces
 
         public bool CanPrevious {  get; }
 
-        public IList<ChapterPositionItem> GetChapters();
+        public Task<IList<ChapterPositionItem>> GetChaptersAsync();
 
         /// <summary>
         /// 更新一些东西
         /// </summary>
-        public void Refresh();
+        public Task Refresh();
 
         public void SetPageScale(double scale, int max = 1);
         public void SetPage(ChapterPositionItem chapter);
@@ -28,9 +29,9 @@ namespace ZoDream.Shared.Interfaces
         public void SetPage(PositionItem position);
         public void SetPage(PagePositionItem page);
 
-        public IList<PageItem> GetPrevious();
-        public IList<PageItem> GetNext();
+        public Task<IList<PageItem>> GetPreviousAsync();
+        public Task<IList<PageItem>> GetNextAsync();
 
-        public IList<PageItem> Get();
+        public Task<IList<PageItem>> GetAsync();
     }
 }

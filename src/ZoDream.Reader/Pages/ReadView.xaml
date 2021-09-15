@@ -26,23 +26,24 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="2*" MaxWidth="400"/>
             </Grid.ColumnDefinitions>
-            <ListBox x:Name="ChapterListBox" ItemsSource="{Binding ChapterItems}" 
+            <ListBox x:Name="ChapterListBox"
+                     ItemsSource="{Binding ChapterItems}" 
                      DisplayMemberPath="Title" 
                      MouseDoubleClick="ChapterListBox_MouseDoubleClick"/>
 
             <StackPanel Orientation="Vertical"
                         Background="White"
                         Grid.Column="2">
-                <TextBlock Text="字体"/>
+                <TextBlock Text="字体" Style="{DynamicResource LabelTb}"/>
                 <ComboBox/>
-                <TextBlock Text="字体大小"/>
+                <TextBlock Text="字体大小" Style="{DynamicResource LabelTb}"/>
                 <control:NumberInput Value="28"/>
-                <TextBlock Text="背景颜色"/>
-                
-                <TextBlock Text="文字颜色"/>
-                <TextBlock Text="翻页效果"/>
-                <TextBlock Text="自动翻页"/>
-                <TextBlock Text="语音朗读"/>
+                <TextBlock Text="背景颜色" Style="{DynamicResource LabelTb}"/>
+
+                <TextBlock Text="文字颜色" Style="{DynamicResource LabelTb}"/>
+                <TextBlock Text="翻页效果" Style="{DynamicResource LabelTb}"/>
+                <TextBlock Text="自动翻页" Style="{DynamicResource LabelTb}"/>
+                <TextBlock Text="语音朗读" Style="{DynamicResource LabelTb}"/>
                 <control:SwitchInput OffLabel="关" OnLabel="开"/>
             </StackPanel>
         </Grid>
@@ -59,5 +60,6 @@
                 Background="Transparent" FontSize="30"
                 BorderThickness="0" Click="MoreBtn_Click"/>
         </Grid>
+        <control:LoadingRing x:Name="loadingRing" Grid.RowSpan="2"/>
     </Grid>
 </Window>

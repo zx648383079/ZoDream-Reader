@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ZoDream.Shared.Interfaces
 {
@@ -9,7 +10,9 @@ namespace ZoDream.Shared.Interfaces
 
         public long Position { get; set; }
 
-        public string? ReadLine();
+        public Task<string?> ReadLineAsync();
+
+        public Task<string?> ReadLineAsync(long position);
 
     }
 }

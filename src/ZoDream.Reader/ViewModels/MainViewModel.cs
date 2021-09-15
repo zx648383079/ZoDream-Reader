@@ -5,15 +5,28 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ZoDream.Reader.Models;
 using ZoDream.Reader.Repositories;
+using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.ViewModels
 {
     public class MainViewModel: BindableBase
     {
-        private Database database = new Database();
-        private Disk disk = new Disk();
+        public MainViewModel()
+        {
+            Initialize();
+        }
+
+        private async void Initialize()
+        {
+            var dbFile = await DiskRepository.CreateDatabaseAsync();
+            Database.Initialize(dbFile);
+            DatabaseRepository = new Database(dbFile);
+            Load();
+        }
+
+        public Database DatabaseRepository { get; private set; }
+        public Disk DiskRepository { get; private set; } = new Disk();
 
         private ObservableCollection<BookItem> bookItems = new ObservableCollection<BookItem>();
 
@@ -23,9 +36,9 @@ namespace ZoDream.Reader.ViewModels
             set => Set(ref bookItems, value);
         }
 
-        public void Load()
+        public async void Load()
         {
-            var items = database.GetBookList();
+            var items = DatabaseRepository.GetBooks();
             foreach (var item in items)
             {
                 BookItems.Add(item);
@@ -41,27 +54,20 @@ namespace ZoDream.Reader.ViewModels
 
         public void Load(string fileName)
         {
-            if (!disk.AddTxt(fileName, out var bookFile, out var Name))
+            var item = DiskRepository.AddTxt(fileName);
+            if (item == null)
             {
                 return;
             }
-            var item = new BookItem()
-            {
-                Name = Name,
-                FileName = bookFile,
-            };
-            database.AddBook(item);
+            DatabaseRepository.AddBook(item);
             BookItems.Add(item);
         }
 
-        public string GetFileName(BookItem book)
+        public void RemoveBook(BookItem item)
         {
-            return disk.TxtFileName(book.FileName);
-        }
-
-        internal void Update(BookItem book)
-        {
-            database.UpdateBook(book);
+            BookItems.Remove(item);
+            DatabaseRepository.DeleteBook(item);
+            _ = DiskRepository.DeleteBookAsync(item);
         }
     }
 }

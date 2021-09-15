@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using ZoDream.Reader.Models;
 using ZoDream.Reader.ViewModels;
+using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Pages
 {
@@ -27,6 +17,7 @@ namespace ZoDream.Reader.Pages
             DataContext = ViewModel;
             ViewModel.Book = book;
             Title = book.Name;
+            loadingRing.Visibility = Visibility.Visible;
         }
 
         public ReadViewModel ViewModel = new ReadViewModel();
@@ -37,11 +28,17 @@ namespace ZoDream.Reader.Pages
             ViewModel.Tokenizer.Width = PageRender.ActualWidth;
             ViewModel.Tokenizer.Height = PageRender.ActualHeight;
             ViewModel.Tokenizer.ColumnCount = 2;
-            ViewModel.Tokenizer.Refresh();
+            Load();
+        }
+
+        private async void Load()
+        {
+            await ViewModel.Tokenizer.Refresh();
             ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
             PageRender.FontSize = ViewModel.Tokenizer.FontSize;
             PageRender.Flush();
-            PageRender.Draw(ViewModel.Tokenizer.Get());
+            loadingRing.Visibility = Visibility.Collapsed;
+            PageRender.Draw(await ViewModel.Tokenizer.GetAsync());
             isBooted = true;
             ViewModel.Load();
         }
@@ -51,9 +48,9 @@ namespace ZoDream.Reader.Pages
             ViewModel.Tokenizer.Dispose();
         }
 
-        private void PageRender_OnPrevious(object sender)
+        private async void PageRender_OnPrevious(object sender)
         {
-            var items = ViewModel.Tokenizer.GetPrevious();
+            var items = await ViewModel.Tokenizer.GetPreviousAsync();
             if (items.Count < 1)
             {
                 // 不能向前了
@@ -62,13 +59,12 @@ namespace ZoDream.Reader.Pages
             PageRender.Swap(items);
             ViewModel.Book.Position = items[0].Begin;
             ViewModel.ReloadChapter();
-            App.ViewModel.Update(ViewModel.Book);
-            
+            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
         }
 
-        private void PageRender_OnNext(object sender)
+        private async void PageRender_OnNext(object sender)
         {
-            var items = ViewModel.Tokenizer.GetNext();
+            var items = await ViewModel.Tokenizer.GetNextAsync();
             if (items.Count < 1)
             {
                 // 没有更多了
@@ -77,10 +73,10 @@ namespace ZoDream.Reader.Pages
             PageRender.Swap(items);
             ViewModel.Book.Position = items[0].Begin;
             ViewModel.ReloadChapter();
-            App.ViewModel.Update(ViewModel.Book);
+            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
         }
 
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        private async void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (!isBooted)
             {
@@ -88,9 +84,9 @@ namespace ZoDream.Reader.Pages
             }
             ViewModel.Tokenizer.Width = PageRender.ActualWidth;
             ViewModel.Tokenizer.Height = PageRender.ActualHeight;
-            ViewModel.Tokenizer.Refresh();
+            await ViewModel.Tokenizer.Refresh();
             PageRender.Flush();
-            PageRender.Draw(ViewModel.Tokenizer.Get());
+            PageRender.Draw(await ViewModel.Tokenizer.GetAsync());
         }
 
         private void MoreBtn_Click(object sender, RoutedEventArgs e)
@@ -99,7 +95,7 @@ namespace ZoDream.Reader.Pages
                 Visibility.Collapsed : Visibility.Visible;
         }
 
-        private void ChapterListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private async void ChapterListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var i = ChapterListBox.SelectedIndex;
             if (i < -1)
@@ -110,7 +106,7 @@ namespace ZoDream.Reader.Pages
             var chapter = ViewModel.ChapterItems[i];
             ViewModel.ChapterTitle = chapter.Title;
             ViewModel.Tokenizer.SetPage(chapter);
-            var items = ViewModel.Tokenizer.Get();
+            var items = await ViewModel.Tokenizer.GetAsync();
             if (items.Count < 1)
             {
                 // 没有更多了
@@ -119,7 +115,7 @@ namespace ZoDream.Reader.Pages
             PageRender.Flush();
             PageRender.Draw(items);
             ViewModel.Book.Position = items[0].Begin;
-            App.ViewModel.Update(ViewModel.Book);
+            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
         }
     }
 }

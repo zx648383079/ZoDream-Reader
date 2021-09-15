@@ -8,11 +8,12 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <NavigationView BackRequested="NavigationView_BackRequested">
+    <NavigationView 
+        IsBackButtonVisible="Collapsed" ItemInvoked="NavigationView_ItemInvoked">
         <NavigationView.MenuItems>
             <NavigationViewItem Icon="Home" Content="我的书架"/>
         </NavigationView.MenuItems>
-        <Frame x:Name="frame">
+        <Frame x:Name="AppFrame">
             <Frame.ContentTransitions>
                 <TransitionCollection>
                     <NavigationThemeTransition>

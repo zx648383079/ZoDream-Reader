@@ -48,26 +48,39 @@ namespace ZoDream.Reader
         }
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            ViewModel.ChildFrame = frame;
-            if (e.NavigationMode == NavigationMode.New)
+            ViewModel.ChildFrame = AppFrame;
+            if (AppFrame.CurrentSourcePageType == null)
             {
-                ViewModel.Navigate(typeof(BookPage));
+                NavigatePage(typeof(BookPage));
             }
             base.OnNavigatedTo(e);
+            ViewModel.ListenNavigate(true);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            if (ViewModel.ChildFrame == frame)
+            if (ViewModel.ChildFrame == AppFrame)
             {
                 ViewModel.ChildFrame = null;
             }
         }
 
-        private void NavigationView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
+        private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            frame.GoBack();
+            var label = args.InvokedItemContainer.Name;
+            var pageType =
+                args.IsSettingsInvoked ? typeof(SettingPage) :
+                typeof(BookPage);
+            NavigatePage(pageType);
+        }
+
+        private void NavigatePage(Type pageType)
+        {
+            if (pageType != null && pageType != AppFrame.CurrentSourcePageType)
+            {
+                AppFrame.Navigate(pageType);
+            }
         }
     }
 }

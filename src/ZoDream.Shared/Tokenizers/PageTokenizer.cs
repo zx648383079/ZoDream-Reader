@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
 
@@ -112,7 +113,7 @@ namespace ZoDream.Shared.Tokenizers
         #endregion
 
         #region 对章节的操作
-        public IList<ChapterPositionItem> GetChapters()
+        public async Task<IList<ChapterPositionItem>> GetChaptersAsync()
         {
             var items = new List<ChapterPositionItem>();
             if (Content == null)
@@ -124,7 +125,7 @@ namespace ZoDream.Shared.Tokenizers
             while (true)
             {
                 var postion = Content.Position;
-                var line = Content.ReadLine();
+                var line = await Content.ReadLineAsync();
                 if (line == null)
                 {
                     break;
@@ -179,7 +180,7 @@ namespace ZoDream.Shared.Tokenizers
 
 
 
-        public IList<PagePositionItem> GetPages()
+        public async Task<IList<PagePositionItem>> GetPagesAsync()
         {
             var items = new List<PagePositionItem>();
             if (Content == null)
@@ -189,6 +190,10 @@ namespace ZoDream.Shared.Tokenizers
             Content.Position = 0;
             var maxH = PageInnerHeight;
             var maxW = PageInnerWidth;
+            if (maxH <= 0 || maxW <= 0)
+            {
+                throw new ArgumentOutOfRangeException("view size error");
+            }
             var fontH = FontSize + LineSpace;
             var x = .0;
             var y = .0;
@@ -199,7 +204,7 @@ namespace ZoDream.Shared.Tokenizers
             while (true)
             {
                 var position = Content.Position;
-                var line = Content.ReadLine();
+                var line = await Content.ReadLineAsync();
                 if (line == null)
                 {
                     page.End = new PositionItem(position);
@@ -245,12 +250,12 @@ namespace ZoDream.Shared.Tokenizers
             return items;
         }
 
-        public PageItem GetPage(PagePositionItem page)
+        public async Task<PageItem> GetPageAsync(PagePositionItem page)
         {
-            return GetPage(page.Begin);
+            return await GetPageAsync(page.Begin);
         }
 
-        public PageItem GetPage(PositionItem begin)
+        public async Task<PageItem> GetPageAsync(PositionItem begin)
         {
             var data = new PageItem()
             {
@@ -271,7 +276,7 @@ namespace ZoDream.Shared.Tokenizers
             while (true)
             {
                 var position = Content.Position;
-                var line = Content.ReadLine();
+                var line = await Content.ReadLineAsync();
                 if (line == null)
                 {
                     break;
@@ -321,23 +326,23 @@ namespace ZoDream.Shared.Tokenizers
             return data;
         }
 
-        public PageItem GetPage(long position)
+        public async Task<PageItem> GetPageAsync(long position)
         {
-            return GetPage(new PositionItem(position));
+            return await GetPageAsync(new PositionItem(position));
         }
 
-        public IList<PageItem> GetPages(PagePositionItem page, int count)
+        public async Task<IList<PageItem>> GetPagesAsync(PagePositionItem page, int count)
         {
-            return GetPages(page.Begin, count);
+            return await GetPagesAsync(page.Begin, count);
         }
 
-        public IList<PageItem> GetPages(PositionItem begin, int count)
+        public async Task<IList<PageItem>> GetPagesAsync(PositionItem begin, int count)
         {
             var items = new List<PageItem>();
             var position = begin;
             for (int i = 0; i < count; i++)
             {
-                var page = GetPage(position);
+                var page = await GetPageAsync(position);
                 ResetPage(PageX(i), PageY(i), ref page);
                 items.Add(page);
                 position = page.End + 1;
@@ -345,9 +350,9 @@ namespace ZoDream.Shared.Tokenizers
             return items;
         }
 
-        public IList<PageItem> GetPages(long position, int count)
+        public async Task<IList<PageItem>> GetPagesAsync(long position, int count)
         {
-            return GetPages(new PositionItem(position), count);
+            return await GetPagesAsync(new PositionItem(position), count);
         }
 
         /// <summary>
@@ -369,9 +374,9 @@ namespace ZoDream.Shared.Tokenizers
             page.Top = y;
         }
 
-        public void Refresh()
+        public async Task Refresh()
         {
-            CachePages = GetPages();
+            CachePages = await GetPagesAsync();
         }
 
         /// <summary>
@@ -429,38 +434,45 @@ namespace ZoDream.Shared.Tokenizers
         /// 获取当前页
         /// </summary>
         /// <returns></returns>
-        public IList<PageItem> Get()
+        public async Task<IList<PageItem>> GetAsync()
         {
+            if (Page < 0)
+            {
+                Page = 0;
+            } else if (Page >= CachePages.Count)
+            {
+                Page = CachePages.Count  - 1;
+            }
             var item = CachePages[Page];
-            return GetPages(item, ColumnCount);
+            return await GetPagesAsync(item, ColumnCount);
         }
 
         /// <summary>
         /// 获取下一页
         /// </summary>
         /// <returns></returns>
-        public IList<PageItem> GetNext()
+        public async Task<IList<PageItem>> GetNextAsync()
         {
             if (!CanNext)
             {
                 return new List<PageItem>();
             }
             Page++;
-            return Get();
+            return await GetAsync();
         }
 
         /// <summary>
         /// 获取上一页
         /// </summary>
         /// <returns></returns>
-        public IList<PageItem> GetPrevious()
+        public async Task<IList<PageItem>> GetPreviousAsync()
         {
             if (!CanPrevious)
             {
                 return new List<PageItem>();
             }
             Page --;
-            return Get();
+            return await GetAsync();
         }
 
         public void Dispose()

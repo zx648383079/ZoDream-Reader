@@ -150,5 +150,10 @@ namespace ZoDream.Reader.Controls
                 Draw(lastPage);
             }
         }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            renderTarget = null;
+        }
     }
 }

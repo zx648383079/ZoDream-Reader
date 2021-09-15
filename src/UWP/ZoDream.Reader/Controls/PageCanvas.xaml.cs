@@ -2,21 +2,13 @@
 using Microsoft.Graphics.Canvas.Text;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using ZoDream.Reader.Events;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
@@ -34,6 +26,9 @@ namespace ZoDream.Reader.Controls
 
         private CanvasRenderTarget renderTarget;
         private Point lastMousePoint = new Point(0, 0);
+        private IEnumerable<PageItem> lastPage;
+        private bool lastBooted = false;
+
         public event ControlEventHandler OnPrevious;
         public event ControlEventHandler OnNext;
 
@@ -48,7 +43,10 @@ namespace ZoDream.Reader.Controls
 
         private void DrawerCanvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
         {
-            
+            if (lastPage != null && !lastBooted)
+            {
+                Draw(lastPage);
+            }
         }
 
         public void Draw(CharItem item)
@@ -81,11 +79,26 @@ namespace ZoDream.Reader.Controls
 
         public void Draw(IEnumerable<PageItem> pages)
         {
-            renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
+            lastPage = pages;
+            lastBooted = false;
+            if (renderTarget == null)
+            {
+                try
+                {
+                    renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
                    (float)DrawerCanvas.ActualHeight, 96);
-            var font = new CanvasTextFormat();
-            font.FontFamily = FontFamily.ToString();
-            font.FontSize = (float)FontSize;
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+            }
+            lastBooted = true;
+            var font = new CanvasTextFormat()
+            {
+                FontFamily = FontFamily.ToString(), // name.ttf#name
+                FontSize = (float)FontSize
+            };
             var color = ColorHelper.FromArgb(255, 0, 0, 0);
             using (var ds = renderTarget.CreateDrawingSession())
             {
@@ -105,7 +118,8 @@ namespace ZoDream.Reader.Controls
 
         public void Swap(IEnumerable<PageItem> pages)
         {
-            throw new NotImplementedException();
+            Flush();
+            Draw(pages);
         }
 
         public void Flush()
@@ -134,7 +148,11 @@ namespace ZoDream.Reader.Controls
 
         private void UserControl_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
-            var p = e.Position;
+            MouseMoveEnd(e.Position);
+        }
+
+        private void MouseMoveEnd(Point p)
+        {
             var diffX = p.X - lastMousePoint.X;
             var diffY = p.Y - lastMousePoint.Y;
             var diff = Math.Pow(diffX, 2) + Math.Pow(diffY, 2);
@@ -168,7 +186,16 @@ namespace ZoDream.Reader.Controls
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             renderTarget = null;
-            DrawerCanvas.Invalidate();
+        }
+
+        private void UserControl_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            lastMousePoint = e.GetCurrentPoint(this).Position;
+        }
+
+        private void UserControl_PointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            MouseMoveEnd(e.GetCurrentPoint(this).Position);
         }
     }
 }

@@ -1,17 +1,14 @@
 ﻿<Page
-    x:Class="ZoDream.Reader.Pages.BookPage"
+    x:Class="ZoDream.Reader.Pages.SettingPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:control="using:ZoDream.Reader.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <control:ActionListBox x:Name="BookListBox" 
-                               Items="{x:Bind ViewModel.BookItems, Mode=OneWay}"
-                               OnAdd="BookListBox_OnAdd" OnAction="BookListBox_OnAction"/>
+
     </Grid>
 </Page>

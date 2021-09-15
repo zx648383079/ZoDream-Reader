@@ -4,4 +4,7 @@
 
     <FontFamily x:Key="IconFontFamily">Segoe MDL2 Assets</FontFamily>
     <FontFamily x:Key="TextFontFamily">Microsoft YaHei</FontFamily>
+    <Style x:Key="LabelTb" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0 5"/>
+    </Style>
 </ResourceDictionary>

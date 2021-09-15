@@ -13,9 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ZoDream.Reader.Events;
-using ZoDream.Reader.Models;
 using ZoDream.Reader.Pages;
 using ZoDream.Reader.ViewModels;
+using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader
 {
@@ -72,12 +72,17 @@ namespace ZoDream.Reader
             {
                 var page = new ReadView(item);
                 page.ShowDialog();
+                return;
+            }
+            if (e == ActionEvent.DELETE)
+            {
+                ViewModel.RemoveBook(item);
+                return;
             }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            ViewModel.Load();
         }
     }
 }

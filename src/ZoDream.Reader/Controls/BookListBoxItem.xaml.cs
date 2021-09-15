@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ZoDream.Reader.Events;
-using ZoDream.Reader.Models;
+using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Controls
 {

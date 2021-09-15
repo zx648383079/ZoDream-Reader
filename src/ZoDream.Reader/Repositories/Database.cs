@@ -2,43 +2,37 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using ZoDream.Reader.Models;
+using System.IO;
+using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Repositories
 {
-    public class Database: IDisposable
+    public class Database: IDatabaseRepository
     {
-        public Database()
+        public Database(string dbFile)
         {
-            connection = new SqliteConnection("Data Source=zodream.db");
+            connection = new SqliteConnection($"Data Source={dbFile}");
             connection.Open();
         }
         private SqliteConnection connection;
+        
 
-        public void Open()
+        public void DeleteBook(object id)
         {
             var command = connection.CreateCommand();
             command.CommandText =
-            @"
-        SELECT name
-        FROM user
-        WHERE id = $id
-    ";
-            command.Parameters.AddWithValue("$id", 1);
-
-            using (var reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    var name = reader.GetString(0);
-
-                    Console.WriteLine($"Hello, {name}!");
-                }
-            }
+                @"DELETE FROM Book WHERE Id=:id";
+            command.Parameters.AddWithValue(":id", id); ;
+            command.ExecuteNonQuery();
         }
 
-        public IList<BookItem> GetBookList()
+        public void DeleteBook(BookItem item)
+        {
+            DeleteBook(item.Id);
+        }
+
+        public IList<BookItem> GetBooks()
         {
             var items = new List<BookItem>();
             var command = connection.CreateCommand();
@@ -49,12 +43,10 @@ namespace ZoDream.Reader.Repositories
             {
                 while (reader.Read())
                 {
-                    items.Add(new BookItem()
+                    items.Add(new BookItem(reader.GetString(1), reader.GetString(3))
                     {
                         Id = reader.GetInt32(0),
-                        Name = reader.GetString(1),
                         Cover = reader.GetString(2),
-                        FileName = reader.GetString(3),
                         Position = new PositionItem(reader.GetString(4)),
                     });
                 }
@@ -66,7 +58,7 @@ namespace ZoDream.Reader.Repositories
         {
             if (string.IsNullOrEmpty(item.Cover))
             {
-                item.Cover = BookItem.RandomCover();
+                item.Cover = Utils.Converter.RandomCover();
             }
             var command = connection.CreateCommand();
             command.CommandText =
@@ -87,7 +79,7 @@ namespace ZoDream.Reader.Repositories
         {
             if (string.IsNullOrEmpty(item.Cover))
             {
-                item.Cover = BookItem.RandomCover();
+                item.Cover = Utils.Converter.RandomCover();
             }
             var command = connection.CreateCommand();
             command.CommandText =
@@ -103,14 +95,6 @@ namespace ZoDream.Reader.Repositories
             command.ExecuteNonQuery();
         }
 
-        public void RemoveBook(BookItem item)
-        {
-            var command = connection.CreateCommand();
-            command.CommandText =
-                @"DELETE FROM Book WHERE Id=:id";
-            command.Parameters.AddWithValue(":id", item.Id);;
-            command.ExecuteNonQuery();
-        }
 
         public void GetSetting()
         {
@@ -125,6 +109,33 @@ namespace ZoDream.Reader.Repositories
         public void Dispose()
         {
             connection.Dispose();
+        }
+
+        public static void Initialize(string dbFile)
+        {
+            using (var db = new SqliteConnection($"Data Source={dbFile}"))
+            {
+                db.Open();
+                var sql = @"
+CREATE TABLE IF NOT EXISTS Book (
+    Id    INTEGER NOT NULL,
+	Name  TEXT NOT NULL,
+	Cover TEXT NOT NULL,
+	FileName  TEXT NOT NULL,
+	Position  TEXT NOT NULL,
+	CreatedAt NUMERIC NOT NULL,
+	UpdatedAt BLOB NOT NULL,
+	PRIMARY KEY(Id AUTOINCREMENT)
+);
+CREATE TABLE IF NOT EXISTS Setting (
+    Name  TEXT NOT NULL,
+	Value TEXT NOT NULL,
+	PRIMARY KEY(Name)
+);
+";
+                var createTable = new SqliteCommand(sql, db);
+                var q = createTable.ExecuteReader();
+            }
         }
     }
 }

@@ -35,9 +35,18 @@ namespace ZoDream.Shared.Renders
         {
             var bytes = new List<byte>();
             var isEnd = false;
+            int bInt;
             while (true)
             {
-                var bInt = _reader.ReadByte();
+                try
+                {
+                    bInt = _reader.ReadByte();
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    isEnd = true;
+                    break;
+                }
                 if (bInt == -1)
                 {
                     isEnd = true;
@@ -69,6 +78,20 @@ namespace ZoDream.Shared.Renders
         public void Dispose()
         {
             _reader?.Close();
+        }
+
+        public Task<string?> ReadLineAsync()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return ReadLine();
+            });
+        }
+
+        public Task<string?> ReadLineAsync(long position)
+        {
+            Position = position;
+            return ReadLineAsync();
         }
     }
 }

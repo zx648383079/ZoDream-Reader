@@ -5,23 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Models;
 
-namespace ZoDream.Reader.Models
+namespace ZoDream.Shared.Models
 {
     public class BookItem
     {
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public string Cover { get; set; }
+        public string? Cover { get; set; }
 
         public string FileName { get; set; }
 
         public PositionItem Position { get; set; } = new PositionItem();
-
-        public static string RandomCover()
+        public BookItem(string name, string fileName)
         {
-            var rd = new Random();
-            return $"Assets/cover{rd.Next(1, 11)}.jpg";
+            Name = name;
+            FileName = fileName;
         }
     }
 }
