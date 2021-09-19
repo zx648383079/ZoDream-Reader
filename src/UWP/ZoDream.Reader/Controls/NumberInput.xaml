@@ -1,0 +1,23 @@
+﻿<UserControl
+    x:Class="ZoDream.Reader.Controls.NumberInput"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Height="30"
+    mc:Ignorable="d"
+    d:DesignHeight="30" d:DesignWidth="200">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MaxWidth="60"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*" MaxWidth="60"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="MinusBtn" Content="-" Click="MinusBtn_Click"/>
+        <TextBox x:Name="NumberTb" Grid.Column="1" 
+                 TextAlignment="Center" TextChanged="NumberTb_TextChanged"/>
+        <Button x:Name="PlusBtn" Content="+" Grid.Column="2" Click="PlusBtn_Click"/>
+    </Grid>
+</UserControl>
