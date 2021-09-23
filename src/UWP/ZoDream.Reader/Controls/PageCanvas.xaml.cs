@@ -96,7 +96,7 @@ namespace ZoDream.Reader.Controls
             lastBooted = true;
             var font = new CanvasTextFormat()
             {
-                FontFamily = FontFamily.ToString(), // name.ttf#name
+                FontFamily = FontFamily.Source, // name.ttf#name
                 FontSize = (float)FontSize
             };
             var color = ColorHelper.FromArgb(255, 0, 0, 0);

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -95,15 +96,40 @@ namespace ZoDream.Reader.Repositories
             command.ExecuteNonQuery();
         }
 
-
-        public void GetSetting()
+        public UserSetting GetSetting()
         {
-            throw new NotImplementedException();
+            var command = connection.CreateCommand();
+            command.CommandText =
+                @"SELECT Value FROM Setting WHERE Name=:name LIMIT 1";
+            command.Parameters.AddWithValue(":name", "setting"); ;
+            var data = command.ExecuteScalar();
+            if (data == null)
+            {
+                return ResetSetting();
+            }
+            return JsonConvert.DeserializeObject<UserSetting>((string)data);
         }
 
-        public void SaveSetting()
+        public void SaveSetting(UserSetting data)
         {
-            throw new NotImplementedException();
+            var command = connection.CreateCommand();
+            command.CommandText =
+                @"UPDATE Setting 
+                    SET Value=:value
+                  WHERE Name=:name";
+            command.Parameters.AddWithValue(":name", "setting");
+            command.Parameters.AddWithValue(":value", JsonConvert.SerializeObject(data));
+            command.ExecuteNonQuery();
+        }
+
+        public UserSetting ResetSetting()
+        {
+            var command = connection.CreateCommand();
+            command.CommandText =
+                @"DELETE FROM Setting WHERE Name=:name";
+            command.Parameters.AddWithValue(":name", "setting"); ;
+            command.ExecuteNonQuery();
+            return new UserSetting();
         }
 
         public void Dispose()
@@ -137,5 +163,6 @@ CREATE TABLE IF NOT EXISTS Setting (
                 var q = createTable.ExecuteReader();
             }
         }
+
     }
 }

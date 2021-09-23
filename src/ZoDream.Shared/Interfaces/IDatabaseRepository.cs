@@ -18,5 +18,11 @@ namespace ZoDream.Shared.Interfaces
         public void DeleteBook(object id);
 
         public void DeleteBook(BookItem item);
+
+        public UserSetting GetSetting();
+
+        public void SaveSetting(UserSetting data);
+
+        public UserSetting ResetSetting();
     }
 }

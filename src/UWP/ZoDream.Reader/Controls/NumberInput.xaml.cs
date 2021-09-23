@@ -63,17 +63,17 @@ namespace ZoDream.Reader.Controls
 
 
 
-        public int Value
+        public float Value
         {
-            get { return (int)GetValue(ValueProperty); }
+            get { return (float)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Value.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(int), typeof(NumberInput), new PropertyMetadata(0, OnValueChanged));
+            DependencyProperty.Register("Value", typeof(float), typeof(NumberInput), new PropertyMetadata(0f, OnValueChanged));
 
-        public event ValueChangedEventHandler<int> ValueChanged;
+        public event ValueChangedEventHandler<float> ValueChanged;
 
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

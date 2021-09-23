@@ -110,6 +110,8 @@ namespace ZoDream.Shared.Tokenizers
         /// </summary>
         public int Page { get; set; } = 0;
 
+        public int PageCount => CachePages.Count;
+
         public bool CanNext => Page < CachePages.Count - 1;
 
         public bool CanPrevious => Page > 0;
@@ -461,7 +463,7 @@ namespace ZoDream.Shared.Tokenizers
             {
                 return new List<PageItem>();
             }
-            Page++;
+            Page+= ColumnCount;
             return await GetAsync();
         }
 
@@ -475,7 +477,7 @@ namespace ZoDream.Shared.Tokenizers
             {
                 return new List<PageItem>();
             }
-            Page --;
+            Page -= ColumnCount;
             return await GetAsync();
         }
 

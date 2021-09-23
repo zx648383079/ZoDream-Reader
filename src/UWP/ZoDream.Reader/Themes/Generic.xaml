@@ -5,5 +5,8 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="ms-appx:///Themes/ActionListBox.xaml"/>
         <ResourceDictionary Source="ms-appx:///Themes/AddListBoxItem.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Themes/PanelDialog.xaml"/>
     </ResourceDictionary.MergedDictionaries>
+
+    
 </ResourceDictionary>

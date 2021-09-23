@@ -26,7 +26,7 @@ namespace ZoDream.Reader.Pages
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             ViewModel.Tokenizer.Width = PageRender.ActualWidth;
-            ViewModel.Tokenizer.Height = PageRender.ActualHeight;
+            ViewModel.Tokenizer.Height = PageRender.ActualHeight - 20;
             ViewModel.Tokenizer.ColumnCount = 2;
             Load();
         }

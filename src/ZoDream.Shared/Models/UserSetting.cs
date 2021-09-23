@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ZoDream.Shared.Models
+{
+    public class UserSetting
+    {
+        public int FontSize { get; set; } = 18;
+
+        public string FontFamily { get; set; } = string.Empty;
+
+        public string Background { get; set; } = string.Empty;
+
+        public string BackgroundImage { get; set; } = string.Empty;
+
+        public string Foreground { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 开启夜间模式
+        /// </summary>
+        public bool OpenDark { get; set; } = false;
+
+        public int LineSpace { get; set; } = 5;
+
+        public int LetterSpace { get; set; } = 5;
+
+        public int Padding { get; set; } = 10;
+
+        public bool IsSimple { get; set; } = true;
+
+        public int Animation { get; set; } = 0;
+
+        public bool AutoFlip { get; set; } = false;
+
+        public float FlipSpace { get; set; } = 100;
+
+        public bool OpenSpeek { get; set; } = false;
+
+        public float SpeekSpeed { get; set; } = 1;
+    }
+}

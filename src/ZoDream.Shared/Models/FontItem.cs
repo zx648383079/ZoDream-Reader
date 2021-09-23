@@ -23,9 +23,26 @@ namespace ZoDream.Shared.Models
             }
         }
 
+        public override string ToString()
+        {
+            return FontFamily;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ToString() == obj.ToString();
+        }
+
         public FontItem(string name)
         {
-            Name = name;
+            var args = name.Split('#');
+            if (args.Length == 1)
+            {
+                Name = args[0];
+                return;
+            }
+            Name = args[1];
+            FileName = args[0];
         }
     }
 }

@@ -29,7 +29,22 @@
             <Button Grid.Column="2" Content="&#xE10C;" 
                 FontFamily="{StaticResource IconFontFamily}"
                 Background="Transparent" FontSize="30"
-                BorderThickness="0"/>
+                BorderThickness="0">
+                <Button.Flyout>
+                    <Flyout>
+                        <StackPanel Orientation="Vertical" Margin="0" MinWidth="200">
+                            <control:MenuItem x:Name="JumpBtn" Icon="&#xE143;" Label="跳转进度" Tapped="JumpBtn_Tapped"/>
+                            <control:MenuItem x:Name="ChapterBtn" Icon="&#xE14C;" Label="目录" Tapped="ChapterBtn_Tapped"/>
+                            <control:MenuItem x:Name="SettingBtn" Icon="&#xE115;" Label="设置" Tapped="SettingBtn_Tapped"/>
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
         </Grid>
+        <control:PanelDialog x:Name="ChapterPanel" Header="章节目录">
+            <ListBox x:Name="ChapterListBox" ItemsSource="{x:Bind ViewModel.ChapterItems}" 
+                     DisplayMemberPath="Title" SelectionChanged="ChapterListBox_SelectionChanged"/>
+        </control:PanelDialog>
+        <control:LoadingRing x:Name="LoadingBtn" Grid.RowSpan="2"/>
     </Grid>
 </Page>

@@ -30,7 +30,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="行间距" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput Grid.Column="1"/>
+                    <control:NumberInput x:Name="lineTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -38,7 +38,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="字间距" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput Grid.Column="1"/>
+                    <control:NumberInput x:Name="letterTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -46,7 +46,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="页边距" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput Grid.Column="1"/>
+                    <control:NumberInput x:Name="paddingTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -55,9 +55,12 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="字体" Style="{StaticResource LabelTb}"/>
-                    <ComboBox Grid.Column="1" ItemsSource="{x:Bind ViewModel.FontItems}" 
+                    <ComboBox x:Name="fontTb" Grid.Column="1" ItemsSource="{x:Bind ViewModel.FontItems}" 
                               DisplayMemberPath="Name"/>
-                    <Button Content="&#xE11C;" FontFamily="{StaticResource IconFontFamily}" Grid.Column="2"/>
+                    <Button x:Name="openFontBtn" 
+                            Click="openFontBtn_Click"
+                            Content="&#xE11C;" 
+                            FontFamily="{StaticResource IconFontFamily}" Grid.Column="2"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -65,7 +68,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="字号" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput Grid.Column="1"/>
+                    <control:NumberInput x:Name="sizeTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -73,17 +76,17 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="简繁体" Style="{StaticResource LabelTb}"/>
-                    <ToggleSwitch Grid.Column="1" OffContent="简体" OnContent="繁体"/>
+                    <ToggleSwitch x:Name="simpleTb" Grid.Column="1" OffContent="简体" OnContent="繁体"/>
                 </Grid>
                 <TextBlock Text="翻页动画" Style="{StaticResource LabelTb}"/>
-                <ListBox Style="{StaticResource SelectTb}" ItemsSource="{x:Bind ViewModel.AnimateItems}"/>
+                <ListBox x:Name="animateListBox" Style="{StaticResource SelectTb}" ItemsSource="{x:Bind ViewModel.AnimateItems}"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="自动翻页" Style="{StaticResource LabelTb}"/>
-                    <ToggleSwitch Grid.Column="1" OffContent="关闭" OnContent="开启"/>
+                    <ToggleSwitch x:Name="flipTb" Grid.Column="1" OffContent="关闭" OnContent="开启"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -91,7 +94,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="翻页间隔/s" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput Grid.Column="1"/>
+                    <control:NumberInput x:Name="flipSpaceTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -99,7 +102,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="语音朗读" Style="{StaticResource LabelTb}"/>
-                    <ToggleSwitch Grid.Column="1" OffContent="关闭" OnContent="开启"/>
+                    <ToggleSwitch x:Name="speekTb" Grid.Column="1" OffContent="关闭" OnContent="开启"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -107,7 +110,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="朗读速度/x" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput Grid.Column="1"/>
+                    <control:NumberInput x:Name="speekSpeedTb" Grid.Column="1"/>
                 </Grid>
             </StackPanel>
         </ScrollViewer>

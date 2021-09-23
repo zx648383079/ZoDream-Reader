@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using ZoDream.Reader.Controls;
 using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Models;
 
@@ -43,11 +44,18 @@ namespace ZoDream.Reader.Pages
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            LoadingBtn.Visibility = Visibility.Visible;
             App.ViewModel.ListenNavigate();
             ViewModel.Book = e.Parameter as BookItem;
             ApplicationView.GetForCurrentView().Title = ViewModel.Book.Name;
-
-            PageRender.FontSize = ViewModel.Tokenizer.FontSize;
+            var setting = App.ViewModel.Setting;
+            PageRender.FontSize = ViewModel.Tokenizer.FontSize = setting.FontSize;
+            PageRender.FontFamily = new FontFamily(setting.FontFamily);
+            ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
+                ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
+            ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
+            ViewModel.Tokenizer.LineSpace = setting.LineSpace;
+            ViewModel.Tokenizer.Gap = setting.Padding * 2;
             ViewModel.Tokenizer.ColumnCount = 2;
             BootAsync();
         }
@@ -57,13 +65,14 @@ namespace ZoDream.Reader.Pages
             if (PageRender.ActualWidth > 0)
             {
                 ViewModel.Tokenizer.Width = PageRender.ActualWidth;
-                ViewModel.Tokenizer.Height = PageRender.ActualHeight;
+                ViewModel.Tokenizer.Height = PageRender.ActualHeight - 20;
                 await ViewModel.Tokenizer.Refresh();
                 ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
                 PageRender.Flush();
                 PageRender.Draw(await ViewModel.Tokenizer.GetAsync());
                 ViewModel.Load();
                 isBooted = true;
+                LoadingBtn.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -106,6 +115,64 @@ namespace ZoDream.Reader.Pages
             PageRender.Swap(items);
             ViewModel.Book.Position = items[0].Begin;
             ViewModel.ReloadChapter();
+            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+        }
+
+        private async void JumpBtn_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (ViewModel.Tokenizer.PageCount < 1)
+            {
+                return;
+            }
+            var dialog = new ProgressDialog();
+            dialog.Value = ViewModel.Tokenizer.Page * 100 / ViewModel.Tokenizer.PageCount;
+            var res = await dialog.ShowAsync();
+            if (res != ContentDialogResult.Primary)
+            {
+                return;
+            }
+            ViewModel.Tokenizer.SetPageScale(dialog.Value, 100);
+            var items = await ViewModel.Tokenizer.GetAsync();
+            if (items.Count < 1)
+            {
+                // 不能向前了
+                return;
+            }
+            PageRender.Swap(items);
+            ViewModel.Book.Position = items[0].Begin;
+            ViewModel.ReloadChapter();
+            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+        }
+
+        private void SettingBtn_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            App.ViewModel.Navigate(typeof(SettingPage), null, false);
+        }
+
+        private void ChapterBtn_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            ChapterPanel.IsOpen = !ChapterPanel.IsOpen;
+        }
+
+        private async void ChapterListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var i = ChapterListBox.SelectedIndex;
+            if (i < -1)
+            {
+                return;
+            }
+            var chapter = ViewModel.ChapterItems[i];
+            ViewModel.ChapterTitle = chapter.Title;
+            ViewModel.Tokenizer.SetPage(chapter);
+            var items = await ViewModel.Tokenizer.GetAsync();
+            if (items.Count < 1)
+            {
+                // 没有更多了
+                return;
+            }
+            PageRender.Flush();
+            PageRender.Draw(items);
+            ViewModel.Book.Position = items[0].Begin;
             App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
         }
     }
