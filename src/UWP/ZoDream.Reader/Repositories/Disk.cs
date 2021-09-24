@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FontInfo;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -8,6 +9,8 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
+using Vortice.DirectWrite;
+using static Vortice.DirectWrite.DWrite;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -34,7 +37,8 @@ namespace ZoDream.Reader.Repositories
 
         public IList<FontItem> GetFonts()
         {
-            var factory = new SharpDX.DirectWrite.Factory();
+            var factory = DWriteCreateFactory<IDWriteFactory>();
+
             var fontCollection = factory.GetSystemFontCollection(false);
             var familCount = fontCollection.FontFamilyCount;
             var items = new List<FontItem>();
@@ -54,6 +58,8 @@ namespace ZoDream.Reader.Repositories
                 string name = familyNames.GetString(index);
                 items.Add(new FontItem(name));
             }
+            fontCollection.Dispose();
+            factory.Dispose();
             return items;
         }
 
@@ -69,14 +75,9 @@ namespace ZoDream.Reader.Repositories
         {
             var name = file.Name.Substring(0, file.Name.IndexOf('.'));
             var fileId = file.Name;
-            var tempfile = await file.CopyAsync(FontFolder);
-            var pfc = new System.Drawing.Text.PrivateFontCollection();
-            pfc.AddFontFile(tempfile.Path);
-            var item = pfc.Families.FirstOrDefault();
-            if (item != null)
-            {
-                name = item.Name;
-            }
+            var tempfile = await file.CopyAsync(FontFolder, file.Name, NameCollisionOption.ReplaceExisting);
+            // var factory = DWriteCreateFactory<IDWriteFactory>();
+            // var fontRef = factory.CreateFontFileReference(tempfile.Path);
             return new FontItem(name)
             {
                 FileName = fileId,

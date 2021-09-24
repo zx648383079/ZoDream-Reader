@@ -1,20 +1,13 @@
-﻿using SharpDX.Direct2D1;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Vortice.DCommon;
+using Vortice.Direct2D1;
+using Vortice.Direct3D;
+using Vortice.Direct3D11;
+using Vortice.DXGI;
+using static Vortice.Direct2D1.D2D1;
+using static Vortice.Direct3D11.D3D11;
 
 namespace ZoDream.Reader.Drawing
 {
@@ -30,14 +23,12 @@ namespace ZoDream.Reader.Drawing
 
         // - field -----------------------------------------------------------------------
 
-        private SharpDX.Direct3D11.Device device;
-        private Texture2D renderTarget;
-        private Dx11ImageSource d3DSurface;
-        private RenderTarget d2DRenderTarget;
-        private SharpDX.Direct2D1.Factory d2DFactory;
-
-        protected ResourceCache resCache = new ResourceCache();
-
+        private ID3D11Device device;
+        private SurfaceImageSource dxgiSurface;
+        private ID2D1RenderTarget d2DRenderTarget;
+        private ID3D11Texture2D renderTarget;
+        private ID2D1Factory d2DFactory;
+        private IDXGIFactory dXGIFactory;
 
         public event RenderEventHandler? Draw;
         public event RenderEventHandler? CreateResources;
@@ -48,10 +39,9 @@ namespace ZoDream.Reader.Drawing
         public void Invalidate()
         {
             PrepareAndCallRender();
-            d3DSurface.InvalidateD3DImage();
         }
 
-        public void DrawImage(RenderTarget renderTarget)
+        public void DrawImage(ID2D1RenderTarget renderTarget)
         {
             device.ImmediateContext.Flush();
         }
@@ -62,34 +52,44 @@ namespace ZoDream.Reader.Drawing
 
         private void StartD3D()
         {
-            device = new SharpDX.Direct3D11.Device(SharpDX.Direct3D.DriverType.Hardware, DeviceCreationFlags.BgraSupport);
-            d3DSurface = new Dx11ImageSource();
-            imageBox.Source = d3DSurface;
+            var res = D3D11CreateDevice(null, DriverType.Hardware, DeviceCreationFlags.BgraSupport, new[]
+            {
+                Vortice.Direct3D.FeatureLevel.Level_11_1,
+                Vortice.Direct3D.FeatureLevel.Level_11_0,
+                Vortice.Direct3D.FeatureLevel.Level_10_1,
+                Vortice.Direct3D.FeatureLevel.Level_10_0
+            }, out var tempDevice, out var _);
+            if (res.Failure)
+            {
+                return;
+            }
+            device = tempDevice.QueryInterface<ID3D11Device1>();
+            d2DFactory = D2D1CreateFactory<ID2D1Factory1>();
+            dXGIFactory = DXGI.CreateDXGIFactory1<IDXGIFactory1>();
+            dxgiSurface = new SurfaceImageSource();
+            imageBox.Source = dxgiSurface;
         }
 
         private void EndD3D()
         {
             imageBox.Source = null;
-
-            Disposer.SafeDispose(ref d2DRenderTarget);
-            Disposer.SafeDispose(ref d2DFactory);
-            Disposer.SafeDispose(ref d3DSurface);
-            Disposer.SafeDispose(ref renderTarget);
-            Disposer.SafeDispose(ref device);
+            dxgiSurface.SetRenderTarget(null);
+            d2DRenderTarget?.Dispose();
+            d2DFactory?.Dispose();
+            renderTarget?.Dispose();
+            dxgiSurface?.Dispose();
+            device?.Dispose();
         }
 
-        public RenderTarget? CreateRenderTarget()
+        public ID2D1RenderTarget? CreateRenderTarget()
         {
-            if (d3DSurface == null)
+            if (dxgiSurface == null)
             {
                 return null;
             }
 
-            d3DSurface.SetRenderTarget(null);
-
-            Disposer.SafeDispose(ref d2DRenderTarget);
-            Disposer.SafeDispose(ref d2DFactory);
-            Disposer.SafeDispose(ref renderTarget);
+            d2DRenderTarget?.Dispose();
+            renderTarget?.Dispose();
 
             var width = Math.Max((int)ActualWidth, 100);
             var height = Math.Max((int)ActualHeight, 100);
@@ -108,18 +108,13 @@ namespace ZoDream.Reader.Drawing
                 ArraySize = 1
             };
 
-            renderTarget = new Texture2D(device, renderDesc);
+            renderTarget = device.CreateTexture2D(renderDesc);
 
-            var surface = renderTarget.QueryInterface<Surface>();
+            var surface = renderTarget.QueryInterface<IDXGISurface>();
 
-            d2DFactory = new SharpDX.Direct2D1.Factory();
-            var rtp = new RenderTargetProperties(new SharpDX.Direct2D1.PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied));
-            d2DRenderTarget = new RenderTarget(d2DFactory, surface, rtp);
-            resCache.RenderTarget = d2DRenderTarget;
-
-            d3DSurface.SetRenderTarget(renderTarget);
-
-            device.ImmediateContext.Rasterizer.SetViewport(0, 0, width, height, 0.0f, 1.0f);
+            var rtp = new RenderTargetProperties(new PixelFormat(Format.Unknown, Vortice.DCommon.AlphaMode.Premultiplied));
+            d2DRenderTarget = d2DFactory.CreateDxgiSurfaceRenderTarget(surface, rtp);
+            dxgiSurface.SetRenderTarget(renderTarget);
             return d2DRenderTarget;
         }
 

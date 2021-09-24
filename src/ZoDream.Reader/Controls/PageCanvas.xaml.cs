@@ -1,25 +1,18 @@
-﻿using SharpDX.Direct2D1;
-using SharpDX.DirectWrite;
-using SharpDX.Mathematics.Interop;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Vortice.Direct2D1;
+using Vortice.DirectWrite;
 using ZoDream.Reader.Drawing;
 using ZoDream.Reader.Events;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
+using static Vortice.DirectWrite.DWrite;
+using Point = System.Windows.Point;
 
 namespace ZoDream.Reader.Controls
 {
@@ -33,7 +26,7 @@ namespace ZoDream.Reader.Controls
             InitializeComponent();
         }
 
-        private SharpDX.Direct2D1.RenderTarget? renderTarget;
+        private ID2D1RenderTarget? renderTarget;
         private Point lastMousePoint = new Point(0, 0);
         private IEnumerable<PageItem>? lastPage;
         private bool lastBooted = false;
@@ -64,9 +57,9 @@ namespace ZoDream.Reader.Controls
                 return;
             }
             lastBooted = true;
-            var dwriteFactory = new SharpDX.DirectWrite.Factory();
-            var font = new TextFormat(dwriteFactory, FontFamily.ToString(), (float)FontSize);
-            var color = new SharpDX.Direct2D1.SolidColorBrush(renderTarget, ColorHelper.FromArgb(255, 0, 0, 0));
+            var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
+            var font = dwriteFactory.CreateTextFormat(FontFamily.ToString(), (float)FontSize);
+            var color = renderTarget.CreateSolidColorBrush(ColorHelper.FromArgb(255, 0, 0, 0));
             renderTarget.BeginDraw();
             renderTarget.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
             foreach (var page in pages)
@@ -74,7 +67,7 @@ namespace ZoDream.Reader.Controls
                 foreach (var item in page.Data)
                 {
                     renderTarget.DrawText(item.Code.ToString(), font, 
-                        new RawRectangleF((float)item.X, (float)item.Y, int.MaxValue, int.MaxValue),
+                        new RectangleF((float)item.X, (float)item.Y, int.MaxValue, int.MaxValue),
                         color);
                 }
             }

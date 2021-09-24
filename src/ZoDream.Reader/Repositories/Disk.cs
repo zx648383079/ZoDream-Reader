@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
+using Vortice.DirectWrite;
+using static Vortice.DirectWrite.DWrite;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -41,7 +43,8 @@ namespace ZoDream.Reader.Repositories
 
         public IList<FontItem> GetFonts()
         {
-            var factory = new SharpDX.DirectWrite.Factory();
+            var factory = DWriteCreateFactory<IDWriteFactory>();
+
             var fontCollection = factory.GetSystemFontCollection(false);
             var familCount = fontCollection.FontFamilyCount;
             var items = new List<FontItem>();
@@ -61,6 +64,8 @@ namespace ZoDream.Reader.Repositories
                 string name = familyNames.GetString(index);
                 items.Add(new FontItem(name));
             }
+            fontCollection.Dispose();
+            factory.Dispose();
             return items;
         }
 

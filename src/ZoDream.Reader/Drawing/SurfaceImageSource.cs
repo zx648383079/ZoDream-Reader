@@ -1,38 +1,32 @@
-﻿using SharpDX.Direct3D9;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Interop;
+using Vortice.Direct3D11;
+using Vortice.Direct3D9;
 
 namespace ZoDream.Reader.Drawing
 {
-    class Dx11ImageSource: D3DImage, IDisposable
+    public class SurfaceImageSource : D3DImage, IDisposable
     {
-        private static int ActiveClients;
-        private static Direct3DEx D3DContext;
-        private static DeviceEx D3DDevice;
+        private static int ActiveClients = 0;
+        private static IDirect3D9Ex? D3DContext;
+        private static IDirect3DDevice9Ex? D3DDevice;
 
-        private Texture renderTarget;
+        private IDirect3DTexture9 renderTarget;
 
         // - property --------------------------------------------------------------------
 
         public int RenderWait { get; set; } = 2; // default: 2ms
 
-        // - public methods --------------------------------------------------------------
-
-        public Dx11ImageSource()
+        public SurfaceImageSource()
         {
             StartD3D();
-            Dx11ImageSource.ActiveClients++;
-        }
-
-        public void Dispose()
-        {
-            SetRenderTarget(null);
-
-            Disposer.SafeDispose(ref renderTarget);
-
-            Dx11ImageSource.ActiveClients--;
-            EndD3D();
+            SurfaceImageSource.ActiveClients++;
         }
 
         public void InvalidateD3DImage()
@@ -49,23 +43,14 @@ namespace ZoDream.Reader.Drawing
             }
         }
 
-        public void SetRenderTarget(SharpDX.Direct3D11.Texture2D? target)
+
+        public void SetRenderTarget(ID3D11Texture2D? target)
         {
-            if (renderTarget != null)
-            {
-                renderTarget = null;
-
-                base.Lock();
-                base.SetBackBuffer(D3DResourceType.IDirect3DSurface9, IntPtr.Zero);
-                base.Unlock();
-            }
-
             if (target == null)
             {
                 return;
             }
-
-            var format = Dx11ImageSource.TranslateFormat(target);
+            var format = TranslateFormat(target);
             var handle = GetSharedHandle(target);
 
             if (!IsShareable(target))
@@ -83,8 +68,7 @@ namespace ZoDream.Reader.Drawing
                 throw new ArgumentException("Invalid handle");
             }
 
-            renderTarget = new Texture(Dx11ImageSource.D3DDevice, target.Description.Width, target.Description.Height, 1, Usage.RenderTarget, format, Pool.Default, ref handle);
-
+            renderTarget = D3DDevice.CreateTexture(target.Description.Width, target.Description.Height, 1, Usage.RenderTarget, format, Pool.Default, ref handle);
             using (var surface = renderTarget.GetSurfaceLevel(0))
             {
                 base.Lock();
@@ -93,43 +77,54 @@ namespace ZoDream.Reader.Drawing
             }
         }
 
+        public void Dispose()
+        {
+            SetRenderTarget(null);
+
+            renderTarget?.Dispose();
+
+            ActiveClients--;
+            EndD3D();
+        }
+
         // - private methods -------------------------------------------------------------
 
         private void StartD3D()
         {
-            if (Dx11ImageSource.ActiveClients != 0)
+            if (ActiveClients != 0)
             {
                 return;
             }
 
             var presentParams = GetPresentParameters();
             var createFlags = CreateFlags.HardwareVertexProcessing | CreateFlags.Multithreaded | CreateFlags.FpuPreserve;
-
-            Dx11ImageSource.D3DContext = new Direct3DEx();
-            Dx11ImageSource.D3DDevice = new DeviceEx(D3DContext, 0, DeviceType.Hardware, IntPtr.Zero, createFlags, presentParams);
+            D3D9.Create9Ex(out D3DContext);
+            D3DDevice = D3DContext.CreateDeviceEx(0, DeviceType.Hardware, IntPtr.Zero, createFlags, presentParams);
         }
 
         private void EndD3D()
         {
-            if (Dx11ImageSource.ActiveClients != 0)
+            if (ActiveClients != 0)
             {
                 return;
             }
-
-            Disposer.SafeDispose(ref renderTarget);
-            Disposer.SafeDispose(ref Dx11ImageSource.D3DDevice);
-            Disposer.SafeDispose(ref Dx11ImageSource.D3DContext);
+            renderTarget?.Dispose();
+            D3DDevice?.Dispose();
+            D3DContext?.Dispose();
         }
+
+        [DllImport("user32.dll", SetLastError = false)]
+        public static extern IntPtr GetDesktopWindow();
 
         private static void ResetD3D()
         {
-            if (Dx11ImageSource.ActiveClients == 0)
+            if (ActiveClients == 0)
             {
                 return;
             }
 
             var presentParams = GetPresentParameters();
-            Dx11ImageSource.D3DDevice.ResetEx(ref presentParams);
+            D3DDevice.ResetEx(ref presentParams);
         }
 
         private static PresentParameters GetPresentParameters()
@@ -138,34 +133,34 @@ namespace ZoDream.Reader.Drawing
 
             presentParams.Windowed = true;
             presentParams.SwapEffect = SwapEffect.Discard;
-            presentParams.DeviceWindowHandle = NativeMethods.GetDesktopWindow();
+            presentParams.DeviceWindowHandle = GetDesktopWindow();
             presentParams.PresentationInterval = PresentInterval.Default;
 
             return presentParams;
         }
 
-        private IntPtr GetSharedHandle(SharpDX.Direct3D11.Texture2D texture)
+        private IntPtr GetSharedHandle(ID3D11Texture2D texture)
         {
-            using (var resource = texture.QueryInterface<SharpDX.DXGI.Resource>())
+            using (var resource = texture.QueryInterface<Vortice.DXGI.IDXGIResource>())
             {
                 return resource.SharedHandle;
             }
         }
 
-        private static Format TranslateFormat(SharpDX.Direct3D11.Texture2D texture)
+        private static Format TranslateFormat(ID3D11Texture2D texture)
         {
             switch (texture.Description.Format)
             {
-                case SharpDX.DXGI.Format.R10G10B10A2_UNorm: return SharpDX.Direct3D9.Format.A2B10G10R10;
-                case SharpDX.DXGI.Format.R16G16B16A16_Float: return SharpDX.Direct3D9.Format.A16B16G16R16F;
-                case SharpDX.DXGI.Format.B8G8R8A8_UNorm: return SharpDX.Direct3D9.Format.A8R8G8B8;
-                default: return SharpDX.Direct3D9.Format.Unknown;
+                case Vortice.DXGI.Format.R10G10B10A2_UNorm: return Format.A2B10G10R10;
+                case Vortice.DXGI.Format.R16G16B16A16_Float: return Format.A16B16G16R16F;
+                case Vortice.DXGI.Format.B8G8R8A8_UNorm: return Format.A8R8G8B8;
+                default: return Format.Unknown;
             }
         }
 
-        private static bool IsShareable(SharpDX.Direct3D11.Texture2D texture)
+        private static bool IsShareable(ID3D11Texture2D texture)
         {
-            return (texture.Description.OptionFlags & SharpDX.Direct3D11.ResourceOptionFlags.Shared) != 0;
+            return (texture.Description.OptionFlags & ResourceOptionFlags.Shared) != 0;
         }
     }
 }
