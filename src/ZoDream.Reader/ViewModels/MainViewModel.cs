@@ -36,13 +36,26 @@ namespace ZoDream.Reader.ViewModels
             set => Set(ref bookItems, value);
         }
 
-        public async void Load()
+        private UserSetting setting = new UserSetting();
+
+        public UserSetting Setting
+        {
+            get { return setting; }
+            set
+            {
+                setting = value;
+                DatabaseRepository.SaveSetting(value);
+            }
+        }
+
+        public void Load()
         {
             var items = DatabaseRepository.GetBooks();
             foreach (var item in items)
             {
                 BookItems.Add(item);
             }
+            Setting = DatabaseRepository.GetSetting();
         }
         public void Load(IEnumerable<string> fileNames)
         {

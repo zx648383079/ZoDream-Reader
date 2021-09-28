@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using Vortice;
 using Vortice.DCommon;
 using Vortice.Direct2D1;
 using Vortice.Direct3D;
@@ -39,6 +41,7 @@ namespace ZoDream.Reader.Drawing
         public void Invalidate()
         {
             PrepareAndCallRender();
+            dxgiSurface.InvalidateD3DImage();
         }
 
         public void DrawImage(ID2D1RenderTarget renderTarget)
@@ -58,12 +61,12 @@ namespace ZoDream.Reader.Drawing
                 Vortice.Direct3D.FeatureLevel.Level_11_0,
                 Vortice.Direct3D.FeatureLevel.Level_10_1,
                 Vortice.Direct3D.FeatureLevel.Level_10_0
-            }, out var tempDevice, out var _);
+            }, out device, out var _);
             if (res.Failure)
             {
                 return;
             }
-            device = tempDevice.QueryInterface<ID3D11Device1>();
+            // device = tempDevice.QueryInterface<ID3D11Device1>();
             d2DFactory = D2D1CreateFactory<ID2D1Factory1>();
             dXGIFactory = DXGI.CreateDXGIFactory1<IDXGIFactory1>();
             dxgiSurface = new SurfaceImageSource();
@@ -125,6 +128,50 @@ namespace ZoDream.Reader.Drawing
                 return;
             }
             Draw?.Invoke(this);
+        }
+
+        public ID2D1Bitmap LoadBitmap(string file)
+        {
+            using (var bitmap = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(file))
+            {
+                var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+                var bitmapProperties = new BitmapProperties(new PixelFormat(Format.R8G8B8A8_UNorm, Vortice.DCommon.AlphaMode.Premultiplied));
+                var size = new System.Drawing.Size(bitmap.Width, bitmap.Height);
+
+                // Transform pixels from BGRA to RGBA
+                int stride = bitmap.Width * sizeof(int);
+                using (var tempStream = new DataStream(bitmap.Height * stride, true, true))
+                {
+                    // Lock System.Drawing.Bitmap
+                    var bitmapData = bitmap.LockBits(sourceArea, System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+
+                    // Convert all pixels 
+                    for (int y = 0; y < bitmap.Height; y++)
+                    {
+                        int offset = bitmapData.Stride * y;
+                        for (int x = 0; x < bitmap.Width; x++)
+                        {
+                            // Not optimized 
+                            byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            int rgba = R | (G << 8) | (B << 16) | (A << 24);
+                            tempStream.Write(rgba);
+                        }
+
+                    }
+                    bitmap.UnlockBits(bitmapData);
+                    tempStream.Position = 0;
+
+                    return d2DRenderTarget.CreateBitmap(size, tempStream.BasePointer, stride, bitmapProperties); ;
+                }
+            }
+        }
+
+        public Layer CreateLayer()
+        {
+            return new Layer(this, Math.Max((int)ActualWidth, 100), Math.Max((int)ActualHeight, 100));
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)

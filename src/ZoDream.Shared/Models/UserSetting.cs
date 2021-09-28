@@ -10,11 +10,11 @@ namespace ZoDream.Shared.Models
 
         public string FontFamily { get; set; } = string.Empty;
 
-        public string Background { get; set; } = string.Empty;
+        public string Background { get; set; } = "#fff";
 
         public string BackgroundImage { get; set; } = string.Empty;
 
-        public string Foreground { get; set; } = string.Empty;
+        public string Foreground { get; set; } = "#333";
 
         /// <summary>
         /// 开启夜间模式

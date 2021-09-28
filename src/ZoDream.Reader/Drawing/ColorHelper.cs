@@ -13,5 +13,10 @@ namespace ZoDream.Reader.Drawing
         {
             return Color.FromArgb(a, r, g, b);
         }
+
+        public static Color From(string color)
+        {
+            return ColorTranslator.FromHtml(color);
+        }
     }
 }

@@ -59,9 +59,14 @@ namespace ZoDream.Reader.Controls
             lastBooted = true;
             var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
             var font = dwriteFactory.CreateTextFormat(FontFamily.ToString(), (float)FontSize);
-            var color = renderTarget.CreateSolidColorBrush(ColorHelper.FromArgb(255, 0, 0, 0));
+            var setting = App.ViewModel.Setting;
+            var color = renderTarget.CreateSolidColorBrush(ColorHelper.From(setting.Foreground));
             renderTarget.BeginDraw();
-            renderTarget.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
+            renderTarget.Clear(ColorHelper.From(setting.Background));
+            if (!string.IsNullOrWhiteSpace(setting.BackgroundImage))
+            {
+                renderTarget.DrawBitmap(DrawerCanvas.LoadBitmap(setting.BackgroundImage));
+            }
             foreach (var page in pages)
             {
                 foreach (var item in page.Data)
@@ -146,6 +151,7 @@ namespace ZoDream.Reader.Controls
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            renderTarget?.Dispose();
             renderTarget = null;
         }
     }

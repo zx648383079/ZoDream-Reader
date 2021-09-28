@@ -76,8 +76,15 @@ namespace ZoDream.Reader.Repositories
             var name = file.Name.Substring(0, file.Name.IndexOf('.'));
             var fileId = file.Name;
             var tempfile = await file.CopyAsync(FontFolder, file.Name, NameCollisionOption.ReplaceExisting);
-            // var factory = DWriteCreateFactory<IDWriteFactory>();
-            // var fontRef = factory.CreateFontFileReference(tempfile.Path);
+            //var factory = DWriteCreateFactory<IDWriteFactory>();
+            //var fontRef = factory.CreateFontFileReference(tempfile.Path);
+            //fontRef.Analyze(out var isSupprted, out var fontFileType, out var fontFaceType, out var numberOfFaces);
+            //if (!isSupprted)
+            //{
+            //    return null;
+            //}
+            //var fontFace = factory.CreateFontFace(fontFaceType, new []{ fontRef });
+           
             return new FontItem(name)
             {
                 FileName = fileId,

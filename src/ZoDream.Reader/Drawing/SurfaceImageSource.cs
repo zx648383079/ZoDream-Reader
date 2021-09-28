@@ -26,7 +26,7 @@ namespace ZoDream.Reader.Drawing
         public SurfaceImageSource()
         {
             StartD3D();
-            SurfaceImageSource.ActiveClients++;
+            ActiveClients++;
         }
 
         public void InvalidateD3DImage()
