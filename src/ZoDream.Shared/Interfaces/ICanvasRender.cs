@@ -1,37 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ZoDream.Shared.Events;
 using ZoDream.Shared.Models;
 
 namespace ZoDream.Shared.Interfaces
 {
     public interface ICanvasRender
     {
+        public ICanvasSource? Source {  get; set; }
+
         /// <summary>
-        /// 画字
+        /// 翻页完成事件
         /// </summary>
-        /// <param name="item"></param>
-        void Draw(CharItem item);
+        public event PageChangedEventHandler? PageChanged;
+
         /// <summary>
-        /// 画一页
+        /// 画布准备就绪事件
         /// </summary>
-        /// <param name="page"></param>
-        void Draw(PageItem page);
+        public event CanvasReadyEventHandler? OnReady;
+
         /// <summary>
         /// 画多页，分栏
         /// </summary>
         /// <param name="pages"></param>
-        void Draw(IEnumerable<PageItem> pages);
+        public void Draw(IEnumerable<PageItem> pages);
 
         /// <summary>
-        /// 使用过渡动画切换
+        /// 使用过渡动画切换到新的页面，下一页
         /// </summary>
         /// <param name="pages"></param>
-        void Swap(IEnumerable<PageItem> pages);
+        public void SwapTo(IEnumerable<PageItem> pages);
+        public void SwapTo(IEnumerable<PageItem> pages, int page);
+
+        public void SwapTo(int page);
+
+        /// <summary>
+        /// 使用过渡动画切换回新的页面，上一页
+        /// </summary>
+        /// <param name="pages"></param>
+        public void SwapFrom(IEnumerable<PageItem> pages);
+
+        public void SwapFrom(IEnumerable<PageItem> pages, int page);
+        public void SwapFrom(int page);
+
+        public void SwapNext();
+
+        public void SwapPrevious();
 
         /// <summary>
         /// 清空页面内容
         /// </summary>
-        void Flush();
+        public void Flush();
     }
 }

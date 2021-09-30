@@ -5,10 +5,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Vortice.Direct2D1;
 using Vortice.DirectWrite;
 using ZoDream.Reader.Drawing;
 using ZoDream.Reader.Events;
+using ZoDream.Shared.Events;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
 using static Vortice.DirectWrite.DWrite;
@@ -28,26 +30,23 @@ namespace ZoDream.Reader.Controls
 
         private ID2D1RenderTarget? renderTarget;
         private Point lastMousePoint = new Point(0, 0);
-        private IEnumerable<PageItem>? lastPage;
-        private bool lastBooted = false;
 
-        public event ControlEventHandler? OnPrevious;
-        public event ControlEventHandler? OnNext;
 
-        public void Draw(CharItem item)
-        {
-            
-        }
+        private int currentPage = -1;
+        private CanvasLayer[] layerItems = new CanvasLayer[3];
+        /// <summary>
+        /// 翻页动画方向
+        /// </summary>
+        private bool? swapDirect;
+        private DispatcherTimer? timer;
+        public ICanvasSource? Source { get; set; }
 
-        public void Draw(PageItem page)
-        {
-            
-        }
+        public event PageChangedEventHandler? PageChanged;
+        public event CanvasReadyEventHandler? OnReady;
+
 
         public void Draw(IEnumerable<PageItem> pages)
         {
-            lastPage = pages;
-            lastBooted = false;
             if (renderTarget == null)
             {
                 renderTarget = DrawerCanvas.CreateRenderTarget();
@@ -56,7 +55,6 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
-            lastBooted = true;
             var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
             var font = dwriteFactory.CreateTextFormat(FontFamily.ToString(), (float)FontSize);
             var setting = App.ViewModel.Setting;
@@ -78,6 +76,77 @@ namespace ZoDream.Reader.Controls
             }
             renderTarget.EndDraw();
             DrawerCanvas.Invalidate();
+        }
+
+        /// <summary>
+        /// 使用过渡动画切换到新的页面，下一页
+        /// </summary>
+        /// <param name="pages"></param>
+        public void SwapTo(IEnumerable<PageItem> pages)
+        {
+            SwapTo(pages, 0);
+        }
+
+        private CanvasLayer CreateLayer(IEnumerable<PageItem> pages, int page)
+        {
+            var layer = DrawerCanvas.CreateLayer();
+            layer.Page = page;
+            layer.Add(pages);
+            return layer;
+        }
+
+        public void SwapTo(IEnumerable<PageItem> pages, int page)
+        {
+            layerItems[0] = layerItems[1];
+            layerItems[1] = CreateLayer(pages, page);
+            swapDirect = true;
+            Flush();
+            layerItems[1].Draw(renderTarget);
+        }
+
+        public async void SwapTo(int page)
+        {
+            if (Source == null || !Source.Canable(page))
+            {
+                return;
+            }
+            SwapTo(await Source.GetAsync(page), page);
+        }
+
+        /// <summary>
+        /// 使用过渡动画切换回新的页面，上一页
+        /// </summary>
+        /// <param name="pages"></param>
+        public void SwapFrom(IEnumerable<PageItem> pages)
+        {
+            SwapFrom(pages, 0);
+        }
+
+        public void SwapFrom(IEnumerable<PageItem> pages, int page)
+        {
+            layerItems[2] = layerItems[1];
+            layerItems[1] = CreateLayer(pages, page);
+            swapDirect = false;
+            Flush();
+            layerItems[1].Draw(renderTarget);
+        }
+        public async void SwapFrom(int page)
+        {
+            if (Source == null || !Source.Canable(page))
+            {
+                return;
+            }
+            SwapFrom(await Source.GetAsync(page), page);
+        }
+
+        public void SwapNext()
+        {
+            SwapTo(currentPage++);
+        }
+
+        public void SwapPrevious()
+        {
+            SwapTo(currentPage--);
         }
 
         public void Flush()
@@ -106,10 +175,10 @@ namespace ZoDream.Reader.Controls
                 // TODO 点击
                 if (p.X < ActualWidth / 3)
                 {
-                    OnPrevious?.Invoke(this);
+                    SwapPrevious();
                 } else if (p.X > ActualWidth * .7)
                 {
-                    OnNext?.Invoke(this);
+                    SwapNext();
                 }
                 return;
             }
@@ -118,18 +187,12 @@ namespace ZoDream.Reader.Controls
             {
                 if (diff.X > 0)
                 {
-                    OnPrevious?.Invoke(this);
+                    SwapPrevious();
                 } else if (diff.X < 0)
                 {
-                    OnNext?.Invoke(this);
+                    SwapNext();
                 }
             }
-        }
-
-        public void Swap(IEnumerable<PageItem> pages)
-        {
-            Flush();
-            Draw(pages);
         }
 
         private void DrawerCanvas_Draw(object sender)
@@ -143,14 +206,32 @@ namespace ZoDream.Reader.Controls
 
         private void DrawerCanvas_CreateResources(object sender)
         {
-            if (lastPage != null && !lastBooted)
-            {
-                Draw(lastPage);
-            }
+            OnReady?.Invoke(this);
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            renderTarget?.Dispose();
+            renderTarget = null;
+        }
+
+        private void UserControl_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Right || e.Key == Key.PageDown)
+            {
+                SwapNext();
+                return;
+            }
+            if (e.Key == Key.Left || e.Key == Key.PageUp)
+            {
+                SwapPrevious();
+                return;
+            }
+        }
+
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            timer?.Stop();
             renderTarget?.Dispose();
             renderTarget = null;
         }

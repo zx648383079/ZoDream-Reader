@@ -14,10 +14,11 @@
     ManipulationStarted="UserControl_ManipulationStarted"
     ManipulationCompleted="UserControl_ManipulationCompleted" 
     PointerPressed="UserControl_PointerPressed" 
-    PointerReleased="UserControl_PointerReleased">
+    PointerReleased="UserControl_PointerReleased"
+    KeyUp="UserControl_KeyUp">
     <Grid>
         <win2d:CanvasControl x:Name="DrawerCanvas" 
-                             Draw="DrawerCanvas_Draw" 
+                             Draw="DrawerCanvas_Draw"
                              CreateResources="DrawerCanvas_CreateResources">
         </win2d:CanvasControl>
     </Grid>

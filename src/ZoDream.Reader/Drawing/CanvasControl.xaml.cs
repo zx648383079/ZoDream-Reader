@@ -169,9 +169,9 @@ namespace ZoDream.Reader.Drawing
             }
         }
 
-        public Layer CreateLayer()
+        public CanvasLayer CreateLayer()
         {
-            return new Layer(this, Math.Max((int)ActualWidth, 100), Math.Max((int)ActualHeight, 100));
+            return new CanvasLayer(this, Math.Max((int)ActualWidth, 100), Math.Max((int)ActualHeight, 100));
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)

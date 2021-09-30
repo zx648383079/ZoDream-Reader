@@ -4,13 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
 using ZoDream.Shared.Renders;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ReadViewModel: BindableBase
+    public class ReadViewModel: BindableBase, ICanvasSource
     {
 
         public PageTokenizer Tokenizer { get; private set; } = new PageTokenizer();
@@ -89,6 +90,16 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             ChapterTitle = ChapterItems[i].Title;
+        }
+
+        public Task<IList<PageItem>> GetAsync(int page)
+        {
+            return Tokenizer.GetAsync(page);
+        }
+
+        public bool Canable(int page)
+        {
+            return Tokenizer.Canable(page);
         }
     }
 }

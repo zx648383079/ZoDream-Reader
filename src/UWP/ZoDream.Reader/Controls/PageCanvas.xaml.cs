@@ -4,12 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Windows.Foundation;
-using Windows.UI;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using ZoDream.Reader.Drawing;
 using ZoDream.Reader.Events;
+using ZoDream.Shared.Events;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
 
@@ -26,11 +28,18 @@ namespace ZoDream.Reader.Controls
 
         private CanvasRenderTarget renderTarget;
         private Point lastMousePoint = new Point(0, 0);
-        private IEnumerable<PageItem> lastPage;
-        private bool lastBooted = false;
 
-        public event ControlEventHandler OnPrevious;
-        public event ControlEventHandler OnNext;
+        private int currentPage = -1;
+        private CanvasLayer[] layerItems = new CanvasLayer[3];
+        /// <summary>
+        /// 翻页动画方向
+        /// </summary>
+        private bool? swapDirect = null;
+        private DispatcherTimer timer;
+        public ICanvasSource Source { get; set; }
+
+        public event PageChangedEventHandler PageChanged;
+        public event CanvasReadyEventHandler OnReady;
 
         private void DrawerCanvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
         {
@@ -43,57 +52,13 @@ namespace ZoDream.Reader.Controls
 
         private void DrawerCanvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
         {
-            if (lastPage != null && !lastBooted)
-            {
-                Draw(lastPage);
-            }
-        }
-
-        public void Draw(CharItem item)
-        {
-
-        }
-
-        public void Draw(PageItem page)
-        {
-            if (renderTarget == null)
-            {
-                renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
-                   (float)DrawerCanvas.ActualHeight, 96);
-            }
-            var font = new CanvasTextFormat();
-            font.FontFamily = FontFamily.ToString();
-            font.FontSize = (float)FontSize;
-            using (var ds = renderTarget.CreateDrawingSession())
-            {
-                ds.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
-                foreach (var item in page)
-                {
-                    ds.DrawText(item.Code.ToString(),
-                        new Vector2((float)item.X, (float)item.Y),
-                        ColorHelper.FromArgb(255, 0, 0, 0), font);
-                }
-            }
-            DrawerCanvas.Invalidate();
+            OnReady?.Invoke(this);
         }
 
         public void Draw(IEnumerable<PageItem> pages)
         {
-            lastPage = pages;
-            lastBooted = false;
-            if (renderTarget == null)
-            {
-                try
-                {
-                    renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
+            renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
                    (float)DrawerCanvas.ActualHeight, 96);
-                }
-                catch (Exception)
-                {
-                    return;
-                }
-            }
-            lastBooted = true;
             var font = new CanvasTextFormat()
             {
                 FontFamily = FontFamily.Source, // name.ttf#name
@@ -116,10 +81,83 @@ namespace ZoDream.Reader.Controls
             DrawerCanvas.Invalidate();
         }
 
-        public void Swap(IEnumerable<PageItem> pages)
+        /// <summary>
+        /// 使用过渡动画切换到新的页面，下一页
+        /// </summary>
+        /// <param name="pages"></param>
+        public void SwapTo(IEnumerable<PageItem> pages)
         {
-            Flush();
-            Draw(pages);
+            SwapTo(pages, 0);
+        }
+
+        private CanvasLayer CreateLayer(IEnumerable<PageItem> pages, int page)
+        {
+            var layer = new CanvasLayer(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
+                   (float)DrawerCanvas.ActualHeight);
+            layer.Page = page;
+            layer.Add(pages);
+            return layer;
+        }
+
+        public void SwapTo(IEnumerable<PageItem> pages, int page)
+        {
+            layerItems[0] = layerItems[1];
+            layerItems[1] = CreateLayer(pages, page);
+            swapDirect = true;
+            using (var ds = renderTarget.CreateDrawingSession())
+            {
+                ds.Clear(Drawing.ColorHelper.FromArgb(255, 255, 255, 255));
+                layerItems[1].Draw(ds);
+            }
+        }
+
+        public async void SwapTo(int page)
+        {
+            if (Source == null || !Source.Canable(page))
+            {
+                return;
+            }
+            SwapTo(await Source.GetAsync(page), page);
+        }
+
+        /// <summary>
+        /// 使用过渡动画切换回新的页面，上一页
+        /// </summary>
+        /// <param name="pages"></param>
+        public void SwapFrom(IEnumerable<PageItem> pages)
+        {
+            SwapFrom(pages, 0);
+        }
+
+        public void SwapFrom(IEnumerable<PageItem> pages, int page)
+        {
+            layerItems[2] = layerItems[1];
+            layerItems[1] = CreateLayer(pages, page);
+            swapDirect = false;
+            using (var ds = renderTarget.CreateDrawingSession())
+            {
+                ds.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
+                layerItems[1].Draw(ds);
+            }
+            
+        }
+        public async void SwapFrom(int page)
+        {
+            if (Source == null || !Source.Canable(page))
+            {
+                return;
+            }
+            SwapFrom(await Source.GetAsync(page), page);
+        }
+
+        public void SwapNext()
+        {
+            SwapTo(currentPage++);
+        }
+
+        public void SwapPrevious()
+        {
+            SwapTo(currentPage--);
         }
 
         public void Flush()
@@ -137,6 +175,7 @@ namespace ZoDream.Reader.Controls
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
+            timer?.Stop();
             DrawerCanvas.RemoveFromVisualTree();
             DrawerCanvas = null;
         }
@@ -161,11 +200,11 @@ namespace ZoDream.Reader.Controls
                 // TODO 点击
                 if (p.X < ActualWidth / 3)
                 {
-                    OnPrevious?.Invoke(this);
+                    SwapPrevious();
                 }
                 else if (p.X > ActualWidth * .7)
                 {
-                    OnNext?.Invoke(this);
+                    SwapNext();
                 }
                 return;
             }
@@ -174,11 +213,11 @@ namespace ZoDream.Reader.Controls
             {
                 if (diffX > 0)
                 {
-                    OnPrevious?.Invoke(this);
+                    SwapPrevious();
                 }
                 else if (diffX < 0)
                 {
-                    OnNext?.Invoke(this);
+                    SwapNext();
                 }
             }
         }
@@ -196,6 +235,20 @@ namespace ZoDream.Reader.Controls
         private void UserControl_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             MouseMoveEnd(e.GetCurrentPoint(this).Position);
+        }
+
+        private void UserControl_KeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Right || e.Key == VirtualKey.PageDown)
+            {
+                SwapNext();
+                return;
+            }
+            if (e.Key == VirtualKey.Left || e.Key == VirtualKey.PageUp)
+            {
+                SwapPrevious();
+                return;
+            }
         }
     }
 }

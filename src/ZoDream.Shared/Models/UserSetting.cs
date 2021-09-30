@@ -21,6 +21,8 @@ namespace ZoDream.Shared.Models
         /// </summary>
         public bool OpenDark { get; set; } = false;
 
+        public int ColumnCount { get; set; } = 2;
+
         public int LineSpace { get; set; } = 5;
 
         public int LetterSpace { get; set; } = 5;

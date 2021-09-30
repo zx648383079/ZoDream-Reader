@@ -6,8 +6,7 @@
         xmlns:local="clr-namespace:ZoDream.Reader.Pages"
         xmlns:control="clr-namespace:ZoDream.Reader.Controls"
         mc:Ignorable="d"
-        Title="阅读" Height="450" Width="800" 
-        Loaded="Window_Loaded"
+        Title="阅读" Height="450" Width="800"
         Unloaded="Window_Unloaded"
         SizeChanged="Window_SizeChanged"
         WindowStartupLocation="CenterScreen"
@@ -18,8 +17,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <control:PageCanvas x:Name="PageRender" OnPrevious="PageRender_OnPrevious" 
-                            OnNext="PageRender_OnNext"/>
+        <control:PageCanvas x:Name="PageRender" PageChanged="PageRender_PageChanged" OnReady="PageRender_OnReady"/>
         <Grid x:Name="MorePanel" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" MaxWidth="400"/>

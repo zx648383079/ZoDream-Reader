@@ -6,7 +6,7 @@ using ZoDream.Shared.Models;
 
 namespace ZoDream.Shared.Interfaces
 {
-    public interface IPageTokenizer: IDisposable
+    public interface IPageTokenizer: ICanvasSource, IDisposable
     {
         public int Page { get; set; }
 
@@ -21,6 +21,11 @@ namespace ZoDream.Shared.Interfaces
         /// </summary>
         public Task Refresh();
 
+        /// <summary>
+        /// 按比例转化为页码
+        /// </summary>
+        /// <param name="scale"></param>
+        /// <param name="max"></param>
         public void SetPageScale(double scale, int max = 1);
         public void SetPage(ChapterPositionItem chapter);
         public void SetPage(double position);
@@ -33,5 +38,6 @@ namespace ZoDream.Shared.Interfaces
         public Task<IList<PageItem>> GetNextAsync();
 
         public Task<IList<PageItem>> GetAsync();
+
     }
 }

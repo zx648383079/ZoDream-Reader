@@ -382,7 +382,9 @@ namespace ZoDream.Shared.Tokenizers
 
         public async Task Refresh()
         {
+            var scale = PageCount > 0 ? Page / PageCount : 0;
             CachePages = await GetPagesAsync();
+            SetPageScale(scale);
         }
 
         /// <summary>
@@ -436,6 +438,11 @@ namespace ZoDream.Shared.Tokenizers
             SetPage(page.Begin);
         }
 
+        public bool Canable(int page)
+        {
+            return page >= 0 && page < CachePages.Count;
+        }
+
         /// <summary>
         /// 获取当前页
         /// </summary>
@@ -453,6 +460,16 @@ namespace ZoDream.Shared.Tokenizers
             return await GetPagesAsync(item, ColumnCount);
         }
 
+        public async Task<IList<PageItem>> GetAsync(int page)
+        {
+            if (!Canable(page))
+            {
+                return new List<PageItem>();
+            }
+            var item = CachePages[page];
+            return await GetPagesAsync(item, ColumnCount);
+        }
+
         /// <summary>
         /// 获取下一页
         /// </summary>
@@ -463,7 +480,7 @@ namespace ZoDream.Shared.Tokenizers
             {
                 return new List<PageItem>();
             }
-            Page+= ColumnCount;
+            Page += ColumnCount;
             return await GetAsync();
         }
 

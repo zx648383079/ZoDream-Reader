@@ -56,7 +56,6 @@ namespace ZoDream.Reader.Pages
             ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
             ViewModel.Tokenizer.LineSpace = setting.LineSpace;
             ViewModel.Tokenizer.Gap = setting.Padding * 2;
-            ViewModel.Tokenizer.ColumnCount = 2;
             BootAsync();
         }
 
@@ -64,8 +63,10 @@ namespace ZoDream.Reader.Pages
         {
             if (PageRender.ActualWidth > 0)
             {
+                PageRender.Source = ViewModel;
                 ViewModel.Tokenizer.Width = PageRender.ActualWidth;
                 ViewModel.Tokenizer.Height = PageRender.ActualHeight - 20;
+                ViewModel.Tokenizer.ColumnCount = App.ViewModel.Setting.ColumnCount;
                 await ViewModel.Tokenizer.Refresh();
                 ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
                 PageRender.Flush();
@@ -87,35 +88,7 @@ namespace ZoDream.Reader.Pages
             ViewModel.Tokenizer.Height = PageRender.ActualHeight;
             await ViewModel.Tokenizer.Refresh();
             PageRender.Flush();
-            PageRender.Draw(await ViewModel.Tokenizer.GetAsync());
-        }
-
-        private async void PageRender_OnNext(object sender)
-        {
-            var items = await ViewModel.Tokenizer.GetNextAsync();
-            if (items.Count < 1)
-            {
-                // 没有更多了
-                return;
-            }
-            PageRender.Swap(items);
-            ViewModel.Book.Position = items[0].Begin;
-            ViewModel.ReloadChapter();
-            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
-        }
-
-        private async void PageRender_OnPrevious(object sender)
-        {
-            var items = await ViewModel.Tokenizer.GetPreviousAsync();
-            if (items.Count < 1)
-            {
-                // 不能向前了
-                return;
-            }
-            PageRender.Swap(items);
-            ViewModel.Book.Position = items[0].Begin;
-            ViewModel.ReloadChapter();
-            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+            PageRender.SwapTo(ViewModel.Tokenizer.Page);
         }
 
         private async void JumpBtn_Tapped(object sender, TappedRoutedEventArgs e)
@@ -132,16 +105,7 @@ namespace ZoDream.Reader.Pages
                 return;
             }
             ViewModel.Tokenizer.SetPageScale(dialog.Value, 100);
-            var items = await ViewModel.Tokenizer.GetAsync();
-            if (items.Count < 1)
-            {
-                // 不能向前了
-                return;
-            }
-            PageRender.Swap(items);
-            ViewModel.Book.Position = items[0].Begin;
-            ViewModel.ReloadChapter();
-            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+            PageRender.SwapTo(ViewModel.Tokenizer.Page);
         }
 
         private void SettingBtn_Tapped(object sender, TappedRoutedEventArgs e)
@@ -174,6 +138,19 @@ namespace ZoDream.Reader.Pages
             PageRender.Draw(items);
             ViewModel.Book.Position = items[0].Begin;
             App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+        }
+
+        private void PageRender_PageChanged(object sender, int page, PositionItem pagePosition)
+        {
+            ViewModel.Tokenizer.Page = page;
+            ViewModel.Book.Position = pagePosition;
+            ViewModel.ReloadChapter();
+            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+        }
+
+        private void PageRender_OnReady(object sender)
+        {
+            BootAsync();
         }
     }
 }

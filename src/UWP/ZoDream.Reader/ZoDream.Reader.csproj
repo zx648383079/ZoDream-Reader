@@ -140,6 +140,8 @@
     <Compile Include="Controls\ProgressDialog.xaml.cs">
       <DependentUpon>ProgressDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Drawing\CanvasLayer.cs" />
+    <Compile Include="Drawing\ColorHelper.cs" />
     <Compile Include="Events\ActionItemEventHandler.cs" />
     <Compile Include="Events\AddEventHandler.cs" />
     <Compile Include="Events\ValueChangedEventHandler.cs" />
