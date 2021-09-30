@@ -31,6 +31,7 @@ namespace ZoDream.Reader.Controls
 
         private int currentPage = -1;
         private CanvasLayer[] layerItems = new CanvasLayer[3];
+
         /// <summary>
         /// 翻页动画方向
         /// </summary>
@@ -55,7 +56,7 @@ namespace ZoDream.Reader.Controls
             OnReady?.Invoke(this);
         }
 
-        public void Draw(IEnumerable<PageItem> pages)
+        public void Draw(IList<PageItem> pages)
         {
             renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
                    (float)DrawerCanvas.ActualHeight, 96);
@@ -85,12 +86,12 @@ namespace ZoDream.Reader.Controls
         /// 使用过渡动画切换到新的页面，下一页
         /// </summary>
         /// <param name="pages"></param>
-        public void SwapTo(IEnumerable<PageItem> pages)
+        public void SwapTo(IList<PageItem> pages)
         {
             SwapTo(pages, 0);
         }
 
-        private CanvasLayer CreateLayer(IEnumerable<PageItem> pages, int page)
+        private CanvasLayer CreateLayer(IList<PageItem> pages, int page)
         {
             var layer = new CanvasLayer(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
                    (float)DrawerCanvas.ActualHeight);
@@ -99,16 +100,14 @@ namespace ZoDream.Reader.Controls
             return layer;
         }
 
-        public void SwapTo(IEnumerable<PageItem> pages, int page)
+        public void SwapTo(IList<PageItem> pages, int page)
         {
             layerItems[0] = layerItems[1];
             layerItems[1] = CreateLayer(pages, page);
-            swapDirect = true;
-            using (var ds = renderTarget.CreateDrawingSession())
+            SwapAnimate(true, () =>
             {
-                ds.Clear(Drawing.ColorHelper.FromArgb(255, 255, 255, 255));
-                layerItems[1].Draw(ds);
-            }
+                PageChanged?.Invoke(this, page, pages[0].Begin);
+            });
         }
 
         public async void SwapTo(int page)
@@ -124,22 +123,19 @@ namespace ZoDream.Reader.Controls
         /// 使用过渡动画切换回新的页面，上一页
         /// </summary>
         /// <param name="pages"></param>
-        public void SwapFrom(IEnumerable<PageItem> pages)
+        public void SwapFrom(IList<PageItem> pages)
         {
             SwapFrom(pages, 0);
         }
 
-        public void SwapFrom(IEnumerable<PageItem> pages, int page)
+        public void SwapFrom(IList<PageItem> pages, int page)
         {
             layerItems[2] = layerItems[1];
             layerItems[1] = CreateLayer(pages, page);
-            swapDirect = false;
-            using (var ds = renderTarget.CreateDrawingSession())
+            SwapAnimate(false, () =>
             {
-                ds.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
-                layerItems[1].Draw(ds);
-            }
-            
+                PageChanged?.Invoke(this, page, pages[0].Begin);
+            });
         }
         public async void SwapFrom(int page)
         {
@@ -148,6 +144,30 @@ namespace ZoDream.Reader.Controls
                 return;
             }
             SwapFrom(await Source.GetAsync(page), page);
+        }
+
+        private void SwapAnimate(bool toNext, Action finished)
+        {
+            swapDirect = toNext;
+            if (renderTarget == null)
+            {
+                renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
+                   (float)DrawerCanvas.ActualHeight, 96);
+            }
+            var setting = App.ViewModel.Setting;
+            var font = new CanvasTextFormat()
+            {
+                FontFamily = setting.FontFamily, // name.ttf#name
+                FontSize = (float)setting.FontSize
+            };
+            var color = ColorHelper.From(setting.Foreground);
+            using (var ds = renderTarget.CreateDrawingSession())
+            {
+                ds.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
+                layerItems[1].Draw(ds, font, color, null);
+            }
+            DrawerCanvas.Invalidate();
+            finished?.Invoke();
         }
 
         public void SwapNext()

@@ -45,7 +45,7 @@ namespace ZoDream.Reader.Controls
         public event CanvasReadyEventHandler? OnReady;
 
 
-        public void Draw(IEnumerable<PageItem> pages)
+        public void Draw(IList<PageItem> pages)
         {
             if (renderTarget == null)
             {
@@ -82,12 +82,12 @@ namespace ZoDream.Reader.Controls
         /// 使用过渡动画切换到新的页面，下一页
         /// </summary>
         /// <param name="pages"></param>
-        public void SwapTo(IEnumerable<PageItem> pages)
+        public void SwapTo(IList<PageItem> pages)
         {
             SwapTo(pages, 0);
         }
 
-        private CanvasLayer CreateLayer(IEnumerable<PageItem> pages, int page)
+        private CanvasLayer CreateLayer(IList<PageItem> pages, int page)
         {
             var layer = DrawerCanvas.CreateLayer();
             layer.Page = page;
@@ -95,7 +95,7 @@ namespace ZoDream.Reader.Controls
             return layer;
         }
 
-        public void SwapTo(IEnumerable<PageItem> pages, int page)
+        public void SwapTo(IList<PageItem> pages, int page)
         {
             layerItems[0] = layerItems[1];
             layerItems[1] = CreateLayer(pages, page);
@@ -117,12 +117,12 @@ namespace ZoDream.Reader.Controls
         /// 使用过渡动画切换回新的页面，上一页
         /// </summary>
         /// <param name="pages"></param>
-        public void SwapFrom(IEnumerable<PageItem> pages)
+        public void SwapFrom(IList<PageItem> pages)
         {
             SwapFrom(pages, 0);
         }
 
-        public void SwapFrom(IEnumerable<PageItem> pages, int page)
+        public void SwapFrom(IList<PageItem> pages, int page)
         {
             layerItems[2] = layerItems[1];
             layerItems[1] = CreateLayer(pages, page);

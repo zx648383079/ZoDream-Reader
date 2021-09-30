@@ -70,7 +70,7 @@ namespace ZoDream.Reader.Pages
                 await ViewModel.Tokenizer.Refresh();
                 ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
                 PageRender.Flush();
-                PageRender.Draw(await ViewModel.Tokenizer.GetAsync());
+                PageRender.SwapTo(ViewModel.Tokenizer.Page);
                 ViewModel.Load();
                 isBooted = true;
                 LoadingBtn.Visibility = Visibility.Collapsed;

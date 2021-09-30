@@ -100,18 +100,20 @@ namespace ZoDream.Reader.Drawing
 
         public void Draw(CanvasDrawingSession target, CanvasTextFormat font, Color color, ICanvasImage background)
         {
-            var layer = target.CreateLayer(1);
-            var setting = App.ViewModel.Setting;
-            target.Clear(ColorHelper.From(setting.Background));
-            if (background != null)
+            using (target.CreateLayer(1))
             {
-                target.DrawImage(background);
-            }
-            foreach (var item in Data)
-            {
-                target.DrawText(item.Code.ToString(),
-                            new Vector2((float)item.X, (float)item.Y),
-                            color, font);
+                var setting = App.ViewModel.Setting;
+                target.Clear(ColorHelper.From(setting.Background));
+                if (background != null)
+                {
+                    target.DrawImage(background);
+                }
+                foreach (var item in Data)
+                {
+                    target.DrawText(item.Code.ToString(),
+                                new Vector2((float)item.X, (float)item.Y),
+                                color, font);
+                }
             }
         }
     }

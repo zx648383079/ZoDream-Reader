@@ -24,14 +24,14 @@ namespace ZoDream.Shared.Interfaces
         /// 画多页，分栏
         /// </summary>
         /// <param name="pages"></param>
-        public void Draw(IEnumerable<PageItem> pages);
+        public void Draw(IList<PageItem> pages);
 
         /// <summary>
         /// 使用过渡动画切换到新的页面，下一页
         /// </summary>
         /// <param name="pages"></param>
-        public void SwapTo(IEnumerable<PageItem> pages);
-        public void SwapTo(IEnumerable<PageItem> pages, int page);
+        public void SwapTo(IList<PageItem> pages);
+        public void SwapTo(IList<PageItem> pages, int page);
 
         public void SwapTo(int page);
 
@@ -39,9 +39,9 @@ namespace ZoDream.Shared.Interfaces
         /// 使用过渡动画切换回新的页面，上一页
         /// </summary>
         /// <param name="pages"></param>
-        public void SwapFrom(IEnumerable<PageItem> pages);
+        public void SwapFrom(IList<PageItem> pages);
 
-        public void SwapFrom(IEnumerable<PageItem> pages, int page);
+        public void SwapFrom(IList<PageItem> pages, int page);
         public void SwapFrom(int page);
 
         public void SwapNext();
