@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Vortice.Direct2D1;
@@ -89,29 +90,31 @@ namespace ZoDream.Reader.Drawing
             var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
             Draw(target, dwriteFactory.CreateTextFormat(setting.FontFamily, (float)setting.FontSize),
                 target.CreateSolidColorBrush(ColorHelper.From(setting.Foreground)),
+                target.CreateSolidColorBrush(ColorHelper.From(setting.Background)),
                 !string.IsNullOrWhiteSpace(setting.BackgroundImage) ? 
                 Control.LoadBitmap(setting.BackgroundImage) : null);
         }
 
-        public void Draw(ID2D1RenderTarget target, IDWriteTextFormat font, ID2D1SolidColorBrush color, ID2D1Bitmap? background)
+        public void Draw(ID2D1RenderTarget target, IDWriteTextFormat font, ID2D1SolidColorBrush foreground, ID2D1SolidColorBrush background, ID2D1Bitmap? backgroundImage)
         {
-            var layer = target.CreateLayer(new SizeF(Width, Height));
-            var lpt = new LayerParameters();
-            target.PushLayer(ref lpt, layer);
-            
-            var setting = App.ViewModel.Setting;
-            target.Clear(ColorHelper.From(setting.Background));
-            if (background != null)
+            // var layer = target.CreateLayer(new SizeF(Width, Height));
+            // var lpt = new LayerParameters();
+            // lpt.Opacity = 1;
+            // target.PushLayer(ref lpt, layer);
+            // target.Transform = Matrix3x2.CreateTranslation(0, 0);
+            target.Clear(background.Color);
+            if (backgroundImage != null)
             {
-                target.DrawBitmap(background);
+                target.DrawBitmap(backgroundImage);
             }
             foreach (var item in Data)
             {
                 target.DrawText(item.Code.ToString(), font,
                     new RectangleF((float)item.X, (float)item.Y, int.MaxValue, int.MaxValue),
-                    color);
+                    foreground);
             }
-            target.PopLayer();
+            // target.PopLayer();
+            // layer.Dispose();
         }
     }
 }

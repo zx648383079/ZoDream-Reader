@@ -94,26 +94,31 @@ namespace ZoDream.Reader.Drawing
                 FontSize = (float)setting.FontSize
             };
             var color = ColorHelper.From(setting.Foreground);
-            Draw(target, font, color, !string.IsNullOrWhiteSpace(setting.BackgroundImage) ?
+            Draw(target, font, color, ColorHelper.From(setting.Background), !string.IsNullOrWhiteSpace(setting.BackgroundImage) ?
                 await CanvasBitmap.LoadAsync(Control, setting.BackgroundImage) : null);
         }
 
-        public void Draw(CanvasDrawingSession target, CanvasTextFormat font, Color color, ICanvasImage background)
+        public void Draw(CanvasDrawingSession target, 
+            CanvasTextFormat font, Color foreground, Color background, ICanvasImage backgroundImage)
         {
-            using (target.CreateLayer(1))
+            var cl = new CanvasCommandList(Control);
+            using (var ds = cl.CreateDrawingSession())
             {
-                var setting = App.ViewModel.Setting;
-                target.Clear(ColorHelper.From(setting.Background));
-                if (background != null)
+                ds.Clear(background);
+                if (backgroundImage != null)
                 {
-                    target.DrawImage(background);
+                    ds.DrawImage(backgroundImage);
                 }
                 foreach (var item in Data)
                 {
-                    target.DrawText(item.Code.ToString(),
+                    ds.DrawText(item.Code.ToString(),
                                 new Vector2((float)item.X, (float)item.Y),
-                                color, font);
+                                foreground, font);
                 }
+            }
+            using (target.CreateLayer(1))
+            {
+                target.DrawImage(cl);
             }
         }
     }

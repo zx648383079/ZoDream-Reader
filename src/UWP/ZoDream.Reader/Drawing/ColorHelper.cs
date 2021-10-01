@@ -9,9 +9,16 @@ namespace ZoDream.Reader.Drawing
         {
             return Color.FromArgb(a, r, g, b);
         }
-
         public static Color From(string hex)
         {
+            return From(hex, Colors.White);
+        }
+        public static Color From(string hex, Color defColor)
+        {
+            if (string.IsNullOrWhiteSpace(hex))
+            {
+                return defColor;
+            }
             hex = hex.Replace("#", string.Empty);
 
             //#FFDFD991
@@ -24,7 +31,7 @@ namespace ZoDream.Reader.Drawing
 
             if (!existAlpha && hex.Length != 6 && hex.Length != 3)
             {
-                return Colors.White;
+                return defColor;
             }
 
             var n = 0;

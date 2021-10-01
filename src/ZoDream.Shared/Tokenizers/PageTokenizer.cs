@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -104,7 +105,11 @@ namespace ZoDream.Shared.Tokenizers
 
         #region 缓存数据
 
+        public Regex ChapterRegex = new(@"^(正文)?[\s]{0,6}第?[\s]*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?[\s\S]{0,20}$");
+
         public IList<PagePositionItem> CachePages { get; private set; } = new List<PagePositionItem>();
+        
+        public IList<ChapterPositionItem> CacheChapters {  get; private set; } = new List<ChapterPositionItem>();
         /// <summary>
         /// 当前页码
         /// </summary>
@@ -121,13 +126,16 @@ namespace ZoDream.Shared.Tokenizers
         #region 对章节的操作
         public async Task<IList<ChapterPositionItem>> GetChaptersAsync()
         {
+            if (CacheChapters.Count > 0)
+            {
+                return CacheChapters;
+            }
             var items = new List<ChapterPositionItem>();
             if (Content == null)
             {
                 return items;
             }
             Content.Position = 0;
-            var regex = new Regex(@"^(正文)?[\s]{0,6}第?[\s]*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?[\s\S]{0,20}$");
             while (true)
             {
                 var postion = Content.Position;
@@ -136,20 +144,30 @@ namespace ZoDream.Shared.Tokenizers
                 {
                     break;
                 }
-                if (string.IsNullOrWhiteSpace(line))
-                {
-                    continue;
-                }
-                if (items.Count < 1 || regex.IsMatch(line))
+                var chapter = FormatChapter(line, items.Count);
+                if (chapter != null)
                 {
                     items.Add(new ChapterPositionItem()
                     {
-                        Title = line.Trim(),
+                        Title = chapter,
                         Position = postion,
                     });
                 }
             }
-            return items;
+            return CacheChapters = items;
+        }
+
+        private string? FormatChapter(string line, int count = 0)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                return null;
+            }
+            if (count < 1 || ChapterRegex.IsMatch(line))
+            {
+                return line.Trim();
+            }
+            return null;
         }
 
         public int GetChapter(IEnumerable<ChapterPositionItem> items, PositionItem position)
@@ -184,14 +202,12 @@ namespace ZoDream.Shared.Tokenizers
 
         #endregion
 
-
-
-        public async Task<IList<PagePositionItem>> GetPagesAsync()
+        public async Task<Tuple<IList<PagePositionItem>, IList<ChapterPositionItem>>> GetPagesAsync()
         {
-            var items = new List<PagePositionItem>();
+            var data = new Tuple<IList<PagePositionItem>, IList<ChapterPositionItem>>(new List<PagePositionItem>(), new List<ChapterPositionItem>());
             if (Content == null)
             {
-                return items;
+                return data;
             }
             Content.Position = 0;
             var maxH = PageInnerHeight;
@@ -216,10 +232,23 @@ namespace ZoDream.Shared.Tokenizers
                     page.End = new PositionItem(position);
                     if (page.Length > 0)
                     {
-                        items.Add(page);
+                        data.Item1.Add(page);
                     }
                     break;
                 }
+                #region 添加章节目录
+                var chapter = FormatChapter(line, data.Item2.Count);
+                if (chapter != null)
+                {
+                    data.Item2.Add(new ChapterPositionItem()
+                    {
+                        Title = chapter,
+                        Position = position,
+                    });
+                }
+                #endregion
+
+
                 for (int i = 0; i < line.Length; i++)
                 {
                     var fontW = FontWidth((char?)line[i]);
@@ -231,7 +260,7 @@ namespace ZoDream.Shared.Tokenizers
                         {
                             y = 0;
                             page.End = new PositionItem(position, i - 1);
-                            items.Add(page);
+                            data.Item1.Add(page);
                             page = new PagePositionItem()
                             {
                                 Begin = new PositionItem(position, i),
@@ -246,14 +275,14 @@ namespace ZoDream.Shared.Tokenizers
                 {
                     y = 0;
                     page.End = new PositionItem(Content.Position, 0);
-                    items.Add(page);
+                    data.Item1.Add(page);
                     page = new PagePositionItem()
                     {
                         Begin = new PositionItem(Content.Position, 0),
                     };
                 }
             }
-            return items;
+            return data;
         }
 
         public async Task<PageItem> GetPageAsync(PagePositionItem page)
@@ -285,6 +314,7 @@ namespace ZoDream.Shared.Tokenizers
                 var line = await Content.ReadLineAsync();
                 if (line == null)
                 {
+                    data.End = new PositionItem(position, 0);
                     break;
                 }
                 int i = data.Data.Count < 1 ? offset : 0;
@@ -383,7 +413,9 @@ namespace ZoDream.Shared.Tokenizers
         public async Task Refresh()
         {
             var scale = PageCount > 0 ? Page / PageCount : 0;
-            CachePages = await GetPagesAsync();
+            var res = await GetPagesAsync();
+            CachePages = res.Item1;
+            CacheChapters = res.Item2;
             SetPageScale(scale);
         }
 
@@ -502,6 +534,7 @@ namespace ZoDream.Shared.Tokenizers
         {
             Content?.Dispose();
             CachePages.Clear();
+            CacheChapters.Clear();
         }
     }
 }

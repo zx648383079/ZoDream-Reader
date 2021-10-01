@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -30,15 +31,18 @@ namespace ZoDream.Reader.Controls
 
         private ID2D1RenderTarget? renderTarget;
         private Point lastMousePoint = new Point(0, 0);
-
-
         private int currentPage = -1;
         private CanvasLayer[] layerItems = new CanvasLayer[3];
+        private IDWriteTextFormat cacheFont;
+        private ID2D1SolidColorBrush cacheForeground;
+        private ID2D1SolidColorBrush cacheBackground;
+        private ID2D1Bitmap? cacheImage;
+        private Action onSwapFinished;
         /// <summary>
         /// 翻页动画方向
         /// </summary>
         private bool? swapDirect;
-        private DispatcherTimer? timer;
+        private DispatcherTimer? swapTimer;
         public ICanvasSource? Source { get; set; }
 
         public event PageChangedEventHandler? PageChanged;
@@ -47,35 +51,35 @@ namespace ZoDream.Reader.Controls
 
         public void Draw(IList<PageItem> pages)
         {
-            if (renderTarget == null)
-            {
-                renderTarget = DrawerCanvas.CreateRenderTarget();
-            }
-            if (renderTarget == null)
-            {
-                return;
-            }
-            var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
-            var font = dwriteFactory.CreateTextFormat(FontFamily.ToString(), (float)FontSize);
-            var setting = App.ViewModel.Setting;
-            var color = renderTarget.CreateSolidColorBrush(ColorHelper.From(setting.Foreground));
-            renderTarget.BeginDraw();
-            renderTarget.Clear(ColorHelper.From(setting.Background));
-            if (!string.IsNullOrWhiteSpace(setting.BackgroundImage))
-            {
-                renderTarget.DrawBitmap(DrawerCanvas.LoadBitmap(setting.BackgroundImage));
-            }
-            foreach (var page in pages)
-            {
-                foreach (var item in page.Data)
-                {
-                    renderTarget.DrawText(item.Code.ToString(), font, 
-                        new RectangleF((float)item.X, (float)item.Y, int.MaxValue, int.MaxValue),
-                        color);
-                }
-            }
-            renderTarget.EndDraw();
-            DrawerCanvas.Invalidate();
+            //if (renderTarget == null)
+            //{
+            //    renderTarget = DrawerCanvas.CreateRenderTarget();
+            //}
+            //if (renderTarget == null)
+            //{
+            //    return;
+            //}
+            //var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
+            //var font = dwriteFactory.CreateTextFormat(FontFamily.ToString(), (float)FontSize);
+            //var setting = App.ViewModel.Setting;
+            //var color = renderTarget.CreateSolidColorBrush(ColorHelper.From(setting.Foreground));
+            //renderTarget.BeginDraw();
+            //renderTarget.Clear(ColorHelper.From(setting.Background));
+            //if (!string.IsNullOrWhiteSpace(setting.BackgroundImage))
+            //{
+            //    renderTarget.DrawBitmap(DrawerCanvas.LoadBitmap(setting.BackgroundImage));
+            //}
+            //foreach (var page in pages)
+            //{
+            //    foreach (var item in page.Data)
+            //    {
+            //        renderTarget.DrawText(item.Code.ToString(), font, 
+            //            new RectangleF((float)item.X, (float)item.Y, int.MaxValue, int.MaxValue),
+            //            color);
+            //    }
+            //}
+            //renderTarget.EndDraw();
+            //DrawerCanvas.Invalidate();
         }
 
         /// <summary>
@@ -99,12 +103,15 @@ namespace ZoDream.Reader.Controls
         {
             layerItems[0] = layerItems[1];
             layerItems[1] = CreateLayer(pages, page);
-            swapDirect = true;
-            Flush();
-            layerItems[1].Draw(renderTarget);
+            SwapAnimate(true, () =>
+            {
+                swapDirect = null;
+                currentPage = page;
+                PageChanged?.Invoke(this, page, pages[0].Begin);
+            });
         }
 
-        public async void SwapTo(int page)
+        public async Task SwapTo(int page)
         {
             if (Source == null || !Source.Canable(page))
             {
@@ -126,9 +133,12 @@ namespace ZoDream.Reader.Controls
         {
             layerItems[2] = layerItems[1];
             layerItems[1] = CreateLayer(pages, page);
-            swapDirect = false;
-            Flush();
-            layerItems[1].Draw(renderTarget);
+            SwapAnimate(false, () =>
+            {
+                swapDirect = null; 
+                currentPage = page;
+                PageChanged?.Invoke(this, page, pages[0].Begin);
+            });
         }
         public async void SwapFrom(int page)
         {
@@ -139,14 +149,53 @@ namespace ZoDream.Reader.Controls
             SwapFrom(await Source.GetAsync(page), page);
         }
 
-        public void SwapNext()
+        private async void SwapAnimate(bool toNext, Action finished)
         {
-            SwapTo(currentPage++);
+            swapDirect = toNext;
+            onSwapFinished = finished;
+            var setting = App.ViewModel.Setting;
+            var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
+            if (renderTarget == null)
+            {
+                renderTarget = DrawerCanvas.CreateRenderTarget();
+            }
+            cacheFont = dwriteFactory.CreateTextFormat(setting.FontFamily, (float)setting.FontSize);
+            cacheForeground = renderTarget.CreateSolidColorBrush(ColorHelper.From(setting.Foreground));
+            cacheBackground = renderTarget.CreateSolidColorBrush(ColorHelper.From(setting.Background));
+            cacheImage = !string.IsNullOrWhiteSpace(setting.BackgroundImage) ?
+                DrawerCanvas.LoadBitmap(setting.BackgroundImage) : null;
+            
+            DrawerCanvas.Invalidate();
+            if (setting.Animation < 1)
+            {
+                onSwapFinished?.Invoke();
+                return;
+            }
+            if (swapTimer == null)
+            {
+                swapTimer = new DispatcherTimer()
+                {
+                    Interval = TimeSpan.FromMilliseconds(40),
+                };
+                swapTimer.Tick += SwapTimer_Tick;
+            }
+            swapTimer.Start();
         }
 
-        public void SwapPrevious()
+        private void SwapTimer_Tick(object? sender, object e)
         {
-            SwapTo(currentPage--);
+            DrawerCanvas.Invalidate();
+        }
+
+
+        public async void SwapNext()
+        {
+            await SwapTo(currentPage + 1);
+        }
+
+        public async void SwapPrevious()
+        {
+            await SwapTo(currentPage - 1);
         }
 
         public void Flush()
@@ -197,10 +246,26 @@ namespace ZoDream.Reader.Controls
 
         private void DrawerCanvas_Draw(object sender)
         {
-            if (renderTarget == null)
+            if (renderTarget == null || cacheFont == null)
             {
                 return;
             }
+            renderTarget.BeginDraw();
+            if (swapDirect == null)
+            {
+                layerItems[1]?.Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
+            }
+            else if (swapDirect == true)
+            {
+                layerItems[1].Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                layerItems[0]?.Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
+            }
+            else
+            {
+                layerItems[3]?.Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                layerItems[1].Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
+            }
+            renderTarget.EndDraw();
             DrawerCanvas.DrawImage(renderTarget);
         }
 
@@ -231,7 +296,7 @@ namespace ZoDream.Reader.Controls
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            timer?.Stop();
+            swapTimer?.Stop();
             renderTarget?.Dispose();
             renderTarget = null;
         }

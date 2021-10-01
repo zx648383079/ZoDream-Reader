@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Models;
 
@@ -25,22 +27,45 @@ namespace ZoDream.Reader.Pages
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            // BootAsync();
         }
 
-        private async void Load()
+        private async void BootAsync()
         {
-            ViewModel.Tokenizer.Width = PageRender.ActualWidth;
-            ViewModel.Tokenizer.Height = PageRender.ActualHeight - 20;
-            ViewModel.Tokenizer.ColumnCount = App.ViewModel.Setting.ColumnCount;
-            await ViewModel.Tokenizer.Refresh();
+            if (!isBooted && PageRender.ActualWidth > 0)
+            {
+                var setting = App.ViewModel.Setting;
+                PageRender.FontSize = ViewModel.Tokenizer.FontSize = setting.FontSize;
+                PageRender.FontFamily = new FontFamily(setting.FontFamily);
+                ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
+                    ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
+                ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
+                ViewModel.Tokenizer.LineSpace = setting.LineSpace;
+                ViewModel.Tokenizer.Gap = setting.Padding * 2;
+                PageRender.Source = ViewModel;
+                ViewModel.Tokenizer.ColumnCount = App.ViewModel.Setting.ColumnCount;
+                await OnResizeAsync();
+                ViewModel.Load();
+                isBooted = true;
+                loadingRing.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async Task OnResizeAsync()
+        {
+            var width = PageRender.ActualWidth;
+            var height = PageRender.ActualHeight - 20;
+            var tokenizer = ViewModel.Tokenizer;
+            if (tokenizer.Width == width && tokenizer.Height == height)
+            {
+                return;
+            }
+            tokenizer.Width = width;
+            tokenizer.Height = height;
+            await tokenizer.Refresh();
             ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
-            PageRender.Source = ViewModel;
-            PageRender.FontSize = ViewModel.Tokenizer.FontSize;
             PageRender.Flush();
-            loadingRing.Visibility = Visibility.Collapsed;
-            PageRender.SwapTo(ViewModel.Tokenizer.Page);
-            isBooted = true;
-            ViewModel.Load();
+            await PageRender.SwapTo(tokenizer.Page);
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -48,17 +73,14 @@ namespace ZoDream.Reader.Pages
             ViewModel.Tokenizer.Dispose();
         }
 
-        private async void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (!isBooted)
             {
+                BootAsync();
                 return;
             }
-            ViewModel.Tokenizer.Width = PageRender.ActualWidth;
-            ViewModel.Tokenizer.Height = PageRender.ActualHeight;
-            await ViewModel.Tokenizer.Refresh();
-            PageRender.Flush();
-            PageRender.SwapTo(ViewModel.Tokenizer.Page);
+            _ = OnResizeAsync();
         }
 
         private void MoreBtn_Click(object sender, RoutedEventArgs e)
@@ -100,7 +122,7 @@ namespace ZoDream.Reader.Pages
 
         private void PageRender_OnReady(object sender)
         {
-            Load();
+            BootAsync();
         }
     }
 }

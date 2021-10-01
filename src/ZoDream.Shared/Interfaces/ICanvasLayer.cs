@@ -32,6 +32,6 @@ namespace ZoDream.Shared.Interfaces
 
         public void Draw(RenderTargetT target);
 
-        public void Draw(RenderTargetT target, FontT font, ColorT color, ImageT? background);
+        public void Draw(RenderTargetT target, FontT font, ColorT foreground, ColorT background, ImageT? backgroundImage);
     }
 }

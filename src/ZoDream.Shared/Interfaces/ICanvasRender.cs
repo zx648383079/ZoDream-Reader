@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using ZoDream.Shared.Events;
 using ZoDream.Shared.Models;
 
@@ -33,7 +34,7 @@ namespace ZoDream.Shared.Interfaces
         public void SwapTo(IList<PageItem> pages);
         public void SwapTo(IList<PageItem> pages, int page);
 
-        public void SwapTo(int page);
+        public Task SwapTo(int page);
 
         /// <summary>
         /// 使用过渡动画切换回新的页面，上一页

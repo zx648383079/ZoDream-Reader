@@ -23,7 +23,7 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{x:Bind ViewModel.ChapterTitle, Mode=OneWay}" VerticalAlignment="Center"/>
-
+            <TextBlock x:Name="progressTb" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Button Grid.Column="2" Content="&#xE10C;" 
                 FontFamily="{StaticResource IconFontFamily}"
                 Background="Transparent" FontSize="30"

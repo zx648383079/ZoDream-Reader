@@ -3,8 +3,10 @@ using Microsoft.Graphics.Canvas.Text;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.System;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -14,6 +16,7 @@ using ZoDream.Reader.Events;
 using ZoDream.Shared.Events;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
+using ColorHelper = ZoDream.Reader.Drawing.ColorHelper;
 
 //https://go.microsoft.com/fwlink/?LinkId=234236 上介绍了“用户控件”项模板
 
@@ -26,17 +29,21 @@ namespace ZoDream.Reader.Controls
             this.InitializeComponent();
         }
 
-        private CanvasRenderTarget renderTarget;
         private Point lastMousePoint = new Point(0, 0);
-
+        private CanvasRenderTarget renderTarget;
         private int currentPage = -1;
         private CanvasLayer[] layerItems = new CanvasLayer[3];
+        private CanvasTextFormat cacheFont;
+        private Color cacheForeground;
+        private Color cacheBackground;
+        private CanvasBitmap cacheImage;
+        private Action onSwapFinished;
 
         /// <summary>
         /// 翻页动画方向
         /// </summary>
         private bool? swapDirect = null;
-        private DispatcherTimer timer;
+        private DispatcherTimer swapTimer;
         public ICanvasSource Source { get; set; }
 
         public event PageChangedEventHandler PageChanged;
@@ -44,9 +51,24 @@ namespace ZoDream.Reader.Controls
 
         private void DrawerCanvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
         {
-            if (renderTarget == null)
+            if (cacheFont == null)
             {
                 return;
+            }
+            using (var ds = renderTarget.CreateDrawingSession())
+            {
+                if (swapDirect == null)
+                {
+                    layerItems[1]?.Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                }
+                else if (swapDirect == true)
+                {
+                    layerItems[1].Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                    layerItems[0]?.Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                } else {
+                    layerItems[3]?.Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                    layerItems[1].Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                }
             }
             args.DrawingSession.DrawImage(renderTarget);
         }
@@ -58,28 +80,28 @@ namespace ZoDream.Reader.Controls
 
         public void Draw(IList<PageItem> pages)
         {
-            renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
-                   (float)DrawerCanvas.ActualHeight, 96);
-            var font = new CanvasTextFormat()
-            {
-                FontFamily = FontFamily.Source, // name.ttf#name
-                FontSize = (float)FontSize
-            };
-            var color = ColorHelper.FromArgb(255, 0, 0, 0);
-            using (var ds = renderTarget.CreateDrawingSession())
-            {
-                ds.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
-                foreach (var page in pages)
-                {
-                    foreach (var item in page.Data)
-                    {
-                        ds.DrawText(item.Code.ToString(), 
-                            new Vector2((float)item.X, (float)item.Y), 
-                            color, font);
-                    }
-                }
-            }
-            DrawerCanvas.Invalidate();
+            //renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
+            //       (float)DrawerCanvas.ActualHeight, 96);
+            //var font = new CanvasTextFormat()
+            //{
+            //    FontFamily = FontFamily.Source, // name.ttf#name
+            //    FontSize = (float)FontSize
+            //};
+            //var color = ColorHelper.FromArgb(255, 0, 0, 0);
+            //using (var ds = renderTarget.CreateDrawingSession())
+            //{
+            //    ds.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
+            //    foreach (var page in pages)
+            //    {
+            //        foreach (var item in page.Data)
+            //        {
+            //            ds.DrawText(item.Code.ToString(), 
+            //                new Vector2((float)item.X, (float)item.Y), 
+            //                color, font);
+            //        }
+            //    }
+            //}
+            //DrawerCanvas.Invalidate();
         }
 
         /// <summary>
@@ -106,11 +128,13 @@ namespace ZoDream.Reader.Controls
             layerItems[1] = CreateLayer(pages, page);
             SwapAnimate(true, () =>
             {
+                swapDirect = null;
+                currentPage = page;
                 PageChanged?.Invoke(this, page, pages[0].Begin);
             });
         }
 
-        public async void SwapTo(int page)
+        public async Task SwapTo(int page)
         {
             if (Source == null || !Source.Canable(page))
             {
@@ -134,6 +158,8 @@ namespace ZoDream.Reader.Controls
             layerItems[1] = CreateLayer(pages, page);
             SwapAnimate(false, () =>
             {
+                swapDirect = null;
+                currentPage = page;
                 PageChanged?.Invoke(this, page, pages[0].Begin);
             });
         }
@@ -146,56 +172,90 @@ namespace ZoDream.Reader.Controls
             SwapFrom(await Source.GetAsync(page), page);
         }
 
-        private void SwapAnimate(bool toNext, Action finished)
+        private async void SwapAnimate(bool toNext, Action finished)
         {
             swapDirect = toNext;
+            onSwapFinished = finished;
+            var setting = App.ViewModel.Setting;
+            cacheFont = new CanvasTextFormat()
+            {
+                FontFamily = setting.FontFamily, // name.ttf#name
+                FontSize = (float)setting.FontSize
+            };
+            cacheForeground = ColorHelper.From(setting.Foreground, Colors.Black);
+            cacheBackground = ColorHelper.From(setting.Background);
+            cacheImage = !string.IsNullOrWhiteSpace(setting.BackgroundImage) ? 
+                await CanvasBitmap.LoadAsync(DrawerCanvas, setting.BackgroundImage) : null;
             if (renderTarget == null)
             {
                 renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
                    (float)DrawerCanvas.ActualHeight, 96);
             }
-            var setting = App.ViewModel.Setting;
-            var font = new CanvasTextFormat()
+            if (setting.Animation < 1)
             {
-                FontFamily = setting.FontFamily, // name.ttf#name
-                FontSize = (float)setting.FontSize
-            };
-            var color = ColorHelper.From(setting.Foreground);
-            using (var ds = renderTarget.CreateDrawingSession())
+                SwapTimer_Tick(null, null);
+                return;
+            }
+            if (swapTimer == null)
             {
-                ds.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
-                layerItems[1].Draw(ds, font, color, null);
+                swapTimer = new DispatcherTimer()
+                {
+                    Interval = TimeSpan.FromMilliseconds(40),
+                };
+                swapTimer.Tick += SwapTimer_Tick;
+            }
+            swapTimer.Start();
+        }
+
+        private void SwapTimer_Tick(object sender, object e)
+        {
+            if (IsSwapFinished())
+            {
+                onSwapFinished?.Invoke();
+                swapDirect = null;
+            }
+            if (swapDirect == true)
+            {
+                layerItems[0].X -= 10;
+            } else
+            {
+                layerItems[1].X += 10;
             }
             DrawerCanvas.Invalidate();
-            finished?.Invoke();
         }
 
-        public void SwapNext()
+        private bool IsSwapFinished()
         {
-            SwapTo(currentPage++);
+            if (App.ViewModel.Setting.Animation < 1 || swapDirect == null)
+            {
+                return true;
+            }
+            if (swapDirect == true)
+            {
+                return layerItems[0] == null || layerItems[0].X <= 10 - layerItems[0].Width;
+            }
+            return layerItems[1] == null || layerItems[1].X <= -10;
         }
 
-        public void SwapPrevious()
+        public async void SwapNext()
         {
-            SwapTo(currentPage--);
+            await SwapTo(currentPage + 1);
+        }
+
+        public async void SwapPrevious()
+        {
+            await SwapTo(currentPage - 1);
         }
 
         public void Flush()
         {
-            if (renderTarget == null)
-            {
-                return;
-            }
-            using (var ds = renderTarget.CreateDrawingSession())
-            {
-                ds.Clear(ColorHelper.FromArgb(255, 255, 255, 255));
-            }
             DrawerCanvas.Invalidate();
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            timer?.Stop();
+            renderTarget?.Dispose();
+            swapTimer?.Stop();
             DrawerCanvas.RemoveFromVisualTree();
             DrawerCanvas = null;
         }
@@ -244,6 +304,7 @@ namespace ZoDream.Reader.Controls
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            renderTarget?.Dispose();
             renderTarget = null;
         }
 

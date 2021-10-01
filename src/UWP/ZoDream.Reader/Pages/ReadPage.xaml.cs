@@ -61,34 +61,42 @@ namespace ZoDream.Reader.Pages
 
         private async void BootAsync()
         {
-            if (PageRender.ActualWidth > 0)
+            if (!isBooted && PageRender.ActualWidth > 0)
             {
                 PageRender.Source = ViewModel;
-                ViewModel.Tokenizer.Width = PageRender.ActualWidth;
-                ViewModel.Tokenizer.Height = PageRender.ActualHeight - 20;
                 ViewModel.Tokenizer.ColumnCount = App.ViewModel.Setting.ColumnCount;
-                await ViewModel.Tokenizer.Refresh();
-                ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
-                PageRender.Flush();
-                PageRender.SwapTo(ViewModel.Tokenizer.Page);
+                await OnResizeAsync();
                 ViewModel.Load();
                 isBooted = true;
                 LoadingBtn.Visibility = Visibility.Collapsed;
             }
         }
 
-        private async void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        private async Task OnResizeAsync()
+        {
+            var width = PageRender.ActualWidth;
+            var height = PageRender.ActualHeight - 20;
+            var tokenizer = ViewModel.Tokenizer;
+            if (tokenizer.Width == width && tokenizer.Height == height)
+            {
+                return;
+            }
+            tokenizer.Width = width;
+            tokenizer.Height = height;
+            await tokenizer.Refresh();
+            ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
+            PageRender.Flush();
+            await PageRender.SwapTo(tokenizer.Page);
+        }
+
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (!isBooted)
             {
                 BootAsync();
                 return;
             }
-            ViewModel.Tokenizer.Width = PageRender.ActualWidth;
-            ViewModel.Tokenizer.Height = PageRender.ActualHeight;
-            await ViewModel.Tokenizer.Refresh();
-            PageRender.Flush();
-            PageRender.SwapTo(ViewModel.Tokenizer.Page);
+            _ = OnResizeAsync();
         }
 
         private async void JumpBtn_Tapped(object sender, TappedRoutedEventArgs e)
@@ -105,7 +113,7 @@ namespace ZoDream.Reader.Pages
                 return;
             }
             ViewModel.Tokenizer.SetPageScale(dialog.Value, 100);
-            PageRender.SwapTo(ViewModel.Tokenizer.Page);
+            await PageRender.SwapTo(ViewModel.Tokenizer.Page);
         }
 
         private void SettingBtn_Tapped(object sender, TappedRoutedEventArgs e)
@@ -142,10 +150,12 @@ namespace ZoDream.Reader.Pages
 
         private void PageRender_PageChanged(object sender, int page, PositionItem pagePosition)
         {
+            progressTb.Text = $"{page}/{ViewModel.Tokenizer.PageCount}";
             ViewModel.Tokenizer.Page = page;
             ViewModel.Book.Position = pagePosition;
             ViewModel.ReloadChapter();
             App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+            
         }
 
         private void PageRender_OnReady(object sender)
