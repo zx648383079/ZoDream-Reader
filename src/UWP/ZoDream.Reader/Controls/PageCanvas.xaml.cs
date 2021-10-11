@@ -179,13 +179,16 @@ namespace ZoDream.Reader.Controls
             var setting = App.ViewModel.Setting;
             cacheFont = new CanvasTextFormat()
             {
-                FontFamily = setting.FontFamily, // name.ttf#name
+                FontFamily = await App.ViewModel.DiskRepository.GetFontFamilyAsync(setting.FontFamily), // name.ttf#name
                 FontSize = (float)setting.FontSize
             };
             cacheForeground = ColorHelper.From(setting.Foreground, Colors.Black);
             cacheBackground = ColorHelper.From(setting.Background);
-            cacheImage = !string.IsNullOrWhiteSpace(setting.BackgroundImage) ? 
-                await CanvasBitmap.LoadAsync(DrawerCanvas, setting.BackgroundImage) : null;
+            if (!string.IsNullOrWhiteSpace(setting.BackgroundImage))
+            {
+                var bgImage = await App.ViewModel.DiskRepository.GetFilePathAsync(setting.BackgroundImage);
+                cacheImage = await CanvasBitmap.LoadAsync(DrawerCanvas, bgImage);
+            }
             if (renderTarget == null)
             {
                 renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,

@@ -91,6 +91,8 @@ namespace ZoDream.Reader.Repositories
             };
         }
 
+
+
         public Disk(StorageFolder folder = null)
         {
             BaseFolder = folder == null ? ApplicationData.Current.LocalFolder : folder;
@@ -106,6 +108,36 @@ namespace ZoDream.Reader.Repositories
         public async Task<StorageFile> CreateDatabaseAsync()
         {
             return await BaseFolder.CreateFileAsync("zodream.db", CreationCollisionOption.OpenIfExists);
+        }
+
+        public Task<string> GetFileUriAsync(string fileName)
+        {
+            return Task.FromResult($"ms-appdata:///local/theme/{fileName}");
+        }
+
+        public Task<string> GetFilePathAsync(string fileName)
+        {
+            return Task.FromResult(Path.Combine(ThemeFolder.Path, fileName));
+        }
+
+        public async Task<string> GetFontFamilyAsync(string fontName)
+        {
+            if (string.IsNullOrWhiteSpace(fontName))
+            {
+                return string.Empty;
+            }
+            var font = new FontItem(fontName);
+            if (string.IsNullOrEmpty(font.FileName))
+            {
+                return font.FontFamily;
+            }
+            var file = await ThemeFolder.GetFileAsync(font.FileName);
+            if (file == null)
+            {
+                return string.Empty;
+            }
+            font.FileName = await GetFileUriAsync(fontName);
+            return font.FontFamily;
         }
 
         public async Task<StorageFile> GetBookAsync(BookItem item)

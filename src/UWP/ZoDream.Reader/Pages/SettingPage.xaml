@@ -28,23 +28,31 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="背景颜色" Style="{StaticResource LabelTb}"/>
                     <Button Content="颜色选择" Grid.Column="1">
                         <Button.Flyout>
-                            <Flyout>
-                                <ColorPicker
-                                  ColorSpectrumShape="Box"
-                                  IsMoreButtonVisible="False"
-                                  IsColorSliderVisible="True"
-                                  IsHexInputVisible="True"
-                                  IsColorChannelTextInputVisible="False"
-                                    Grid.Column="1"/>
+                            <Flyout x:Name="bgPopup">
+                                <StackPanel>
+                                    <ColorPicker x:Name="bgPicker"
+                                      ColorSpectrumShape="Box"
+                                      IsMoreButtonVisible="False"
+                                      IsColorSliderVisible="True"
+                                      IsHexInputVisible="True"
+                                      IsColorChannelTextInputVisible="False"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Content="选择图片" x:Name="bgImageBtn" Click="bgImageBtn_Click"/>
+                                        <Button Content="确定" x:Name="bgYesBtn" Grid.Column="1" Click="bgYesBtn_Click"/>
+                                    </Grid>
+                                </StackPanel>
                             </Flyout>
                         </Button.Flyout>
                     </Button>
-                    <Button Content="图片" Grid.Column="2"/>
+                    
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -54,13 +62,16 @@
                     <TextBlock Text="字体颜色" Style="{StaticResource LabelTb}"/>
                     <Button Content="颜色选择" Grid.Column="1">
                         <Button.Flyout>
-                            <Flyout>
-                                <ColorPicker
-                                  ColorSpectrumShape="Box"
-                                  IsMoreButtonVisible="False"
-                                  IsColorSliderVisible="True"
-                                    IsColorChannelTextInputVisible="False"
-                                  IsHexInputVisible="True" Grid.Column="1"/>
+                            <Flyout x:Name="fgPopup">
+                                <StackPanel>
+                                    <ColorPicker x:Name="fgPicker"
+                                      ColorSpectrumShape="Box"
+                                      IsMoreButtonVisible="False"
+                                      IsColorSliderVisible="True"
+                                      IsHexInputVisible="True"
+                                      IsColorChannelTextInputVisible="False"/>
+                                    <Button Content="确定" x:Name="fgBtn" Click="fgBtn_Click"/>
+                                </StackPanel>
                             </Flyout>
                         </Button.Flyout>
                     </Button>
@@ -161,6 +172,8 @@
                     <TextBlock Text="朗读速度/x" Style="{StaticResource LabelTb}"/>
                     <control:NumberInput x:Name="speekSpeedTb" Grid.Column="1"/>
                 </Grid>
+                <TextBlock Text="预览"/>
+                
             </StackPanel>
         </ScrollViewer>
     </Grid>

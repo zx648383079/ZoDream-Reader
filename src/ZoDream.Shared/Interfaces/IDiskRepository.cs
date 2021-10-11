@@ -20,6 +20,11 @@ namespace ZoDream.Shared.Interfaces
 
         public Task<string> GetBookPathAsync(BookItem item);
 
+        public Task<string> GetFontFamilyAsync(string fontName);
+
+        public Task<string> GetFileUriAsync(string fileName);
+        public Task<string> GetFilePathAsync(string fileName);
+
         public Task<BookItem?> AddBookAsync(FileT file);
 
         public Task<string?> AddImageAsync(FileT file);

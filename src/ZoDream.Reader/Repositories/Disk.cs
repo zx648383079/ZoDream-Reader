@@ -116,6 +116,38 @@ namespace ZoDream.Reader.Repositories
             };
         }
 
+        public Task<string> GetFileUriAsync(string fileName)
+        {
+            return Task.FromResult(Path.Join(ThemeFolder, fileName));
+        }
+
+        public Task<string> GetFilePathAsync(string fileName)
+        {
+            return GetFileUriAsync(fileName);
+        }
+        public Task<string> GetFontFamilyAsync(string fontName)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                if (string.IsNullOrWhiteSpace(fontName))
+                {
+                    return string.Empty;
+                }
+                var font = new FontItem(fontName);
+                if (string.IsNullOrEmpty(font.FileName))
+                {
+                    return font.FontFamily;
+                }
+                var file = Path.Join(ThemeFolder, font.FileName);
+                if (!File.Exists(file))
+                {
+                    return string.Empty;
+                }
+                font.FileName = file;
+                return font.FontFamily;
+            });
+        }
+
         public Task<string> GetBookAsync(BookItem item)
         {
             return Task.FromResult(TxtFileName(item.FileName));

@@ -19,7 +19,7 @@ namespace ZoDream.Reader.ViewModels
         private async void Load()
         {
             var items = await App.ViewModel.DiskRepository.GetFontsAsync();
-            FontItems.Clear();
+            // FontItems.Clear();
             foreach (var item in items)
             {
                 FontItems.Add(item);
