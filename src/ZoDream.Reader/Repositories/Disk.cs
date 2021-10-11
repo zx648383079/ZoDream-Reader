@@ -19,7 +19,7 @@ namespace ZoDream.Reader.Repositories
 
         public string BookFolder { get; private set; }
 
-        public string FontFolder { get; private set; }
+        public string ThemeFolder { get; private set; }
 
 
         public string TxtFileName(string fileId)
@@ -38,7 +38,7 @@ namespace ZoDream.Reader.Repositories
 
         public string FontFileName(string fileId)
         {
-            return Path.Join(FontFolder, fileId);
+            return Path.Join(ThemeFolder, fileId);
         }
 
         public IList<FontItem> GetFonts()
@@ -95,7 +95,7 @@ namespace ZoDream.Reader.Repositories
             }
             var name = info.Name.Replace(info.Extension, "");
             var fileId = info.Name;
-            if (info.DirectoryName != null && info.DirectoryName.StartsWith(FontFolder))
+            if (info.DirectoryName != null && info.DirectoryName.StartsWith(ThemeFolder))
             {
                 return new FontItem(name)
                 {
@@ -142,11 +142,31 @@ namespace ZoDream.Reader.Repositories
             return Task.Factory.StartNew(() => AddFont(file));
         }
 
-        public Task ClearFontAsync()
+        public Task<string?> AddImageAsync(string file)
         {
             return Task.Factory.StartNew(() =>
             {
-                foreach (var item in Directory.GetFileSystemEntries(FontFolder))
+                var info = new FileInfo(file);
+                if (!info.Exists)
+                {
+                    return null;
+                }
+                var name = info.Name.Replace(info.Extension, "");
+                var fileId = info.Name;
+                if (info.DirectoryName != null && info.DirectoryName.StartsWith(ThemeFolder))
+                {
+                    return fileId;
+                }
+                var fileInfo = info.CopyTo(FontFileName(info.Name), true);
+                return fileId;
+            });
+        }
+
+        public Task ClearThemeAsync()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                foreach (var item in Directory.GetFileSystemEntries(ThemeFolder))
                 {
                     File.Delete(item);
                 }
@@ -165,9 +185,9 @@ namespace ZoDream.Reader.Repositories
         {
             BaseFolder = string.IsNullOrWhiteSpace(folder) ? AppDomain.CurrentDomain.BaseDirectory : folder;
             BookFolder = Path.Join(BaseFolder, "txt");
-            FontFolder = Path.Join(BaseFolder, "font");
+            ThemeFolder = Path.Join(BaseFolder, "theme");
             Directory.CreateDirectory(BookFolder);
-            Directory.CreateDirectory(FontFolder);
+            Directory.CreateDirectory(ThemeFolder);
         }
     }
 }

@@ -9,8 +9,11 @@ namespace ZoDream.Reader.Events
 {
     public delegate void ActionItemEventHandler(object sender, BookItem item, ActionEvent e);
 
+    public delegate void ActionEventHandler(object sender, ActionEvent e);
+
     public enum ActionEvent
     {
+        NONE,
         CLICK,
         EDIT,
         DELETE,

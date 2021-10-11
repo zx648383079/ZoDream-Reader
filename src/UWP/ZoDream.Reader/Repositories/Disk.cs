@@ -19,7 +19,7 @@ namespace ZoDream.Reader.Repositories
         public StorageFolder BaseFolder;
         public StorageFolder BookFolder { get; private set; }
 
-        public StorageFolder FontFolder { get; private set; }
+        public StorageFolder ThemeFolder { get; private set; }
 
 
         StorageFolder IDiskRepository<StorageFolder, StorageFile>.BaseFolder => throw new NotImplementedException();
@@ -75,7 +75,7 @@ namespace ZoDream.Reader.Repositories
         {
             var name = file.Name.Substring(0, file.Name.IndexOf('.'));
             var fileId = file.Name;
-            var tempfile = await file.CopyAsync(FontFolder, file.Name, NameCollisionOption.ReplaceExisting);
+            var tempfile = await file.CopyAsync(ThemeFolder, file.Name, NameCollisionOption.ReplaceExisting);
             //var factory = DWriteCreateFactory<IDWriteFactory>();
             //var fontRef = factory.CreateFontFileReference(tempfile.Path);
             //fontRef.Analyze(out var isSupprted, out var fontFileType, out var fontFaceType, out var numberOfFaces);
@@ -100,7 +100,7 @@ namespace ZoDream.Reader.Repositories
         private async void Init()
         {
             BookFolder = await BaseFolder.CreateFolderAsync("txt", CreationCollisionOption.OpenIfExists);
-            FontFolder = await BaseFolder.CreateFolderAsync("font", CreationCollisionOption.OpenIfExists);
+            ThemeFolder = await BaseFolder.CreateFolderAsync("theme", CreationCollisionOption.OpenIfExists);
         }
 
         public async Task<StorageFile> CreateDatabaseAsync()
@@ -134,9 +134,16 @@ namespace ZoDream.Reader.Repositories
             return AddFont(file);
         }
 
-        public async Task ClearFontAsync()
+        public async Task<string> AddImageAsync(StorageFile file)
         {
-            var items = await FontFolder.GetItemsAsync();
+            var fileId = file.Name;
+            await file.CopyAsync(ThemeFolder, file.Name, NameCollisionOption.ReplaceExisting);
+            return fileId;
+        }
+
+        public async Task ClearThemeAsync()
+        {
+            var items = await ThemeFolder.GetItemsAsync();
             foreach (var item in items)
             {
                 await item.DeleteAsync(StorageDeleteOption.PermanentDelete);

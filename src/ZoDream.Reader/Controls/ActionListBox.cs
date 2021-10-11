@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -49,6 +50,7 @@ namespace ZoDream.Reader.Controls
     ///
     /// </summary>
     [TemplatePart(Name = "PART_Container", Type = typeof(Panel))]
+    [TemplatePart(Name = "PART_Menu", Type = typeof(ActionMenuBox))]
     public class ActionListBox : Control
     {
         static ActionListBox()
@@ -57,6 +59,7 @@ namespace ZoDream.Reader.Controls
         }
 
         private Panel? boxContianer;
+        private ActionMenuBox? boxMenu;
 
         private double ItemWidth = 160;
         private double ItemHeight = 200;
@@ -143,12 +146,25 @@ namespace ZoDream.Reader.Controls
                 book.Height = ItemHeight;
                 book.OnAction += (_, item, e) =>
                 {
+                    if (e == ActionEvent.NONE)
+                    {
+                        boxMenu?.Show(GetActionPosition(book));
+                        return;
+                    }
                     OnAction?.Invoke(this, item, e);
                 };
                 boxContianer.Children.Add(book);
                 book.Source = data[j];
             }
             MoveActionButton();
+        }
+
+        private Point GetActionPosition(BookListBoxItem item)
+        {
+            var p = item.TranslatePoint(new Point(0, 0), this);
+            p.X += item.ActualWidth - 60;
+            p.Y += 30;
+            return p;
         }
 
         private void BindListener()
@@ -245,6 +261,7 @@ namespace ZoDream.Reader.Controls
         {
             base.OnApplyTemplate();
             boxContianer = GetTemplateChild("PART_Container") as Panel;
+            boxMenu = GetTemplateChild("PART_Menu") as ActionMenuBox;
             RefreshItems();
         }
     }

@@ -120,6 +120,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ActionListBox.cs" />
+    <Compile Include="Controls\ActionMenuBox.xaml.cs">
+      <DependentUpon>ActionMenuBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\AddListBoxItem.cs" />
     <Compile Include="Controls\BookListBoxItem.xaml.cs">
       <DependentUpon>BookListBoxItem.xaml</DependentUpon>
@@ -197,6 +200,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Controls\ActionMenuBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\BookListBoxItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

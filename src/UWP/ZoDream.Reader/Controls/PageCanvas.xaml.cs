@@ -239,12 +239,12 @@ namespace ZoDream.Reader.Controls
 
         public async void SwapNext()
         {
-            await SwapTo(currentPage + 1);
+            await SwapTo(currentPage + App.ViewModel.Setting.ColumnCount);
         }
 
         public async void SwapPrevious()
         {
-            await SwapTo(currentPage - 1);
+            await SwapTo(currentPage - App.ViewModel.Setting.ColumnCount);
         }
 
         public void Flush()

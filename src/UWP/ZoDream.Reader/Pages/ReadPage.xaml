@@ -15,7 +15,8 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <control:PageCanvas x:Name="PageRender" PageChanged="PageRender_PageChanged" OnReady="PageRender_OnReady"/>
+        <control:PageCanvas x:Name="PageRender" PageChanged="PageRender_PageChanged" 
+                            OnReady="PageRender_OnReady"/>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>

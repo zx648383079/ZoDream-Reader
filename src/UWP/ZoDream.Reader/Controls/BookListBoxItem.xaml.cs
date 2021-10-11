@@ -65,5 +65,11 @@ namespace ZoDream.Reader.Controls
         {
             OnAction?.Invoke(this, Source, ActionEvent.CLICK);
         }
+
+        private void MoreBtn_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            OnAction?.Invoke(this, Source, ActionEvent.NONE);
+            e.Handled = true;
+        }
     }
 }

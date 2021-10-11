@@ -53,7 +53,7 @@ namespace ZoDream.Reader.Controls
 
         private void MoreBtn_Click(object sender, RoutedEventArgs e)
         {
-            MoreMenu.IsOpen = !MoreMenu.IsOpen;
+            OnAction?.Invoke(this, Source, ActionEvent.NONE);
             e.Handled = true;
         }
 

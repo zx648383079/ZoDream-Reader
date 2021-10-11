@@ -8,7 +8,12 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <WrapPanel x:Name="PART_Container"/>
+                        <Grid>
+                            <WrapPanel x:Name="PART_Container"/>
+
+                            <local:ActionMenuBox x:Name="PART_Menu"/>
+                        </Grid>
+                        
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Local;
+using ZoDream.Shared.Models;
 
 namespace ZoDream.Shared.Renders
 {
@@ -16,37 +18,52 @@ namespace ZoDream.Shared.Renders
         {
             _fileName = fileName;
             _reader = new FileStream(fileName, FileMode.Open);
-            _encoding = TxtEncoder.GetEncoding(_reader);
         }
 
         private string _fileName;
-        private Stream _reader;
-        private Encoding _encoding;
+        private FileStream _reader;
+        private Encoding? _encoding;
+        private bool _isLoading = false;
 
-        public long Position { 
-            get => _reader.Position; 
-            set
+        public long Position => _reader.Position;
+
+        public Task SeekAsync(long position)
+        {
+            return Task.Factory.StartNew(() =>
             {
-                _reader.Seek(value, SeekOrigin.Begin);
+                WaitUnlock();
+                Seek(position);
+            });
+        }
+
+        private void WaitUnlock()
+        {
+            while (_isLoading)
+            {
+                Thread.Sleep(50);
             }
         }
 
-        public string? ReadLine()
+        internal void Seek(long position)
         {
+           _reader.Seek(position, SeekOrigin.Begin);
+        }
+
+        internal string? ReadLine()
+        {
+            return ReadLine(out _);
+        }
+
+        internal string? ReadLine(out long nextPosition)
+        {
+            _isLoading = true;
+            GetEncoding();
             var bytes = new List<byte>();
             var isEnd = false;
             int bInt;
             while (true)
             {
-                try
-                {
-                    bInt = _reader.ReadByte();
-                }
-                catch (IndexOutOfRangeException)
-                {
-                    isEnd = true;
-                    break;
-                }
+                bInt = ReadByte();
                 if (bInt == -1)
                 {
                     isEnd = true;
@@ -59,20 +76,50 @@ namespace ZoDream.Shared.Renders
                 if (bInt == 0x0D)
                 {
                     var p = Position;
-                    if (_reader.ReadByte() == 0x0A)
+                    var next = ReadByte();
+                    if (next == 0x0A)
                     {
                         break;
                     }
-                    Position = p;
+                    if (next == -1)
+                    {
+                        isEnd = true;
+                        break;
+                    }
+                    Seek(p);
                     break;
                 }
                 bytes.Add(Convert.ToByte(bInt));
             }
+            nextPosition = Position;
+            _isLoading = false;
             if (bytes.Count == 0)
             {
                 return isEnd ? null : string.Empty;
             }
-            return _encoding.GetString(bytes.ToArray());
+            return _encoding!.GetString(bytes.ToArray());
+        }
+
+        private void GetEncoding()
+        {
+            if (_encoding == null)
+            {
+                var oldPosition = Position;
+                _encoding = TxtEncoder.GetEncoding(_reader);
+                Seek(oldPosition);
+            }
+        }
+
+        internal int ReadByte()
+        {
+            try
+            {
+                return _reader.ReadByte();
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return -1;
+            }
         }
 
         public void Dispose()
@@ -84,14 +131,22 @@ namespace ZoDream.Shared.Renders
         {
             return Task.Factory.StartNew(() =>
             {
+                WaitUnlock();
                 return ReadLine();
             });
         }
 
-        public Task<string?> ReadLineAsync(long position)
+
+        public Task<ReadLineItem> ReadLineAsync(long position)
         {
-            Position = position;
-            return ReadLineAsync();
+            return Task.Factory.StartNew(() =>
+            {
+                WaitUnlock();
+                _isLoading = true;
+                Seek(position);
+                var str = ReadLine(out var nextPos);
+                return new ReadLineItem(str, nextPos);
+            });
         }
     }
 }

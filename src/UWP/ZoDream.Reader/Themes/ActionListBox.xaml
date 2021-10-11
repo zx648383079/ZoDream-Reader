@@ -9,9 +9,12 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <ScrollViewer>
-                            <Canvas x:Name="PART_Container"/>
-                        </ScrollViewer>
+                        <Grid>
+                            <ScrollViewer>
+                                <Canvas x:Name="PART_Container"/>
+                            </ScrollViewer>
+                            <local:ActionMenuBox x:Name="PART_Menu"/>
+                        </Grid>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

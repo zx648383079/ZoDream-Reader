@@ -12,7 +12,7 @@ namespace ZoDream.Shared.Interfaces
 
         public FolderT BookFolder { get; }
 
-        public FolderT FontFolder {  get; }
+        public FolderT ThemeFolder {  get; }
 
         public Task<FileT> CreateDatabaseAsync();
 
@@ -22,11 +22,13 @@ namespace ZoDream.Shared.Interfaces
 
         public Task<BookItem?> AddBookAsync(FileT file);
 
+        public Task<string?> AddImageAsync(FileT file);
+
         public Task DeleteBookAsync(BookItem item);
 
         public Task<FontItem?> AddFontAsync(FileT file);
 
-        public Task ClearFontAsync();
+        public Task ClearThemeAsync();
 
         public Task<IList<FontItem>> GetFontsAsync();
   

@@ -8,16 +8,6 @@
              x:Name="root"
              Margin="5"
              d:DesignHeight="200" d:DesignWidth="160">
-
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <Style x:Key="MenuItemIcon" TargetType="TextBlock">
-                <Setter Property="FontFamily" Value="{DynamicResource IconFontFamily}"/>
-                <Setter Property="HorizontalAlignment" Value="Center"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-        </ResourceDictionary>
-    </UserControl.Resources>
     <Grid x:Name="MainBox" Background="{Binding ElementName=root, Path=Background}" 
           Margin="{Binding ElementName=root, Path=Margin}" MouseLeftButtonUp="MainBox_MouseLeftButtonUp">
         <Image x:Name="CoverImg" Source="/Assets/cover1.jpg" Stretch="UniformToFill"/>
@@ -37,25 +27,6 @@
                 FontSize="30"
                 BorderThickness="0"
                 VerticalAlignment="Top" HorizontalAlignment="Right"/>
-
-        <Popup x:Name="MoreMenu"
-               StaysOpen="False"
-               PlacementTarget="{Binding ElementName=MoreBtn}">
-            <StackPanel Background="White">
-                <MenuItem Header="编辑属性" x:Name="EditBtn" Click="EditBtn_Click">
-                    <MenuItem.Icon>
-                        <TextBlock Text="&#xE104;" 
-                                   Style="{DynamicResource MenuItemIcon}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="移除" x:Name="RemoveBtn" Click="RemoveBtn_Click">
-                    <MenuItem.Icon>
-                        <TextBlock Text="&#xE107;" 
-                                   Style="{DynamicResource MenuItemIcon}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-            </StackPanel>
-        </Popup>
         <Grid.Effect>
             <DropShadowEffect Color="Black" BlurRadius="16" ShadowDepth="0" Opacity=".5" />
         </Grid.Effect>

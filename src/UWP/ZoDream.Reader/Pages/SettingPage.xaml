@@ -28,6 +28,55 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="背景颜色" Style="{StaticResource LabelTb}"/>
+                    <Button Content="颜色选择" Grid.Column="1">
+                        <Button.Flyout>
+                            <Flyout>
+                                <ColorPicker
+                                  ColorSpectrumShape="Box"
+                                  IsMoreButtonVisible="False"
+                                  IsColorSliderVisible="True"
+                                  IsHexInputVisible="True"
+                                  IsColorChannelTextInputVisible="False"
+                                    Grid.Column="1"/>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button Content="图片" Grid.Column="2"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="字体颜色" Style="{StaticResource LabelTb}"/>
+                    <Button Content="颜色选择" Grid.Column="1">
+                        <Button.Flyout>
+                            <Flyout>
+                                <ColorPicker
+                                  ColorSpectrumShape="Box"
+                                  IsMoreButtonVisible="False"
+                                  IsColorSliderVisible="True"
+                                    IsColorChannelTextInputVisible="False"
+                                  IsHexInputVisible="True" Grid.Column="1"/>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="夜间模式" Style="{StaticResource LabelTb}"/>
+                    <ToggleSwitch x:Name="darkTb" Grid.Column="1" OffContent="关闭" OnContent="开启"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="行间距" Style="{StaticResource LabelTb}"/>
                     <control:NumberInput x:Name="lineTb" Grid.Column="1"/>

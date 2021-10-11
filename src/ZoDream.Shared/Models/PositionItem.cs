@@ -52,5 +52,10 @@ namespace ZoDream.Shared.Models
         {
             return !position.Equals(con);
         }
+
+        public PositionItem Clone()
+        {
+            return new PositionItem(Position, Offset);
+        }
     }
 }

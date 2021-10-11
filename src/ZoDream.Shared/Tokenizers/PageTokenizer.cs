@@ -135,16 +135,15 @@ namespace ZoDream.Shared.Tokenizers
             {
                 return items;
             }
-            Content.Position = 0;
+            var postion = 0L;
             while (true)
             {
-                var postion = Content.Position;
-                var line = await Content.ReadLineAsync();
-                if (line == null)
+                var line = await Content.ReadLineAsync(postion);
+                if (line.IsEndLine)
                 {
                     break;
                 }
-                var chapter = FormatChapter(line, items.Count);
+                var chapter = FormatChapter(line.ToString(), items.Count);
                 if (chapter != null)
                 {
                     items.Add(new ChapterPositionItem()
@@ -153,6 +152,7 @@ namespace ZoDream.Shared.Tokenizers
                         Position = postion,
                     });
                 }
+                postion = line.NextPosition;
             }
             return CacheChapters = items;
         }
@@ -202,14 +202,19 @@ namespace ZoDream.Shared.Tokenizers
 
         #endregion
 
-        public async Task<Tuple<IList<PagePositionItem>, IList<ChapterPositionItem>>> GetPagesAsync()
+        /// <summary>
+        /// 获取分页同时获取章节
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public async Task<Tuple<IList<PagePositionItem>, IList<ChapterPositionItem>>> GetPagesWithChaptersAsync()
         {
             var data = new Tuple<IList<PagePositionItem>, IList<ChapterPositionItem>>(new List<PagePositionItem>(), new List<ChapterPositionItem>());
             if (Content == null)
             {
                 return data;
             }
-            Content.Position = 0;
+            
             var maxH = PageInnerHeight;
             var maxW = PageInnerWidth;
             if (maxH <= 0 || maxW <= 0)
@@ -219,15 +224,15 @@ namespace ZoDream.Shared.Tokenizers
             var fontH = FontSize + LineSpace;
             var x = .0;
             var y = .0;
+            var position = 0L;
             var page = new PagePositionItem()
             {
                 Begin = new PositionItem()
             };
             while (true)
             {
-                var position = Content.Position;
-                var line = await Content.ReadLineAsync();
-                if (line == null)
+                var line = await Content.ReadLineAsync(position);
+                if (line.IsEndLine)
                 {
                     page.End = new PositionItem(position);
                     if (page.Length > 0)
@@ -236,8 +241,9 @@ namespace ZoDream.Shared.Tokenizers
                     }
                     break;
                 }
+                var lineStr = line.ToString();
                 #region 添加章节目录
-                var chapter = FormatChapter(line, data.Item2.Count);
+                var chapter = FormatChapter(lineStr, data.Item2.Count);
                 if (chapter != null)
                 {
                     data.Item2.Add(new ChapterPositionItem()
@@ -249,9 +255,9 @@ namespace ZoDream.Shared.Tokenizers
                 #endregion
 
 
-                for (int i = 0; i < line.Length; i++)
+                for (int i = 0; i < lineStr.Length; i++)
                 {
-                    var fontW = FontWidth((char?)line[i]);
+                    var fontW = FontWidth((char?)lineStr[i]);
                     if (x +  fontW > maxW)
                     {
                         x = 0;
@@ -281,9 +287,87 @@ namespace ZoDream.Shared.Tokenizers
                         Begin = new PositionItem(Content.Position, 0),
                     };
                 }
+                position = line.NextPosition;
             }
             return data;
         }
+        /// <summary>
+        /// 只刷新分页
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public async Task<IList<PagePositionItem>> GetPagesAsync()
+        {
+            var data = new List<PagePositionItem>();
+            if (Content == null)
+            {
+                return data;
+            }
+
+            var maxH = PageInnerHeight;
+            var maxW = PageInnerWidth;
+            if (maxH <= 0 || maxW <= 0)
+            {
+                throw new ArgumentOutOfRangeException("view size error");
+            }
+            var fontH = FontSize + LineSpace;
+            var x = .0;
+            var y = .0;
+            var position = 0L;
+            var page = new PagePositionItem()
+            {
+                Begin = new PositionItem()
+            };
+            while (true)
+            {
+                var line = await Content.ReadLineAsync(position);
+                if (line.IsEndLine)
+                {
+                    page.End = new PositionItem(position);
+                    if (page.Length > 0)
+                    {
+                        data.Add(page);
+                    }
+                    break;
+                }
+                var lineStr = line.ToString();
+                for (int i = 0; i < lineStr.Length; i++)
+                {
+                    var fontW = FontWidth((char?)lineStr[i]);
+                    if (x + fontW > maxW)
+                    {
+                        x = 0;
+                        y += fontH;
+                        if (y >= maxH)
+                        {
+                            y = 0;
+                            page.End = new PositionItem(position, i - 1);
+                            data.Add(page);
+                            page = new PagePositionItem()
+                            {
+                                Begin = new PositionItem(position, i),
+                            };
+                        }
+                    }
+                    x += fontW;
+                }
+                y += fontH;
+                x = 0;
+                if (y >= maxH)
+                {
+                    y = 0;
+                    page.End = new PositionItem(Content.Position, 0);
+                    data.Add(page);
+                    page = new PagePositionItem()
+                    {
+                        Begin = new PositionItem(Content.Position, 0),
+                    };
+                }
+                position = line.NextPosition;
+            }
+            return data;
+        }
+
 
         public async Task<PageItem> GetPageAsync(PagePositionItem page)
         {
@@ -294,20 +378,20 @@ namespace ZoDream.Shared.Tokenizers
         {
             var data = new PageItem()
             {
-                Begin = begin,
+                Begin = begin.Clone(),
                 Data = new List<CharItem>(),
             };
             if (Content == null)
             {
                 return data;
             }
-            Content.Position = begin.Position >= 0 ? begin.Position : 0;
+            await Content.SeekAsync(data.Begin.Position >= 0 ? data.Begin.Position : 0);
             var maxH = PageInnerHeight;
             var maxW = PageInnerWidth;
             var fontH = FontSize + LineSpace;
             var x = .0;
             var y = .0;
-            var offset = begin.Offset;
+            var offset = data.Begin.Offset;
             while (true)
             {
                 var position = Content.Position;
@@ -413,9 +497,7 @@ namespace ZoDream.Shared.Tokenizers
         public async Task Refresh()
         {
             var scale = PageCount > 0 ? Page / PageCount : 0;
-            var res = await GetPagesAsync();
-            CachePages = res.Item1;
-            CacheChapters = res.Item2;
+            CachePages = await GetPagesAsync();
             SetPageScale(scale);
         }
 

@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
@@ -18,6 +19,7 @@ using ZoDream.Shared.Models;
 namespace ZoDream.Reader.Controls
 {
     [TemplatePart(Name = "PART_Container", Type = typeof(Panel))]
+    [TemplatePart(Name = "PART_Menu", Type = typeof(ActionMenuBox))]
     public sealed class ActionListBox : Control
     {
         public ActionListBox()
@@ -27,6 +29,7 @@ namespace ZoDream.Reader.Controls
         }
 
         private Panel boxContianer;
+        private ActionMenuBox boxMenu;
 
         private double ItemWidth = 160;
         private double ItemHeight = 200;
@@ -34,6 +37,7 @@ namespace ZoDream.Reader.Controls
         public event ControlEventHandler OnAdd;
 
         public event ActionItemEventHandler OnAction;
+
 
         public bool ActionOnBefore
         {
@@ -111,6 +115,11 @@ namespace ZoDream.Reader.Controls
                 book.Height = ItemHeight;
                 book.OnAction += (_, item, e) =>
                 {
+                    if (e == ActionEvent.NONE)
+                    {
+                        boxMenu?.Show(GetActionPosition(book));
+                        return;
+                    }
                     OnAction?.Invoke(this, item, e);
                 };
                 boxContianer.Children.Add(book);
@@ -118,6 +127,14 @@ namespace ZoDream.Reader.Controls
             }
             MoveActionButton();
             RefreshSize();
+        }
+
+        private Point GetActionPosition(BookListBoxItem item)
+        {
+            var p = item.TransformToVisual(this).TransformPoint(new Point(0, 0));
+            p.X += item.ActualWidth - 60;
+            p.Y += 30;
+            return p;
         }
 
         private void RefreshSize()
@@ -237,6 +254,7 @@ namespace ZoDream.Reader.Controls
         {
             base.OnApplyTemplate();
             boxContianer = GetTemplateChild("PART_Container") as Panel;
+            boxMenu = GetTemplateChild("PART_Menu") as ActionMenuBox;
             RefreshItems();
         }
     }
