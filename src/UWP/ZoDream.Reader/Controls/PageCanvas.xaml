@@ -12,9 +12,11 @@
     SizeChanged="UserControl_SizeChanged"
     
     ManipulationStarted="UserControl_ManipulationStarted"
+    ManipulationDelta="UserControl_ManipulationDelta"
     ManipulationCompleted="UserControl_ManipulationCompleted" 
-    PointerPressed="UserControl_PointerPressed" 
+    PointerPressed="UserControl_PointerPressed"
     PointerReleased="UserControl_PointerReleased"
+    PointerMoved="UserControl_PointerMoved"
     KeyUp="UserControl_KeyUp">
     <Grid>
         <win2d:CanvasControl x:Name="DrawerCanvas" 

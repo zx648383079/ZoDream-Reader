@@ -5,7 +5,7 @@ using ZoDream.Shared.Models;
 
 namespace ZoDream.Shared.Interfaces
 {
-    public interface ICanvasLayer<RenderTargetT, PointT, FontT, ColorT, ImageT>
+    public interface ICanvasLayer: IDisposable
     {
 
         public float X { get; set; }
@@ -22,16 +22,7 @@ namespace ZoDream.Shared.Interfaces
 
         public void Add(IEnumerable<PageItem> items);
 
-        public void BeginSwap(PointT point);
-
-        public void MoveSwap(PointT point);
-
-        public void EndSwap();
 
         public void Clear();
-
-        public void Draw(RenderTargetT target);
-
-        public void Draw(RenderTargetT target, FontT font, ColorT foreground, ColorT background, ImageT? backgroundImage);
     }
 }

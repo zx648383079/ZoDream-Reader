@@ -14,6 +14,7 @@ using ZoDream.Reader.Events;
 using ZoDream.Shared.Events;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
+using ZoDream.Shared.Utils;
 using static Vortice.DirectWrite.DWrite;
 using Point = System.Windows.Point;
 
@@ -35,7 +36,7 @@ namespace ZoDream.Reader.Controls
         private CanvasLayer[] layerItems = new CanvasLayer[3];
         private IDWriteTextFormat cacheFont;
         private ID2D1SolidColorBrush cacheForeground;
-        private ID2D1SolidColorBrush cacheBackground;
+        private System.Drawing.Color cacheBackground;
         private ID2D1Bitmap? cacheImage;
         private Action onSwapFinished;
         /// <summary>
@@ -43,10 +44,56 @@ namespace ZoDream.Reader.Controls
         /// </summary>
         private bool? swapDirect;
         private DispatcherTimer? swapTimer;
+        private Tween<float>? swapTween;
         public ICanvasSource? Source { get; set; }
+        public bool IsReady { get; private set; } = false;
 
         public event PageChangedEventHandler? PageChanged;
         public event CanvasReadyEventHandler? OnReady;
+
+
+        public UserSetting Setting
+        {
+            get { return (UserSetting)GetValue(SettingProperty); }
+            set { SetValue(SettingProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Setting.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SettingProperty =
+            DependencyProperty.Register("Setting", typeof(UserSetting), typeof(PageCanvas), new PropertyMetadata(null, OnSettingChanged));
+
+        private static async void OnSettingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var canvas = d as PageCanvas;
+
+            var setting = e.NewValue as UserSetting;
+            var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
+            canvas.cacheFont = dwriteFactory.CreateTextFormat(await App.ViewModel.DiskRepository.GetFontFamilyAsync(setting.FontFamily), (float)setting.FontSize);
+            if (!canvas.IsReady)
+            {
+                return;
+            }
+            if (canvas.renderTarget == null)
+            {
+                canvas.renderTarget = canvas.DrawerCanvas.CreateRenderTarget();
+            }
+            canvas.cacheForeground = canvas.renderTarget.CreateSolidColorBrush(ColorHelper.From(setting.Foreground));
+            canvas.cacheBackground = ColorHelper.From(setting.Background);
+
+            if (!string.IsNullOrWhiteSpace(setting.BackgroundImage))
+            {
+                var bgImage = await App.ViewModel.DiskRepository.GetFilePathAsync(setting.BackgroundImage);
+                canvas.cacheImage = canvas.DrawerCanvas.LoadBitmap(bgImage);
+            }
+            else
+            {
+                canvas.cacheImage = null;
+            }
+            foreach (var item in canvas.layerItems)
+            {
+                item?.Update(canvas.cacheFont, canvas.cacheForeground, canvas.cacheBackground, canvas.cacheImage);
+            }
+        }
 
 
         public void Draw(IList<PageItem> pages)
@@ -96,6 +143,7 @@ namespace ZoDream.Reader.Controls
             var layer = DrawerCanvas.CreateLayer();
             layer.Page = page;
             layer.Add(pages);
+            layer.Update(cacheFont, cacheForeground, cacheBackground, cacheImage);
             return layer;
         }
 
@@ -153,39 +201,58 @@ namespace ZoDream.Reader.Controls
         {
             swapDirect = toNext;
             onSwapFinished = finished;
-            var setting = App.ViewModel.Setting;
-            var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
-            if (renderTarget == null)
+            if (Setting.Animation < 1)
             {
-                renderTarget = DrawerCanvas.CreateRenderTarget();
-            }
-            cacheFont = dwriteFactory.CreateTextFormat(setting.FontFamily, (float)setting.FontSize);
-            cacheForeground = renderTarget.CreateSolidColorBrush(ColorHelper.From(setting.Foreground));
-            cacheBackground = renderTarget.CreateSolidColorBrush(ColorHelper.From(setting.Background));
-            cacheImage = !string.IsNullOrWhiteSpace(setting.BackgroundImage) ?
-                DrawerCanvas.LoadBitmap(setting.BackgroundImage) : null;
-            
-            DrawerCanvas.Invalidate();
-            if (setting.Animation < 1)
-            {
-                onSwapFinished?.Invoke();
+                SwapTimer_Tick(null, null);
                 return;
             }
             if (swapTimer == null)
             {
                 swapTimer = new DispatcherTimer()
                 {
-                    Interval = TimeSpan.FromMilliseconds(40),
+                    Interval = TimeSpan.FromMilliseconds(15),
                 };
                 swapTimer.Tick += SwapTimer_Tick;
             }
             swapTimer.Start();
+            swapTween = new Tween<float>(0f, (float)DrawerCanvas.ActualWidth, 1000, Tween<float>.EaseIn);
         }
 
         private void SwapTimer_Tick(object? sender, object e)
         {
+            if (IsSwapFinished())
+            {
+                onSwapFinished?.Invoke();
+                swapDirect = null;
+                swapTimer?.Stop();
+                foreach (var item in layerItems)
+                {
+                    item?.EndSwap();
+                }
+            }
+            if (swapDirect == true)
+            {
+                layerItems[0].MoveSwap(-swapTween.Get());
+            }
+            else if (swapDirect == false)
+            {
+                layerItems[1].MoveSwap(swapTween.Get());
+            }
             DrawerCanvas.Invalidate();
         }
+        private bool IsSwapFinished()
+        {
+            if (Setting.Animation < 1 || swapDirect == null)
+            {
+                return true;
+            }
+            if (swapDirect == true)
+            {
+                return layerItems[0] == null || layerItems[0].X <= 10 - layerItems[0].Width;
+            }
+            return layerItems[1] == null || layerItems[1].X <= -10;
+        }
+
 
 
         public async void SwapNext()
@@ -250,27 +317,28 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
-            renderTarget.BeginDraw();
+            // renderTarget.BeginDraw();
             if (swapDirect == null)
             {
-                layerItems[1]?.Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                layerItems[1]?.Draw(renderTarget);
             }
             else if (swapDirect == true)
             {
-                layerItems[1].Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
-                layerItems[0]?.Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                layerItems[1].Draw(renderTarget);
+                layerItems[0]?.Draw(renderTarget);
             }
             else
             {
-                layerItems[3]?.Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
-                layerItems[1].Draw(renderTarget, cacheFont, cacheForeground, cacheBackground, cacheImage);
+                layerItems[3]?.Draw(renderTarget);
+                layerItems[1].Draw(renderTarget);
             }
-            renderTarget.EndDraw();
+            // renderTarget.EndDraw();
             DrawerCanvas.DrawImage(renderTarget);
         }
 
         private void DrawerCanvas_CreateResources(object sender)
         {
+            IsReady = true;
             OnReady?.Invoke(this);
         }
 

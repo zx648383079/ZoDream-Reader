@@ -67,7 +67,7 @@
 
   <ItemGroup>
     <PackageReference Include="FontInfo" Version="1.1.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.10" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
     <PackageReference Include="Vortice.Direct2D1" Version="1.9.143" />

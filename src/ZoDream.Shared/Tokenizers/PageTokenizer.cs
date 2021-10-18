@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
@@ -110,6 +111,9 @@ namespace ZoDream.Shared.Tokenizers
         public IList<PagePositionItem> CachePages { get; private set; } = new List<PagePositionItem>();
         
         public IList<ChapterPositionItem> CacheChapters {  get; private set; } = new List<ChapterPositionItem>();
+        
+        private IDictionary<int, PageItem> CachePageData = new Dictionary<int, PageItem>();
+        private bool IsLoading = false;
         /// <summary>
         /// 当前页码
         /// </summary>
@@ -499,6 +503,7 @@ namespace ZoDream.Shared.Tokenizers
             var scale = PageCount > 0 ? Page / PageCount : 0;
             CachePages = await GetPagesAsync();
             SetPageScale(scale);
+            CachePageData.Clear();
         }
 
         /// <summary>
@@ -570,18 +575,90 @@ namespace ZoDream.Shared.Tokenizers
             {
                 Page = CachePages.Count  - 1;
             }
-            var item = CachePages[Page];
-            return await GetPagesAsync(item, ColumnCount);
+            return await GetAsync(Page);
         }
 
         public async Task<IList<PageItem>> GetAsync(int page)
         {
+            while (IsLoading)
+            {
+                Thread.Sleep(50);
+            }
+            var items = new List<PageItem>();
+            for (int i = 0; i < ColumnCount; i++)
+            {
+                var item = await GetPageAsync(page + i);
+                if (item == null)
+                {
+                    break;
+                }
+                ResetPage(PageX(i), PageY(i), ref item);
+                items.Add(item);
+            }
+            UpdateCachePages(page);
+            return items;
+        }
+
+        private async void UpdateCachePages(int page)
+        {
+            IsLoading = true;
+            var pageCount = 3;
+            var min = Math.Max(0, page - pageCount * ColumnCount);
+            var max = Math.Min(PageCount - 1, page + pageCount * ColumnCount);
+
+            var keys = new int[CachePageData.Keys.Count];
+            CachePageData.Keys.CopyTo(keys, 0);
+            foreach (var item in keys)
+            {
+                if (item < min || item > max)
+                {
+                    CachePageData.Remove(item);
+                }
+            }
+            for (int i = min; i <= max; i++)
+            {
+                if (HasCachePage(i))
+                {
+                    continue;
+                }
+                var item = await GetPageAsync(CachePages[i]);
+                if (item == null)
+                {
+                    break;
+                }
+                SetCachePage(i, item);
+            }
+            IsLoading = false;
+        }
+
+        public async Task<PageItem?> GetPageAsync(int page)
+        {
             if (!Canable(page))
             {
-                return new List<PageItem>();
+                return null;
             }
-            var item = CachePages[page];
-            return await GetPagesAsync(item, ColumnCount);
+            if (HasCachePage(page))
+            {
+                return GetCachePage(page);
+            }
+            var data = await GetPageAsync(CachePages[page]);
+            SetCachePage(page, data);
+            return data;
+        }
+
+        private void SetCachePage(int page, PageItem data)
+        {
+            CachePageData[page] = data;
+        }
+
+        private PageItem GetCachePage(int page)
+        {
+            return CachePageData[page];
+        }
+
+        private bool HasCachePage(int page)
+        {
+            return CachePageData.ContainsKey(page);
         }
 
         /// <summary>
@@ -617,6 +694,7 @@ namespace ZoDream.Shared.Tokenizers
             Content?.Dispose();
             CachePages.Clear();
             CacheChapters.Clear();
+            CachePageData.Clear();
         }
     }
 }

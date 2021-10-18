@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
@@ -14,7 +15,7 @@ using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Drawing
 {
-    public class CanvasLayer: ICanvasLayer<CanvasDrawingSession, Point, CanvasTextFormat, Color, ICanvasImage>
+    public class CanvasLayer: ICanvasLayer
     {
 
         public CanvasLayer(CanvasControl control, float width, float height)
@@ -38,6 +39,10 @@ namespace ZoDream.Reader.Drawing
 
         public int Page { get; set; }
 
+        private CanvasRenderTarget CacheBitmap;
+
+        private ICanvasEffect CacheEffect;
+
         public void Add(IEnumerable<CharItem> items)
         {
             foreach (var item in items)
@@ -56,58 +61,53 @@ namespace ZoDream.Reader.Drawing
 
         public void Clear()
         {
-            Data.Clear();
+            Data?.Clear();
+            CacheBitmap?.Dispose();
+            CacheEffect?.Dispose();
+            CacheBitmap = null;
+            CacheEffect = null;
         }
 
-        /// <summary>
-        /// 开始翻页
-        /// </summary>
-        /// <param name="point"></param>
-        public void BeginSwap(Point point)
+
+        private void AddEffect()
         {
-
-        }
-
-        /// <summary>
-        /// 移动位置
-        /// </summary>
-        /// <param name="point"></param>
-        public void MoveSwap(Point point)
-        {
-
-        }
-
-        /// <summary>
-        /// 翻页结束，自动完成后续动画
-        /// </summary>
-        public void EndSwap()
-        {
-
-        }
-
-        public async void Draw(CanvasDrawingSession target)
-        {
-            var setting = App.ViewModel.Setting;
-            var font = new CanvasTextFormat()
-            {
-                FontFamily = setting.FontFamily, // name.ttf#name
-                FontSize = (float)setting.FontSize
+            CacheEffect = new Transform2DEffect() {
+                Source = new ShadowEffect()
+                {
+                    Source = CacheBitmap,
+                    BlurAmount = 2,
+                },
+                TransformMatrix = Matrix3x2.CreateTranslation(3, 3)
             };
-            var color = ColorHelper.From(setting.Foreground);
-            Draw(target, font, color, ColorHelper.From(setting.Background), !string.IsNullOrWhiteSpace(setting.BackgroundImage) ?
-                await CanvasBitmap.LoadAsync(Control, setting.BackgroundImage) : null);
         }
 
-        public void Draw(CanvasDrawingSession target, 
-            CanvasTextFormat font, Color foreground, Color background, ICanvasImage backgroundImage)
+        public void Draw(CanvasDrawingSession target)
         {
-            var cl = new CanvasCommandList(Control);
-            using (var ds = cl.CreateDrawingSession())
+            if (CacheEffect != null)
+            {
+                target.DrawImage(CacheEffect, X, Y);
+                // return;
+            }
+            if (CacheBitmap == null)
+            {
+                return;
+            }
+            target.DrawImage(CacheBitmap, X, Y);
+        }
+
+        public void Update(CanvasTextFormat font, Color foreground, Color background, ICanvasImage backgroundImage)
+        {
+            if (CacheBitmap == null)
+            {
+                CacheBitmap = new CanvasRenderTarget(Control, (float)Width,
+                   (float)Height, 96);
+            }
+            using (var ds = CacheBitmap.CreateDrawingSession())
             {
                 ds.Clear(background);
                 if (backgroundImage != null)
                 {
-                    ds.DrawImage(backgroundImage);
+                    ds.DrawImage(backgroundImage, 0, 0, new Rect(0, 0, Width, Height));
                 }
                 foreach (var item in Data)
                 {
@@ -116,10 +116,13 @@ namespace ZoDream.Reader.Drawing
                                 foreground, font);
                 }
             }
-            using (target.CreateLayer(1))
-            {
-                target.DrawImage(cl);
-            }
+        }
+
+        public void Dispose()
+        {
+            Data.Clear();
+            CacheBitmap?.Dispose();
+            CacheBitmap = null;
         }
     }
 }

@@ -23,12 +23,21 @@ namespace ZoDream.Shared.Models
             Offset = offset;
         }
 
-        public bool Equals(PositionItem target)
+        public override bool Equals(object target)
         {
-            return Position == target.Position && Offset == target.Offset;
+            if (target == null)
+            {
+                return false;
+            }
+            if (target is not PositionItem)
+            {
+                return false;
+            }
+            var t = target as PositionItem;
+            return Position == t.Position && Offset == t.Offset;
         }
 
-        
+
         public override string ToString()
         {
             return $"{Position},{Offset}";
@@ -43,13 +52,21 @@ namespace ZoDream.Shared.Models
             return new PositionItem(position.Position, position.Offset + offset);
         }
 
-        public static bool operator ==(PositionItem position, PositionItem con)
+        public static bool operator ==(PositionItem? position, PositionItem? con)
         {
+            if (position is null)
+            {
+                return con is null;
+            }
             return position.Equals(con);
         }
 
-        public static bool operator !=(PositionItem position, PositionItem con)
+        public static bool operator !=(PositionItem? position, PositionItem? con)
         {
+            if (position is null)
+            {
+                return con is not null;
+            }
             return !position.Equals(con);
         }
 

@@ -35,33 +35,6 @@ namespace ZoDream.Reader.Repositories
             return await BookFolder.GetFileAsync(fileId);
         }
 
-        public IList<FontItem> GetFonts()
-        {
-            var factory = DWriteCreateFactory<IDWriteFactory>();
-
-            var fontCollection = factory.GetSystemFontCollection(false);
-            var familCount = fontCollection.FontFamilyCount;
-            var items = new List<FontItem>();
-            for (int i = 0; i < familCount; i++)
-            {
-                var fontFamily = fontCollection.GetFontFamily(i);
-                var familyNames = fontFamily.FamilyNames;
-                int index;
-                if (!familyNames.FindLocaleName(CultureInfo.CurrentCulture.Name, out index))
-                {
-                    if (!familyNames.FindLocaleName("en-us", out index))
-                    {
-                        index = 0;
-                    }
-                }
-
-                string name = familyNames.GetString(index);
-                items.Add(new FontItem(name));
-            }
-            fontCollection.Dispose();
-            factory.Dispose();
-            return items;
-        }
 
         public async Task<BookItem> AddTxt(StorageFile file)
         {
@@ -84,8 +57,8 @@ namespace ZoDream.Reader.Repositories
             //    return null;
             //}
             //var fontFace = factory.CreateFontFace(fontFaceType, new []{ fontRef });
-           
-            return new FontItem(name)
+            var font = await Font.CreateAsync(tempfile.Path);
+            return new FontItem(font.Details.Family)
             {
                 FileName = fileId,
             };
@@ -136,7 +109,7 @@ namespace ZoDream.Reader.Repositories
             {
                 return string.Empty;
             }
-            font.FileName = await GetFileUriAsync(fontName);
+            font.FileName = await GetFileUriAsync(font.FileName);
             return font.FontFamily;
         }
 
@@ -182,9 +155,46 @@ namespace ZoDream.Reader.Repositories
             }
         }
 
-        public Task<IList<FontItem>> GetFontsAsync()
+        public async Task<IList<FontItem>> GetFontsAsync()
         {
-            return Task.Factory.StartNew(() => GetFonts());
+            var factory = DWriteCreateFactory<IDWriteFactory>();
+
+            var fontCollection = factory.GetSystemFontCollection(false);
+            var familCount = fontCollection.FontFamilyCount;
+            var items = new List<FontItem>();
+            for (int i = 0; i < familCount; i++)
+            {
+                var fontFamily = fontCollection.GetFontFamily(i);
+                var familyNames = fontFamily.FamilyNames;
+                int index;
+                if (!familyNames.FindLocaleName(CultureInfo.CurrentCulture.Name, out index))
+                {
+                    if (!familyNames.FindLocaleName("en-us", out index))
+                    {
+                        index = 0;
+                    }
+                }
+
+                string name = familyNames.GetString(index);
+                items.Add(new FontItem(name));
+            }
+            fontCollection.Dispose();
+            factory.Dispose();
+            var files = await ThemeFolder.GetFilesAsync();
+            foreach (var item in files)
+            {
+                if (!item.Name.Contains(".ttf"))
+                {
+                    continue;
+                }
+                var font = await Font.CreateAsync(item.Path);
+                items.Add(new FontItem(font.Details.Family)
+                {
+                    FileName = item.Name,
+                });
+
+            }
+            return items;
         }
     }
 }

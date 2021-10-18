@@ -49,8 +49,7 @@ namespace ZoDream.Reader.Pages
             ViewModel.Book = e.Parameter as BookItem;
             ApplicationView.GetForCurrentView().Title = ViewModel.Book.Name;
             var setting = App.ViewModel.Setting;
-            PageRender.FontSize = ViewModel.Tokenizer.FontSize = setting.FontSize;
-            PageRender.FontFamily = new FontFamily(setting.FontFamily);
+            ViewModel.Tokenizer.FontSize = setting.FontSize;
             ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
                 ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
             ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
@@ -63,12 +62,12 @@ namespace ZoDream.Reader.Pages
         {
             if (!isBooted && PageRender.ActualWidth > 0)
             {
+                PageRender.Setting = App.ViewModel.Setting;
                 PageRender.Source = ViewModel;
                 ViewModel.Tokenizer.ColumnCount = App.ViewModel.Setting.ColumnCount;
                 await OnResizeAsync();
                 ViewModel.Load();
                 isBooted = true;
-                LoadingBtn.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -87,6 +86,7 @@ namespace ZoDream.Reader.Pages
             ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
             PageRender.Flush();
             await PageRender.SwapTo(tokenizer.Page);
+            LoadingBtn.Visibility = Visibility.Collapsed;
         }
 
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -152,6 +152,10 @@ namespace ZoDream.Reader.Pages
         {
             progressTb.Text = $"{page}/{ViewModel.Tokenizer.PageCount}";
             ViewModel.Tokenizer.Page = page;
+            if (pagePosition == null)
+            {
+                pagePosition = ViewModel.Tokenizer.CachePages[page].Begin;
+            }
             ViewModel.Book.Position = pagePosition;
             ViewModel.ReloadChapter();
             App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);

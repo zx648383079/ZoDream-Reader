@@ -5,5 +5,5 @@ using ZoDream.Shared.Models;
 
 namespace ZoDream.Shared.Events
 {
-    public delegate void PageChangedEventHandler(object sender, int page, PositionItem pagePosition);
+    public delegate void PageChangedEventHandler(object sender, int page, PositionItem? position);
 }

@@ -43,10 +43,10 @@ namespace ZoDream.Shared.Utils
 
         public T Get(TimeSpan timeSpan)
         {
-			return Get(timeSpan.Ticks);
+			return Get(timeSpan.Ticks / 10000);
         }
 
-        public static double Linear(float time, double nBegin, double nEnd, float nDuration)
+        public static float Linear(float time, float nBegin, float nEnd, float nDuration)
 		{
 			if (time >= nDuration)
 			{
@@ -55,13 +55,13 @@ namespace ZoDream.Shared.Utils
 			return (nEnd - nBegin) * time / nDuration + nBegin;
 		}
 
-		public static double EaseIn(float time, double nBegin, double nEnd, float nDuration)
+		public static float EaseIn(float time, float nBegin, float nEnd, float nDuration)
 		{
 			if (time >= nDuration)
 			{
 				return nEnd;
 			}
-			return (nEnd - nBegin) * Math.Pow(time / nDuration, 2) + nBegin;
+			return (float)((nEnd - nBegin) * Math.Pow(time / nDuration, 2) + nBegin);
 		}
 	}
 }

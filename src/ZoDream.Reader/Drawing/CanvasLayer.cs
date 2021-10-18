@@ -13,7 +13,7 @@ using static Vortice.DirectWrite.DWrite;
 
 namespace ZoDream.Reader.Drawing
 {
-    public class CanvasLayer: ICanvasLayer<ID2D1RenderTarget, Point, IDWriteTextFormat, ID2D1SolidColorBrush, ID2D1Bitmap>
+    public class CanvasLayer: ICanvasLayer
     {
 
         public CanvasLayer(CanvasControl control, float width, float height)
@@ -37,6 +37,10 @@ namespace ZoDream.Reader.Drawing
 
         public int Page { get; set; }
 
+        private ID2D1RenderTarget? CacheBitmap;
+
+        private ID2D1RenderTarget? CacheEffect;
+
         public void Add(IEnumerable<CharItem> items)
         {
             foreach (var item in items)
@@ -56,6 +60,8 @@ namespace ZoDream.Reader.Drawing
         public void Clear()
         {
             Data.Clear();
+            CacheBitmap?.Dispose();
+            CacheEffect?.Dispose();
         }
 
         /// <summary>
@@ -64,7 +70,14 @@ namespace ZoDream.Reader.Drawing
         /// <param name="point"></param>
         public void BeginSwap(Point point)
         {
+            X = (float)point.X;
+            Y = (float)point.Y;
+            AddEffect();
+        }
 
+        private void AddEffect()
+        {
+            
         }
 
         /// <summary>
@@ -73,7 +86,21 @@ namespace ZoDream.Reader.Drawing
         /// <param name="point"></param>
         public void MoveSwap(Point point)
         {
+            X = (float)point.X;
+            Y = (float)point.Y;
+            if (CacheEffect == null)
+            {
+                AddEffect();
+            }
+        }
 
+        public void MoveSwap(float diff)
+        {
+            if (CacheEffect == null)
+            {
+                AddEffect();
+            }
+            X += diff;
         }
 
         /// <summary>
@@ -81,18 +108,24 @@ namespace ZoDream.Reader.Drawing
         /// </summary>
         public void EndSwap()
         {
-
+            CacheEffect?.Dispose();
+            CacheEffect = null;
         }
+
 
         public void Draw(ID2D1RenderTarget target)
         {
-            var setting = App.ViewModel.Setting;
-            var dwriteFactory = DWriteCreateFactory<IDWriteFactory>();
-            Draw(target, dwriteFactory.CreateTextFormat(setting.FontFamily, (float)setting.FontSize),
-                target.CreateSolidColorBrush(ColorHelper.From(setting.Foreground)),
-                target.CreateSolidColorBrush(ColorHelper.From(setting.Background)),
-                !string.IsNullOrWhiteSpace(setting.BackgroundImage) ? 
-                Control.LoadBitmap(setting.BackgroundImage) : null);
+            // target.DrawBitmap(CacheBitmap);
+            if (CacheEffect != null)
+            {
+                Control.DrawImage(CacheEffect);
+                // return;
+            }
+            if (CacheBitmap == null)
+            {
+                return;
+            }
+            Control.DrawImage(CacheBitmap);
         }
 
         public void Draw(ID2D1RenderTarget target, IDWriteTextFormat font, ID2D1SolidColorBrush foreground, ID2D1SolidColorBrush background, ID2D1Bitmap? backgroundImage)
@@ -102,19 +135,37 @@ namespace ZoDream.Reader.Drawing
             // lpt.Opacity = 1;
             // target.PushLayer(ref lpt, layer);
             // target.Transform = Matrix3x2.CreateTranslation(0, 0);
-            target.Clear(background.Color);
+            
+            // target.PopLayer();
+            // layer.Dispose();
+        }
+
+        public void Update(IDWriteTextFormat font, ID2D1SolidColorBrush foreground, Color background, ID2D1Bitmap? backgroundImage)
+        {
+            if (CacheBitmap == null)
+            {
+                CacheBitmap = Control.CreateRenderTarget();
+            }
+            CacheBitmap.BeginDraw();
+            CacheBitmap.Clear(background);
             if (backgroundImage != null)
             {
-                target.DrawBitmap(backgroundImage);
+                CacheBitmap.DrawBitmap(backgroundImage);
             }
             foreach (var item in Data)
             {
-                target.DrawText(item.Code.ToString(), font,
+                CacheBitmap.DrawText(item.Code.ToString(), font,
                     new RectangleF((float)item.X, (float)item.Y, int.MaxValue, int.MaxValue),
                     foreground);
             }
-            // target.PopLayer();
-            // layer.Dispose();
+            CacheBitmap.EndDraw();
+        }
+
+        public void Dispose()
+        {
+            Data.Clear();
+            CacheBitmap?.Dispose();
+            CacheBitmap = null;
         }
     }
 }

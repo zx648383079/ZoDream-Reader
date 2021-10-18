@@ -35,8 +35,7 @@ namespace ZoDream.Reader.Pages
             if (!isBooted && PageRender.ActualWidth > 0)
             {
                 var setting = App.ViewModel.Setting;
-                PageRender.FontSize = ViewModel.Tokenizer.FontSize = setting.FontSize;
-                PageRender.FontFamily = new FontFamily(setting.FontFamily);
+                PageRender.Setting = App.ViewModel.Setting;
                 ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
                     ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
                 ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
@@ -47,7 +46,6 @@ namespace ZoDream.Reader.Pages
                 await OnResizeAsync();
                 ViewModel.Load();
                 isBooted = true;
-                loadingRing.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -66,6 +64,7 @@ namespace ZoDream.Reader.Pages
             ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
             PageRender.Flush();
             await PageRender.SwapTo(tokenizer.Page);
+            loadingRing.Visibility = Visibility.Collapsed;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)

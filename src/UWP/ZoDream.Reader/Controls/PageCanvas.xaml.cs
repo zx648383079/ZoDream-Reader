@@ -12,10 +12,12 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using ZoDream.Reader.Drawing;
+using ZoDream.Reader.Drawing.Animations;
 using ZoDream.Reader.Events;
 using ZoDream.Shared.Events;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
+using ZoDream.Shared.Utils;
 using ColorHelper = ZoDream.Reader.Drawing.ColorHelper;
 
 //https://go.microsoft.com/fwlink/?LinkId=234236 上介绍了“用户控件”项模板
@@ -29,52 +31,103 @@ namespace ZoDream.Reader.Controls
             this.InitializeComponent();
         }
 
-        private Point lastMousePoint = new Point(0, 0);
-        private CanvasRenderTarget renderTarget;
+        
         private int currentPage = -1;
-        private CanvasLayer[] layerItems = new CanvasLayer[3];
+        public int CurrentPage
+        {
+            get { return currentPage; }
+            set {
+                if (currentPage == value)
+                {
+                    return;
+                }
+                currentPage = value;
+                PageChanged?.Invoke(this, value, null);
+            }
+        }
+        internal CanvasLayer[] layerItems = new CanvasLayer[3];
         private CanvasTextFormat cacheFont;
         private Color cacheForeground;
         private Color cacheBackground;
         private CanvasBitmap cacheImage;
-        private Action onSwapFinished;
 
-        /// <summary>
-        /// 翻页动画方向
-        /// </summary>
-        private bool? swapDirect = null;
-        private DispatcherTimer swapTimer;
+        private ILayerAnimate swapAnimate;
+        private bool isPointerOn = false;
+        public bool IsReady { get; private set; } = false;
         public ICanvasSource Source { get; set; }
 
         public event PageChangedEventHandler PageChanged;
         public event CanvasReadyEventHandler OnReady;
 
-        private void DrawerCanvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
+
+
+        public UserSetting Setting
         {
-            if (cacheFont == null)
+            get { return (UserSetting)GetValue(SettingProperty); }
+            set { SetValue(SettingProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Setting.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SettingProperty =
+            DependencyProperty.Register("Setting", typeof(UserSetting), typeof(PageCanvas), new PropertyMetadata(null, OnSettingChanged));
+
+        private static async void OnSettingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var canvas = d as PageCanvas;
+            
+            var setting = e.NewValue as UserSetting;
+            canvas.swapAnimate?.Dispose();
+            canvas.swapAnimate = canvas.CreateAnimate(setting.Animation);
+            canvas.cacheForeground = ColorHelper.From(setting.Foreground, Colors.Black);
+            canvas.cacheBackground = ColorHelper.From(setting.Background);
+            canvas.cacheFont = new CanvasTextFormat()
+            {
+                FontFamily = await App.ViewModel.DiskRepository.GetFontFamilyAsync(setting.FontFamily), // name.ttf#name
+                FontSize = (float)setting.FontSize
+            };
+            if (!canvas.IsReady)
             {
                 return;
             }
-            using (var ds = renderTarget.CreateDrawingSession())
+            if (!string.IsNullOrWhiteSpace(setting.BackgroundImage))
             {
-                if (swapDirect == null)
-                {
-                    layerItems[1]?.Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
-                }
-                else if (swapDirect == true)
-                {
-                    layerItems[1].Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
-                    layerItems[0]?.Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
-                } else {
-                    layerItems[3]?.Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
-                    layerItems[1].Draw(ds, cacheFont, cacheForeground, cacheBackground, cacheImage);
-                }
+                var bgImage = await App.ViewModel.DiskRepository.GetFilePathAsync(setting.BackgroundImage);
+                canvas.cacheImage = await CanvasBitmap.LoadAsync(canvas.DrawerCanvas, bgImage);
+            } else
+            {
+                canvas.cacheImage = null;
             }
-            args.DrawingSession.DrawImage(renderTarget);
+            foreach (var item in canvas.layerItems)
+            {
+                item?.Update(canvas.cacheFont, canvas.cacheForeground, canvas.cacheBackground, canvas.cacheImage);
+            }
+        }
+
+        private ILayerAnimate CreateAnimate(int val)
+        {
+            switch (val)
+            {
+                case 1:
+                    return new SimulateAnimate();
+                case 2:
+                    return new CoverAnimate(this);
+                case 3:
+                    return new VerticalCoverAnimate(this);
+                case 4:
+                    return new ScrollAnimate();
+                default:
+                    return new NoneAnimate(this);
+            }
+        }
+
+        private void DrawerCanvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
+        {
+            swapAnimate.Draw(args.DrawingSession);
         }
 
         private void DrawerCanvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
         {
+            IsReady = true;
             OnReady?.Invoke(this);
         }
 
@@ -119,6 +172,24 @@ namespace ZoDream.Reader.Controls
                    (float)DrawerCanvas.ActualHeight);
             layer.Page = page;
             layer.Add(pages);
+            layer.Update(cacheFont, cacheForeground, cacheBackground, cacheImage);
+            return layer;
+        }
+
+        public CanvasLayer CreateLayer(int page)
+        {
+            if (!Source.Canable(page))
+            {
+                return null;
+            }
+            var layer = CreateLayer(new List<PageItem>(), page);
+            Task.Factory.StartNew(async () =>
+            {
+                var data = await Source.GetAsync(page);
+                layer.Clear();
+                layer.Add(data);
+                layer.Update(cacheFont, cacheForeground, cacheBackground, cacheImage);
+            });
             return layer;
         }
 
@@ -126,9 +197,8 @@ namespace ZoDream.Reader.Controls
         {
             layerItems[0] = layerItems[1];
             layerItems[1] = CreateLayer(pages, page);
-            SwapAnimate(true, () =>
+            swapAnimate.Animate(true, () =>
             {
-                swapDirect = null;
                 currentPage = page;
                 PageChanged?.Invoke(this, page, pages[0].Begin);
             });
@@ -156,9 +226,8 @@ namespace ZoDream.Reader.Controls
         {
             layerItems[2] = layerItems[1];
             layerItems[1] = CreateLayer(pages, page);
-            SwapAnimate(false, () =>
+            swapAnimate.Animate(false, () =>
             {
-                swapDirect = null;
                 currentPage = page;
                 PageChanged?.Invoke(this, page, pages[0].Begin);
             });
@@ -172,72 +241,9 @@ namespace ZoDream.Reader.Controls
             SwapFrom(await Source.GetAsync(page), page);
         }
 
-        private async void SwapAnimate(bool toNext, Action finished)
+        public void Invalidate()
         {
-            swapDirect = toNext;
-            onSwapFinished = finished;
-            var setting = App.ViewModel.Setting;
-            cacheFont = new CanvasTextFormat()
-            {
-                FontFamily = await App.ViewModel.DiskRepository.GetFontFamilyAsync(setting.FontFamily), // name.ttf#name
-                FontSize = (float)setting.FontSize
-            };
-            cacheForeground = ColorHelper.From(setting.Foreground, Colors.Black);
-            cacheBackground = ColorHelper.From(setting.Background);
-            if (!string.IsNullOrWhiteSpace(setting.BackgroundImage))
-            {
-                var bgImage = await App.ViewModel.DiskRepository.GetFilePathAsync(setting.BackgroundImage);
-                cacheImage = await CanvasBitmap.LoadAsync(DrawerCanvas, bgImage);
-            }
-            if (renderTarget == null)
-            {
-                renderTarget = new CanvasRenderTarget(DrawerCanvas, (float)DrawerCanvas.ActualWidth,
-                   (float)DrawerCanvas.ActualHeight, 96);
-            }
-            if (setting.Animation < 1)
-            {
-                SwapTimer_Tick(null, null);
-                return;
-            }
-            if (swapTimer == null)
-            {
-                swapTimer = new DispatcherTimer()
-                {
-                    Interval = TimeSpan.FromMilliseconds(40),
-                };
-                swapTimer.Tick += SwapTimer_Tick;
-            }
-            swapTimer.Start();
-        }
-
-        private void SwapTimer_Tick(object sender, object e)
-        {
-            if (IsSwapFinished())
-            {
-                onSwapFinished?.Invoke();
-                swapDirect = null;
-            }
-            if (swapDirect == true)
-            {
-                layerItems[0].X -= 10;
-            } else
-            {
-                layerItems[1].X += 10;
-            }
             DrawerCanvas.Invalidate();
-        }
-
-        private bool IsSwapFinished()
-        {
-            if (App.ViewModel.Setting.Animation < 1 || swapDirect == null)
-            {
-                return true;
-            }
-            if (swapDirect == true)
-            {
-                return layerItems[0] == null || layerItems[0].X <= 10 - layerItems[0].Width;
-            }
-            return layerItems[1] == null || layerItems[1].X <= -10;
         }
 
         public async void SwapNext()
@@ -257,15 +263,14 @@ namespace ZoDream.Reader.Controls
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            renderTarget?.Dispose();
-            swapTimer?.Stop();
+            swapAnimate?.Dispose();
             DrawerCanvas.RemoveFromVisualTree();
             DrawerCanvas = null;
         }
 
         private void UserControl_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
-            lastMousePoint = e.Position;
+            swapAnimate.TouchMoveBegin(e.Position);
         }
 
         private void UserControl_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
@@ -275,49 +280,27 @@ namespace ZoDream.Reader.Controls
 
         private void MouseMoveEnd(Point p)
         {
-            var diffX = p.X - lastMousePoint.X;
-            var diffY = p.Y - lastMousePoint.Y;
-            var diff = Math.Pow(diffX, 2) + Math.Pow(diffY, 2);
-            if (diff < 25)
-            {
-                // TODO 点击
-                if (p.X < ActualWidth / 3)
-                {
-                    SwapPrevious();
-                }
-                else if (p.X > ActualWidth * .7)
-                {
-                    SwapNext();
-                }
-                return;
-            }
-
-            if (Math.Abs(diffX) > Math.Abs(diffY))
-            {
-                if (diffX > 0)
-                {
-                    SwapPrevious();
-                }
-                else if (diffX < 0)
-                {
-                    SwapNext();
-                }
-            }
+            swapAnimate.TouchMoveEnd(p);
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            renderTarget?.Dispose();
-            renderTarget = null;
+            for (int i = 0; i < layerItems.Length; i++)
+            {
+                layerItems[i]?.Dispose();
+                layerItems[i] = null;
+            }
         }
 
         private void UserControl_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            lastMousePoint = e.GetCurrentPoint(this).Position;
+            isPointerOn = true;
+            swapAnimate.TouchMoveBegin(e.GetCurrentPoint(this).Position);
         }
 
         private void UserControl_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
+            isPointerOn = false;
             MouseMoveEnd(e.GetCurrentPoint(this).Position);
         }
 
@@ -332,6 +315,19 @@ namespace ZoDream.Reader.Controls
             {
                 SwapPrevious();
                 return;
+            }
+        }
+
+        private void UserControl_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
+        {
+            swapAnimate.TouchMove(e.Position);
+        }
+
+        private void UserControl_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            if (isPointerOn)
+            {
+                swapAnimate.TouchMove(e.GetCurrentPoint(this).Position);
             }
         }
     }
