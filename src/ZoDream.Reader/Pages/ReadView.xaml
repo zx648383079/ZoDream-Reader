@@ -58,6 +58,13 @@
                 Background="Transparent" FontSize="30"
                 BorderThickness="0" Click="MoreBtn_Click"/>
         </Grid>
+        <Popup>
+            <StackPanel Orientation="Vertical" Margin="0" MinWidth="200">
+                <control:MenuItem x:Name="JumpBtn" Icon="&#xE143;" Label="跳转进度"/>
+                <control:MenuItem x:Name="ChapterBtn" Icon="&#xE14C;" Label="目录"/>
+                <control:MenuItem x:Name="SettingBtn" Icon="&#xE115;" Label="设置"/>
+            </StackPanel>
+        </Popup>
         <control:LoadingRing x:Name="loadingRing" Grid.RowSpan="2"/>
     </Grid>
 </Window>

@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using ZoDream.Shared.Renders;
 using ZoDream.Shared.Tokenizers;
 
@@ -20,5 +22,4 @@ public class PageTest
         tokenizer.Dispose();
         Assert.IsTrue(page[0].End == data.End);
     }
-
 }

@@ -23,7 +23,7 @@ namespace ZoDream.Shared.Renders
         private string _fileName;
         private FileStream _reader;
         private Encoding? _encoding;
-        private bool _isLoading = false;
+        private volatile bool _isLoading = false;
 
         public long Position => _reader.Position;
 
