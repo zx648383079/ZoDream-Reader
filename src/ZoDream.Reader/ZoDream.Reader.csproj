@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10</LangVersion>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Assets\reader.ico</ApplicationIcon>
   </PropertyGroup>
@@ -66,13 +66,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FontInfo" Version="1.1.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.0" />
+    <PackageReference Include="FontInfo" Version="1.2.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-    <PackageReference Include="Vortice.Direct2D1" Version="1.9.143" />
-    <PackageReference Include="Vortice.Direct3D11" Version="1.9.143" />
-    <PackageReference Include="Vortice.Direct3D9" Version="1.9.143" />
+    <PackageReference Include="Vortice.Direct2D1" Version="2.1.2" />
+    <PackageReference Include="Vortice.Direct3D11" Version="2.1.2" />
+    <PackageReference Include="Vortice.Direct3D9" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10</LangVersion>
     <Title>ZoDream.Shared</Title>
     <Nullable>enable</Nullable>
   </PropertyGroup>
