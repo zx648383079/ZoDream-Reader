@@ -13,12 +13,12 @@ namespace ZoDream.Shared.Animations
 
         public void Animate(bool toNext, Action finished)
         {
-            throw new NotImplementedException();
+            
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

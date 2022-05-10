@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ZoDream.Shared.Models
 {
-    public class UserSetting
+    public class AppOption
     {
         public int FontSize { get; set; } = 18;
 

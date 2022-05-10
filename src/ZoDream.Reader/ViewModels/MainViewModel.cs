@@ -36,9 +36,9 @@ namespace ZoDream.Reader.ViewModels
             set => Set(ref bookItems, value);
         }
 
-        private UserSetting setting = new UserSetting();
+        private AppOption setting = new AppOption();
 
-        public UserSetting Setting
+        public AppOption Setting
         {
             get { return setting; }
             set

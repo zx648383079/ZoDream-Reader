@@ -106,7 +106,7 @@ namespace ZoDream.Reader.Repositories
             command.ExecuteNonQuery();
         }
 
-        public UserSetting GetSetting()
+        public AppOption GetSetting()
         {
             var command = connection.CreateCommand();
             command.CommandText =
@@ -117,10 +117,10 @@ namespace ZoDream.Reader.Repositories
             {
                 return ResetSetting(true);
             }
-            return JsonConvert.DeserializeObject<UserSetting>((string)data);
+            return JsonConvert.DeserializeObject<AppOption>((string)data);
         }
 
-        public void SaveSetting(UserSetting data)
+        public void SaveSetting(AppOption data)
         {
             var command = connection.CreateCommand();
             command.CommandText =
@@ -132,14 +132,14 @@ namespace ZoDream.Reader.Repositories
             command.ExecuteNonQuery();
         }
 
-        public UserSetting ResetSetting()
+        public AppOption ResetSetting()
         {
             return ResetSetting(false);
         }
 
-        public UserSetting ResetSetting(bool isInset)
+        public AppOption ResetSetting(bool isInset)
         {
-            var model = new UserSetting();
+            var model = new AppOption();
             if (isInset)
             {
                 var command = connection.CreateCommand();

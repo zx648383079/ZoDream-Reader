@@ -1,11 +1,12 @@
 ﻿using Microsoft.Data.Sqlite;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
+using ZoDream.Shared.Storage;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -96,40 +97,19 @@ namespace ZoDream.Reader.Repositories
             command.ExecuteNonQuery();
         }
 
-        public UserSetting GetSetting()
+        public async Task<AppOption> LoadSettingAsync()
         {
-            var command = connection.CreateCommand();
-            command.CommandText =
-                @"SELECT Value FROM Setting WHERE Name=:name LIMIT 1";
-            command.Parameters.AddWithValue(":name", "setting"); ;
-            var data = command.ExecuteScalar();
-            if (data == null)
+            var option = await AppData.LoadAsync<AppOption>();
+            if (option == null)
             {
-                return ResetSetting();
+                return new AppOption();
             }
-            return JsonConvert.DeserializeObject<UserSetting>((string)data);
+            return option;
         }
 
-        public void SaveSetting(UserSetting data)
+        public async Task SaveSettingAsync(AppOption data)
         {
-            var command = connection.CreateCommand();
-            command.CommandText =
-                @"UPDATE Setting 
-                    SET Value=:value
-                  WHERE Name=:name";
-            command.Parameters.AddWithValue(":name", "setting");
-            command.Parameters.AddWithValue(":value", JsonConvert.SerializeObject(data));
-            command.ExecuteNonQuery();
-        }
-
-        public UserSetting ResetSetting()
-        {
-            var command = connection.CreateCommand();
-            command.CommandText =
-                @"DELETE FROM Setting WHERE Name=:name";
-            command.Parameters.AddWithValue(":name", "setting"); ;
-            command.ExecuteNonQuery();
-            return new UserSetting();
+            await AppData.SaveAsync(data);
         }
 
         public void Dispose()

@@ -4,7 +4,8 @@ using System.Text;
 
 namespace ZoDream.Shared.Font
 {
-    public class Font
+    public static class Font
     {
+        
     }
 }

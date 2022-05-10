@@ -8,7 +8,7 @@ namespace ZoDream.Shared.Models
 {
     public class FontItem
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public string? FileName { get; set; }
 
@@ -33,6 +33,11 @@ namespace ZoDream.Shared.Models
             return ToString() == obj.ToString();
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public FontItem(string name)
         {
             var args = name.Split('#');
@@ -43,6 +48,12 @@ namespace ZoDream.Shared.Models
             }
             Name = args[1];
             FileName = args[0];
+        }
+
+        public FontItem(string name, string fileName)
+        {
+            Name = name;
+            FileName = fileName;
         }
     }
 }

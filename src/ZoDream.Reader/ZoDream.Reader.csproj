@@ -66,16 +66,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FontInfo" Version="1.2.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-    <PackageReference Include="Vortice.Direct2D1" Version="2.1.2" />
-    <PackageReference Include="Vortice.Direct3D11" Version="2.1.2" />
-    <PackageReference Include="Vortice.Direct3D9" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\shared\ZoDream.Shared.Controls\ZoDream.Shared.Controls.csproj" />
     <ProjectReference Include="..\ZoDream.Shared\ZoDream.Shared.csproj" />
   </ItemGroup>
 
@@ -84,7 +79,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Skins\SettingSkin.xaml">
+    <Page Update="Themes\SettingSkin.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

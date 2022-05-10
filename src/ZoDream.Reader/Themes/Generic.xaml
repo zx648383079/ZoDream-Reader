@@ -5,6 +5,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Themes/ActionListBox.xaml"/>
         <ResourceDictionary Source="/Themes/AddListBoxItem.xaml"/>
+        <ResourceDictionary Source="/Themes/PageCanvas.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

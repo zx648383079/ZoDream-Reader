@@ -34,9 +34,9 @@ namespace ZoDream.Reader.Pages
         public SettingViewModel ViewModel = new SettingViewModel();
 
 
-        private UserSetting setting = new UserSetting();
+        private AppOption setting = new AppOption();
 
-        public UserSetting Setting
+        public AppOption Setting
         {
             get
             {

@@ -6,10 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using ZoDream.Shared.Font;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
-using Vortice.DirectWrite;
-using static Vortice.DirectWrite.DWrite;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -43,30 +42,7 @@ namespace ZoDream.Reader.Repositories
 
         public IList<FontItem> GetFonts()
         {
-            var factory = DWriteCreateFactory<IDWriteFactory>();
-
-            var fontCollection = factory.GetSystemFontCollection(false);
-            var familCount = fontCollection.FontFamilyCount;
-            var items = new List<FontItem>();
-            for (int i = 0; i < familCount; i++)
-            {
-                var fontFamily = fontCollection.GetFontFamily(i);
-                var familyNames = fontFamily.FamilyNames;
-                int index;
-                if (!familyNames.FindLocaleName(CultureInfo.CurrentCulture.Name, out index))
-                {
-                    if (!familyNames.FindLocaleName("en-us", out index))
-                    {
-                        index = 0;
-                    }
-                }
-
-                string name = familyNames.GetString(index);
-                items.Add(new FontItem(name));
-            }
-            fontCollection.Dispose();
-            factory.Dispose();
-            return items;
+            return Fonts.SystemFontFamilies.Select(i => new FontItem(i.Source)).ToList();
         }
 
         public BookItem? AddTxt(string file)
@@ -102,10 +78,8 @@ namespace ZoDream.Reader.Repositories
                     FileName = fileId,
                 };
             }
-            var fileInfo = info.CopyTo(FontFileName(info.Name), true);
-            var pfc = new System.Drawing.Text.PrivateFontCollection();
-            pfc.AddFontFile(file);
-            var item = pfc.Families.FirstOrDefault();
+            info.CopyTo(FontFileName(info.Name), true);
+            var item = FontHelper.GetFontFamilyAsync(file).GetAwaiter().GetResult().FirstOrDefault();
             if (item != null)
             {
                 name = item.Name;

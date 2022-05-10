@@ -61,21 +61,21 @@ namespace ZoDream.Reader.Controls
 
 
 
-        public UserSetting Setting
+        public AppOption Setting
         {
-            get { return (UserSetting)GetValue(SettingProperty); }
+            get { return (AppOption)GetValue(SettingProperty); }
             set { SetValue(SettingProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Setting.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SettingProperty =
-            DependencyProperty.Register("Setting", typeof(UserSetting), typeof(PageCanvas), new PropertyMetadata(null, OnSettingChanged));
+            DependencyProperty.Register("Setting", typeof(AppOption), typeof(PageCanvas), new PropertyMetadata(null, OnSettingChanged));
 
         private static async void OnSettingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var canvas = d as PageCanvas;
             
-            var setting = e.NewValue as UserSetting;
+            var setting = e.NewValue as AppOption;
             canvas.swapAnimate?.Dispose();
             canvas.swapAnimate = canvas.CreateAnimate(setting.Animation);
             canvas.cacheForeground = ColorHelper.From(setting.Foreground, Colors.Black);

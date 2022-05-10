@@ -19,10 +19,8 @@ namespace ZoDream.Shared.Interfaces
 
         public void DeleteBook(BookItem item);
 
-        public UserSetting GetSetting();
+        public Task<AppOption> LoadSettingAsync();
 
-        public void SaveSetting(UserSetting data);
-
-        public UserSetting ResetSetting();
+        public Task SaveSettingAsync(AppOption data);
     }
 }

@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoDream.Reader", "ZoDream.Reader\ZoDream.Reader.csproj", "{56B24471-0A2B-4D2A-85B1-834FCA11A3E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Reader", "ZoDream.Reader\ZoDream.Reader.csproj", "{56B24471-0A2B-4D2A-85B1-834FCA11A3E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoDream.Tests", "ZoDream.Tests\ZoDream.Tests.csproj", "{1808C9DA-1FE6-46FA-BD90-24329DEBF81C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Tests", "ZoDream.Tests\ZoDream.Tests.csproj", "{1808C9DA-1FE6-46FA-BD90-24329DEBF81C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoDream.Shared", "ZoDream.Shared\ZoDream.Shared.csproj", "{8EF038F2-3365-486C-A33D-A276BA6B039B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Shared", "ZoDream.Shared\ZoDream.Shared.csproj", "{8EF038F2-3365-486C-A33D-A276BA6B039B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UWP", "UWP", "{239C273F-7D2A-4586-A0D7-A5D1528156DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoDream.Reader", "UWP\ZoDream.Reader\ZoDream.Reader.csproj", "{15F0607C-43A5-4D6A-9513-07A1B610A4A7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Shared.Controls", "..\shared\ZoDream.Shared.Controls\ZoDream.Shared.Controls.csproj", "{5D78A002-F73E-46EC-A2F3-D68CB857F37C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +115,26 @@ Global
 		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|x86.ActiveCfg = Release|x86
 		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|x86.Build.0 = Release|x86
 		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|x86.Deploy.0 = Release|x86
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|ARM.Build.0 = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|x64.Build.0 = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|x86.Build.0 = Debug|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|ARM.ActiveCfg = Release|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|ARM.Build.0 = Release|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|ARM64.Build.0 = Release|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|x64.ActiveCfg = Release|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|x64.Build.0 = Release|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|x86.ActiveCfg = Release|Any CPU
+		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
