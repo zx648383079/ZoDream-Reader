@@ -7,18 +7,28 @@ namespace ZoDream.Shared.Animations
 {
     public class CoverAnimate : ICanvasAnimate
     {
-        public bool HasAnimate => throw new NotImplementedException();
+        public bool HasAnimate => true;
 
-        public bool IsFinished => throw new NotImplementedException();
-
-        public void Animate(bool toNext, Action finished)
+        public double Move(ICanvasLayer layer, double x, double y)
         {
-            
+            throw new NotImplementedException();
+        }
+
+        public void MoveStart(ICanvasLayer layer, double x, double y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Animate(IList<ICanvasLayer> layers, double offset, bool isTouch)
+        {
+            throw new NotImplementedException();
         }
 
         public void Dispose()
         {
-            
+            throw new NotImplementedException();
         }
+
+
     }
 }

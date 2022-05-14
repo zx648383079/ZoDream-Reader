@@ -4,13 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ZoDream.Reader"
-        xmlns:control="clr-namespace:ZoDream.Reader.Controls"
+        xmlns:ctl="clr-namespace:ZoDream.Reader.Controls"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" 
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
     <Grid>
-        <control:ActionListBox x:Name="BookListBox" 
+        <ctl:ActionListBox x:Name="BookListBox" 
                                Items="{Binding BookItems}" 
                                OnAdd="BookListBox_OnAdd"
                                OnAction="BookListBox_OnAction"

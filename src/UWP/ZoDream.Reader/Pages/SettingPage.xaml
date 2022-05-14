@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:control="using:ZoDream.Reader.Controls"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -90,7 +90,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="行间距" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput x:Name="lineTb" Grid.Column="1"/>
+                    <ctl:NumberInput x:Name="lineTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -98,7 +98,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="字间距" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput x:Name="letterTb" Grid.Column="1"/>
+                    <ctl:NumberInput x:Name="letterTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -106,7 +106,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="页边距" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput x:Name="paddingTb" Grid.Column="1"/>
+                    <ctl:NumberInput x:Name="paddingTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -128,7 +128,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="字号" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput x:Name="sizeTb" Grid.Column="1"/>
+                    <ctl:NumberInput x:Name="sizeTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -154,7 +154,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="翻页间隔/s" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput x:Name="flipSpaceTb" Grid.Column="1"/>
+                    <ctl:NumberInput x:Name="flipSpaceTb" Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -170,7 +170,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="朗读速度/x" Style="{StaticResource LabelTb}"/>
-                    <control:NumberInput x:Name="speekSpeedTb" Grid.Column="1"/>
+                    <ctl:NumberInput x:Name="speekSpeedTb" Grid.Column="1"/>
                 </Grid>
                 <TextBlock Text="预览"/>
                 

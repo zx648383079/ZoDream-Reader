@@ -8,6 +8,7 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400"
+    Loaded="UserControl_Loaded"
     Unloaded="UserControl_Unloaded" 
     SizeChanged="UserControl_SizeChanged"
     

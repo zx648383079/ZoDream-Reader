@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -67,7 +66,7 @@ namespace ZoDream.Reader.ViewModels
                 {
                     return;
                 }
-                await dispatcherQueue.EnqueueAsync(() =>
+                dispatcherQueue.TryEnqueue(() =>
                 {
                     foreach (var item in items)
                     {

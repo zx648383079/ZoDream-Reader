@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Sqlite;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
+using ZoDream.Shared.Storage;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -106,55 +106,21 @@ namespace ZoDream.Reader.Repositories
             command.ExecuteNonQuery();
         }
 
-        public AppOption GetSetting()
+        public async Task<AppOption> LoadSettingAsync()
         {
-            var command = connection.CreateCommand();
-            command.CommandText =
-                @"SELECT Value FROM Setting WHERE Name=:name LIMIT 1";
-            command.Parameters.AddWithValue(":name", "setting"); ;
-            var data = command.ExecuteScalar();
-            if (data == null)
+            var option = await AppData.LoadAsync<AppOption>();
+            if (option == null)
             {
-                return ResetSetting(true);
+                return new AppOption();
             }
-            return JsonConvert.DeserializeObject<AppOption>((string)data);
+            return option;
         }
 
-        public void SaveSetting(AppOption data)
+        public async Task SaveSettingAsync(AppOption data)
         {
-            var command = connection.CreateCommand();
-            command.CommandText =
-                @"UPDATE Setting 
-                    SET Value=:value
-                  WHERE Name=:name";
-            command.Parameters.AddWithValue(":name", "setting");
-            command.Parameters.AddWithValue(":value", JsonConvert.SerializeObject(data));
-            command.ExecuteNonQuery();
+            await AppData.SaveAsync(data);
         }
 
-        public AppOption ResetSetting()
-        {
-            return ResetSetting(false);
-        }
-
-        public AppOption ResetSetting(bool isInset)
-        {
-            var model = new AppOption();
-            if (isInset)
-            {
-                var command = connection.CreateCommand();
-                command.CommandText =
-                    @"INSERT INTO Setting (Name,Value)
-                  VALUES (:name,:value)";
-                command.Parameters.AddWithValue(":name", "setting");
-                command.Parameters.AddWithValue(":value", JsonConvert.SerializeObject(model));
-                command.ExecuteNonQuery();
-            } else
-            {
-                SaveSetting(model);
-            }
-            return model;
-        }
 
         public void Dispose()
         {

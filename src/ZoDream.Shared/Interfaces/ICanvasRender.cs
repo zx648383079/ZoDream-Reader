@@ -21,33 +21,25 @@ namespace ZoDream.Shared.Interfaces
         /// </summary>
         public event CanvasReadyEventHandler? OnReady;
 
-        /// <summary>
-        /// 画多页，分栏
-        /// </summary>
-        /// <param name="pages"></param>
-        public void Draw(IList<PageItem> pages);
-
+      
+        public void SwapTo(IList<PageItem> pages, int page);
         /// <summary>
         /// 使用过渡动画切换到新的页面，下一页
         /// </summary>
-        /// <param name="pages"></param>
-        public void SwapTo(IList<PageItem> pages);
-        public void SwapTo(IList<PageItem> pages, int page);
+        /// <param name="page"></param>
+        /// <returns></returns>
+        public Task SwapToAsync(int page);
 
-        public Task SwapTo(int page);
-
+        public void SwapFrom(IList<PageItem> pages, int page);
         /// <summary>
         /// 使用过渡动画切换回新的页面，上一页
         /// </summary>
-        /// <param name="pages"></param>
-        public void SwapFrom(IList<PageItem> pages);
+        /// <param name="page"></param>
+        public Task SwapFromAsync(int page);
 
-        public void SwapFrom(IList<PageItem> pages, int page);
-        public void SwapFrom(int page);
+        public Task SwapNextAsync();
 
-        public void SwapNext();
-
-        public void SwapPrevious();
+        public Task SwapPreviousAsync();
 
         /// <summary>
         /// 清空页面内容

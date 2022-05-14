@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ZoDream.Reader.Pages"
         xmlns:control="clr-namespace:ZoDream.Reader.Controls"
+        xmlns:sctl="clr-namespace:ZoDream.Shared.Controls;assembly=ZoDream.Shared.Controls"
         mc:Ignorable="d"
         Title="阅读" Height="450" Width="800"
         Unloaded="Window_Unloaded"
@@ -35,14 +36,14 @@
                 <TextBlock Text="字体" Style="{DynamicResource LabelTb}"/>
                 <ComboBox/>
                 <TextBlock Text="字体大小" Style="{DynamicResource LabelTb}"/>
-                <control:NumberInput Value="28"/>
+                <sctl:NumberInput Value="28"/>
                 <TextBlock Text="背景颜色" Style="{DynamicResource LabelTb}"/>
 
                 <TextBlock Text="文字颜色" Style="{DynamicResource LabelTb}"/>
                 <TextBlock Text="翻页效果" Style="{DynamicResource LabelTb}"/>
                 <TextBlock Text="自动翻页" Style="{DynamicResource LabelTb}"/>
                 <TextBlock Text="语音朗读" Style="{DynamicResource LabelTb}"/>
-                <control:SwitchInput OffLabel="关" OnLabel="开"/>
+                <sctl:SwitchInput OffLabel="关" OnLabel="开"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">
@@ -65,6 +66,6 @@
                 <control:MenuItem x:Name="SettingBtn" Icon="&#xE115;" Label="设置"/>
             </StackPanel>
         </Popup>
-        <control:LoadingRing x:Name="loadingRing" Grid.RowSpan="2"/>
+        <sctl:ProgressRing x:Name="loadingRing" Grid.RowSpan="2"/>
     </Grid>
 </Window>

@@ -23,6 +23,7 @@ namespace ZoDream.Reader.ViewModels
             Database.Initialize(dbFile);
             DatabaseRepository = new Database(dbFile);
             Load();
+            Setting = await DatabaseRepository.LoadSettingAsync();
         }
 
         public Database DatabaseRepository { get; private set; }
@@ -36,17 +37,7 @@ namespace ZoDream.Reader.ViewModels
             set => Set(ref bookItems, value);
         }
 
-        private AppOption setting = new AppOption();
-
-        public AppOption Setting
-        {
-            get { return setting; }
-            set
-            {
-                setting = value;
-                DatabaseRepository.SaveSetting(value);
-            }
-        }
+        public AppOption Setting { get; set; }
 
         public void Load()
         {
@@ -55,7 +46,6 @@ namespace ZoDream.Reader.ViewModels
             {
                 BookItems.Add(item);
             }
-            Setting = DatabaseRepository.GetSetting();
         }
         public void Load(IEnumerable<string> fileNames)
         {

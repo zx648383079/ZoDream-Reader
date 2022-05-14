@@ -7,7 +7,7 @@ namespace ZoDream.Shared.Utils
 	public class Tween<T>
 	{
 
-		public Tween(T data, T target, float duration, Func<float, T, T, float, T> func)
+		public Tween(T data, T target, double duration, Func<double, T, T, double, T> func)
 		{
 			InitProperties = data;
 			TargetProperties = target;
@@ -22,16 +22,18 @@ namespace ZoDream.Shared.Utils
 
 		public DateTime InitTime { get; private set; }
 
-		public Func<float, T, T, float, T> EasingFunc { get; private set; }
-
-        public float Duration { get; private set; }
+		public Func<double, T, T, double, T> EasingFunc { get; private set; }
+		/// <summary>
+		/// /ms
+		/// </summary>
+        public double Duration { get; private set; }
 
         public T Get()
 		{
 			return Get(DateTime.Now);
 		}
 
-		public T Get(float time)
+		public T Get(double time)
 		{
 			return EasingFunc(time, InitProperties, TargetProperties, Duration);
 		}
@@ -46,7 +48,7 @@ namespace ZoDream.Shared.Utils
 			return Get(timeSpan.Ticks / 10000);
         }
 
-        public static float Linear(float time, float nBegin, float nEnd, float nDuration)
+        public static double Linear(double time, double nBegin, double nEnd, double nDuration)
 		{
 			if (time >= nDuration)
 			{
@@ -55,13 +57,13 @@ namespace ZoDream.Shared.Utils
 			return (nEnd - nBegin) * time / nDuration + nBegin;
 		}
 
-		public static float EaseIn(float time, float nBegin, float nEnd, float nDuration)
+		public static double EaseIn(double time, double nBegin, double nEnd, double nDuration)
 		{
 			if (time >= nDuration)
 			{
 				return nEnd;
 			}
-			return (float)((nEnd - nBegin) * Math.Pow(time / nDuration, 2) + nBegin);
+			return (double)((nEnd - nBegin) * Math.Pow(time / nDuration, 2) + nBegin);
 		}
 	}
 }

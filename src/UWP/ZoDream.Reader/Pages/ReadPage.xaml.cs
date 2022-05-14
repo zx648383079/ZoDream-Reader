@@ -44,7 +44,7 @@ namespace ZoDream.Reader.Pages
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            LoadingBtn.Visibility = Visibility.Visible;
+            LoadingBtn.IsActive = true;
             App.ViewModel.ListenNavigate();
             ViewModel.Book = e.Parameter as BookItem;
             ApplicationView.GetForCurrentView().Title = ViewModel.Book.Name;
@@ -85,8 +85,8 @@ namespace ZoDream.Reader.Pages
             await tokenizer.Refresh();
             ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
             PageRender.Flush();
-            await PageRender.SwapTo(tokenizer.Page);
-            LoadingBtn.Visibility = Visibility.Collapsed;
+            await PageRender.SwapToAsync(tokenizer.Page);
+            LoadingBtn.IsActive = false;
         }
 
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -113,7 +113,7 @@ namespace ZoDream.Reader.Pages
                 return;
             }
             ViewModel.Tokenizer.SetPageScale(dialog.Value, 100);
-            await PageRender.SwapTo(ViewModel.Tokenizer.Page);
+            await PageRender.SwapToAsync(ViewModel.Tokenizer.Page);
         }
 
         private void SettingBtn_Tapped(object sender, TappedRoutedEventArgs e)
@@ -136,16 +136,7 @@ namespace ZoDream.Reader.Pages
             var chapter = ViewModel.ChapterItems[i];
             ViewModel.ChapterTitle = chapter.Title;
             ViewModel.Tokenizer.SetPage(chapter);
-            var items = await ViewModel.Tokenizer.GetAsync();
-            if (items.Count < 1)
-            {
-                // 没有更多了
-                return;
-            }
-            PageRender.Flush();
-            PageRender.Draw(items);
-            ViewModel.Book.Position = items[0].Begin;
-            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+            await PageRender.SwapToAsync(ViewModel.Tokenizer.Page);
         }
 
         private void PageRender_PageChanged(object sender, int page, PositionItem pagePosition)

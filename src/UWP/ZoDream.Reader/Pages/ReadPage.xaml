@@ -44,6 +44,6 @@
             <ListBox x:Name="ChapterListBox" ItemsSource="{x:Bind ViewModel.ChapterItems}" 
                      DisplayMemberPath="Title" SelectionChanged="ChapterListBox_SelectionChanged"/>
         </control:PanelDialog>
-        <control:LoadingRing x:Name="LoadingBtn" Grid.RowSpan="2"/>
+        <ProgressRing x:Name="LoadingBtn" Grid.RowSpan="2"/>
     </Grid>
 </Page>

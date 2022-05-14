@@ -19,10 +19,10 @@ namespace ZoDream.Reader.Pages
             DataContext = ViewModel;
             ViewModel.Book = book;
             Title = book.Name;
-            loadingRing.Visibility = Visibility.Visible;
+            loadingRing.IsActive = true;
         }
 
-        public ReadViewModel ViewModel = new ReadViewModel();
+        public ReadViewModel ViewModel = new();
         private bool isBooted = false;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -63,8 +63,8 @@ namespace ZoDream.Reader.Pages
             await tokenizer.Refresh();
             ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
             PageRender.Flush();
-            await PageRender.SwapTo(tokenizer.Page);
-            loadingRing.Visibility = Visibility.Collapsed;
+            await PageRender.SwapToAsync(tokenizer.Page);
+            loadingRing.IsActive = false;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -99,16 +99,8 @@ namespace ZoDream.Reader.Pages
             var chapter = ViewModel.ChapterItems[i];
             ViewModel.ChapterTitle = chapter.Title;
             ViewModel.Tokenizer.SetPage(chapter);
-            var items = await ViewModel.Tokenizer.GetAsync();
-            if (items.Count < 1)
-            {
-                // 没有更多了
-                return;
-            }
-            PageRender.Flush();
-            PageRender.Draw(items);
-            ViewModel.Book.Position = items[0].Begin;
-            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+            await PageRender.SwapToAsync(ViewModel.Tokenizer.Page);
+            // App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
         }
 
         private void PageRender_PageChanged(object sender, int page, PositionItem pagePosition)

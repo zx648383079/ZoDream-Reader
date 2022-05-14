@@ -75,10 +75,10 @@ namespace ZoDream.Reader.Pages
                 }
                 simpleTb.IsOn = !value.IsSimple;
                 flipTb.IsOn = value.AutoFlip;
-                flipSpaceTb.Value = value.FlipSpace;
+                flipSpaceTb.Value = (long)value.FlipSpace;
                 animateListBox.SelectedIndex = value.Animation;
                 speekTb.IsOn = value.OpenSpeek;
-                speekSpeedTb.Value = value.SpeekSpeed;
+                speekSpeedTb.Value = (long)value.SpeekSpeed;
                 bgPicker.Color = ColorHelper.From(value.Background);
                 fgPicker.Color = ColorHelper.From(value.Foreground);
                 

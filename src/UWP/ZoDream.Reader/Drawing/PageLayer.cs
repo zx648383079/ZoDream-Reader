@@ -15,53 +15,57 @@ using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Drawing
 {
-    public class CanvasLayer: ICanvasLayer
+    public class PageLayer: ICanvasLayer
     {
 
-        public CanvasLayer(CanvasControl control, float width, float height)
+        public PageLayer(CanvasControl control, double width, double height)
         {
-            Width = width;
-            Height = height;
+            ActualWidth = width;
+            ActualHeight = height;
             Control = control;
         }
 
         private CanvasControl Control;
 
-        public IList<CharItem> Data { get; set; } = new List<CharItem>();
 
-        public float X { get; set; } = 0;
+        public double Left { get; set; } = 0;
 
-        public float Y { get; set; } = 0;
+        public double Top { get; set; } = 0;
 
-        public float Width { get; set; }
+        public double ActualWidth { get; set; }
 
-        public float Height { get; set; }
+        public double ActualHeight { get; set; }
 
         public int Page { get; set; }
+        public IList<PageItem> Content { get; set; }
+
+        public bool IsVisible { get; set; } = true;
 
         private CanvasRenderTarget CacheBitmap;
 
         private ICanvasEffect CacheEffect;
 
+        public CanvasTextFormat FontFamily { get; set; }
+        public Color Foreground { get; set; } = Colors.Black;
+        public Color Background { get; set; } = Colors.White;
+        public ICanvasImage BackgroundImage { get; set; }
+
         public void Add(IEnumerable<CharItem> items)
         {
-            foreach (var item in items)
+            Add(new List<PageItem>
             {
-                Data.Add(item);
-            }
+                new PageItem() { Data = items.ToList() }
+            });
         }
 
         public void Add(IEnumerable<PageItem> items)
         {
-            foreach (var item in items)
-            {
-                Add(item);
-            }
+            Content = items.ToList();
         }
 
         public void Clear()
         {
-            Data?.Clear();
+            Content?.Clear();
             CacheBitmap?.Dispose();
             CacheEffect?.Dispose();
             CacheBitmap = null;
@@ -85,44 +89,65 @@ namespace ZoDream.Reader.Drawing
         {
             if (CacheEffect != null)
             {
-                target.DrawImage(CacheEffect, X, Y);
+                target.DrawImage(CacheEffect, (float)Left, (float)Top);
                 // return;
             }
             if (CacheBitmap == null)
             {
                 return;
             }
-            target.DrawImage(CacheBitmap, X, Y);
+            target.DrawImage(CacheBitmap, (float)Left, (float)Top);
         }
 
-        public void Update(CanvasTextFormat font, Color foreground, Color background, ICanvasImage backgroundImage)
+        public void InvalidateVisual()
         {
             if (CacheBitmap == null)
             {
-                CacheBitmap = new CanvasRenderTarget(Control, (float)Width,
-                   (float)Height, 96);
+                CacheBitmap = new CanvasRenderTarget(Control, (float)ActualWidth,
+                   (float)ActualHeight, 96);
             }
             using (var ds = CacheBitmap.CreateDrawingSession())
             {
-                ds.Clear(background);
-                if (backgroundImage != null)
+                ds.Clear(Background);
+                if (BackgroundImage != null)
                 {
-                    ds.DrawImage(backgroundImage, 0, 0, new Rect(0, 0, Width, Height));
+                    ds.DrawImage(BackgroundImage, 0, 0, new Rect(0, 0, ActualWidth, ActualHeight));
                 }
-                foreach (var item in Data)
+                foreach (var page in Content)
                 {
-                    ds.DrawText(item.Code.ToString(),
+                    foreach (var item in page)
+                    {
+                        ds.DrawText(item.Code.ToString(),
                                 new Vector2((float)item.X, (float)item.Y),
-                                foreground, font);
+                                Foreground, FontFamily);
+                    }
                 }
             }
         }
 
         public void Dispose()
         {
-            Data.Clear();
+            Content.Clear();
             CacheBitmap?.Dispose();
             CacheBitmap = null;
+        }
+
+        public void Move(double x, double y)
+        {
+            Left = x;
+            Top = y;
+        }
+
+        public void Resize(double x, double y, double width, double height)
+        {
+            Move(x, y);
+            ActualWidth = width;
+            ActualHeight = height;
+        }
+
+        public void Toggle(bool visible)
+        {
+            IsVisible = visible;
         }
     }
 }

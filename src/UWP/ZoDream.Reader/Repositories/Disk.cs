@@ -1,5 +1,4 @@
-﻿using FontInfo;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -9,8 +8,8 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
-using Vortice.DirectWrite;
-using static Vortice.DirectWrite.DWrite;
+using ZoDream.Shared.Font;
+using Microsoft.Graphics.Canvas.Text;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -57,8 +56,8 @@ namespace ZoDream.Reader.Repositories
             //    return null;
             //}
             //var fontFace = factory.CreateFontFace(fontFaceType, new []{ fontRef });
-            var font = await Font.CreateAsync(tempfile.Path);
-            return new FontItem(font.Details.Family)
+            var items = await FontHelper.GetFontFamilyAsync(tempfile.Path);
+            return new FontItem(items.FirstOrDefault().Name)
             {
                 FileName = fileId,
             };
@@ -157,29 +156,12 @@ namespace ZoDream.Reader.Repositories
 
         public async Task<IList<FontItem>> GetFontsAsync()
         {
-            var factory = DWriteCreateFactory<IDWriteFactory>();
-
-            var fontCollection = factory.GetSystemFontCollection(false);
-            var familCount = fontCollection.FontFamilyCount;
+            var fontCollection = CanvasTextFormat.GetSystemFontFamilies();
             var items = new List<FontItem>();
-            for (int i = 0; i < familCount; i++)
+            foreach (var name in fontCollection)
             {
-                var fontFamily = fontCollection.GetFontFamily(i);
-                var familyNames = fontFamily.FamilyNames;
-                int index;
-                if (!familyNames.FindLocaleName(CultureInfo.CurrentCulture.Name, out index))
-                {
-                    if (!familyNames.FindLocaleName("en-us", out index))
-                    {
-                        index = 0;
-                    }
-                }
-
-                string name = familyNames.GetString(index);
                 items.Add(new FontItem(name));
             }
-            fontCollection.Dispose();
-            factory.Dispose();
             var files = await ThemeFolder.GetFilesAsync();
             foreach (var item in files)
             {
@@ -187,8 +169,8 @@ namespace ZoDream.Reader.Repositories
                 {
                     continue;
                 }
-                var font = await Font.CreateAsync(item.Path);
-                items.Add(new FontItem(font.Details.Family)
+                var font = await FontHelper.GetFontFamilyAsync(item.Path);
+                items.Add(new FontItem(font.FirstOrDefault().Name)
                 {
                     FileName = item.Name,
                 });

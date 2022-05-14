@@ -1,0 +1,34 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Controls">
+    <FontFamily x:Key="IconFontFamily">Segoe MDL2 Assets</FontFamily>
+    <Style TargetType="local:NumberInput" >
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:NumberInput">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="PART_ValueTb" Text="0"
+                                     TextAlignment="Center" Grid.RowSpan="2" />
+                            <Button x:Name="PART_PlusBtn" Content="&#xE010;"
+                                    Grid.Column="1" FontFamily="{StaticResource IconFontFamily}"/>
+                            <Button x:Name="PART_MinusBtn" Content="&#xE011;" 
+                                    Grid.Column="1" Grid.Row="1" FontFamily="{StaticResource IconFontFamily}"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

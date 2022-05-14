@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Controls
@@ -46,24 +48,28 @@ namespace ZoDream.Reader.Controls
     ///     <MyNamespace:PageLayer/>
     ///
     /// </summary>
-    public class PageLayer : Control
+    public class PageLayer : Control, ICanvasLayer
     {
         static PageLayer()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PageLayer), new FrameworkPropertyMetadata(typeof(PageLayer)));
         }
 
+        public double Left => Canvas.GetLeft(this);
+        public double Top => Canvas.GetTop(this);
+
+
         public int Page { get; set; }
 
-        public IEnumerable<PageItem> Content
+        public IList<PageItem> Content
         {
-            get { return (IEnumerable<PageItem>)GetValue(ContentProperty); }
+            get { return (IList<PageItem>)GetValue(ContentProperty); }
             set { SetValue(ContentProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Content.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(IEnumerable<PageItem>), 
+            DependencyProperty.Register("Content", typeof(IList<PageItem>), 
                 typeof(PageLayer), new PropertyMetadata(null, (d, e) =>
                 {
                     (d as PageLayer)?.InvalidateVisual();
@@ -72,7 +78,9 @@ namespace ZoDream.Reader.Controls
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
-            if (Content == null)
+            drawingContext.DrawRectangle(Background, new Pen(BorderBrush, BorderThickness.Top), new Rect(
+                0, 0, ActualWidth, ActualHeight));
+            if (Content is null)
             {
                 return;
             }
@@ -86,6 +94,51 @@ namespace ZoDream.Reader.Controls
                     drawingContext.DrawText(format, new Point(item.X, item.Y));
                 }
             }
+        }
+
+        public void Add(IEnumerable<CharItem> items)
+        {
+            Add(new List<PageItem>
+            {
+                new PageItem() { Data = items.ToList() }
+            });
+        }
+
+        public void Add(IEnumerable<PageItem> items)
+        {
+            Content = items.ToList();
+        }
+
+        public void Clear()
+        {
+            Content = null;
+        }
+
+        public void Move(double x, double y)
+        {
+            Canvas.SetLeft(this, x);
+            Canvas.SetTop(this, y);
+        }
+
+        public void Resize(double x, double y, double width, double height)
+        {
+            Height = height;
+            Width = width;
+            Move(x, y);
+        }
+
+        public void Toggle(bool visible)
+        {
+            if (visible == IsVisible)
+            {
+                return;
+            }
+            Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

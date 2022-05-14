@@ -50,19 +50,19 @@ namespace ZoDream.Reader.ViewModels
             get { return setting; }
             set {
                 setting = value;
-                DatabaseRepository.SaveSetting(value);
+                _ = DatabaseRepository.SaveSettingAsync(value);
             }
         }
 
 
-        public void Load()
+        public async void Load()
         {
             var items = DatabaseRepository.GetBooks();
             foreach (var item in items)
             {
                 BookItems.Add(item);
             }
-            Setting = DatabaseRepository.GetSetting();
+            Setting = await DatabaseRepository.LoadSettingAsync();
         }
         public async void Load(StorageFile file)
         {
