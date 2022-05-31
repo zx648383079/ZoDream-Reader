@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ZoDream.Reader.Pages"
-        xmlns:control="clr-namespace:ZoDream.Reader.Controls"
+        xmlns:ctl="clr-namespace:ZoDream.Reader.Controls"
         xmlns:sctl="clr-namespace:ZoDream.Shared.Controls;assembly=ZoDream.Shared.Controls"
         mc:Ignorable="d"
         Title="阅读" Height="450" Width="800"
@@ -18,7 +18,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <control:PageCanvas x:Name="PageRender" PageChanged="PageRender_PageChanged" OnReady="PageRender_OnReady"/>
+        <ctl:PageCanvas x:Name="PageRender" PageChanged="PageRender_PageChanged" OnReady="PageRender_OnReady"/>
         <Grid x:Name="MorePanel" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" MaxWidth="400"/>
@@ -30,21 +30,8 @@
                      DisplayMemberPath="Title" 
                      MouseDoubleClick="ChapterListBox_MouseDoubleClick"/>
 
-            <StackPanel Orientation="Vertical"
-                        Background="White"
-                        Grid.Column="2">
-                <TextBlock Text="字体" Style="{DynamicResource LabelTb}"/>
-                <ComboBox/>
-                <TextBlock Text="字体大小" Style="{DynamicResource LabelTb}"/>
-                <sctl:NumberInput Value="28"/>
-                <TextBlock Text="背景颜色" Style="{DynamicResource LabelTb}"/>
-
-                <TextBlock Text="文字颜色" Style="{DynamicResource LabelTb}"/>
-                <TextBlock Text="翻页效果" Style="{DynamicResource LabelTb}"/>
-                <TextBlock Text="自动翻页" Style="{DynamicResource LabelTb}"/>
-                <TextBlock Text="语音朗读" Style="{DynamicResource LabelTb}"/>
-                <sctl:SwitchInput OffLabel="关" OnLabel="开"/>
-            </StackPanel>
+            <ctl:SettingPanel
+                        Grid.Column="2"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -61,9 +48,9 @@
         </Grid>
         <Popup>
             <StackPanel Orientation="Vertical" Margin="0" MinWidth="200">
-                <control:MenuItem x:Name="JumpBtn" Icon="&#xE143;" Label="跳转进度"/>
-                <control:MenuItem x:Name="ChapterBtn" Icon="&#xE14C;" Label="目录"/>
-                <control:MenuItem x:Name="SettingBtn" Icon="&#xE115;" Label="设置"/>
+                <ctl:MenuItem x:Name="JumpBtn" Icon="&#xE143;" Label="跳转进度"/>
+                <ctl:MenuItem x:Name="ChapterBtn" Icon="&#xE14C;" Label="目录"/>
+                <ctl:MenuItem x:Name="SettingBtn" Icon="&#xE115;" Label="设置"/>
             </StackPanel>
         </Popup>
         <sctl:ProgressRing x:Name="loadingRing" Grid.RowSpan="2"/>

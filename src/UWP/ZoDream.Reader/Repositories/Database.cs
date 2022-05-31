@@ -16,6 +16,7 @@ namespace ZoDream.Reader.Repositories
     {
         public Database(StorageFile dbFile)
         {
+            AppData.DefaultFileName = Path.Combine(ApplicationData.Current.LocalFolder.Path, "setting.xml");
             connection = new SqliteConnection($"Data Source={dbFile.Path}");
             connection.Open();
         }

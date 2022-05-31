@@ -15,13 +15,10 @@ namespace ZoDream.Reader.Repositories
 {
     public class Disk : IDiskRepository<StorageFolder, StorageFile>
     {
-        public StorageFolder BaseFolder;
+        public StorageFolder BaseFolder { get; private set; }
         public StorageFolder BookFolder { get; private set; }
 
         public StorageFolder ThemeFolder { get; private set; }
-
-
-        StorageFolder IDiskRepository<StorageFolder, StorageFile>.BaseFolder => throw new NotImplementedException();
 
         public async Task<StorageFile> TxtFileName(string fileId)
         {
