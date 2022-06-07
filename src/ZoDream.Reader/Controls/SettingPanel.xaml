@@ -26,7 +26,14 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="背景颜色" Style="{StaticResource LabelTb}"/>
                     <ctl:ColorInput Grid.Column="1"/>
-
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="背景图片" Style="{StaticResource LabelTb}"/>
+                    <ctl:FileInput Grid.Column="1"/>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>

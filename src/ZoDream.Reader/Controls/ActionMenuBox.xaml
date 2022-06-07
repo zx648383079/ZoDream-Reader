@@ -9,7 +9,10 @@
              Loaded="UserControl_Loaded" 
              Unloaded="UserControl_Unloaded" MouseDown="UserControl_MouseDown">
     <Canvas>
-        <StackPanel x:Name="MenuBox" Background="White" Width="120" Visibility="Collapsed">
+        <StackPanel x:Name="MenuBox" Background="White" Margin="5" Width="120" Visibility="Collapsed">
+            <StackPanel.Effect>
+                <DropShadowEffect BlurRadius="7" ShadowDepth="0"/>
+            </StackPanel.Effect>
             <local:MenuItem Icon="&#xE104;" Label="编辑属性" x:Name="EditBtn" MouseDown="EditBtn_MouseDown"/>
             <local:MenuItem Icon="&#xE107;" Label="移除" x:Name="RemoveBtn" MouseDown="RemoveBtn_MouseDown"/>
         </StackPanel>

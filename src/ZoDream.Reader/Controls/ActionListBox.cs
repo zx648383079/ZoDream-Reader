@@ -58,6 +58,8 @@ namespace ZoDream.Reader.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ActionListBox), new FrameworkPropertyMetadata(typeof(ActionListBox)));
         }
 
+
+
         private Panel? boxContianer;
         private ActionMenuBox? boxMenu;
 
@@ -65,7 +67,6 @@ namespace ZoDream.Reader.Controls
         private double ItemHeight = 200;
 
         public event ControlEventHandler? OnAdd;
-
         public event ActionItemEventHandler? OnAction;
 
         public bool ActionOnBefore
@@ -141,9 +142,11 @@ namespace ZoDream.Reader.Controls
             }
             for (; j < count; j++)
             {
-                var book = new BookListBoxItem();
-                book.Width = ItemWidth;
-                book.Height = ItemHeight;
+                var book = new BookListBoxItem
+                {
+                    Width = ItemWidth,
+                    Height = ItemHeight
+                };
                 book.OnAction += (_, item, e) =>
                 {
                     if (e == ActionEvent.NONE)
@@ -206,10 +209,12 @@ namespace ZoDream.Reader.Controls
             var index = ActionButtonIndex();
             if (index < 0)
             {
-                var button = new AddListBoxItem();
-                button.Width = ItemWidth;
-                button.Height = ItemHeight;
-                button.FontSize = ItemWidth / 3;
+                var button = new AddListBoxItem
+                {
+                    Width = ItemWidth,
+                    Height = ItemHeight,
+                    FontSize = ItemWidth / 3
+                };
                 button.MouseLeftButtonUp += (_, _) =>
                 {
                     OnAdd?.Invoke(this);

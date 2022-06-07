@@ -29,21 +29,27 @@ namespace ZoDream.Reader.Controls
         public event ActionEventHandler? OnAction;
 
 
-        public void Show( Point position)
+        public void Show(Point position)
         {
             Canvas.SetLeft(MenuBox, position.X);
             Canvas.SetTop(MenuBox, position.Y);
             MenuBox.Visibility = Visibility.Visible;
         }
 
+        public void Hide()
+        {
+
+            MenuBox.Visibility = Visibility.Collapsed;
+        }
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            Mouse.AddMouseDownHandler(this, UserControl_MouseDown);
+            Mouse.AddMouseDownHandler(App.Current.MainWindow, UserControl_MouseDown);
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            Mouse.RemoveMouseDownHandler(this, UserControl_MouseDown);
+            Mouse.RemoveMouseDownHandler(App.Current.MainWindow, UserControl_MouseDown);
         }
 
         private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
