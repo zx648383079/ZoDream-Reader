@@ -30,8 +30,7 @@
                      DisplayMemberPath="Title" 
                      MouseDoubleClick="ChapterListBox_MouseDoubleClick"/>
 
-            <ctl:SettingPanel
-                        Grid.Column="2"/>
+            <ctl:SettingPanel x:Name="OptionPanel" Grid.Column="2"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

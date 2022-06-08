@@ -25,9 +25,44 @@ namespace ZoDream.Reader.Controls
         {
             InitializeComponent();
             DataContext = ViewModel;
+            ViewModel.PropertyChanged += (_, e) =>
+            {
+                IsOptionChanged = true;
+                if (e.PropertyName == nameof(ViewModel.FontSize) ||
+                e.PropertyName == nameof(ViewModel.LineSpace) ||
+                e.PropertyName == nameof(ViewModel.LetterSpace) ||
+                e.PropertyName == nameof(ViewModel.Padding) )
+                {
+                    IsSizeChanged = true;
+                    return;
+                }
+                if (e.PropertyName == nameof(ViewModel.OpenSpeek) || 
+                e.PropertyName == nameof(ViewModel.AutoFlip) || 
+                e.PropertyName == nameof(ViewModel.FlipSpace) ||
+                e.PropertyName == nameof(ViewModel.SpeekSpeed))
+                {
+                    return;
+                }
+                IsLayerChanged = true;
+            };
         }
 
         public SettingViewModel ViewModel = new();
+
+        public bool IsSizeChanged { get; private set; } = false;
+        public bool IsLayerChanged { get; private set; } = false;
+        public bool IsOptionChanged { get; private set; } = false;
+
+        public void Show()
+        {
+            Visibility = Visibility.Visible;
+            IsOptionChanged = IsSizeChanged = IsLayerChanged = false;
+        }
+
+        public void Hide()
+        {
+            Visibility = Visibility.Collapsed;
+        }
 
         private void openFontBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -41,7 +76,18 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
+            AddFont(picker.FileName);
+        }
 
+        private async void AddFont(string font)
+        {
+            var item = await App.ViewModel.DiskRepository.AddFontAsync(font);
+            if (item == null)
+            {
+                return;
+            }
+            ViewModel.FontItems.Add(item);
+            ViewModel.FontFamily = item.FontFamily;
         }
     }
 }

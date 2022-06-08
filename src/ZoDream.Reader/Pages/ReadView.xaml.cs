@@ -84,8 +84,46 @@ namespace ZoDream.Reader.Pages
 
         private void MoreBtn_Click(object sender, RoutedEventArgs e)
         {
-            MorePanel.Visibility = MorePanel.Visibility == Visibility.Visible ? 
-                Visibility.Collapsed : Visibility.Visible;
+            var isOpen = MorePanel.Visibility != Visibility.Visible;
+            MorePanel.Visibility = isOpen ? Visibility.Visible : Visibility.Collapsed;
+            if (isOpen)
+            {
+                OptionPanel.Show();
+                OptionPanel.ViewModel.Option = App.ViewModel.Setting;
+            } else
+            {
+                OptionPanel.Hide();
+                _ = ApplyOpitonAsync();
+            }
+        }
+
+        private async Task ApplyOpitonAsync()
+        {
+            var setting = OptionPanel.ViewModel.Option;
+            if (OptionPanel.IsOptionChanged)
+            {
+                _ = App.ViewModel.DatabaseRepository.SaveSettingAsync(setting);
+                App.ViewModel.Setting = setting;
+            }
+            var tokenizer = ViewModel.Tokenizer;
+            if (OptionPanel.IsSizeChanged)
+            {
+                PageRender.Setting = setting;
+                ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
+                    ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
+                ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
+                ViewModel.Tokenizer.LineSpace = setting.LineSpace;
+                ViewModel.Tokenizer.Gap = setting.Padding * 2;
+                await tokenizer.Refresh();
+                ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
+                PageRender.Flush();
+                await PageRender.SwapToAsync(tokenizer.Page);
+                return;
+            }
+            if (OptionPanel.IsLayerChanged)
+            {
+                PageRender.Setting = setting;
+            }
         }
 
         private async void ChapterListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
