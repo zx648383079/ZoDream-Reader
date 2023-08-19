@@ -557,7 +557,7 @@ namespace ZoDream.Shared.Tokenizers
             SetPage(page.Begin);
         }
 
-        public bool Canable(int page)
+        public bool Enable(int page)
         {
             return page >= 0 && page < CachePages.Count;
         }
@@ -633,7 +633,7 @@ namespace ZoDream.Shared.Tokenizers
 
         public async Task<PageItem?> GetPageAsync(int page)
         {
-            if (!Canable(page))
+            if (!Enable(page))
             {
                 return null;
             }

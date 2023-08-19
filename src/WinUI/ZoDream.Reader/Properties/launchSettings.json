@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ZoDream.Reader (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "ZoDream.Reader (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -10,6 +10,6 @@ namespace ZoDream.Shared.Interfaces
     {
         public Task<IList<PageItem>> GetAsync(int page);
 
-        public bool Canable(int page);
+        public bool Enable(int page);
     }
 }

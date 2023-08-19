@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="ZoDream.Reader.Dialogs.AddSourceDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    PrimaryButtonText="创建"
+    SecondaryButtonText="取消">
+
+    <StackPanel>
+        <TextBlock Text="创建书源" Style="{StaticResource TitleTextBlockStyle}"/>
+        <TextBlock Text="介绍" Style="{StaticResource CaptionTextBlockStyle}"/>
+
+        <TextBox Text="书源名"/>
+        <TextBox />
+        
+        <TextBox Text="网址"/>
+        <TextBox />
+
+        <CheckBox Content="支持发现模块"/>
+        <CheckBox Content="支持搜索模块"/>
+        <CheckBox Content="支持获取书籍详情"/>
+        <CheckBox Content="支持获取目录"/>
+        <CheckBox Content="支持获取章节内容"/>
+    </StackPanel>
+</ContentDialog>

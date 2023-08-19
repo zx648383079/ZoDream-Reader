@@ -97,9 +97,9 @@ namespace ZoDream.Reader.ViewModels
             return Tokenizer.GetAsync(page);
         }
 
-        public bool Canable(int page)
+        public bool Enable(int page)
         {
-            return Tokenizer.Canable(page);
+            return Tokenizer.Enable(page);
         }
     }
 }

@@ -98,7 +98,7 @@ namespace ZoDream.Reader.Controls
 
         public async Task SwapToAsync(int page)
         {
-            if (Source == null || !Source.Canable(page))
+            if (Source == null || !Source.Enable(page))
             {
                 return;
             }
@@ -164,7 +164,7 @@ namespace ZoDream.Reader.Controls
         }
         public async Task SwapFromAsync(int page)
         {
-            if (Source == null || !Source.Canable(page))
+            if (Source == null || !Source.Enable(page))
             {
                 return;
             }

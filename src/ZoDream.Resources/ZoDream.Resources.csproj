@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+        <None Remove="en-US\Resources.resw" />
+        <None Remove="zh-CN\Resources.resw" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <EmbeddedResource Include="en-US\Resources.resw" />
+	  <EmbeddedResource Include="zh-CN\Resources.resw" />
+  </ItemGroup>
+
+</Project>

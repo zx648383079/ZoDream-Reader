@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ZoDream.Reader.Pages.SettingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:lbs="using:CommunityToolkit.Labs.WinUI"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid RowSpacing="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="LayoutVisualGroups">
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource MediumWindowThresholdWidth}" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderText.Margin" Value="{StaticResource NarrowContainerPadding}" />
+                        <Setter Target="MainViewer.Padding" Value="{StaticResource NarrowContainerPadding}" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <TextBlock
+            x:Name="HeaderText"
+            Style="{StaticResource TitleTextBlockStyle}"
+            Margin="{StaticResource DefaultContainerPadding}"
+            HorizontalAlignment="Left"
+            Text="设置" />
+        <ScrollViewer
+            x:Name="MainViewer"
+            Grid.Row="1"
+            Padding="{StaticResource DefaultContainerPadding}"
+            HorizontalScrollMode="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,0,24" Spacing="4">
+                <StackPanel.ChildrenTransitions>
+                    <RepositionThemeTransition IsStaggeringEnabled="False" />
+                </StackPanel.ChildrenTransitions>
+                <lbs:SettingsCard Header="书源管理" Description="新建、导入、编辑或管理书源"/>
+                <lbs:SettingsCard Header="TXT目录规则" Description="配置TXT目录规则"/>
+                <lbs:SettingsCard Header="替换净化" Description="配置替换净化"/>
+                <lbs:SettingsCard Header="字典规则" Description="配置字典规则"/>
+                <lbs:SettingsCard Header="主题模式" Description="选择主题模式"/>
+                <lbs:SettingsCard Header="Web服务" Description="用浏览器写源或看书">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+                <TextBlock Text="设置" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="{StaticResource GroupGapPadding}"/>
+                <lbs:SettingsCard Header="备份与恢复"/>
+                <lbs:SettingsCard Header="主题设置"/>
+                <lbs:SettingsCard Header="其他设置"/>
+                <TextBlock Text="其他" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="{StaticResource GroupGapPadding}"/>
+                <lbs:SettingsCard Header="书签"/>
+                <lbs:SettingsCard Header="阅读记录"/>
+                <lbs:SettingsCard Header="文件管理"/>
+                <lbs:SettingsCard Header="关于"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
