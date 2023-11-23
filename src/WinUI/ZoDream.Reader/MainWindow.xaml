@@ -6,28 +6,19 @@
     xmlns:local="using:ZoDream.Reader"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
     mc:Ignorable="d">
+    <Window.SystemBackdrop>
+        <DesktopAcrylicBackdrop />
+    </Window.SystemBackdrop>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid MinHeight="48"
-            Padding="16,0,0,0"
-            ColumnSpacing="8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Rectangle Fill="Transparent" Grid.ColumnSpan="2"/>
-            <Button BorderThickness="0">
-                <FontIcon Glyph="&#xE0A6;"/>
-            </Button>
-            <Border x:Name="AppTitleBar" Grid.Column="1">
-                <TextBlock x:Name="AppTitle" Text="ZoDream Reader" Margin="4,4,0,0"/>
-            </Border>
-        </Grid>
+        <ctl:AppTitleBar x:Name="AppTitleBar" Title="ZoDream Reader"/>
+        
         <Frame Name="AppFrame" Grid.Row="1">
             <Frame.ContentTransitions>
                 <TransitionCollection>
@@ -39,6 +30,6 @@
                 </TransitionCollection>
             </Frame.ContentTransitions>
         </Frame>
-        <Frame Name="ReadFrame" Grid.RowSpan="2" Visibility="Collapsed"/>
+        <Frame Name="ReadFrame" Grid.Row="1" Visibility="Collapsed"/>
     </Grid>
 </Window>

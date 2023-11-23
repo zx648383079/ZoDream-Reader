@@ -1,29 +1,52 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.22621.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>ZoDream.Reader</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;ARM64</Platforms>
-    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
-    <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
+	  <LangVersion>12</LangVersion>
+	  <Nullable>enable</Nullable>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Controls\TextContainer.xaml" />
+    <None Remove="Dialogs\AddChapterRuleDialog.xaml" />
+    <None Remove="Dialogs\AddDictionaryDialog.xaml" />
+    <None Remove="Dialogs\AddGroupDialog.xaml" />
     <None Remove="Dialogs\AddNovelDialog.xaml" />
+    <None Remove="Dialogs\AddReplaceDialog.xaml" />
     <None Remove="Dialogs\AddSourceDialog.xaml" />
+    <None Remove="Dialogs\GroupDialog.xaml" />
+    <None Remove="Pages\BookmarkPage.xaml" />
+    <None Remove="Pages\ExplorePage.xaml" />
+    <None Remove="Pages\HelpPage.xaml" />
+    <None Remove="Pages\HistoryPage.xaml" />
     <None Remove="Pages\HomePage.xaml" />
     <None Remove="Pages\MainPage.xaml" />
+    <None Remove="Pages\NovelPage.xaml" />
     <None Remove="Pages\ReadPage.xaml" />
+    <None Remove="Pages\Rules\ChapterRulePage.xaml" />
+    <None Remove="Pages\Rules\DictionaryRulePage.xaml" />
+    <None Remove="Pages\Rules\EditSourcePage.xaml" />
+    <None Remove="Pages\Rules\ReplaceRulePage.xaml" />
     <None Remove="Pages\SettingPage.xaml" />
+    <None Remove="Pages\Settings\AboutPage.xaml" />
+    <None Remove="Pages\Settings\BakPage.xaml" />
+    <None Remove="Pages\Settings\OtherPage.xaml" />
+    <None Remove="Pages\Settings\ThemePage.xaml" />
+    <None Remove="Pages\SourcePage.xaml" />
     <None Remove="Pages\StartupPage.xaml" />
     <None Remove="Themes\BaseStyle.xaml" />
     <None Remove="Themes\Button.xaml" />
     <None Remove="Themes\DarkTheme.xaml" />
     <None Remove="Themes\LightTheme.xaml" />
     <None Remove="Themes\Novel.xaml" />
+    <None Remove="Themes\Panel.xaml" />
+    <None Remove="Themes\Rule.xaml" />
+    <None Remove="Themes\TitleBar.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,11 +61,14 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.18" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.10" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.5.1" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230724000" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231115000" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.2428" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -57,10 +83,41 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\shared\ZoDream.Shared.Http\ZoDream.Shared.Http.csproj" />
     <ProjectReference Include="..\..\ZoDream.Resources\ZoDream.Resources.csproj" />
+    <ProjectReference Include="..\..\ZoDream.Shared.Animations\ZoDream.Shared.Animations.csproj" />
     <ProjectReference Include="..\..\ZoDream.Shared.Font\ZoDream.Shared.Font.csproj" />
     <ProjectReference Include="..\..\ZoDream.Shared.Plugins\ZoDream.Shared.Plugins.csproj" />
     <ProjectReference Include="..\..\ZoDream.Shared.Repositories\ZoDream.Shared.Repositories.csproj" />
     <ProjectReference Include="..\..\ZoDream.Shared\ZoDream.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\TextContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\AddGroupDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\GroupDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\NovelPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Themes\Rule.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\SourcePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Dialogs\AddNovelDialog.xaml">
@@ -98,9 +155,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Converters\" />
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Themes\DarkTheme.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -125,6 +179,11 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\Rules\ChapterRulePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 
   <!-- 
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 
@@ -134,4 +193,85 @@
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="Pages\Rules\EditSourcePage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="Pages\Rules\EditSourcePage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Themes\Panel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\HelpPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\Settings\OtherPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\Settings\ThemePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\Settings\BakPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\AddDictionaryDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\AddChapterRuleDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\AddReplaceDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\BookmarkPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\HistoryPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\Rules\DictionaryRulePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\Rules\ReplaceRulePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Themes\TitleBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\ExplorePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\Settings\AboutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 </Project>

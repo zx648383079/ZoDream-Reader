@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="ZoDream.Reader.Dialogs.GroupDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
+    mc:Ignorable="d"
+    Title="分组管理"
+    PrimaryButtonText="添加"
+    SecondaryButtonText="确认">
+
+    <ContentDialog.DataContext>
+        <vm:GroupViewModel/>
+    </ContentDialog.DataContext>
+
+    <Grid>
+        <ListBox ItemsSource="{Binding GroupItems}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <ctl:GroupListItem/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</ContentDialog>

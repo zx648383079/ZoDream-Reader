@@ -6,10 +6,57 @@
     xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    xmlns:ctl="using:ZoDream.Reader.Controls"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:ReadViewModel/>
+    </Page.DataContext>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
 
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="标题" VerticalAlignment="Center"/>
+            <TextBlock Text="0/10" Grid.Column="1" VerticalAlignment="Center"/>
+            <CommandBar Grid.Column="2">
+                <AppBarButton Icon="Previous" Label="上一章"/>
+                <AppBarButton Icon="List" Label="目录" Command="{Binding CatalogCommand}"/>
+                <AppBarButton Icon="Next" Label="下一章"/>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton Icon="Setting" Label="设置"/>
+                </CommandBar.SecondaryCommands>
+            </CommandBar>
+        </Grid>
+
+        <ctl:ContentPanel Header="目录" IsOpen="{Binding CatalogOpen,Mode=TwoWay}"
+                          Grid.RowSpan="2">
+            <ListBox ItemsSource="{Binding Items}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Title}" VerticalAlignment="Center"/>
+                            <FontIcon Glyph="&#xE73E;" 
+                                      VerticalAlignment="Center"
+                                      Visibility="{Binding IsChecked,Converter={StaticResource ToggleCvt}}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ctl:ContentPanel>
     </Grid>
 </Page>

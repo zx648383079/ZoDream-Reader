@@ -6,6 +6,12 @@
     <Style TargetType="ctl:NovelListItem">
         <Setter Property="FirstIcon" Value="&#xE81C;"/>
         <Setter Property="SecondIcon" Value="&#xE74C;"/>
+        <Setter Property="Title" Value="标题"/>
+        <Setter Property="FirstText" Value="标题"/>
+        <Setter Property="SecondText" Value="标题"/>
+        <Setter Property="Author" Value="做好"/>
+        <Setter Property="Width" Value="360"/>
+        <Setter Property="Height" Value="120"/>
         <Setter Property="FontFamily" Value="{StaticResource ContentControlThemeFontFamily}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -16,24 +22,38 @@
                         BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="20"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="20"/>
+                                <RowDefinition Height="20"/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <Image Source="{TemplateBinding Cover}"/>
-                            <TextBlock Text="{TemplateBinding Title}" Grid.Column="1" Grid.ColumnSpan="2"/>
-                            <FontIcon Glyph="&#xE77B;" Grid.Column="1" Grid.Row="1"/>
-                            <TextBlock Text="{TemplateBinding Author}" Grid.Column="2" Grid.Row="1"/>
-                            <FontIcon Glyph="{TemplateBinding FirstIcon}" Grid.Column="1" Grid.Row="2"/>
-                            <TextBlock Text="{TemplateBinding FirstText}" Grid.Column="2" Grid.Row="2"/>
-                            <FontIcon Glyph="{TemplateBinding SecondIcon}" Grid.Column="1" Grid.Row="3"/>
-                            <TextBlock Text="{TemplateBinding SecondText}" Grid.Column="2" Grid.Row="3"/>
+                            <Image Source="{TemplateBinding Cover}" Grid.RowSpan="4" 
+                                   Stretch="UniformToFill" Margin="0,0,10,0"/>
+                            <TextBlock Text="{TemplateBinding Title}" 
+                                        VerticalAlignment="Center"
+                                       FontWeight="Bold"
+                                       Grid.Column="1" Grid.ColumnSpan="2"/>
+                            <FontIcon Glyph="&#xE77B;" 
+                                      FontSize="{TemplateBinding IconFontSize}" 
+                                      VerticalAlignment="Center"
+                                      Grid.Column="1" Grid.Row="1"/>
+                            <TextBlock Text="{TemplateBinding Author}" 
+                                       Grid.Column="2" Grid.Row="1" VerticalAlignment="Center"/>
+                            <FontIcon Glyph="{TemplateBinding FirstIcon}" 
+                                      FontSize="{TemplateBinding IconFontSize}" 
+                                      Grid.Column="1" Grid.Row="2" VerticalAlignment="Center"/>
+                            <TextBlock Text="{TemplateBinding FirstText}" 
+                                       Grid.Column="2" Grid.Row="2" VerticalAlignment="Center"/>
+                            <FontIcon Glyph="{TemplateBinding SecondIcon}" 
+                                       VerticalAlignment="Top" FontSize="{TemplateBinding IconFontSize}" 
+                                      Grid.Column="1" Grid.Row="3" Margin="0,5,0,0"/>
+                            <TextBlock Text="{TemplateBinding SecondText}" 
+                                       Grid.Column="2" Grid.Row="3"/>
                         </Grid>
                     </Border>
                 </ControlTemplate>
@@ -56,6 +76,34 @@
                             </Grid.RowDefinitions>
                             <TextBlock Text="目录"/>
                             <ListBox Grid.Row="1"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style TargetType="ctl:GroupListItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ctl:GroupListItem">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox/>
+                            <TextBlock Grid.Column="1"/>
+                            <CommandBar Grid.Column="2">
+                                <AppBarButton Icon="Edit" Label="编辑"/>
+                                <AppBarButton Icon="Delete" Label="删除"/>
+                            </CommandBar>
                         </Grid>
                     </Border>
                 </ControlTemplate>

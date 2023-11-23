@@ -1,21 +1,9 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using ZoDream.Reader.Pages;
+using System.Diagnostics;
 using ZoDream.Reader.Repositories;
 using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Interfaces.Route;
+using ZoDream.Shared.ViewModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -30,10 +18,39 @@ namespace ZoDream.Reader
         public MainWindow()
         {
             this.InitializeComponent();
-            ExtendsContentIntoTitleBar = true;
-            SetTitleBar(AppTitleBar);
-            App.GetService<AppViewModel>().BaseWindow = this;
-            (App.GetService<IRouter>() as Router)?.BindMain(AppFrame, ReadFrame);
+            ViewModel.BaseWindow = this;
+            ViewModel.TitleBar = AppTitleBar;
+            BindRouter();
+        }
+
+        public AppViewModel ViewModel => App.GetService<AppViewModel>();
+
+        private void BindRouter()
+        {
+            if (App.GetService<IRouter>() is not Router router)
+            {
+                return;
+            }
+            router.BindMain(AppFrame, ReadFrame);
+            AppTitleBar.BackCommand = new RelayCommand(_ => {
+                Debug.WriteLine(1);
+                router.GoBackAsync();
+            });
+            router.RouteChanged += Router_RouteChanged;
+        }
+
+
+        private void Router_RouteChanged(object sender, RoutedEventArgs e)
+        {
+            if (sender is Router router)
+            {
+                AppTitleBar.BackVisible = router.IsBackVisible ? Visibility.Visible : Visibility.Collapsed;
+                if (!router.IsMenuVisible)
+                {
+                    AppTitleBar.MenuVisible = Visibility.Collapsed;
+                }
+                
+            }   
         }
     }
 }

@@ -8,5 +8,7 @@ namespace ZoDream.Shared.Repositories
     {
         AppTheme,
         AppLanguage,
+        AppInstalled,
+        LibraryPath
     }
 }

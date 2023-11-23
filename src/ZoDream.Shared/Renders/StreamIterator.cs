@@ -19,8 +19,8 @@ namespace ZoDream.Shared.Renders
             _reader = new FileStream(fileName, FileMode.Open);
         }
 
-        private string _fileName;
-        private FileStream _reader;
+        private readonly string _fileName;
+        private readonly FileStream _reader;
         private Encoding? _encoding;
         private volatile bool _isLoading = false;
 

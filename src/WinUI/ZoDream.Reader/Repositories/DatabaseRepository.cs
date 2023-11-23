@@ -12,15 +12,15 @@ using ZoDream.Shared.Storage;
 
 namespace ZoDream.Reader.Repositories
 {
-    public class Database : IDatabaseRepository
+    public class DatabaseRepository : IDatabaseRepository
     {
-        public Database(StorageFile dbFile)
+        public DatabaseRepository(StorageFile dbFile)
         {
             AppData.DefaultFileName = Path.Combine(ApplicationData.Current.LocalFolder.Path, "setting.xml");
             connection = new SqliteConnection($"Data Source={dbFile.Path}");
             connection.Open();
         }
-        private SqliteConnection connection;
+        private readonly SqliteConnection connection;
 
         public void DeleteBook(object id)
         {
@@ -131,10 +131,9 @@ namespace ZoDream.Reader.Repositories
 
         public static void Initialize(StorageFile dbFile)
         {
-            using (var db = new SqliteConnection($"Data Source={dbFile.Path}"))
-            {
-                db.Open();
-                var sql = @"
+            using var db = new SqliteConnection($"Data Source={dbFile.Path}");
+            db.Open();
+            var sql = @"
 CREATE TABLE IF NOT EXISTS Book (
     Id    INTEGER NOT NULL,
 	Name  TEXT NOT NULL,
@@ -151,9 +150,8 @@ CREATE TABLE IF NOT EXISTS Setting (
 	PRIMARY KEY(Name)
 );
 ";
-                var createTable = new SqliteCommand(sql, db);
-                createTable.ExecuteReader();
-            }
+            var createTable = new SqliteCommand(sql, db);
+            createTable.ExecuteReader();
         }
 
         

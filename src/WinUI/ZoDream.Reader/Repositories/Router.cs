@@ -2,24 +2,34 @@
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces.Route;
-using System.Collections;
 using ZoDream.Reader.Pages;
 using ZoDream.Reader.ViewModels;
+using System.Linq;
 
 namespace ZoDream.Reader.Repositories
 {
     public class Router: IRouter
     {
+        public const string HomeRoute = "home";
+
         private Frame MainFrame;
         private Frame SingleFrame;
         private Frame InnerFrame;
         private readonly Dictionary<string, RouteItem> Routes = new();
 
-        private string CurrentRoute = string.Empty;
+        private readonly List<string> Histories = new();
+
+        private RouteItem CurrentRoute => Histories.Count == 0 ? null : 
+            Routes[Histories.Last()];
+
+        public event RoutedEventHandler RouteChanged;
+
+        public bool IsMenuVisible => Histories.Count > 1 && CurrentRoute.RouteType == RouteType.None;
+
+        public bool IsBackVisible => CanGoBack;
+
+        public bool CanGoBack => Histories.Count > 1 || Histories.Last() != HomeRoute;
 
         public void RegisterRoute(string routeName, Type page)
         {
@@ -73,7 +83,7 @@ namespace ZoDream.Reader.Repositories
 
         public void GoToAsync(string routeName)
         {
-            if (CurrentRoute == routeName)
+            if (CurrentRoute?.RouteName == routeName)
             {
                 return;
             }
@@ -99,13 +109,17 @@ namespace ZoDream.Reader.Repositories
                         if (InnerFrame is null)
                         {
                             MainFrame.Navigate(typeof(MainPage));
-                            return;
+                            break;
                         }
                         InnerFrame.Navigate(route.PageType);
                         break;
                 }
             });
-            CurrentRoute = route.RouteName;
+            if (Histories.Count == 0 || Histories.Last() != route.RouteName)
+            {
+                Histories.Add(route.RouteName);
+            }
+            RouteChanged?.Invoke(this, null);
         }
 
         private RouteType GetType(string routeName)
@@ -121,7 +135,7 @@ namespace ZoDream.Reader.Repositories
         {
             if (MainFrame is null)
             {
-                CurrentRoute = routeName;
+                Histories.Add(routeName);
                 return;
             }
             if (!Routes.TryGetValue(routeName, out var route))
@@ -162,6 +176,35 @@ namespace ZoDream.Reader.Repositories
         //    return instance;
         //}
 
+        public void GoBackAsync()
+        {
+            if (Histories.Count < 1)
+            {
+                Histories.Clear();
+                GoToAsync(HomeRoute);
+                return;
+            }
+            App.GetService<AppViewModel>().DispatcherQueue?.TryEnqueue(() => {
+                var last = CurrentRoute;
+                Histories.RemoveAt(Histories.Count - 1);
+                if (last.RouteType == RouteType.Single)
+                {
+                    if (CurrentRoute?.RouteType == RouteType.Single)
+                    {
+                        SingleFrame.GoBack();
+                        return;
+                    }
+                    ToggleFrame(true);
+                    return;
+                }
+                if (InnerFrame is not null && InnerFrame.CanGoBack)
+                {
+                    InnerFrame.GoBack();
+                }
+            });
+            RouteChanged?.Invoke(this, null);
+        }
+
         private void ToggleFrame(bool isMain)
         {
             if (MainFrame is null || SingleFrame is null)
@@ -180,7 +223,7 @@ namespace ZoDream.Reader.Repositories
         {
             MainFrame = frame;
             SingleFrame = singleFrame;
-            if (frame is null || string.IsNullOrEmpty(CurrentRoute))
+            if (frame is null || Histories.Count == 0)
             {
                 return;
             }
@@ -190,7 +233,7 @@ namespace ZoDream.Reader.Repositories
         public void BindInner(Frame frame)
         {
             InnerFrame = frame;
-            if (frame is null || string.IsNullOrEmpty(CurrentRoute))
+            if (frame is null || Histories.Count == 0)
             {
                 return;
             }
@@ -200,7 +243,7 @@ namespace ZoDream.Reader.Repositories
         public void Dispose()
         {
             Routes.Clear();
-            // Histories.Clear();
+            Histories.Clear();
         }
 
         private class RouteItem

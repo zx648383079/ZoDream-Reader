@@ -1,0 +1,26 @@
+﻿<ContentDialog
+    x:Class="ZoDream.Reader.Dialogs.AddDictionaryDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ZoDream.Shared.Repositories.Models"
+    mc:Ignorable="d"
+    Title="字典规则"
+    PrimaryButtonText="保存"
+    SecondaryButtonText="取消">
+
+    <ContentDialog.DataContext>
+        <vm:DictionaryRuleModel/>
+    </ContentDialog.DataContext>
+
+    <StackPanel>
+        <TextBlock Text="规则名称" Style="{StaticResource InputHeaderStyle}"/>
+        <TextBox Text="{Binding Name, Mode=TwoWay}" Style="{StaticResource InputEntryStyle}"/>
+        <TextBlock Text="URL规则" Style="{StaticResource InputHeaderStyle}"/>
+        <TextBox Text="{Binding UrlRule, Mode=TwoWay}" Style="{StaticResource InputEntryStyle}"/>
+        <TextBlock Text="显示规则" Style="{StaticResource InputHeaderStyle}"/>
+        <TextBox Text="{Binding ShowRule, Mode=TwoWay}" Style="{StaticResource InputEntryStyle}"/>
+    </StackPanel>
+</ContentDialog>

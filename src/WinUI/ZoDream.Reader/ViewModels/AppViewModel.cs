@@ -1,17 +1,24 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Windows.Foundation;
 using Windows.Globalization;
+using Windows.Graphics;
+using Windows.Storage;
+using Windows.Storage.AccessCache;
 using Windows.UI;
 using WinRT.Interop;
+using ZoDream.Reader.Controls;
 using ZoDream.Reader.Repositories;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Route;
@@ -19,10 +26,14 @@ using ZoDream.Shared.Repositories;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class AppViewModel
+    public partial class AppViewModel
     {
+        public AppViewModel()
+        {
+            _setting = App.GetService<ISettingRepository>();
+        }
 
-
+        private readonly ISettingRepository _setting;
         private Window _baseWindow;
         private IntPtr _baseWindowHandle;
         private AppWindow _appWindow;
@@ -38,39 +49,63 @@ namespace ZoDream.Reader.ViewModels
         /// <summary>
         /// UI线程.
         /// </summary>
-        public DispatcherQueue DispatcherQueue  => _baseWindow?.DispatcherQueue;
+        public DispatcherQueue DispatcherQueue  => _baseWindow!.DispatcherQueue;
 
-        public XamlRoot BaseXamlRoot => _baseWindow?.Content.XamlRoot;
+        public XamlRoot BaseXamlRoot => _baseWindow!.Content.XamlRoot;
+
+        public IDatabaseRepository Database { get; private set; }
+        public DiskRepository Storage { get; private set; }
+
+
+        public bool IsFirstLaunchEver => !_setting.Exist(SettingNames.AppInstalled);
+
+        public bool HasLibrary {
+            get {
+                var path = _setting.Get(SettingNames.LibraryPath, string.Empty);
+                return !string.IsNullOrEmpty(path) && Directory.Exists(path);
+            }
+        }
 
         /// <summary>
         /// 获取当前版本号.
         /// </summary>
         /// <returns>版本号.</returns>
-        public string GetVersionNumber()
+        public string Version
         {
-            var version = Package.Current.Id.Version;
-            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+            get {
+                var version = Package.Current.Id.Version;
+                return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+            }
         }
 
-        public async Task Initialize()
+        public async Task InitializeAsync()
         {
-            var setting = App.GetService<ISettingRepository>();
-            await setting.LoadAsync();
+            await _setting.LoadAsync();
             InitializeTheme();
             var sysLan = CultureInfo.CurrentCulture.TwoLetterISOLanguageName.StartsWith("zh") ? "zh-CN" : "en-US";
-            var customLan = setting.Get(SettingNames.AppLanguage, sysLan);
+            var customLan = _setting.Get(SettingNames.AppLanguage, sysLan);
             ApplicationLanguages.PrimaryLanguageOverride = customLan;
-            App.GetService<IRouter>().GoToAsync("startup");
+            if (HasLibrary)
+            {
+                await InitializeWorkspaceAsync(await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(AppConstants.WorkspaceToken));
+            }
+            App.GetService<IRouter>().GoToAsync(HasLibrary ? Router.HomeRoute : "startup");
         }
 
         public void InitializePicker(object target)
         {
-            WinRT.Interop.InitializeWithWindow.Initialize(target, _baseWindowHandle);
+            InitializeWithWindow.Initialize(target, _baseWindowHandle);
+        }
+
+        public IAsyncOperation<ContentDialogResult> OpenDialogAsync(ContentDialog target)
+        {
+            target.XamlRoot = BaseXamlRoot;
+            return target.ShowAsync();
         }
 
         public void InitializeTheme()
         {
-            var localTheme = App.GetService<ISettingRepository>().Get<string>(SettingNames.AppTheme, AppConstants.ThemeDefault);
+            var localTheme = App.GetService<ISettingRepository>().Get(SettingNames.AppTheme, AppConstants.ThemeDefault);
             if (localTheme != AppConstants.ThemeDefault)
             {
                 Application.Current.RequestedTheme = localTheme == AppConstants.ThemeLight ?
@@ -79,45 +114,19 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        public void InitializeTitleBar()
-        {
-            if (_appWindow is null)
-            {
-                return;
-            }
-            var bar = _appWindow.TitleBar;
-            bar.ExtendsContentIntoTitleBar = true;
-            if (Application.Current.RequestedTheme == ApplicationTheme.Light)
-            {
-                bar.BackgroundColor = Colors.White;
-                bar.InactiveBackgroundColor = Colors.White;
-                bar.ButtonBackgroundColor = Color.FromArgb(255, 240, 243, 249);
-                bar.ButtonForegroundColor = Colors.DarkGray;
-                bar.ButtonHoverBackgroundColor = Colors.LightGray;
-                bar.ButtonHoverForegroundColor = Colors.DarkGray;
-                bar.ButtonPressedBackgroundColor = Colors.Gray;
-                bar.ButtonPressedForegroundColor = Colors.DarkGray;
-                bar.ButtonInactiveBackgroundColor = Color.FromArgb(255, 240, 243, 249);
-                bar.ButtonInactiveForegroundColor = Colors.Gray;
-            }
-            else
-            {
-                bar.BackgroundColor = Color.FromArgb(255, 240, 243, 249);
-                bar.InactiveBackgroundColor = Colors.Black;
-                bar.ButtonBackgroundColor = Color.FromArgb(255, 32, 32, 32);
-                bar.ButtonForegroundColor = Colors.White;
-                bar.ButtonHoverBackgroundColor = Color.FromArgb(255, 20, 20, 20);
-                bar.ButtonHoverForegroundColor = Colors.White;
-                bar.ButtonPressedBackgroundColor = Color.FromArgb(255, 40, 40, 40);
-                bar.ButtonPressedForegroundColor = Colors.White;
-                bar.ButtonInactiveBackgroundColor = Color.FromArgb(255, 32, 32, 32);
-                bar.ButtonInactiveForegroundColor = Colors.Gray;
-            }
-        }
 
         public void FullScreenAsync(bool isFull)
         {
             _appWindow.SetPresenter(isFull ? AppWindowPresenterKind.FullScreen : AppWindowPresenterKind.Default);
+        }
+
+        internal async Task InitializeWorkspaceAsync(StorageFolder folder, bool createNew = false)
+        {
+            _setting.Set(SettingNames.AppInstalled, true);
+            _setting.Set(SettingNames.LibraryPath, folder.Path);
+            Storage = new DiskRepository(folder);
+            Database = createNew ? await Storage.CreateDatabaseAsync() : 
+                await Storage.OpenDatabaseAsync();
         }
     }
 }

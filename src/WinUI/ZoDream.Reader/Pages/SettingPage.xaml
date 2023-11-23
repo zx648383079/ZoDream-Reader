@@ -7,10 +7,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:lbs="using:CommunityToolkit.Labs.WinUI"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    mc:Ignorable="d">
 
-    <Grid RowSpacing="20">
+    <Page.DataContext>
+        <vm:SettingViewModel/>
+    </Page.DataContext>
+    
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -37,37 +41,42 @@
 
         <TextBlock
             x:Name="HeaderText"
-            Style="{StaticResource TitleTextBlockStyle}"
-            Margin="{StaticResource DefaultContainerPadding}"
-            HorizontalAlignment="Left"
-            Text="设置" />
+            Style="{StaticResource PageHeaderStyle}"
+            Text="设置"/>
         <ScrollViewer
             x:Name="MainViewer"
             Grid.Row="1"
-            Padding="{StaticResource DefaultContainerPadding}"
+            Padding="{StaticResource ContainerPadding}"
             HorizontalScrollMode="Disabled"
             VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="0,0,0,24" Spacing="4">
+            <StackPanel Spacing="4">
                 <StackPanel.ChildrenTransitions>
                     <RepositionThemeTransition IsStaggeringEnabled="False" />
                 </StackPanel.ChildrenTransitions>
-                <lbs:SettingsCard Header="书源管理" Description="新建、导入、编辑或管理书源"/>
-                <lbs:SettingsCard Header="TXT目录规则" Description="配置TXT目录规则"/>
-                <lbs:SettingsCard Header="替换净化" Description="配置替换净化"/>
-                <lbs:SettingsCard Header="字典规则" Description="配置字典规则"/>
-                <lbs:SettingsCard Header="主题模式" Description="选择主题模式"/>
+                <lbs:SettingsCard Header="书源管理" Description="新建、导入、编辑或管理书源" IsClickEnabled="True" Command="{Binding SourceCommand}"/>
+                <lbs:SettingsCard Header="TXT目录规则" Description="配置TXT目录规则" IsClickEnabled="True" Command="{Binding ChapterCommand}"/>
+                <lbs:SettingsCard Header="替换净化" Description="配置替换净化" IsClickEnabled="True" Command="{Binding ReplaceCommand}"/>
+                <lbs:SettingsCard Header="字典规则" Description="配置字典规则" IsClickEnabled="True" Command="{Binding DictionaryCommand}"/>
+                <lbs:SettingsCard Header="主题模式" Description="选择主题模式">
+                    <ComboBox>
+                        <ComboBoxItem>跟随系统</ComboBoxItem>
+                        <ComboBoxItem>亮色主题</ComboBoxItem>
+                        <ComboBoxItem>暗色主题</ComboBoxItem>
+                        <ComboBoxItem>E-Ink(墨水屏)</ComboBoxItem>
+                    </ComboBox>
+                </lbs:SettingsCard>
                 <lbs:SettingsCard Header="Web服务" Description="用浏览器写源或看书">
                     <ToggleSwitch/>
                 </lbs:SettingsCard>
-                <TextBlock Text="设置" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="{StaticResource GroupGapPadding}"/>
-                <lbs:SettingsCard Header="备份与恢复"/>
-                <lbs:SettingsCard Header="主题设置"/>
-                <lbs:SettingsCard Header="其他设置"/>
-                <TextBlock Text="其他" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="{StaticResource GroupGapPadding}"/>
-                <lbs:SettingsCard Header="书签"/>
-                <lbs:SettingsCard Header="阅读记录"/>
-                <lbs:SettingsCard Header="文件管理"/>
-                <lbs:SettingsCard Header="关于"/>
+                <TextBlock Text="设置" Style="{StaticResource GroupHeaderStyle}"/>
+                <lbs:SettingsCard Header="备份与恢复" IsClickEnabled="True" Command="{Binding BakCommand}"/>
+                <lbs:SettingsCard Header="主题设置" IsClickEnabled="True" Command="{Binding ThemeCommand}"/>
+                <lbs:SettingsCard Header="其他设置" IsClickEnabled="True" Command="{Binding OtherCommand}"/>
+                <TextBlock Text="其他" Style="{StaticResource GroupHeaderStyle}"/>
+                <lbs:SettingsCard Header="书签" IsClickEnabled="True" Command="{Binding BookmarkCommand}"/>
+                <lbs:SettingsCard Header="阅读记录" IsClickEnabled="True" Command="{Binding HistoryCommand}"/>
+                <lbs:SettingsCard Header="文件管理" IsClickEnabled="True"/>
+                <lbs:SettingsCard Header="关于" IsClickEnabled="True" Command="{Binding AboutCommand}"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

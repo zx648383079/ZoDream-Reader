@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Models;
 
 namespace ZoDream.Shared.Interfaces
 {
-    public interface IDiskRepository<FolderT, FileT>
+    public interface IDiskRepository
     {
-        public FolderT BaseFolder { get; }
-
-        public FolderT BookFolder { get; }
-
-        public FolderT ThemeFolder {  get; }
-
-        public Task<FileT> CreateDatabaseAsync();
-
-        public Task<FileT> GetBookAsync(BookItem item);
+        public Task<IDatabaseRepository> CreateDatabaseAsync();
+        public Task<IDatabaseRepository> OpenDatabaseAsync();
 
         public Task<string> GetBookPathAsync(BookItem item);
 
@@ -25,13 +19,13 @@ namespace ZoDream.Shared.Interfaces
         public Task<string> GetFileUriAsync(string fileName);
         public Task<string> GetFilePathAsync(string fileName);
 
-        public Task<BookItem?> AddBookAsync(FileT file);
+        public Task<BookItem?> AddBookAsync<T>(T file);
 
-        public Task<string?> AddImageAsync(FileT file);
+        public Task<string?> AddImageAsync<T>(T file);
 
         public Task DeleteBookAsync(BookItem item);
 
-        public Task<FontItem?> AddFontAsync(FileT file);
+        public Task<FontItem?> AddFontAsync<T>(T file);
 
         public Task ClearThemeAsync();
 

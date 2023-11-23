@@ -8,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using ZoDream.Reader.Utils;
+using ZoDream.Shared.Interfaces.Route;
+using ZoDream.Shared.Repositories.Entities;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,9 +34,6 @@ namespace ZoDream.Reader.Controls
         // Using a DependencyProperty as the backing store for Cover.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CoverProperty =
             DependencyProperty.Register("Cover", typeof(ImageSource), typeof(NovelListItem), new PropertyMetadata(null));
-
-
-
 
         public string Title {
             get { return (string)GetValue(TitleProperty); }
@@ -106,5 +106,86 @@ namespace ZoDream.Reader.Controls
 
 
 
+
+        public double IconFontSize {
+            get { return (double)GetValue(IconFontSizeProperty); }
+            set { SetValue(IconFontSizeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for IconFontSize.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IconFontSizeProperty =
+            DependencyProperty.Register("IconFontSize", typeof(double), typeof(NovelListItem), new PropertyMetadata(12.0));
+
+
+        public INovelEntity Source {
+            get { return (INovelEntity)GetValue(SourceProperty); }
+            set { SetValue(SourceProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SourceProperty =
+            DependencyProperty.Register("Source", typeof(INovelEntity), typeof(NovelListItem), new PropertyMetadata(null, OnSourceUpdated));
+
+
+        public event TappedEventHandler Touched;
+        public event TappedEventHandler LongTouched;
+        private DateTime _lastTouchStart;
+
+
+
+        private static void OnSourceUpdated(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            (d as NovelListItem)?.UpdateSource();
+        }
+
+        private void UpdateSource()
+        {
+            if (Source == null)
+            {
+                return;
+            }
+            Title = Source.Name;
+            Cover = Converter.ToImg(Source.Cover);
+            // Author = Source.Author;
+        }
+
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+        {
+            base.OnPointerPressed(e);
+            _lastTouchStart = DateTime.Now;
+        }
+
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+        {
+            base.OnPointerReleased(e);
+            OnTouchEnd();
+        }
+
+        protected override void OnManipulationStarted(ManipulationStartedRoutedEventArgs e)
+        {
+            base.OnManipulationStarted(e);
+            _lastTouchStart = DateTime.Now;
+        }
+
+        protected override void OnManipulationCompleted(ManipulationCompletedRoutedEventArgs e)
+        {
+            base.OnManipulationCompleted(e);
+            OnTouchEnd();
+        }
+
+        private void OnTouchEnd()
+        {
+            var diff = DateTime.Now - _lastTouchStart;
+            var router = App.GetService<IRouter>();
+            if (diff.TotalSeconds > 1)
+            {
+                LongTouched?.Invoke(this, new TappedRoutedEventArgs());
+                router.GoToAsync("novel");
+            } else
+            {
+                Touched?.Invoke(this, new TappedRoutedEventArgs());
+                router.GoToAsync("read");
+            }
+        }
     }
 }

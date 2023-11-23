@@ -69,4 +69,30 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="ctl:IconLabel">
+        <Setter Property="Margin" Value="0,5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ctl:IconLabel">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Glyph="{TemplateBinding Icon}" 
+                                      VerticalAlignment="Top" FontSize="{TemplateBinding FontSize}"/>
+                            <TextBlock Text="{TemplateBinding Text}"
+                                       FontSize="{TemplateBinding FontSize}" Grid.Column="1" 
+                                       VerticalAlignment="Top"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

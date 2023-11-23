@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ZoDream.Reader.Pages.SourcePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
+    mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:SourceViewModel/>
+    </Page.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <ListBox ItemsSource="{Binding SourceItems}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <ctl:SourceRuleItem/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <CommandBar Grid.Row="1">
+            <AppBarButton Icon="List" Label="切换选择"/>
+            <AppBarButton Icon="Edit" Label="编辑"/>
+            <AppBarButton Icon="Delete" Label="删除"/>
+            <AppBarButton Icon="Add" Label="添加" Command="{Binding AddCommand}"/>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Icon="Directions" Label="分组管理" Command="{Binding GroupCommand}"/>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Grid>
+</Page>

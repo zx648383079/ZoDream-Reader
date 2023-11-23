@@ -1,0 +1,50 @@
+﻿<Page
+    x:Class="ZoDream.Reader.Pages.Rules.ReplaceRulePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Pages.Rules"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
+    mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:ReplaceRuleViewModel/>
+    </Page.DataContext>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <ListBox ItemsSource="{Binding RuleItems}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox IsChecked="{Binding IsChecked}"/>
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Grid.Column="1"/>
+                        <ToggleSwitch IsOn="{Binding IsEnabled}" Grid.Column="2"/>
+                        <CommandBar Grid.Column="3">
+                            <AppBarButton Icon="Edit" Label="编辑"/>
+                            <AppBarButton Icon="Delete" Label="删除"/>
+                        </CommandBar>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <CommandBar Grid.Row="1">
+            <AppBarButton Icon="List" Label="切换选择"/>
+            <AppBarButton Icon="Edit" Label="编辑"/>
+            <AppBarButton Icon="Delete" Label="删除"/>
+            <AppBarButton Icon="Add" Label="添加" Command="{Binding AddCommand}"/>
+        </CommandBar>
+    </Grid>
+</Page>

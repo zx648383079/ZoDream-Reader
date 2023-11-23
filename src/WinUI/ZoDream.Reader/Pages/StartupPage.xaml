@@ -8,8 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ctl="using:ZoDream.Reader.Controls"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    mc:Ignorable="d">
 
     <Page.DataContext>
         <vm:StartupViewModel/>
@@ -34,7 +33,8 @@
 
             <!--<InfoBar IsOpen="True" Severity="Error" Title="{Binding Tip}" Message="h"/>-->
 
-            <ctl:LargeIconButton Icon="&#xE838;" Header="打开文件夹" Meta="选择一个已存在" Command="{Binding OpenCommand}"/>
+            <ctl:LargeIconButton Icon="&#xE838;" Header="打开文件夹" Meta="选择一个已存在" 
+                                 Command="{Binding OpenCommand}" Margin="0,40,0,0"/>
             <ctl:LargeIconButton Icon="&#xE710;" Header="创建新" Meta="创建新的" Command="{Binding CreateCommand}"/>
         </StackPanel>
         <!--<InfoBar BorderThickness="0" Severity="Informational" Title="h" Message="应用当前支持.txt" IsOpen="True" IsClosable="False" Grid.Column="1" Grid.Row="1"/>-->

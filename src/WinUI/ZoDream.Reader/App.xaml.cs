@@ -5,6 +5,8 @@ using System.Text;
 using Windows.ApplicationModel.Activation;
 using Windows.Globalization;
 using ZoDream.Reader.Pages;
+using ZoDream.Reader.Pages.Rules;
+using ZoDream.Reader.Pages.Settings;
 using ZoDream.Reader.Repositories;
 using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Interfaces;
@@ -30,7 +32,7 @@ namespace ZoDream.Reader
             this.InitializeComponent();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             RegisterServices();
-            _ = GetService<AppViewModel>().Initialize();
+            _ = GetService<AppViewModel>().InitializeAsync();
         }
 
         /// <summary>
@@ -67,8 +69,22 @@ namespace ZoDream.Reader
             Locator.ServiceCollection.AddSingleton<ISettingRepository, SettingRepository>();
             var router = new Router();
             router.RegisterRoute("startup", typeof(StartupPage));
-            router.RegisterRoute("home", typeof(HomePage), true);
+            router.RegisterRoute(Router.HomeRoute, typeof(HomePage), true);
+            router.RegisterRoute("explore", typeof(ExplorePage), true);
+            router.RegisterRoute("novel", typeof(NovelPage), true);
+            router.RegisterRoute("help", typeof(HelpPage), true);
             router.RegisterRoute("setting", typeof(SettingPage), true);
+            router.RegisterRoute("setting/bak", typeof(BakPage), true);
+            router.RegisterRoute("setting/theme", typeof(ThemePage), true);
+            router.RegisterRoute("setting/other", typeof(OtherPage), true);
+            router.RegisterRoute("about", typeof(AboutPage), true);
+            router.RegisterRoute("history", typeof(HistoryPage), true);
+            router.RegisterRoute("bookmark", typeof(BookmarkPage), true);
+            router.RegisterRoute("rule/source", typeof(SourcePage), true);
+            router.RegisterRoute("rule/chapter", typeof(ChapterRulePage), true);
+            router.RegisterRoute("rule/replace", typeof(ReplaceRulePage), true);
+            router.RegisterRoute("rule/dictionary", typeof(DictionaryRulePage), true);
+            router.RegisterRoute("read", typeof(ReadPage), RouteType.Single);
             Locator.ServiceCollection.AddSingleton<IRouter>(router);
         }
     }

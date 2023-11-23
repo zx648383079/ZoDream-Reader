@@ -1,0 +1,43 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using ZoDream.Shared.Repositories.Entities;
+using ZoDream.Shared.ViewModels;
+
+namespace ZoDream.Reader.ViewModels
+{
+    public class ReadViewModel: BindableBase
+    {
+
+        public ReadViewModel()
+        {
+            CatalogCommand = new RelayCommand(TapCatalog);
+        }
+
+
+        private ObservableCollection<ChapterModel> item = new();
+
+        public ObservableCollection<ChapterModel> Items {
+            get => item;
+            set => Set(ref item, value);
+        }
+
+        private bool catalogOpen;
+
+        public bool CatalogOpen {
+            get => catalogOpen;
+            set => Set(ref catalogOpen, value);
+        }
+
+        public ICommand CatalogCommand { get; private set; }
+
+        private void TapCatalog(object? _)
+        {
+            CatalogOpen = !CatalogOpen;
+        }
+    }
+}

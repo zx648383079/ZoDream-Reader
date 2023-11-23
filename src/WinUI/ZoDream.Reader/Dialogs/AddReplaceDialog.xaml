@@ -1,0 +1,41 @@
+﻿<ContentDialog
+    x:Class="ZoDream.Reader.Dialogs.AddReplaceDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ZoDream.Shared.Repositories.Models"
+    mc:Ignorable="d"
+    Title="替换规则编辑"
+    PrimaryButtonText="保存"
+    SecondaryButtonText="取消">
+
+    <ContentDialog.DataContext>
+        <vm:ReplaceRuleModel/>
+    </ContentDialog.DataContext>
+
+    <ScrollViewer>
+        <StackPanel>
+            <TextBlock Text="规则名称" Style="{StaticResource InputHeaderStyle}"/>
+            <TextBox Style="{StaticResource InputEntryStyle}"/>
+            <TextBlock Text="分组" Style="{StaticResource InputHeaderStyle}"/>
+            <TextBox Style="{StaticResource InputEntryStyle}"/>
+            <TextBlock Text="匹配规则" Style="{StaticResource InputHeaderStyle}"/>
+            <TextBox Style="{StaticResource InputEntryStyle}"/>
+            <ToggleSwitch OnContent="使用正则表达式" OffContent="使用文字匹配"/>
+            <TextBlock Text="替换为" Style="{StaticResource InputHeaderStyle}"/>
+            <TextBox Style="{StaticResource InputEntryStyle}"/>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Content="作用于标题"/>
+                <CheckBox Content="作用于内容"/>
+            </StackPanel>
+            <TextBlock Text="替换范围，选填书名或书源URL" Style="{StaticResource InputHeaderStyle}"/>
+            <TextBox Style="{StaticResource InputEntryStyle}"/>
+            <TextBlock Text="排除范围，选填书名或书源URL" Style="{StaticResource InputHeaderStyle}"/>
+            <TextBox Style="{StaticResource InputEntryStyle}"/>
+            <TextBlock Text="超时毫秒数" Style="{StaticResource InputHeaderStyle}"/>
+            <NumberBox Style="{StaticResource InputEntryStyle}"/>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

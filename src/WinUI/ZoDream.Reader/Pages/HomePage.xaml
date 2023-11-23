@@ -6,10 +6,35 @@
     xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
+    mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:ShelfViewModel/>
+    </Page.DataContext>
 
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <GridView ItemsSource="{Binding NovelItems}" 
+                  SelectionMode="None" Background="Transparent">
+            <GridView.ItemTemplate>
+                <DataTemplate>
+                    <ctl:NovelListItem Source="{Binding}"/>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+        <CommandBar Grid.Row="1">
+            <AppBarButton Icon="List" Label="切换选择"/>
+            <AppBarButton Icon="Edit" Label="编辑"/>
+            <AppBarButton Icon="Delete" Label="删除"/>
+            <AppBarButton Icon="Add" Label="添加" Command="{Binding AddCommand}"/>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Icon="Library" Label="分组"/>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
     </Grid>
 </Page>

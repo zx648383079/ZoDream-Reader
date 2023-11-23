@@ -5,18 +5,18 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    mc:Ignorable="d">
 
-    <NavigationView ItemInvoked="NavigationView_ItemInvoked" IsBackButtonVisible="Collapsed">
+    <NavigationView x:Name="MenuBar" ItemInvoked="NavigationView_ItemInvoked"
+                    IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False">
         <NavigationView.MenuItems>
             <NavigationViewItem Icon="Bookmarks" Content="我的书架" Tag="home" />
-            <NavigationViewItem Icon="Globe" Content="探索发现" Tag="SamplePage2" />
-            <NavigationViewItem Icon="World" Content="书源管理" Tag="SamplePage3" />
+            <NavigationViewItem Icon="Globe" Content="探索发现" Tag="explore" />
+            <NavigationViewItem Icon="World" Content="书源管理" Tag="rule/source" />
         </NavigationView.MenuItems>
-        <NavigationView.PaneFooter>
-            <NavigationViewItem Icon="Help"  Content="帮助支持" Tag="help" />
-        </NavigationView.PaneFooter>
-        <Frame x:Name="ContentFrame" Padding="{StaticResource DefaultPagePadding}" />
+        <NavigationView.FooterMenuItems>
+            <NavigationViewItem Icon="Help"  Content="帮助支持" Tag="help"/>
+        </NavigationView.FooterMenuItems>
+        <Frame x:Name="ContentFrame"/>
     </NavigationView>
 </Page>

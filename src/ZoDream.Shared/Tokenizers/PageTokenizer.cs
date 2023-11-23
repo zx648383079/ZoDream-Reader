@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,98 +10,12 @@ namespace ZoDream.Shared.Tokenizers
 {
     public class PageTokenizer: IPageTokenizer
     {
-        public double Width { get; set; }
 
-        public double Height { get; set; }
-
-        /// <summary>
-        /// 单个字的大小
-        /// </summary>
-        public int FontSize { get; set; } = 20;
-
-        public int LineSpace { get; set; } = 2;
-
-        public int LetterSpace { get; set; } = 2;
-
-        public int Left { get; set; } = 10;
-
-        public int Right {  get; set; } = 10;
-
-        public int Top {  get; set; } = 10;
-
-        public int Bottom {  get; set; } = 10;
-
-        public int Gap {  get; set; } = 20;
-
-        public int ColumnCount { get; set; } = 1;
+        public PageSetting Setting { get; set; } = new();
 
         public ICharIterator? Content {  get; set; }
 
-        public double PageInnerWidth
-        {
-            get {
-                return (Width - Left - Right - (ColumnCount - 1) * Gap) / ColumnCount;
-            }
-        }
-
-        public double PageInnerHeight
-        {
-            get
-            {
-                return Height - Top - Bottom;
-            }
-        }
-
-        public double PageX(int column)
-        {
-            return Left + column * (PageInnerWidth + Gap);
-        }
-
-        public double PageY(int column)
-        {
-            return Top;
-        }
-        public double LineY(int index)
-        {
-            return Top + index * (FontSize + LineSpace);
-        }
-
-        public double FontX(int column, int index)
-        {
-            return FontX(PageX(column), index);
-        }
-
-        public double FontX(double pageX, int index)
-        {
-            return pageX + index * (FontSize + LetterSpace);
-        }
-        public double FontWidth(double count)
-        {
-            return count * (FontSize + LetterSpace);
-        }
-        public double FontWidth(char? code)
-        {
-            if (code == null)
-            {
-                return 0;
-            }
-            if (code == '\t')
-            {
-                return FontWidth(2);
-            }
-            if ((code >= 48 && code <= 57) 
-                || (code >= 64 && code <= 90))
-            {
-                return FontWidth(.8);
-            }
-            if (code == 46 ||
-                (code >= 97 && code <= 122))
-            {
-                return FontWidth(.6);
-            }
-            return FontWidth(1);
-        }
-
+        
         #region 缓存数据
 
         public Regex ChapterRegex = new(@"^(正文)?[\s]{0,6}第?[\s]*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?[\s\S]{0,20}$");
@@ -112,7 +24,7 @@ namespace ZoDream.Shared.Tokenizers
         
         public IList<ChapterPositionItem> CacheChapters {  get; private set; } = new List<ChapterPositionItem>();
         
-        private IDictionary<int, PageItem> CachePageData = new Dictionary<int, PageItem>();
+        private readonly IDictionary<int, PageItem> CachePageData = new Dictionary<int, PageItem>();
         private bool IsLoading = false;
         /// <summary>
         /// 当前页码
@@ -219,13 +131,13 @@ namespace ZoDream.Shared.Tokenizers
                 return data;
             }
             
-            var maxH = PageInnerHeight;
-            var maxW = PageInnerWidth;
+            var maxH = Setting.PageInnerHeight;
+            var maxW = Setting.PageInnerWidth;
             if (maxH <= 0 || maxW <= 0)
             {
                 throw new ArgumentOutOfRangeException("view size error");
             }
-            var fontH = FontSize + LineSpace;
+            var fontH = Setting.FontSize + Setting.LineSpace;
             var x = .0;
             var y = .0;
             var position = 0L;
@@ -261,7 +173,7 @@ namespace ZoDream.Shared.Tokenizers
 
                 for (int i = 0; i < lineStr.Length; i++)
                 {
-                    var fontW = FontWidth((char?)lineStr[i]);
+                    var fontW = Setting.FontWidth((char?)lineStr[i]);
                     if (x +  fontW > maxW)
                     {
                         x = 0;
@@ -308,13 +220,13 @@ namespace ZoDream.Shared.Tokenizers
                 return data;
             }
 
-            var maxH = PageInnerHeight;
-            var maxW = PageInnerWidth;
+            var maxH = Setting.PageInnerHeight;
+            var maxW = Setting.PageInnerWidth;
             if (maxH <= 0 || maxW <= 0)
             {
                 throw new ArgumentOutOfRangeException("view size error");
             }
-            var fontH = FontSize + LineSpace;
+            var fontH = Setting.FontSize + Setting.LineSpace;
             var x = .0;
             var y = .0;
             var position = 0L;
@@ -337,7 +249,7 @@ namespace ZoDream.Shared.Tokenizers
                 var lineStr = line.ToString();
                 for (int i = 0; i < lineStr.Length; i++)
                 {
-                    var fontW = FontWidth((char?)lineStr[i]);
+                    var fontW = Setting.FontWidth((char?)lineStr[i]);
                     if (x + fontW > maxW)
                     {
                         x = 0;
@@ -390,9 +302,9 @@ namespace ZoDream.Shared.Tokenizers
                 return data;
             }
             await Content.SeekAsync(data.Begin.Position >= 0 ? data.Begin.Position : 0);
-            var maxH = PageInnerHeight;
-            var maxW = PageInnerWidth;
-            var fontH = FontSize + LineSpace;
+            var maxH = Setting.PageInnerHeight;
+            var maxW = Setting.PageInnerWidth;
+            var fontH = Setting.FontSize + Setting.LineSpace;
             var x = .0;
             var y = .0;
             var offset = data.Begin.Offset;
@@ -410,7 +322,7 @@ namespace ZoDream.Shared.Tokenizers
                 for (; i < line.Length; i++)
                 {
                     var code = line[i];
-                    var fontW = FontWidth((char?)code);
+                    var fontW = Setting.FontWidth((char?)code);
                     if (x + fontW > maxW)
                     {
                         x = 0;
@@ -467,7 +379,7 @@ namespace ZoDream.Shared.Tokenizers
             for (int i = 0; i < count; i++)
             {
                 var page = await GetPageAsync(position);
-                ResetPage(PageX(i), PageY(i), ref page);
+                ResetPage(Setting.PageX(i), Setting.PageY(i), ref page);
                 items.Add(page);
                 position = page.End + 1;
             }
@@ -585,14 +497,14 @@ namespace ZoDream.Shared.Tokenizers
                 Thread.Sleep(50);
             }
             var items = new List<PageItem>();
-            for (int i = 0; i < ColumnCount; i++)
+            for (int i = 0; i < Setting.ColumnCount; i++)
             {
                 var item = await GetPageAsync(page + i);
                 if (item == null)
                 {
                     break;
                 }
-                ResetPage(PageX(i), PageY(i), ref item);
+                ResetPage(Setting.PageX(i), Setting.PageY(i), ref item);
                 items.Add(item);
             }
             UpdateCachePages(page);
@@ -603,8 +515,8 @@ namespace ZoDream.Shared.Tokenizers
         {
             IsLoading = true;
             var pageCount = 3;
-            var min = Math.Max(0, page - pageCount * ColumnCount);
-            var max = Math.Min(PageCount - 1, page + pageCount * ColumnCount);
+            var min = Math.Max(0, page - pageCount * Setting.ColumnCount);
+            var max = Math.Min(PageCount - 1, page + pageCount * Setting.ColumnCount);
 
             var keys = new int[CachePageData.Keys.Count];
             CachePageData.Keys.CopyTo(keys, 0);
@@ -671,7 +583,7 @@ namespace ZoDream.Shared.Tokenizers
             {
                 return new List<PageItem>();
             }
-            Page += ColumnCount;
+            Page += Setting.ColumnCount;
             return await GetAsync();
         }
 
@@ -685,7 +597,7 @@ namespace ZoDream.Shared.Tokenizers
             {
                 return new List<PageItem>();
             }
-            Page -= ColumnCount;
+            Page -= Setting.ColumnCount;
             return await GetAsync();
         }
 

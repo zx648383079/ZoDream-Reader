@@ -10,10 +10,11 @@ using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
 using ZoDream.Shared.Font;
 using Microsoft.Graphics.Canvas.Text;
+using ZoDream.Shared.Repositories;
 
 namespace ZoDream.Reader.Repositories
 {
-    public class Disk : IDiskRepository<StorageFolder, StorageFile>
+    public class DiskRepository : IDiskRepository
     {
         public StorageFolder BaseFolder { get; private set; }
         public StorageFolder BookFolder { get; private set; }
@@ -34,7 +35,7 @@ namespace ZoDream.Reader.Repositories
 
         public async Task<BookItem> AddTxt(StorageFile file)
         {
-            var name = file.Name.Substring(0, file.Name.IndexOf('.'));
+            var name = file.Name[..file.Name.IndexOf('.')];
             var fileId = file.Name;
             await file.CopyAsync(BookFolder);
             return new BookItem(name, fileId);
@@ -42,18 +43,18 @@ namespace ZoDream.Reader.Repositories
 
         public async Task<FontItem> AddFont(StorageFile file)
         {
-            var name = file.Name.Substring(0, file.Name.IndexOf('.'));
+            var name = file.Name[..file.Name.IndexOf('.')];
             var fileId = file.Name;
-            var tempfile = await file.CopyAsync(ThemeFolder, file.Name, NameCollisionOption.ReplaceExisting);
+            var tempFile = await file.CopyAsync(ThemeFolder, file.Name, NameCollisionOption.ReplaceExisting);
             //var factory = DWriteCreateFactory<IDWriteFactory>();
-            //var fontRef = factory.CreateFontFileReference(tempfile.Path);
-            //fontRef.Analyze(out var isSupprted, out var fontFileType, out var fontFaceType, out var numberOfFaces);
-            //if (!isSupprted)
+            //var fontRef = factory.CreateFontFileReference(tempFile.Path);
+            //fontRef.Analyze(out var isSupported, out var fontFileType, out var fontFaceType, out var numberOfFaces);
+            //if (!isSupported)
             //{
             //    return null;
             //}
             //var fontFace = factory.CreateFontFace(fontFaceType, new []{ fontRef });
-            var items = await FontHelper.GetFontFamilyAsync(tempfile.Path);
+            var items = await FontHelper.GetFontFamilyAsync(tempFile.Path);
             return new FontItem(items.FirstOrDefault().Name)
             {
                 FileName = fileId,
@@ -62,21 +63,23 @@ namespace ZoDream.Reader.Repositories
 
 
 
-        public Disk(StorageFolder folder = null)
+        public DiskRepository(StorageFolder folder = null)
         {
-            BaseFolder = folder == null ? ApplicationData.Current.LocalFolder : folder;
+            BaseFolder = folder ?? ApplicationData.Current.LocalFolder;
             Init();
         }
 
         private async void Init()
         {
-            BookFolder = await BaseFolder.CreateFolderAsync("txt", CreationCollisionOption.OpenIfExists);
+            BookFolder = BaseFolder;//await BaseFolder.CreateFolderAsync("txt", CreationCollisionOption.OpenIfExists);
             ThemeFolder = await BaseFolder.CreateFolderAsync("theme", CreationCollisionOption.OpenIfExists);
         }
 
-        public async Task<StorageFile> CreateDatabaseAsync()
+        public async Task<IDatabaseRepository> CreateDatabaseAsync()
         {
-            return await BaseFolder.CreateFileAsync("zodream.db", CreationCollisionOption.OpenIfExists);
+            var file = await BaseFolder.CreateFileAsync(AppConstants.DatabaseFileName, CreationCollisionOption.ReplaceExisting);
+            DatabaseRepository.Initialize(file);
+            return new DatabaseRepository(file);
         }
 
         public Task<string> GetFileUriAsync(string fileName)
@@ -174,6 +177,27 @@ namespace ZoDream.Reader.Repositories
 
             }
             return items;
+        }
+
+        public async Task<IDatabaseRepository> OpenDatabaseAsync()
+        {
+            return new DatabaseRepository(await BaseFolder.CreateFileAsync(AppConstants.DatabaseFileName, CreationCollisionOption.OpenIfExists));
+        }
+
+
+        public Task<BookItem> AddBookAsync<T>(T file)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> AddImageAsync<T>(T file)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FontItem> AddFontAsync<T>(T file)
+        {
+            throw new NotImplementedException();
         }
     }
 }
