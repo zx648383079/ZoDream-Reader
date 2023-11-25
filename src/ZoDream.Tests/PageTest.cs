@@ -13,8 +13,8 @@ public class PageTest
     public async void TestPages()
     {
         var tokenizer = new PageTokenizer();
-        tokenizer.Width = 600;
-        tokenizer.Height = 600;
+        //tokenizer.Width = 600;
+        //tokenizer.Height = 600;
         tokenizer.Content = new StreamIterator("D:\\Downloads\\hash.txt");
         await tokenizer.Refresh();
         var page = await tokenizer.GetAsync();

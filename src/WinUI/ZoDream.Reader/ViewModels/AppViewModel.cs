@@ -23,6 +23,7 @@ using ZoDream.Reader.Repositories;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Repositories;
+using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -30,10 +31,15 @@ namespace ZoDream.Reader.ViewModels
     {
         public AppViewModel()
         {
+            BackCommand = new RelayCommand(TapBack);
+            MenuCommand = new RelayCommand(TapMenu);
             _setting = App.GetService<ISettingRepository>();
+            _router = (Router)App.GetService<IRouter>();
+            _router.RouteChanged += Router_RouteChanged;
         }
 
         private readonly ISettingRepository _setting;
+        private readonly Router _router;
         private Window _baseWindow;
         private IntPtr _baseWindowHandle;
         private AppWindow _appWindow;

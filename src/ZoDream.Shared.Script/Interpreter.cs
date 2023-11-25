@@ -8,7 +8,8 @@ namespace ZoDream.Shared.Script
     {
         public object Execute(string code)
         {
-            return false;
+            var func = new Parser().ParseProgram(code);
+            return func.Compile().DynamicInvoke();
         }
 
         public T Execute<T>(string code)

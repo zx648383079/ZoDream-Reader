@@ -12,20 +12,50 @@ namespace ZoDream.Reader.Repositories
     public class Router: IRouter
     {
         public const string HomeRoute = "home";
+        public const string MainRoute = "main";
 
-        private Frame MainFrame;
-        private Frame SingleFrame;
-        private Frame InnerFrame;
+        private Frame? MainFrame;
+        private Frame? SingleFrame;
+        private Frame? InnerFrame;
         private readonly Dictionary<string, RouteItem> Routes = new();
 
         private readonly List<string> Histories = new();
 
-        private RouteItem CurrentRoute => Histories.Count == 0 ? null : 
+        public RouteItem? CurrentRoute => Histories.Count == 0 ? null : 
             Routes[Histories.Last()];
 
-        public event RoutedEventHandler RouteChanged;
+        public object? CurrentPage 
+        {
+            get {
+                if (MainFrame is null)
+                {
+                    return null;
+                }
+                var route = CurrentRoute!;
+                return route.RouteType switch
+                {
+                    RouteType.Single => SingleFrame?.Content,
+                    RouteType.None => InnerFrame?.Content,
+                    _ => MainFrame?.Content,
+                };
+            }
+        }
+        public object? CurrentRootPage {
+            get {
+                if (MainFrame is null)
+                {
+                    return null;
+                }
+                var route = CurrentRoute!;
+                return route.RouteType switch
+                {
+                    RouteType.Single => SingleFrame?.Content,
+                    _ => MainFrame?.Content,
+                };
+            }
+        }
 
-        public bool IsMenuVisible => Histories.Count > 1 && CurrentRoute.RouteType == RouteType.None;
+        public event RoutedEventHandler? RouteChanged;
 
         public bool IsBackVisible => CanGoBack;
 
@@ -50,15 +80,9 @@ namespace ZoDream.Reader.Repositories
             RegisterRoute(routeName, page, viewModel, RouteType.None);
         }
 
-        public void RegisterRoute(string routeName, Type page, Type viewModel, RouteType routeType)
+        public void RegisterRoute(string routeName, Type page, Type? viewModel, RouteType routeType)
         {
-            var route = new RouteItem()
-            {
-                RouteName = routeName,
-                PageType = page,
-                ViewType = viewModel,
-                RouteType = routeType
-            };
+            var route = new RouteItem(routeName, page, viewModel, routeType);
             if (!Routes.TryAdd(routeName, route))
             {
                 Routes[routeName] = route;
@@ -101,14 +125,14 @@ namespace ZoDream.Reader.Repositories
                         break;
                     case RouteType.Single:
                         ToggleFrame(false);
-                        SingleFrame.Navigate(route.PageType);
+                        SingleFrame?.Navigate(route.PageType);
                         break;
                     case RouteType.None:
                     default:
                         ToggleFrame(true);
                         if (InnerFrame is null)
                         {
-                            MainFrame.Navigate(typeof(MainPage));
+                            NavigatePage(MainFrame, MainRoute);
                             break;
                         }
                         InnerFrame.Navigate(route.PageType);
@@ -120,6 +144,16 @@ namespace ZoDream.Reader.Repositories
                 Histories.Add(route.RouteName);
             }
             RouteChanged?.Invoke(this, null);
+        }
+
+
+        private void NavigatePage(Frame? frame, string routeName)
+        {
+            if (!Routes.TryGetValue(routeName, out var route))
+            {
+                return;
+            }
+            frame?.Navigate(route.PageType);
         }
 
         private RouteType GetType(string routeName)
@@ -184,14 +218,14 @@ namespace ZoDream.Reader.Repositories
                 GoToAsync(HomeRoute);
                 return;
             }
+            var last = CurrentRoute!;
+            Histories.RemoveAt(Histories.Count - 1);
             App.GetService<AppViewModel>().DispatcherQueue?.TryEnqueue(() => {
-                var last = CurrentRoute;
-                Histories.RemoveAt(Histories.Count - 1);
                 if (last.RouteType == RouteType.Single)
                 {
                     if (CurrentRoute?.RouteType == RouteType.Single)
                     {
-                        SingleFrame.GoBack();
+                        SingleFrame?.GoBack();
                         return;
                     }
                     ToggleFrame(true);
@@ -227,17 +261,17 @@ namespace ZoDream.Reader.Repositories
             {
                 return;
             }
-            Navigate(CurrentRoute);
+            Navigate(CurrentRoute!);
         }
 
-        public void BindInner(Frame frame)
+        public void BindInner(Frame? frame)
         {
             InnerFrame = frame;
             if (frame is null || Histories.Count == 0)
             {
                 return;
             }
-            Navigate(CurrentRoute);
+            Navigate(CurrentRoute!);
         }
 
         public void Dispose()
@@ -245,16 +279,33 @@ namespace ZoDream.Reader.Repositories
             Routes.Clear();
             Histories.Clear();
         }
+    }
 
-        private class RouteItem
+    public class RouteItem
+    {
+        public string RouteName { get; private set; } = string.Empty;
+        public Type PageType { get; private set; }
+
+        public Type? ViewType { get; private set; }
+
+        public RouteType RouteType { get; private set; } = RouteType.None;
+
+        public RouteItem(string name, Type pageType)
         {
-            public string RouteName { get; set; } = string.Empty;
-            public Type PageType { get; set; }
+            RouteName = name;
+            PageType = pageType;
+        }
 
-            public Type ViewType { get; set; }
+        public RouteItem(string name, Type pageType, RouteType routeType)
+            : this(name, pageType)
+        {
+            RouteType = routeType;
+        }
 
-            public RouteType RouteType { get; set; } = RouteType.None;
-
+        public RouteItem(string name, Type pageType, Type? viewType, RouteType routeType)
+            : this(name, pageType, routeType)
+        {
+            ViewType = viewType;
         }
     }
 

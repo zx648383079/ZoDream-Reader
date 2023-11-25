@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using ZoDream.Shared.Database.Adapters;
 
 namespace ZoDream.Shared.Database
 {
     public interface IDatabase: IDatabaseQuery
-    {      
+    {
+
+        public IBuilderGrammar Grammar { get; }
+
         public object Insert<T>(string tableName, string primaryKeyName, 
             bool autoIncrement, T data);
    

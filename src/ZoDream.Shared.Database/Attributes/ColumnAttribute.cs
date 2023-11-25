@@ -12,6 +12,8 @@ namespace ZoDream.Shared.Database
             Name = name; 
         }
         public string Name { get; set; }
+
+        public int Length { get; set; }
         public bool ExactNameMatch { get; set; }
     }
 }

@@ -16,7 +16,7 @@
             <TextBlock Text="书源名" Style="{StaticResource InputHeaderStyle}"/>
             <TextBox Style="{StaticResource InputEntryStyle}"/>
 
-            <TextBox Text="网址" Style="{StaticResource InputHeaderStyle}"/>
+            <TextBlock Text="网址" Style="{StaticResource InputHeaderStyle}"/>
             <TextBox Style="{StaticResource InputEntryStyle}"/>
 
             <CheckBox Content="支持发现模块"/>

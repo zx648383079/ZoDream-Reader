@@ -29,7 +29,7 @@ namespace ZoDream.Shared.Database.Mappers
                 {
                     continue;
                 }
-                var name = GetPropertyName(item);
+                var name = ReflectionHelper.GetPropertyName(item);
                 if (string.IsNullOrEmpty(name) || !fieldMaps.TryGetValue(name, out var i))
                 {
                     continue;
@@ -78,21 +78,7 @@ namespace ZoDream.Shared.Database.Mappers
             return Map(reader, type, 0);
         }
 
-        private string GetPropertyName(PropertyInfo info)
-        {
-            foreach (var item in info.GetCustomAttributes())
-            {
-                if (item is IgnoreAttribute)
-                {
-                    return string.Empty;
-                }
-                if (item is ColumnAttribute column)
-                {
-                    return column.Name;
-                }
-            }
-            return info.Name;
-        }
+ 
 
         public T? Map<T>(IDataReader reader, int index)
         {

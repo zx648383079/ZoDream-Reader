@@ -6,19 +6,28 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Windows.Input;
 using Windows.Foundation;
 using Windows.Graphics;
 using Windows.UI;
 using ZoDream.Reader.Controls;
+using ZoDream.Reader.Pages;
+using ZoDream.Reader.Repositories;
+using ZoDream.Shared.Interfaces.Route;
+using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
     public partial class AppViewModel
     {
-        public AppTitleBar TitleBar {  get; set; }
+        public AppTitleBar? TitleBar {  get; private set; }
+
+        public ICommand BackCommand { get; private set; }
+        public ICommand MenuCommand { get; private set; }
 
         public void InitializeTitleBar()
         {
@@ -60,6 +69,47 @@ namespace ZoDream.Reader.ViewModels
         {
             _baseWindow.ExtendsContentIntoTitleBar = true;
             _baseWindow.SetTitleBar(titleBar);
+            if (titleBar is AppTitleBar obj)
+            {
+                SetTitleBar(obj);
+            }
+        }
+
+        internal void SetTitleBar(AppTitleBar titleBar)
+        {
+            TitleBar = titleBar;
+            TitleBar.BackCommand = BackCommand;
+            TitleBar.MenuCommand = MenuCommand;
+        }
+
+        private void TapBack(object? _)
+        {
+            _router.GoBackAsync();
+        }
+
+        private void TapMenu(object? _)
+        {
+            if (_router.CurrentRootPage is MainPage o)
+            {
+                o.ToggleMenuMode();
+                return;
+            }
+            if (_router.CurrentRootPage is ReadPage r)
+            {
+                r.ViewModel.CatalogCommand.Execute(null);
+            }
+        }
+
+        private void Router_RouteChanged(object sender, RoutedEventArgs e)
+        {
+            if (TitleBar is null)
+            {
+                return;
+            }
+            TitleBar.BackVisible = _router.IsBackVisible ? Visibility.Visible : Visibility.Collapsed;
+            var route = _router.CurrentRoute;
+            TitleBar.MenuVisible = route != null && (route.RouteType == RouteType.None ||
+                route.RouteName == "read") ? Visibility.Visible : Visibility.Collapsed;
         }
 
         internal void SetTitleBar(FrameworkElement titleBar, double buttonWidth)
@@ -79,7 +129,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            var elementPoint = TitleBar.TransformToVisual(_baseWindow.Content).TransformPoint(new Point(0, 0));
+            var elementPoint = TitleBar!.TransformToVisual(_baseWindow.Content).TransformPoint(new Point(0, 0));
             var draggableRect = new RectInt32((int)(elementPoint.X * dpiScaleFactor),
                 (int)(elementPoint.Y * dpiScaleFactor),
                 (int)(TitleBar.ActualWidth * dpiScaleFactor), (int)(TitleBar.ActualHeight * dpiScaleFactor));
@@ -117,7 +167,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            var elementPoint = TitleBar.TransformToVisual(_baseWindow.Content).TransformPoint(new Point(0, 0));
+            var elementPoint = TitleBar!.TransformToVisual(_baseWindow.Content).TransformPoint(new Point(0, 0));
             var draggableRect = new RectInt32((int)Math.Round(elementPoint.X * dpiScaleFactor),
                 (int)Math.Round(elementPoint.Y * dpiScaleFactor),
                 (int)Math.Round(TitleBar.ActualWidth * dpiScaleFactor), 

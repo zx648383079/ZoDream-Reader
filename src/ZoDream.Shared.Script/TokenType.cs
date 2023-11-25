@@ -10,6 +10,8 @@ namespace ZoDream.Shared.Script
         None,
         /// <summary>End of file</summary>
         Eof,
+        InvalidChar,
+        NewLine,
 
         String,
         Number,
@@ -18,10 +20,18 @@ namespace ZoDream.Shared.Script
         /// 分隔符 ,;
         /// </summary>
         Separator,
+        Comma,
         Dot,
+        DotDot,
+        /// <summary>
+        /// :
+        /// </summary>
+        Colon,
         /// <summary>
         /// 成对出现的括号 (){}[]
         /// </summary>
         Bracket,
+
+        
     }
 }

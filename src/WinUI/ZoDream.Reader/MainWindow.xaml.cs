@@ -19,7 +19,6 @@ namespace ZoDream.Reader
         {
             this.InitializeComponent();
             ViewModel.BaseWindow = this;
-            ViewModel.TitleBar = AppTitleBar;
             BindRouter();
         }
 
@@ -32,25 +31,7 @@ namespace ZoDream.Reader
                 return;
             }
             router.BindMain(AppFrame, ReadFrame);
-            AppTitleBar.BackCommand = new RelayCommand(_ => {
-                Debug.WriteLine(1);
-                router.GoBackAsync();
-            });
-            router.RouteChanged += Router_RouteChanged;
-        }
-
-
-        private void Router_RouteChanged(object sender, RoutedEventArgs e)
-        {
-            if (sender is Router router)
-            {
-                AppTitleBar.BackVisible = router.IsBackVisible ? Visibility.Visible : Visibility.Collapsed;
-                if (!router.IsMenuVisible)
-                {
-                    AppTitleBar.MenuVisible = Visibility.Collapsed;
-                }
-                
-            }   
+            
         }
     }
 }

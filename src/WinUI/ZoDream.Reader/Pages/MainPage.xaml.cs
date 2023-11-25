@@ -36,25 +36,18 @@ namespace ZoDream.Reader.Pages
         {
             base.OnNavigatedTo(e);
             (App.GetService<IRouter>() as Router)?.BindInner(ContentFrame);
-            if (App.GetService<AppViewModel>() is AppViewModel viewModel)
-            {
-                viewModel.TitleBar.MenuVisible = Visibility.Visible;
-                viewModel.TitleBar.MenuCommand = new RelayCommand(_ => {
-                    MenuBar.PaneDisplayMode = MenuBar.PaneDisplayMode ==
+        }
+
+        public void ToggleMenuMode()
+        {
+            MenuBar.PaneDisplayMode = MenuBar.PaneDisplayMode ==
                     NavigationViewPaneDisplayMode.LeftCompact ? NavigationViewPaneDisplayMode.Auto : NavigationViewPaneDisplayMode.LeftCompact;
-                });
-            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
             (App.GetService<IRouter>() as Router)?.BindInner(null);
-            if (App.GetService<AppViewModel>() is AppViewModel viewModel)
-            {
-                viewModel.TitleBar.MenuVisible = Visibility.Collapsed;
-                viewModel.TitleBar.MenuCommand = null;
-            }
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)

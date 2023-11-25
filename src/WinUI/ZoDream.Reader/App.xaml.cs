@@ -70,6 +70,7 @@ namespace ZoDream.Reader
             var router = new Router();
             router.RegisterRoute("startup", typeof(StartupPage));
             router.RegisterRoute(Router.HomeRoute, typeof(HomePage), true);
+            router.RegisterRoute(Router.MainRoute, typeof(MainPage), RouteType.Main);
             router.RegisterRoute("explore", typeof(ExplorePage), true);
             router.RegisterRoute("novel", typeof(NovelPage), true);
             router.RegisterRoute("help", typeof(HelpPage), true);
