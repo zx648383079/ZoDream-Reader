@@ -20,9 +20,9 @@ namespace ZoDream.Shared.Database
 
         public IPage<T> Page<T>(long page, long perPage, string sql, params object[] args);
 
-        public T First<T>(string sql, params object[] args);
+        public T? First<T>(string sql, params object[] args) where T : class;
 
-        public T FirstOrDefault<T>(string sql, params object[] args);
+        public T FirstOrDefault<T>(string sql, params object[] args) where T : class;
 
         public Dictionary<TKey, TValue> Pluck<TKey, TValue>(string sql, params object[] args);
 

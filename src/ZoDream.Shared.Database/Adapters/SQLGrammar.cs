@@ -10,7 +10,75 @@ namespace ZoDream.Shared.Database.Adapters
 {
     public abstract partial class SQLGrammar
     {
-        
+
+        public string ParamPrefix { get; private set; } = "@";
+
+        public string CompileSelect(string tableName)
+        {
+            return $"SELECT * FROM {WrapName(tableName)}";
+        }
+
+        public string CompileSelectJoin(string tableName, string sql, long page, long perPage)
+        {
+            var offset = Math.Max((page - 1) * perPage, 0);
+            if (sql.StartsWith("SELECT", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return $"{sql} LIMIT {perPage} OFFSET {offset}";
+            }
+            return $"SELECT * FROM {WrapName(tableName)} {sql} LIMIT {perPage} OFFSET {offset}";
+        }
+
+        public string CompileDelete(string tableName, string primaryKeyName)
+        {
+            return $"DELETE FROM {WrapName(tableName)} WHERE {WrapName(primaryKeyName)}={ParamPrefix}0";
+        }
+
+        public string CompileDeleteJoin(string tableName, string sql)
+        {
+            if (sql.StartsWith("DELETE", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return sql;
+            }
+            return $"DELETE FROM {WrapName(tableName)} {sql}";
+        }
+
+        public string CompileUpdate(string tableName, string primaryKeyName, IEnumerable<string> columns)
+        {
+            var sql = string.Empty;
+            var i = 0;
+            foreach (var item in columns)
+            {
+                if (i > 0)
+                {
+                    sql += ", ";
+                }
+                i++;
+                sql += $"{WrapName(item)}={ParamPrefix}{i}";
+            }
+            return $"UPDATE {WrapName(tableName)} SET  WHERE {WrapName(primaryKeyName)}={ParamPrefix}0";
+        }
+
+        public string CompileUpdateJoin(string tableName, string sql)
+        {
+            if (sql.StartsWith("UPDATE", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return sql;
+            }
+            return $"UPDATE {WrapName(tableName)} {sql}";
+        }
+
+        public string CompileInsert(string tableName, string primaryKeyName, List<string> columns)
+        {
+            var field = string.Join(",", columns.Select(WrapName));
+            var value = string.Join(",", columns.Select((_, i) => ParamPrefix + i));
+            var sql = $"INSERT INTO {WrapName(tableName)}({field}) VALUES({value})";
+            if (columns.Contains(primaryKeyName))
+            {
+                return sql;
+            }
+            return $"{sql};SELECT LAST_INSERT_ID()";
+        }
+
         public void CompileCreateTable(StringBuilder builder, Table table)
         {
             builder.AppendLine($"CREATE TABLE IF NOT EXISTS {WrapName(table.Name)} (");

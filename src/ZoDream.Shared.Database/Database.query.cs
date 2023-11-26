@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Linq.Expressions;
-using System.Text;
 using ZoDream.Shared.Database.Mappers;
 
 namespace ZoDream.Shared.Database
@@ -37,6 +34,11 @@ namespace ZoDream.Shared.Database
 
         public T ExecuteScalar<T>(string sql, CommandType commandType, params object[] args)
         {
+            return (T)ExecuteScalar(typeof(T), sql, commandType, args);
+        }
+
+        public object ExecuteScalar(Type type, string sql, CommandType commandType, params object[] args)
+        {
             try
             {
                 Open();
@@ -46,9 +48,8 @@ namespace ZoDream.Shared.Database
                 {
                     return default!;
                 }
-                var t = typeof(T);
-                var u = Nullable.GetUnderlyingType(t);
-                return (T)Convert.ChangeType(val, u ?? t);
+                var u = Nullable.GetUnderlyingType(type);
+                return Convert.ChangeType(val, u ?? type);
             }
             catch (Exception)
             {
@@ -73,7 +74,7 @@ namespace ZoDream.Shared.Database
 
         public List<T> Fetch<T>()
         {
-            return Build<T>().ToList();
+            return Fetch<T>(Grammar.CompileSelect(ReflectionHelper.GetTableName(typeof(T))));
         }
 
         public List<T> Fetch<T>(string sql, params object[] args)
@@ -83,7 +84,11 @@ namespace ZoDream.Shared.Database
 
         public List<T> Fetch<T>(long page, long perPage, string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            return Fetch<T>(Grammar.CompileSelectJoin(
+                ReflectionHelper.GetTableName(typeof(T)),
+                sql,
+                page, perPage
+                ), args);
         }
 
         public IPage<T> Page<T>(long page, long perPage, string sql, params object[] args)
@@ -92,24 +97,65 @@ namespace ZoDream.Shared.Database
         }
 
 
-        public T First<T>(string sql, params object[] args)
+        public T? First<T>(string sql, params object[] args)
+            where T : class
         {
-            throw new NotImplementedException();
+            try
+            {
+                Open();
+                using var cmd = CreateCommand(_sharedConnection, CommandType.Text, sql, args);
+                var reader = cmd.ExecuteReader();
+                if (!reader.Read())
+                {
+                    return default;
+                }
+                return new TypeMapper().Map<T>(reader);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public T FirstOrDefault<T>(string sql, params object[] args)
+        public T FirstOrDefault<T>(string sql, params object[] args) 
+            where T : class
         {
-            throw new NotImplementedException();
+            var res = First<T>(sql, args);
+            if (res is null)
+            {
+                return Activator.CreateInstance<T>();
+            }
+            return res;
         }
 
         public Dictionary<TKey, TValue> Pluck<TKey, TValue>(string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Open();
+                using var cmd = CreateCommand(_sharedConnection, CommandType.Text, sql, args);
+                var reader = cmd.ExecuteReader();
+                return (Dictionary<TKey, TValue>)new TypeMapper().Map(reader, typeof(Dictionary<TKey, TValue>))!;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public List<T> Pluck<T>(string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Open();
+                using var cmd = CreateCommand(_sharedConnection, CommandType.Text, sql, args);
+                var reader = cmd.ExecuteReader();
+                return (List<T>)new TypeMapper().Map(reader, typeof(List<T>))!;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

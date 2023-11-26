@@ -33,7 +33,6 @@ namespace ZoDream.Shared.Database
         private DbConnection _sharedConnection;
 
         public IBuilderGrammar Grammar { get; private set; }
-        private string _paramPrefix = "@";
 
         public void Open()
         {
@@ -56,13 +55,13 @@ namespace ZoDream.Shared.Database
         {
             if (value is DbParameter idbParam)
             {
-                idbParam.ParameterName = string.Format("{0}{1}", _paramPrefix, cmd.Parameters.Count);
+                idbParam.ParameterName = string.Format("{0}{1}", Grammar.ParamPrefix, cmd.Parameters.Count);
                 cmd.Parameters.Add(idbParam);
                 return;
             }
 
             var p = cmd.CreateParameter();
-            p.ParameterName = string.Format("{0}{1}", _paramPrefix, cmd.Parameters.Count);
+            p.ParameterName = string.Format("{0}{1}", Grammar.ParamPrefix, cmd.Parameters.Count);
 
             ParameterHelper.SetParameterValue(Grammar, p, value);
 
@@ -81,9 +80,9 @@ namespace ZoDream.Shared.Database
             {
                 return CreateStoredProcedureCommand(connection, sql, args);
             }
-            if (_paramPrefix != "@")
+            if (Grammar.ParamPrefix != "@")
             {
-                sql = ParameterHelper.RawParamsPrefix.Replace(sql, m => _paramPrefix + m.Value.Substring(1));
+                sql = ParameterHelper.RawParamsPrefix.Replace(sql, m => Grammar.ParamPrefix + m.Value.Substring(1));
             }
             sql = sql.Replace("@@", "@");
             DbCommand cmd = connection.CreateCommand();

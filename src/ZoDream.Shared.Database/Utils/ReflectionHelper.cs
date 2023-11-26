@@ -23,6 +23,35 @@ namespace ZoDream.Shared.Database
             return info.Name;
         }
 
+        public static object GetPropertyValue(PropertyInfo info, object data)
+        {
+            return info.GetValue(data);
+        }
+
+        public static object GetPropertyValue(string name, Type type, object data)
+        {
+            var info = type.GetProperty(name);
+            if (info is not null)
+            {
+                return GetPropertyValue(info, data);
+            }
+            foreach (var item in type.GetProperties())
+            {
+                if (!item.CanRead)
+                {
+                    continue;
+                }
+                foreach (var attr in item.GetCustomAttributes<ColumnAttribute>())
+                {
+                    if (attr.Name == name)
+                    {
+                        return GetPropertyValue(item, data);
+                    }
+                }
+            }
+            return data;
+        }
+
         public static string GetTableName(Type info)
         {
             foreach (var item in info.GetCustomAttributes())
@@ -33,6 +62,37 @@ namespace ZoDream.Shared.Database
                 }
             }
             return info.Name;
+        }
+
+        public static string GetPrimaryKey(Type info)
+        {
+            var attr = info.GetCustomAttribute<PrimaryKeyAttribute>();
+            if (attr is not null)
+            {
+                return attr.Value;
+            }
+            foreach (var item in info.GetProperties())
+            {
+                var name = GetPropertyName(item);
+                if (name.Equals("ID", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return name;
+                }
+            }
+            return "ID";
+        }
+
+        public static bool IsEmpty(object val, Type type)
+        {
+            if (val is null)
+            {
+                return true;
+            }
+            if (val is string s)
+            {
+                return string.IsNullOrWhiteSpace(s);
+            }
+            return false;
         }
     }
 }
