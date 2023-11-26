@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 using ZoDream.Shared.Database.Models;
 
 namespace ZoDream.Shared.Database.Adapters
 {
-    public abstract class SQLBuilderGrammar
+    public abstract partial class SQLGrammar
     {
-
-
-
+        
         public void CompileCreateTable(StringBuilder builder, Table table)
         {
             builder.AppendLine($"CREATE TABLE IF NOT EXISTS {WrapName(table.Name)} (");
@@ -27,6 +26,15 @@ namespace ZoDream.Shared.Database.Adapters
                 }
             }
             builder.AppendLine(");");
+        }
+
+        public string CompileDropTable(string tableName)
+        {
+            return $"DROP TABLE IF EXISTS {WrapName(tableName)};";
+        }
+        public string CompileDropTable(Table table)
+        {
+            return CompileDropTable(table.Name);
         }
 
         protected virtual void CompileCreateField(StringBuilder builder, TableField field)

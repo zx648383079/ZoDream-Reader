@@ -5,7 +5,7 @@ using ZoDream.Shared.Database.Adapters;
 
 namespace ZoDream.Shared.Database
 {
-    public interface IDatabase: IDatabaseQuery
+    public interface IDatabase: IDatabaseQuery, IDisposable
     {
 
         public IBuilderGrammar Grammar { get; }

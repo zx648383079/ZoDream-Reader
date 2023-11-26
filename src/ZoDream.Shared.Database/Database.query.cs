@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq.Expressions;
 using System.Text;
+using ZoDream.Shared.Database.Mappers;
 
 namespace ZoDream.Shared.Database
 {
@@ -12,27 +13,72 @@ namespace ZoDream.Shared.Database
 
         public int Execute(string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            return Execute(sql, CommandType.Text, args);
+        }
+
+        public int Execute(string sql, CommandType commandType, params object[] args)
+        {
+            try
+            {
+                Open();
+                using var cmd = CreateCommand(_sharedConnection, commandType, sql, args);
+                return cmd.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public T ExecuteScalar<T>(string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            return ExecuteScalar<T>(sql, CommandType.Text, args);
+        }
+
+        public T ExecuteScalar<T>(string sql, CommandType commandType, params object[] args)
+        {
+            try
+            {
+                Open();
+                using var cmd = CreateCommand(_sharedConnection, commandType, sql, args);
+                var val = cmd.ExecuteScalar();
+                if (val == null || val == DBNull.Value)
+                {
+                    return default!;
+                }
+                var t = typeof(T);
+                var u = Nullable.GetUnderlyingType(t);
+                return (T)Convert.ChangeType(val, u ?? t);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public List<object> Fetch(Type type, string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Open();
+                using var cmd = CreateCommand(_sharedConnection, CommandType.Text, sql, args);
+                var reader = cmd.ExecuteReader();
+                return new TypeMapper().MapList(reader, type)!;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public List<T> Fetch<T>()
         {
-            throw new NotImplementedException();
+            return Build<T>().ToList();
         }
 
         public List<T> Fetch<T>(string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            return (List<T>)(object)Fetch(typeof(T), sql, args);
         }
 
         public List<T> Fetch<T>(long page, long perPage, string sql, params object[] args)

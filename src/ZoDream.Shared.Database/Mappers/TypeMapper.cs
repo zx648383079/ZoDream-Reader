@@ -38,6 +38,24 @@ namespace ZoDream.Shared.Database.Mappers
             }
             return data;
         }
+
+        public List<object> MapList(IDataReader reader, Type itemType)
+        {
+            var maps = GetFieldMap(reader);
+            var items = new List<object>();
+            while (reader.Read())
+            {
+                if (itemType.IsClass)
+                {
+                    items.Add(Map(reader, itemType, 0)!);
+                    continue;
+                }
+                items.Add(Map(reader, itemType, maps)!);
+            }
+            return items;
+        }
+
+
         public object? Map(IDataReader reader, Type type)
         {
             if (type.IsClass && type.GenericTypeArguments.Length == 0)
@@ -47,18 +65,7 @@ namespace ZoDream.Shared.Database.Mappers
             }
             if (type.IsArray || type == typeof(IList<>) || type == typeof(IPage<>))
             {
-                var maps = GetFieldMap(reader);
-                var itemType = type.GetGenericArguments()[0];
-                var items = new List<object?>();
-                while (reader.Read())
-                {
-                    if (itemType.IsClass)
-                    {
-                        items.Add(Map(reader, itemType, 0));
-                        continue;
-                    }
-                    items.Add(Map(reader, itemType, maps));
-                }
+                var items = MapList(reader, type.GetGenericArguments()[0]);
                 if (type.IsArray)
                 {
                     return items.ToArray();
@@ -77,8 +84,6 @@ namespace ZoDream.Shared.Database.Mappers
             }
             return Map(reader, type, 0);
         }
-
- 
 
         public T? Map<T>(IDataReader reader, int index)
         {

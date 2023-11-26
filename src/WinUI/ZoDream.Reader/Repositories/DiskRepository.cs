@@ -63,7 +63,7 @@ namespace ZoDream.Reader.Repositories
 
 
 
-        public DiskRepository(StorageFolder folder = null)
+        public DiskRepository(StorageFolder? folder = null)
         {
             BaseFolder = folder ?? ApplicationData.Current.LocalFolder;
             Init();
@@ -78,8 +78,9 @@ namespace ZoDream.Reader.Repositories
         public async Task<IDatabaseRepository> CreateDatabaseAsync()
         {
             var file = await BaseFolder.CreateFileAsync(AppConstants.DatabaseFileName, CreationCollisionOption.ReplaceExisting);
-            DatabaseRepository.Initialize(file);
-            return new DatabaseRepository(file);
+            var database = new DatabaseRepository(file);
+            database.Initialize();
+            return database;
         }
 
         public Task<string> GetFileUriAsync(string fileName)

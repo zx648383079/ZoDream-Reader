@@ -6,8 +6,14 @@ using ZoDream.Shared.Database.Models;
 
 namespace ZoDream.Shared.Database.Migrations
 {
-    public class Migration: IMigration
+    public abstract class Migration(IDatabase database) : IMigration
     {
+        public IDatabase Database { get; private set; } = database;
+
+        public abstract void Down();
+        public abstract void Seed();
+        public abstract void Up();
+
         public string CreateTable<T>()
             where T : class
         {
@@ -19,7 +25,22 @@ namespace ZoDream.Shared.Database.Migrations
         public void CreateTable<T>(StringBuilder builder)
             where T : class
         {
+            var table = Format<T>();
+            Database.Grammar.CompileCreateTable(builder, table);
+        }
 
+
+        public string DropTable<T>() where T : class
+        {
+            var sb = new StringBuilder();
+            DropTable<T>(sb);
+            return sb.ToString();
+        }
+
+        public void DropTable<T>(StringBuilder builder) where T : class
+        {
+            var name = ReflectionHelper.GetTableName(typeof(T));
+            builder.AppendLine(Database.Grammar.CompileDropTable(name));
         }
 
         public Table Format<T>()
@@ -71,5 +92,6 @@ namespace ZoDream.Shared.Database.Migrations
             }
             return table;
         }
+
     }
 }

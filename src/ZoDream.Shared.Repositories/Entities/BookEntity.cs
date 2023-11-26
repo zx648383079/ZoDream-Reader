@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ZoDream.Shared.Database;
 
 namespace ZoDream.Shared.Repositories.Entities
 {
+    [TableName("book")]
     public class BookEntity : INovelEntity
     {
         public string Id { get; set; } = string.Empty;

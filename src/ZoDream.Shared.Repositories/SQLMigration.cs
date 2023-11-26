@@ -1,31 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
+using ZoDream.Shared.Database;
 using ZoDream.Shared.Database.Migrations;
 using ZoDream.Shared.Repositories.Entities;
 
 namespace ZoDream.Shared.Repositories
 {
-    public class SQLMigration: Migration
+    public class SQLMigration(IDatabase database) : Migration(database)
     {
-        public string Up()
+        public override void Up()
         {
             var sb = new StringBuilder();
             CreateTable<ReplaceRuleEntity>(sb);
             CreateTable<DictionaryRuleEntity>(sb);
-            return sb.ToString();
+            Database.Execute(sb.ToString());
         }
 
-        public string Down()
+        public override void Down()
         {
-            return string.Empty;
+            var sb = new StringBuilder();
+            DropTable<ReplaceRuleEntity>(sb);
+            DropTable<DictionaryRuleEntity>(sb);
+            Database.Execute(sb.ToString());
         }
 
-        public string Seed()
+        public override void Seed()
         {
-            return string.Empty;
+            
         }
 
-
+     
     }
 }
