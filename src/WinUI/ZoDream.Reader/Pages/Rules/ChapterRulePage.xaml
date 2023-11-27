@@ -63,6 +63,9 @@
             <AppBarButton Icon="Edit" Label="编辑"/>
             <AppBarButton Icon="Delete" Label="删除"/>
             <AppBarButton Icon="Add" Label="添加" Command="{Binding AddCommand}"/>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Icon="Import" Label="导入" Command="{Binding ImportCommand}"/>
+            </CommandBar.SecondaryCommands>
         </CommandBar>
     </Grid>
 </Page>

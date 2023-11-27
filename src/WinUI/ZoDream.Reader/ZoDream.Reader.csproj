@@ -20,6 +20,7 @@
     <None Remove="Dialogs\AddReplaceDialog.xaml" />
     <None Remove="Dialogs\AddSourceDialog.xaml" />
     <None Remove="Dialogs\GroupDialog.xaml" />
+    <None Remove="Dialogs\ImportDialog.xaml" />
     <None Remove="Pages\BookmarkPage.xaml" />
     <None Remove="Pages\ExplorePage.xaml" />
     <None Remove="Pages\HelpPage.xaml" />
@@ -198,6 +199,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="Pages\Rules\EditSourcePage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\ImportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Themes\Panel.xaml">

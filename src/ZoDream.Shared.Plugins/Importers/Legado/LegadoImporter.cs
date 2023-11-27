@@ -6,5 +6,8 @@ namespace ZoDream.Shared.Plugins.Importers
 {
     public class LeGaDoImporter
     {
+
+
+        
     }
 }

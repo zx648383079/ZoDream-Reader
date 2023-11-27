@@ -18,6 +18,7 @@ namespace ZoDream.Reader.ViewModels
         public ChapterRuleViewModel()
         {
             AddCommand = new RelayCommand(TapAdd);
+            ImportCommand = new RelayCommand(TapImport);
         }
 
         private ObservableCollection<ChapterRuleModel> ruleItems = new();
@@ -29,6 +30,8 @@ namespace ZoDream.Reader.ViewModels
 
         public ICommand AddCommand { get; private set; }
 
+        public ICommand ImportCommand {  get; private set; }
+
         private async void TapAdd(object? _)
         {
             var picker = new AddChapterRuleDialog();
@@ -38,6 +41,13 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             RuleItems.Add(picker.ViewModel.Clone<ChapterRuleModel>());
+        }
+
+        private async void TapImport(object? _)
+        {
+            var picker = new ImportDialog();
+            var res = await App.GetService<AppViewModel>().OpenDialogAsync(picker);
+            
         }
     }
 }

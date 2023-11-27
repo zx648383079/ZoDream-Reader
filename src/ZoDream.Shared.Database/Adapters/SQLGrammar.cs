@@ -69,14 +69,19 @@ namespace ZoDream.Shared.Database.Adapters
 
         public string CompileInsert(string tableName, string primaryKeyName, List<string> columns)
         {
-            var field = string.Join(",", columns.Select(WrapName));
-            var value = string.Join(",", columns.Select((_, i) => ParamPrefix + i));
-            var sql = $"INSERT INTO {WrapName(tableName)}({field}) VALUES({value})";
+            var sql = CompileInsert(tableName, columns);
             if (columns.Contains(primaryKeyName))
             {
                 return sql;
             }
-            return $"{sql};SELECT LAST_INSERT_ID()";
+            return $"{sql}SELECT LAST_INSERT_ID();";
+        }
+
+        public string CompileInsert(string tableName, List<string> columns, int begin = 0)
+        {
+            var field = string.Join(",", columns.Select(WrapName));
+            var value = string.Join(",", columns.Select((_, i) => ParamPrefix + (begin + i)));
+            return $"INSERT INTO {WrapName(tableName)}({field}) VALUES({value});";
         }
 
         public void CompileCreateTable(StringBuilder builder, Table table)

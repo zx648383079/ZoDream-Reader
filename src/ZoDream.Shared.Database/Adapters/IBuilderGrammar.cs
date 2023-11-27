@@ -20,6 +20,7 @@ namespace ZoDream.Shared.Database.Adapters
         public string CompileUpdateJoin(string tableName, string sql);
 
         public string CompileInsert(string tableName, string primaryKeyName, List<string> columns);
+        public string CompileInsert(string tableName, List<string> columns, int begin = 0);
 
         public void CompileCreateTable(StringBuilder builder, Table table);
 

@@ -51,18 +51,21 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="5">
-                        <StackPanel>
+                        CornerRadius="5" Padding="20">
+                        <StackPanel Spacing="5">
                             <FontIcon Glyph="{TemplateBinding Icon}" 
                                       FontSize="{TemplateBinding IconFontSize}" 
                                       HorizontalAlignment="Center" FontWeight="Normal"
-                                      Margin="10"/>
+                                      Margin="0,0,0,10"/>
                             <TextBlock Text="{TemplateBinding Header}" FontSize="{TemplateBinding FontSize}" 
-                               FontFamily="{TemplateBinding FontFamily}" 
-                               FontWeight="{TemplateBinding FontWeight}" HorizontalAlignment="Center"/>
+                                   FontFamily="{TemplateBinding FontFamily}" 
+                                   FontWeight="{TemplateBinding FontWeight}" 
+                                       HorizontalAlignment="Center"/>
                             <TextBlock Text="{TemplateBinding Meta}" 
-                               FontSize="{TemplateBinding MetaFontSize}" 
-                               FontFamily="{TemplateBinding FontFamily}" HorizontalAlignment="Center" FontWeight="Normal"/>
+                                   FontSize="{TemplateBinding MetaFontSize}" 
+                                   FontFamily="{TemplateBinding FontFamily}" 
+                                       TextWrapping="Wrap"
+                                       HorizontalAlignment="Center" FontWeight="Normal"/>
                         </StackPanel>
                     </Border>
                 </ControlTemplate>

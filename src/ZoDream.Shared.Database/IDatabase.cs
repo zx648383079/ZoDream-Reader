@@ -15,6 +15,13 @@ namespace ZoDream.Shared.Database
         public object? Insert<T>(string tableName, string primaryKeyName, T data) where T : class;
 
         public object? Insert<T>(T data) where T : class;
+        /// <summary>
+        /// 批量插入数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public int Insert<T>(IEnumerable<T> data) where T : class;
 
         public int Update(string tableName, string primaryKeyName, object primaryKeyValue, object data, IEnumerable<string>? columns = null);
        

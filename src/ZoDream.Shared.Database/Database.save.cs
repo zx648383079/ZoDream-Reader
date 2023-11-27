@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -89,6 +86,43 @@ namespace ZoDream.Shared.Database
             }
             var key = ReflectionHelper.GetPrimaryKey(type);
             return Insert(ReflectionHelper.GetTableName(type), key, data);
+        }
+
+        public int Insert<T>(IEnumerable<T> data) where T : class
+        {
+            var type = typeof(T);
+            var items = new List<object>();
+            var keys = new List<string>();
+            var key = ReflectionHelper.GetPrimaryKey(type);
+            var maps = new Dictionary<string, PropertyInfo>();
+            foreach (var attr in type.GetProperties())
+            {
+                var name = ReflectionHelper.GetPropertyName(attr);
+                if (string.IsNullOrEmpty(name))
+                {
+                    continue;
+                }
+                maps.Add(name, attr);
+            }
+            var sb = new StringBuilder();
+            var index = 0;
+            foreach (var item in data)
+            {
+                keys.Clear();
+                foreach (var attr in maps)
+                {
+                    var val = attr.Value.GetValue(item);
+                    if (attr.Key == key && ReflectionHelper.IsEmpty(val, attr.Value.PropertyType))
+                    {
+                        continue;
+                    }
+                    keys.Add(attr.Key);
+                    items.Add(val);
+                }
+                sb.AppendLine(Grammar.CompileInsert(ReflectionHelper.GetTableName(type), keys, index));
+                index += keys.Count;
+            }
+            return Execute(sb.ToString(), items);
         }
 
         public int Update(string tableName, string primaryKeyName, object primaryKeyValue, object data, IEnumerable<string>? columns = null)
