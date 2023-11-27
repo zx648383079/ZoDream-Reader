@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using ZoDream.Reader.Utils;
+using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Repositories.Entities;
 
@@ -117,14 +118,14 @@ namespace ZoDream.Reader.Controls
             DependencyProperty.Register("IconFontSize", typeof(double), typeof(NovelListItem), new PropertyMetadata(12.0));
 
 
-        public INovelEntity Source {
-            get { return (INovelEntity)GetValue(SourceProperty); }
+        public INovel Source {
+            get { return (INovel)GetValue(SourceProperty); }
             set { SetValue(SourceProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(INovelEntity), typeof(NovelListItem), new PropertyMetadata(null, OnSourceUpdated));
+            DependencyProperty.Register("Source", typeof(INovel), typeof(NovelListItem), new PropertyMetadata(null, OnSourceUpdated));
 
 
         public event TappedEventHandler Touched;

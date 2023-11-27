@@ -88,6 +88,7 @@
     <ProjectReference Include="..\..\ZoDream.Shared.Font\ZoDream.Shared.Font.csproj" />
     <ProjectReference Include="..\..\ZoDream.Shared.Plugins\ZoDream.Shared.Plugins.csproj" />
     <ProjectReference Include="..\..\ZoDream.Shared.Repositories\ZoDream.Shared.Repositories.csproj" />
+    <ProjectReference Include="..\..\ZoDream.Shared.Script\ZoDream.Shared.Script.csproj" />
     <ProjectReference Include="..\..\ZoDream.Shared\ZoDream.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>

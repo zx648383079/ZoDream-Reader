@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ZoDream.Shared.Database;
+using ZoDream.Shared.Interfaces.Entities;
 
 namespace ZoDream.Shared.Repositories.Entities
 {
-    public class BookGroupEntity
+    [TableName("book_group")]
+    public class BookGroupEntity: INovelGroup
     {
         public int Id { get; set; }
 

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ZoDream.Shared.Interfaces.Entities;
 
 namespace ZoDream.Shared.Repositories.Entities
 {
-    public class SourceChannelEntity
+    public class SourceChannelEntity: INovelChannel
     {
 
         public string Name { get; set; } = string.Empty;

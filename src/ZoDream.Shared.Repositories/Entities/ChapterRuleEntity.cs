@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ZoDream.Shared.Database;
+using ZoDream.Shared.Interfaces.Entities;
 
 namespace ZoDream.Shared.Repositories.Entities
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Interfaces.Entities;
 
 namespace ZoDream.Shared.Plugins.Txt
 {

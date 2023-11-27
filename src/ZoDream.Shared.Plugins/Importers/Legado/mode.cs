@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace ZoDream.Shared.Plugins.Importers
 {
-    public class TxtTocRule
+    internal class TxtTocRule
     {
         [JsonProperty("id")]
         public long Id { get; set; }
@@ -23,7 +23,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public long SerialNumber { get; set; }
     }
 
-    public class ThemeConfig
+    internal class ThemeConfig
     {
         [JsonProperty("themeName")]
         public string ThemeName { get; set; }
@@ -44,7 +44,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public string BottomBackground { get; set; }
     }
 
-    public class RssSource
+    internal class RssSource
     {
         [JsonProperty("customOrder")]
         public long CustomOrder { get; set; }
@@ -62,15 +62,15 @@ namespace ZoDream.Shared.Plugins.Importers
         public string SourceGroup { get; set; }
 
         [JsonProperty("sourceIcon")]
-        public Uri SourceIcon { get; set; }
+        public string SourceIcon { get; set; }
 
         [JsonProperty("sourceName")]
         public string SourceName { get; set; }
 
         [JsonProperty("sourceUrl")]
-        public Uri SourceUrl { get; set; }
+        public string SourceUrl { get; set; }
     }
-    public class ReadConfig
+    internal class ReadConfig
     {
         [JsonProperty("bgStr")]
         public string BgStr { get; set; }
@@ -211,7 +211,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public long? TitleTopSpacing { get; set; }
     }
 
-    public class TtsSource
+    internal class TtsSource
     {
         [JsonProperty("id")]
         public long Id { get; set; }
@@ -235,7 +235,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public string LoginCheckJs { get; set; }
     }
 
-    public class Input
+    internal class Input
     {
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -244,7 +244,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public string Type { get; set; }
     }
 
-    public class DictRule
+    internal class DictRule
     {
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -262,7 +262,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public long SortNumber { get; set; }
     }
 
-    public class BookSource
+    internal class BookSource
     {
         [JsonProperty("bookSourceComment")]
         public string BookSourceComment { get; set; }
@@ -277,7 +277,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public long BookSourceType { get; set; }
 
         [JsonProperty("bookSourceUrl")]
-        public Uri BookSourceUrl { get; set; }
+        public string BookSourceUrl { get; set; }
 
         [JsonProperty("customOrder")]
         public long CustomOrder { get; set; }
@@ -328,7 +328,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public long Weight { get; set; }
     }
 
-    public class RuleBookInfo
+    internal class RuleBookInfo
     {
         public string init { get; set; }
         public string name { get; set; }
@@ -344,7 +344,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public string downloadUrls { get; set; }
     }
 
-    public class RuleContent
+    internal class RuleContent
     {
         [JsonProperty("content")]
         public string Content { get; set; }
@@ -353,7 +353,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public string PayAction { get; set; }
     }
 
-    public class Rule
+    internal class Rule
     {
         [JsonProperty("author")]
         public string Author { get; set; }
@@ -377,7 +377,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public string Name { get; set; }
     }
 
-    public class RuleToc
+    internal class RuleToc
     {
         [JsonProperty("chapterList")]
         public string ChapterList { get; set; }

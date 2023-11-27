@@ -1,4 +1,5 @@
-﻿using ZoDream.Shared.Repositories.Entities;
+﻿using ZoDream.Shared.Interfaces.Entities;
+using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Shared.Repositories.Models

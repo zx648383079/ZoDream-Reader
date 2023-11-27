@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ZoDream.Shared.Repositories.Entities
+﻿namespace ZoDream.Shared.Interfaces.Entities
 {
-    public interface INovelEntity
+    public interface INovel
     {
         public string Name { get; }
 

@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ctl="using:ZoDream.Reader.Controls"
     mc:Ignorable="d"
-    Title="导入规则">
+    Title="导入规则"
+    SecondaryButtonText="取消">
 
     <Grid ColumnSpacing="20" Width="300">
         <Grid.ColumnDefinitions>
