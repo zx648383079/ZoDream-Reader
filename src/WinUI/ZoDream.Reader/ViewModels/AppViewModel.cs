@@ -134,5 +134,10 @@ namespace ZoDream.Reader.ViewModels
             Database = createNew ? await Storage.CreateDatabaseAsync() : 
                 await Storage.OpenDatabaseAsync();
         }
+
+        internal async Task InitializeWorkspaceAsync()
+        {
+            Database = await Storage.CreateDatabaseAsync();
+        }
     }
 }

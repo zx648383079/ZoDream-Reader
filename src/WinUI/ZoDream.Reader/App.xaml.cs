@@ -49,9 +49,9 @@ namespace ZoDream.Reader
             m_window.Activate();
         }
 
-        private Window m_window;
+        private Window? m_window;
 
-        private static ServiceLocator Locator;
+        private static ServiceLocator? Locator;
 
         public static T GetService<T>()
         {
@@ -59,7 +59,7 @@ namespace ZoDream.Reader
             {
                 RegisterServices();
             }
-            return Locator.GetService<T>();
+            return Locator!.GetService<T>();
         }
 
         private static void RegisterServices()

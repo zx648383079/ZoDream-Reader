@@ -16,6 +16,7 @@ namespace ZoDream.Shared.Repositories.Entities
 
 
         public bool IsEnabled { get; set; } = true;
+        public int SortOrder { get; set; } = 99;
 
     }
 }

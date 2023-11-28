@@ -3,20 +3,14 @@
 namespace ZoDream.Shared.Database
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class PrimaryKeyAttribute : Attribute
+    public class PrimaryKeyAttribute(string primaryKey) : Attribute
     {
-        public PrimaryKeyAttribute(string primaryKey)
-        {
-            Value = primaryKey;
-            _autoIncrement = true;
-        }
-
         public PrimaryKeyAttribute(string[] primaryKey) : this(string.Join(",", primaryKey))
         {
         }
 
-        public string Value { get; private set; }
-        private bool _autoIncrement;
+        public string Value { get; private set; } = primaryKey;
+        private bool _autoIncrement = true;
         public bool AutoIncrement {
             get { return _autoIncrement; }
             set {

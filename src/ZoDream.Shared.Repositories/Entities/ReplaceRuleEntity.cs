@@ -26,6 +26,7 @@ namespace ZoDream.Shared.Repositories.Entities
         public int Timeout { get; set; } = 3000;
 
         public bool IsEnabled { get; set; } = true;
+        public int SortOrder { get; set; } = 99;
 
     }
 }

@@ -1,11 +1,10 @@
 ﻿namespace ZoDream.Shared.Interfaces.Entities
 {
-    public interface ISubscribeSource
+    public interface ISubscribeSource : IRuleItem
     {
-        public string Name { get; set; }
-
         public string GroupName { get; set; }
 
-        public bool IsEnabled { get; set; }
+        public string Url { get; set; }
+
     }
 }

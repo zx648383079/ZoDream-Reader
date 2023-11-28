@@ -5,9 +5,60 @@
     xmlns:local="using:ZoDream.Reader.Pages.Settings"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:lbs="using:CommunityToolkit.Labs.WinUI"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
     mc:Ignorable="d">
 
-    <Grid>
+    <Page.DataContext>
+        <vm:OtherViewModel/>
+    </Page.DataContext>
 
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="其他设置" Style="{StaticResource PageHeaderStyle}"/>
+        <ScrollViewer
+            Grid.Row="1"
+            Padding="{StaticResource ContainerPadding}"
+            HorizontalScrollMode="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="4">
+                <lbs:SettingsCard Header="语言">
+                    <ComboBox/>
+                </lbs:SettingsCard>
+                <TextBlock Text="主界面" Style="{StaticResource GroupHeaderStyle}"/>
+                <lbs:SettingsCard Header="自动刷新">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="自动跳转最近阅读">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="显示发现">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="显示订阅">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+                <TextBlock Text="其他设置" Style="{StaticResource GroupHeaderStyle}"/>
+                <lbs:SettingsCard Header="设置本地密码"/>
+                <lbs:SettingsCard Header="用户代理"/>
+                <lbs:SettingsCard Header="图片绘制缓存"/>
+                <lbs:SettingsCard Header="预下载"/>
+                <lbs:SettingsCard Header="默认启用替换精华">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="自动清除枸杞搜索数据">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="返回时提示放入书架">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="清理缓存" IsClickEnabled="True"/>
+                <lbs:SettingsCard Header="压缩数据库" IsClickEnabled="True"/>
+                <lbs:SettingsCard Header="清空数据" IsClickEnabled="True" Command="{Binding ClearCommand}"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

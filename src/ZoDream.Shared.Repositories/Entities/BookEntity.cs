@@ -3,7 +3,7 @@ using ZoDream.Shared.Interfaces.Entities;
 
 namespace ZoDream.Shared.Repositories.Entities
 {
-    [TableName("book")]
+    [TableName("books")]
     public class BookEntity : INovel
     {
         public string Id { get; set; } = string.Empty;

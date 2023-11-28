@@ -1,9 +1,7 @@
 ﻿namespace ZoDream.Shared.Interfaces.Entities
 {
-    public interface IReplaceRule
+    public interface IReplaceRule : IRuleItem
     {
-        public string Name { get; set; }
-
         public string GroupName { get; set; }
 
         public string MatchValue { get; set; }
@@ -18,7 +16,6 @@
 
         public int Timeout { get; set; }
 
-        public bool IsEnabled { get; set; }
 
     }
 }

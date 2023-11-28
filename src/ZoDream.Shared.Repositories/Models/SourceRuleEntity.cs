@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ZoDream.Shared.Database;
+using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.ViewModels;
@@ -44,6 +45,9 @@ namespace ZoDream.Shared.Repositories.Models
         public string DetailMatchRule { get; set; } = string.Empty;
         public string ContentMatchRule { get; set; } = string.Empty;
 
+        public string LoginUrl { get; set; } = string.Empty;
+        public IFormInput[] LoginForm { get; set; } = [];
+
 
         private bool isEnabled = true;
 
@@ -51,6 +55,13 @@ namespace ZoDream.Shared.Repositories.Models
         {
             get => isEnabled;
             set => Set(ref isEnabled, value);
+        }
+
+        private int sortOrder = 99;
+
+        public int SortOrder {
+            get => sortOrder;
+            set => Set(ref sortOrder, value);
         }
 
         private bool isChecked;

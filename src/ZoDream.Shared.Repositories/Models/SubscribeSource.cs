@@ -24,6 +24,12 @@ namespace ZoDream.Shared.Repositories.Models
         }
 
 
+        private string url = string.Empty;
+
+        public string Url {
+            get => url;
+            set => Set(ref url, value);
+        }
 
 
         private bool isEnabled = true;
@@ -31,6 +37,13 @@ namespace ZoDream.Shared.Repositories.Models
         public bool IsEnabled {
             get => isEnabled;
             set => Set(ref isEnabled, value);
+        }
+
+        private int sortOrder = 99;
+
+        public int SortOrder {
+            get => sortOrder;
+            set => Set(ref sortOrder, value);
         }
 
         private bool isChecked;

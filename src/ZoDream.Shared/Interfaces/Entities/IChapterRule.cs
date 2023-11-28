@@ -1,14 +1,11 @@
 ﻿namespace ZoDream.Shared.Interfaces.Entities
 {
-    public interface IChapterRule
+    public interface IChapterRule: IRuleItem
     {
-        public string Name { get; set; }
 
         public string MatchRule { get; set; }
 
         public string Example { get; set; }
-
-        public bool IsEnabled { get; set; }
 
     }
 }

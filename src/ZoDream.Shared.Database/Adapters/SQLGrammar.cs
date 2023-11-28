@@ -87,15 +87,17 @@ namespace ZoDream.Shared.Database.Adapters
         public void CompileCreateTable(StringBuilder builder, Table table)
         {
             builder.AppendLine($"CREATE TABLE IF NOT EXISTS {WrapName(table.Name)} (");
+            var isFirst = true;
             foreach (var item in table.Items)
             {
-                CompileCreateField(builder, item);
+                CompileCreateField(builder, item, isFirst);
+                isFirst = false;
             }
             foreach (var item in table.Items)
             {
                 if (item.IsPrimaryKey)
                 {
-                    builder.AppendLine($"PRIMARY KEY ({WrapName(item.Name)})");
+                    builder.AppendLine($",PRIMARY KEY ({WrapName(item.Name)})");
                 }
             }
             builder.AppendLine(");");
@@ -110,7 +112,8 @@ namespace ZoDream.Shared.Database.Adapters
             return CompileDropTable(table.Name);
         }
 
-        protected virtual void CompileCreateField(StringBuilder builder, TableField field)
+        protected virtual void CompileCreateField(StringBuilder builder, 
+            TableField field, bool isFristLine)
         {
             var extra = field.Nullable ? "NULL" : "NOT NULL";
             if (field.AutoIncrement)
@@ -121,7 +124,11 @@ namespace ZoDream.Shared.Database.Adapters
             {
                 extra += " DEFAULT " + field.Default is string ? WrapText(field.Default) : field.Default;
             }
-            builder.AppendLine($"{WrapName(field.Name)} {CompileFieldType(field)} {extra};");
+            if (!isFristLine)
+            {
+                builder.Append(',');
+            }
+            builder.AppendLine($"{WrapName(field.Name)} {CompileFieldType(field)} {extra}");
         }
 
         protected abstract string CompileFieldType(TableField field);

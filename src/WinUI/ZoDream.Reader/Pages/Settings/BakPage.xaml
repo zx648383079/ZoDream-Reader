@@ -5,9 +5,39 @@
     xmlns:local="using:ZoDream.Reader.Pages.Settings"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:lbs="using:CommunityToolkit.Labs.WinUI"
     mc:Ignorable="d">
 
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="备份与恢复" Style="{StaticResource PageHeaderStyle}"/>
+        <ScrollViewer
+            Grid.Row="1"
+            Padding="{StaticResource ContainerPadding}"
+            HorizontalScrollMode="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="4">
+                <lbs:SettingsCard Header="备份路径"/>
+                <lbs:SettingsCard Header="备份"/>
+                <lbs:SettingsCard Header="恢复"/>
+                <lbs:SettingsCard Header="恢复忽略列表"/>
+                <lbs:SettingsCard Header="导入旧版数据"/>
+                <lbs:SettingsCard Header="仅保留最新备份">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+                <TextBlock Text="WbDav设置" Style="{StaticResource GroupHeaderStyle}"/>
+                <lbs:SettingsCard Header="WebDav服务器地址"/>
+                <lbs:SettingsCard Header="WebDav账号"/>
+                <lbs:SettingsCard Header="WebDav密码"/>
+                <lbs:SettingsCard Header="子文件夹"/>
+                <lbs:SettingsCard Header="设备名称"/>
+                <lbs:SettingsCard Header="同步阅读进度" Description="进入退出程序界面时同步阅读进度">
+                    <ToggleSwitch/>
+                </lbs:SettingsCard>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

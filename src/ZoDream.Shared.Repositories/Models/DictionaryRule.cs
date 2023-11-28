@@ -40,6 +40,13 @@ namespace ZoDream.Shared.Repositories.Models
             set => Set(ref isEnabled, value);
         }
 
+        private int sortOrder = 99;
+
+        public int SortOrder {
+            get => sortOrder;
+            set => Set(ref sortOrder, value);
+        }
+
         private bool isChecked;
 
         public bool IsChecked

@@ -3,7 +3,7 @@ using ZoDream.Shared.Interfaces.Entities;
 
 namespace ZoDream.Shared.Repositories.Entities
 {
-    [TableName("book_group")]
+    [TableName("book_groups")]
     public class BookGroupEntity: INovelGroup
     {
         public int Id { get; set; }

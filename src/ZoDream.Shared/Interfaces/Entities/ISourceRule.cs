@@ -1,9 +1,7 @@
 ﻿namespace ZoDream.Shared.Interfaces.Entities
 {
-    public interface ISourceRule
+    public interface ISourceRule : IRuleItem
     {
-        public string Name { get; set; }
-
         public string GroupName { get; set; }
 
         public string BaseUri { get; set; }
@@ -23,7 +21,9 @@
         public string DetailMatchRule { get; set; }
         public string ContentMatchRule { get; set; }
 
-        public bool IsEnabled { get; set; }
+        public string LoginUrl { get; set; }
+        public IFormInput[] LoginForm { get; set; }
+
     }
 
     public enum SourceType

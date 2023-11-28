@@ -5,12 +5,8 @@ using System.Text;
 namespace ZoDream.Shared.Database
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class TableNameAttribute: Attribute
+    public class TableNameAttribute(string tableName) : Attribute
     {
-        public TableNameAttribute(string tableName)
-        {
-            Value = tableName;
-        }
-        public string Value { get; private set; }
+        public string Value { get; private set; } = tableName;
     }
 }

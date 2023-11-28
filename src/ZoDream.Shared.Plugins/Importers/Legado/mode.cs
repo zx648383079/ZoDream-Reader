@@ -124,37 +124,37 @@ namespace ZoDream.Shared.Plugins.Importers
         public long? HeaderPaddingLeft { get; set; }
 
         [JsonProperty("headerPaddingRight", NullValueHandling = NullValueHandling.Ignore)]
-        public long? HeaderPaddingRight { get; set; }
+        public int HeaderPaddingRight { get; set; }
 
         [JsonProperty("headerPaddingTop", NullValueHandling = NullValueHandling.Ignore)]
-        public long? HeaderPaddingTop { get; set; }
+        public int HeaderPaddingTop { get; set; }
 
         [JsonProperty("letterSpacing", NullValueHandling = NullValueHandling.Ignore)]
-        public long? LetterSpacing { get; set; }
+        public int LetterSpacing { get; set; }
 
         [JsonProperty("lineSpacingExtra", NullValueHandling = NullValueHandling.Ignore)]
-        public long? LineSpacingExtra { get; set; }
+        public int LineSpacingExtra { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
 
         [JsonProperty("paddingBottom", NullValueHandling = NullValueHandling.Ignore)]
-        public long? PaddingBottom { get; set; }
+        public int? PaddingBottom { get; set; }
 
         [JsonProperty("paddingLeft", NullValueHandling = NullValueHandling.Ignore)]
-        public long? PaddingLeft { get; set; }
+        public int? PaddingLeft { get; set; }
 
         [JsonProperty("paddingRight", NullValueHandling = NullValueHandling.Ignore)]
-        public long? PaddingRight { get; set; }
+        public int? PaddingRight { get; set; }
 
         [JsonProperty("paddingTop", NullValueHandling = NullValueHandling.Ignore)]
-        public long? PaddingTop { get; set; }
+        public int? PaddingTop { get; set; }
 
         [JsonProperty("paragraphIndent", NullValueHandling = NullValueHandling.Ignore)]
         public string ParagraphIndent { get; set; }
 
         [JsonProperty("paragraphSpacing", NullValueHandling = NullValueHandling.Ignore)]
-        public long? ParagraphSpacing { get; set; }
+        public int? ParagraphSpacing { get; set; }
 
         [JsonProperty("showFooterLine", NullValueHandling = NullValueHandling.Ignore)]
         public bool? ShowFooterLine { get; set; }
@@ -175,7 +175,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public string TextColorNight { get; set; }
 
         [JsonProperty("textSize", NullValueHandling = NullValueHandling.Ignore)]
-        public long? TextSize { get; set; }
+        public int? TextSize { get; set; }
 
         [JsonProperty("tipColor", NullValueHandling = NullValueHandling.Ignore)]
         public long? TipColor { get; set; }
@@ -199,13 +199,13 @@ namespace ZoDream.Shared.Plugins.Importers
         public long? TipHeaderRight { get; set; }
 
         [JsonProperty("titleBottomSpacing", NullValueHandling = NullValueHandling.Ignore)]
-        public long? TitleBottomSpacing { get; set; }
+        public int? TitleBottomSpacing { get; set; }
 
         [JsonProperty("titleMode", NullValueHandling = NullValueHandling.Ignore)]
         public long? TitleMode { get; set; }
 
         [JsonProperty("titleSize", NullValueHandling = NullValueHandling.Ignore)]
-        public long? TitleSize { get; set; }
+        public int? TitleSize { get; set; }
 
         [JsonProperty("titleTopSpacing", NullValueHandling = NullValueHandling.Ignore)]
         public long? TitleTopSpacing { get; set; }

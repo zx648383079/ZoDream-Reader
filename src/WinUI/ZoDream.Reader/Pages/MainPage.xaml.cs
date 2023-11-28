@@ -58,7 +58,7 @@ namespace ZoDream.Reader.Pages
                 router?.GoToAsync("setting");
                 return;
             }
-            router?.GoToAsync(args.InvokedItemContainer.Tag.ToString());
+            router?.GoToAsync(args.InvokedItemContainer.Tag.ToString() ?? Router.HomeRoute);
         }
     }
 }

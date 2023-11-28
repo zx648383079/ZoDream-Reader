@@ -5,15 +5,13 @@ using System.Text;
 namespace ZoDream.Shared.Database
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class ColumnAttribute: Attribute
+    public class ColumnAttribute(string name) : Attribute
     {
-        public ColumnAttribute(string name) 
-        { 
-            Name = name; 
-        }
-        public string Name { get; set; }
+        public string Name { get; set; } = name;
 
         public int Length { get; set; }
         public bool ExactNameMatch { get; set; }
+
+        public bool Nullable { get; set; }
     }
 }

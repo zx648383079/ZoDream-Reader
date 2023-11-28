@@ -88,6 +88,7 @@ namespace ZoDream.Shared.Database.Migrations
                     IsPrimaryKey = isPrimaryKey,
                     AutoIncrement = autoIncrement,
                     Length = info is null ? 0 : info.Length,
+                    Nullable = info is not null && info.Nullable,
                 });
             }
             return table;
