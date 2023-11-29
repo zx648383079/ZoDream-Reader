@@ -27,14 +27,15 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="标题" VerticalAlignment="Center"/>
+            <TextBlock Margin="20,0" Text="标题" VerticalAlignment="Center"/>
             <TextBlock Text="0/10" Grid.Column="1" VerticalAlignment="Center"/>
             <CommandBar Grid.Column="2">
-                <AppBarButton Icon="Previous" Label="上一章"/>
+                <AppBarButton Icon="Previous" Label="上一章" Command="{Binding PreviousCommand}"/>
                 <AppBarButton Icon="List" Label="目录" Command="{Binding CatalogCommand}"/>
-                <AppBarButton Icon="Next" Label="下一章"/>
+                <AppBarButton Icon="Next" Label="下一章" Command="{Binding NextCommand}"/>
                 <CommandBar.SecondaryCommands>
-                    <AppBarButton Icon="Setting" Label="设置"/>
+                    <AppBarButton Icon="Setting" Label="设置" Command="{Binding SettingCommand}"/>
+                    <AppBarButton Icon="Switch" Label="换源" Command="{Binding SourceCommand}"/>
                 </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>

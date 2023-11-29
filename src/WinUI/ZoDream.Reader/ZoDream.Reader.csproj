@@ -13,15 +13,19 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Controls\TextContainer.xaml" />
+    <None Remove="Dialogs\AddAppThemeDialog.xaml" />
     <None Remove="Dialogs\AddChapterRuleDialog.xaml" />
     <None Remove="Dialogs\AddDictionaryDialog.xaml" />
     <None Remove="Dialogs\AddGroupDialog.xaml" />
     <None Remove="Dialogs\AddNovelDialog.xaml" />
+    <None Remove="Dialogs\AddReadThemeDialog.xaml" />
     <None Remove="Dialogs\AddReplaceDialog.xaml" />
     <None Remove="Dialogs\AddSourceDialog.xaml" />
     <None Remove="Dialogs\ConfirmDialog.xaml" />
     <None Remove="Dialogs\GroupDialog.xaml" />
     <None Remove="Dialogs\ImportDialog.xaml" />
+    <None Remove="Dialogs\SearchNovelDialog.xaml" />
+    <None Remove="Dialogs\SearchSourceDialog.xaml" />
     <None Remove="Pages\BookmarkPage.xaml" />
     <None Remove="Pages\ExplorePage.xaml" />
     <None Remove="Pages\HelpPage.xaml" />
@@ -36,18 +40,22 @@
     <None Remove="Pages\Rules\ReplaceRulePage.xaml" />
     <None Remove="Pages\SettingPage.xaml" />
     <None Remove="Pages\Settings\AboutPage.xaml" />
+    <None Remove="Pages\Settings\AppThemePage.xaml" />
     <None Remove="Pages\Settings\BakPage.xaml" />
     <None Remove="Pages\Settings\OtherPage.xaml" />
+    <None Remove="Pages\Settings\ReadThemePage.xaml" />
     <None Remove="Pages\Settings\ThemePage.xaml" />
     <None Remove="Pages\SourcePage.xaml" />
     <None Remove="Pages\StartupPage.xaml" />
     <None Remove="Themes\BaseStyle.xaml" />
     <None Remove="Themes\Button.xaml" />
     <None Remove="Themes\DarkTheme.xaml" />
+    <None Remove="Themes\Input.xaml" />
     <None Remove="Themes\LightTheme.xaml" />
     <None Remove="Themes\Novel.xaml" />
     <None Remove="Themes\Panel.xaml" />
     <None Remove="Themes\Rule.xaml" />
+    <None Remove="Themes\RuleStyle.xaml" />
     <None Remove="Themes\TitleBar.xaml" />
   </ItemGroup>
 
@@ -62,7 +70,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.18" />
+    <PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.0.230907" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.0.230907" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.230907" />
+    <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.0.230907" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.1.1" />
@@ -284,6 +295,47 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Pages\Settings\AboutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="Pages\Settings\AppThemePage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="Pages\Settings\AppThemePage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Themes\Input.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\SearchSourceDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\SearchNovelDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Themes\RuleStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\AddReadThemeDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\AddAppThemeDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\Settings\ReadThemePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

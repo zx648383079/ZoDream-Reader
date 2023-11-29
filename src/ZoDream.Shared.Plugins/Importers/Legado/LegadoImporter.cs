@@ -13,17 +13,18 @@ namespace ZoDream.Shared.Plugins.Importers
 {
     public class LeGaDoImporter: INovelImporter
     {
-        public async Task<List<IAppTheme>> LoadAppThemeAsync(string fileName)
+        public async Task<List<T>> LoadAppThemeAsync<T>(string fileName) 
+            where T : IAppTheme, new()
         {
             var items = await ReadAsync<List<ThemeConfig>>(fileName);
-            var res = new List<IAppTheme>();
+            var res = new List<T>();
             if (items is null)
             {
                 return res;
             }
             foreach (var item in items)
             {
-                res.Add(new AppThemeEntity()
+                res.Add(new T()
                 {
                     Name = item.ThemeName,
                     IsDarkTheme = item.IsNightTheme,
@@ -34,17 +35,18 @@ namespace ZoDream.Shared.Plugins.Importers
             }
             return res;
         }
-        public async Task<List<IReadTheme>> LoadReadThemeAsync(string fileName)
+        public async Task<List<T>> LoadReadThemeAsync<T>(string fileName) 
+            where T : IReadTheme, new()
         {
             var items = await ReadAsync<List<ReadConfig>>(fileName);
             if (items is null)
             {
                 return [];
             }
-            var res = new List<IReadTheme>();
+            var res = new List<T>();
             foreach (var item in items)
             {
-                res.Add(new ReadThemeEntity()
+                res.Add(new T()
                 {
                     Name = item.Name,
                     Background = item.BgType == 0 ? item.BgStr : string.Empty,
@@ -69,17 +71,18 @@ namespace ZoDream.Shared.Plugins.Importers
             return res;
         }
 
-        public async Task<List<ISubscribeSource>> LoadRssAsync(string fileName)
+        public async Task<List<T>> LoadRssAsync<T>(string fileName) 
+            where T : ISubscribeSource, new()
         {
             var items = await ReadAsync<List<RssSource>>(fileName);
             if (items is null)
             {
                 return [];
             }
-            var res = new List<ISubscribeSource>();
+            var res = new List<T>();
             foreach (var item in items)
             {
-                res.Add(new SubscribeSourceEntity()
+                res.Add(new T()
                 {
                     Name = item.SourceName,
                 });
@@ -87,17 +90,18 @@ namespace ZoDream.Shared.Plugins.Importers
             return res;
         }
 
-        public async Task<List<ISourceRule>> LoadSourceAsync(string fileName)
+        public async Task<List<T>> LoadSourceAsync<T>(string fileName) 
+            where T : ISourceRule, new()
         {
             var items = await ReadAsync<List<BookSource>>(fileName);
             if (items is null)
             {
                 return [];
             }
-            var res = new List<ISourceRule>();
+            var res = new List<T>();
             foreach (var item in items)
             {
-                res.Add(new SourceRuleEntity()
+                res.Add(new T()
                 {
                     Name = item.BookSourceName,
                     IsEnabled = item.Enabled
@@ -105,17 +109,18 @@ namespace ZoDream.Shared.Plugins.Importers
             }
             return res;
         }
-        public async Task<List<ITextToSpeech>> LoadTTSAsync(string fileName)
+        public async Task<List<T>> LoadTTSAsync<T>(string fileName) 
+            where T : ITextToSpeech, new()
         {
             var items = await ReadAsync<List<TtsSource>>(fileName);
             if (items is null)
             {
                 return [];
             }
-            var res = new List<ITextToSpeech>();
+            var res = new List<T>();
             foreach (var item in items)
             {
-                res.Add(new TextToSpeechEntity()
+                res.Add(new T()
                 {
                     Name = item.Name,
                     Url = item.Url,
@@ -124,17 +129,18 @@ namespace ZoDream.Shared.Plugins.Importers
             return res;
         }
 
-        public async Task<List<IDictionaryRule>> LoadDictionaryRuleAsync(string fileName)
+        public async Task<List<T>> LoadDictionaryRuleAsync<T>(string fileName) 
+            where T : IDictionaryRule, new()
         {
             var items = await ReadAsync<List<DictRule>>(fileName);
             if (items is null)
             {
                 return [];
             }
-            var res = new List<IDictionaryRule>();
+            var res = new List<T>();
             foreach (var item in items)
             {
-                res.Add(new DictionaryRuleEntity()
+                res.Add(new T()
                 {
                     Name = item.Name,
                     UrlRule = item.UrlRule,
@@ -145,17 +151,38 @@ namespace ZoDream.Shared.Plugins.Importers
             return res;
         }
 
-        public async Task<List<IChapterRule>> LoadChapterRuleAsync(string fileName)
+        public async Task<List<T>> LoadReplaceRuleAsync<T>(string fileName) 
+            where T : IReplaceRule, new()
+        {
+            var items = await ReadAsync<List<DictRule>>(fileName);
+            if (items is null)
+            {
+                return [];
+            }
+            var res = new List<T>();
+            foreach (var item in items)
+            {
+                res.Add(new T()
+                {
+                    Name = item.Name,
+                    IsEnabled = item.Enabled,
+                });
+            }
+            return res;
+        }
+
+        public async Task<List<T>> LoadChapterRuleAsync<T>(string fileName) 
+            where T : IChapterRule, new()
         {
             var items = await ReadAsync<List<TxtTocRule>>(fileName);
             if (items is null)
             {
                 return [];
             }
-            var res = new List<IChapterRule>();
+            var res = new List<T>();
             foreach ( var item in items)
             {
-                res.Add(new ChapterRuleEntity()
+                res.Add(new T()
                 {
                     Name = item.Name,
                     Example = item.Example,

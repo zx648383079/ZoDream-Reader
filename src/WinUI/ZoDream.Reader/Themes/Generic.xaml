@@ -8,6 +8,9 @@
         <ResourceDictionary Source="ms-appx:///Themes/Button.xaml"/>
         <ResourceDictionary Source="ms-appx:///Themes/Novel.xaml"/>
         <ResourceDictionary Source="ms-appx:///Themes/Panel.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Themes/Input.xaml"/>
     </ResourceDictionary.MergedDictionaries>
+
+
 
 </ResourceDictionary>

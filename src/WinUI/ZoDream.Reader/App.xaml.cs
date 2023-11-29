@@ -78,6 +78,8 @@ namespace ZoDream.Reader
             router.RegisterRoute("setting/bak", typeof(BakPage), true);
             router.RegisterRoute("setting/theme", typeof(ThemePage), true);
             router.RegisterRoute("setting/other", typeof(OtherPage), true);
+            router.RegisterRoute("setting/read_theme", typeof(ReadThemePage), true);
+            router.RegisterRoute("setting/app_theme", typeof(AppThemePage), true);
             router.RegisterRoute("about", typeof(AboutPage), true);
             router.RegisterRoute("history", typeof(HistoryPage), true);
             router.RegisterRoute("bookmark", typeof(BookmarkPage), true);

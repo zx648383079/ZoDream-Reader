@@ -1,0 +1,47 @@
+﻿<ContentDialog
+    x:Class="ZoDream.Reader.Dialogs.SearchSourceDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ZoDream.Reader.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    mc:Ignorable="d"
+    Title="换源"
+    PrimaryButtonText="切换为"
+    SecondaryButtonText="取消">
+
+    <ContentDialog.DataContext>
+        <vm:SearchSourceViewModel/>
+    </ContentDialog.DataContext>
+
+    <ContentDialog.Resources>
+        <ResourceDictionary Source="ms-appx:///Themes/RuleStyle.xaml"/>
+    </ContentDialog.Resources>
+
+    <Grid>
+        <ListBox ItemsSource="{Binding SourceItems}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding Author}" Grid.Column="1"/>
+                        <TextBlock Text="{Binding LatestChapterTitle}" Grid.Row="1"/>
+
+                        <FontIcon Glyph="&#xE73E;" 
+                                  Visibility="{Binding IsChecked,Converter={StaticResource ToggleCvt}}" Grid.Row="1" Grid.Column="1"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</ContentDialog>

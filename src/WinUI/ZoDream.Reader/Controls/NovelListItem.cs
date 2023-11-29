@@ -128,8 +128,8 @@ namespace ZoDream.Reader.Controls
             DependencyProperty.Register("Source", typeof(INovel), typeof(NovelListItem), new PropertyMetadata(null, OnSourceUpdated));
 
 
-        public event TappedEventHandler Touched;
-        public event TappedEventHandler LongTouched;
+        public event TappedEventHandler? Touched;
+        public event TappedEventHandler? LongTouched;
         private DateTime _lastTouchStart;
 
 
@@ -178,14 +178,19 @@ namespace ZoDream.Reader.Controls
         {
             var diff = DateTime.Now - _lastTouchStart;
             var router = App.GetService<IRouter>();
+            var queries = new Dictionary<string, object>
+            {
+                {"novel",  Source},
+                {"id", Source.Name},
+            };
             if (diff.TotalSeconds > 1)
             {
                 LongTouched?.Invoke(this, new TappedRoutedEventArgs());
-                router.GoToAsync("novel");
+                router.GoToAsync("novel", queries);
             } else
             {
                 Touched?.Invoke(this, new TappedRoutedEventArgs());
-                router.GoToAsync("read");
+                router.GoToAsync("read", queries);
             }
         }
     }

@@ -12,26 +12,20 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using ZoDream.Shared.Interfaces;
-using ZoDream.Shared.Plugins.Importers;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace ZoDream.Reader.Dialogs
+namespace ZoDream.Reader.Pages.Settings
 {
-    public sealed partial class ImportDialog : ContentDialog
+    /// <summary>
+    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// </summary>
+    public sealed partial class AppThemePage : Page
     {
-        public ImportDialog()
+        public AppThemePage()
         {
             this.InitializeComponent();
         }
-
-        private void IconButton_Click(object sender, RoutedEventArgs e)
-        {
-            Hide();
-        }
-
-        public INovelImporter Importer => new LeGaDoImporter();
     }
 }

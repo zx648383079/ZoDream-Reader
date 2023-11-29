@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Dialogs;
+using ZoDream.Shared.Models;
 using ZoDream.Shared.Plugins.Importers;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Repositories.Extensions;
@@ -15,19 +16,19 @@ using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ChapterRuleViewModel: BindableBase
+    public class ReadThemeViewModel: BindableBase
     {
-        public ChapterRuleViewModel()
+        public ReadThemeViewModel()
         {
             AddCommand = new RelayCommand(TapAdd);
             ImportCommand = new RelayCommand(TapImport);
         }
 
-        private ObservableCollection<ChapterRuleModel> ruleItems = new();
+        private ObservableCollection<ReadThemeModel> themeItems = new();
 
-        public ObservableCollection<ChapterRuleModel> RuleItems {
-            get => ruleItems;
-            set => Set(ref ruleItems, value);
+        public ObservableCollection<ReadThemeModel> ThemeItems {
+            get => themeItems;
+            set => Set(ref themeItems, value);
         }
 
         public ICommand AddCommand { get; private set; }
@@ -36,13 +37,13 @@ namespace ZoDream.Reader.ViewModels
 
         private async void TapAdd(object? _)
         {
-            var picker = new AddChapterRuleDialog();
+            var picker = new AddReadThemeDialog();
             var res = await App.GetService<AppViewModel>().OpenDialogAsync(picker);
             if (res != Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
             {
                 return;
             }
-            RuleItems.Add(picker.ViewModel.Clone<ChapterRuleModel>());
+            ThemeItems.Add(picker.ViewModel.Clone<ReadThemeModel>());
         }
 
         private async void TapImport(object? _)
@@ -62,10 +63,10 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            var items = await dialog.Importer.LoadChapterRuleAsync<ChapterRuleModel>(file.Path);
+            var items = await dialog.Importer.LoadReadThemeAsync<ReadThemeModel>(file.Path);
             foreach (var item in items)
             {
-                RuleItems.Add(item);
+                ThemeItems.Add(item);
             }
         }
     }

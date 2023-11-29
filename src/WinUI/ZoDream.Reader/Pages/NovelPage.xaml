@@ -7,36 +7,42 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ctl="using:ZoDream.Reader.Controls"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
     mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:NovelViewModel/>
+    </Page.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="200"/>
             <RowDefinition/>
-            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Image/>
+            <Image Source="{Binding Cover}"/>
             <StackPanel Grid.Column="1">
-                <TextBlock Text="名称"/>
-                <ctl:IconLabel Icon="&#xE77B;" Text="作者"/>
+                <TextBlock Text="{Binding Name}"/>
+                <ctl:IconLabel Icon="&#xE77B;" Text="{Binding Author}"/>
                 <ctl:IconLabel Icon="&#xE81C;" Text="最新章节"/>
                 <ctl:IconLabel Icon="&#xE74C;" Text="更新时间"/>
+
+                <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="立即阅读"/>
+                    <Button Content="删除书籍" Grid.Column="1"/>
+                </Grid>
             </StackPanel>
         </Grid>
-        <TextBlock Grid.Row="1"/>
+        <TextBlock Grid.Row="1" Text="{Binding Description}" TextWrapping="Wrap"/>
 
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Button Content="删除书籍"/>
-            <Button Content="立即阅读"/>
-        </Grid>
+        
     </Grid>
 </Page>

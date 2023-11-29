@@ -17,9 +17,9 @@ namespace ZoDream.Reader.Repositories
         private Frame? MainFrame;
         private Frame? SingleFrame;
         private Frame? InnerFrame;
-        private readonly Dictionary<string, RouteItem> Routes = new();
+        private readonly Dictionary<string, RouteItem> Routes = [];
 
-        private readonly List<string> Histories = new();
+        private readonly List<string> Histories = [];
 
         public RouteItem? CurrentRoute => Histories.Count == 0 ? null : 
             Routes[Histories.Last()];
@@ -89,9 +89,17 @@ namespace ZoDream.Reader.Repositories
             }
         }
 
-        public void GoToAsync(string routeName, IDictionary<string, object> queries)
+        public void GoToAsync(string routeName, IDictionary<string, object>? queries)
         {
-            GoToAsync(routeName);
+            if (CurrentRoute?.RouteName == routeName)
+            {
+                return;
+            }
+            Navigate(routeName, queries);
+            if (queries is null)
+            {
+                return;
+            }
             var type = GetType(routeName);
             var current = type switch
             {
@@ -107,25 +115,21 @@ namespace ZoDream.Reader.Repositories
 
         public void GoToAsync(string routeName)
         {
-            if (CurrentRoute?.RouteName == routeName)
-            {
-                return;
-            }
-            Navigate(routeName);
+            GoToAsync(routeName, null);
         }
 
-        private void Navigate(RouteItem route)
+        private void Navigate(RouteItem route, IDictionary<string, object>? queries = null)
         {
             App.GetService<AppViewModel>().DispatcherQueue?.TryEnqueue(() => {
                 switch (route.RouteType)
                 {
                     case RouteType.Main:
                         ToggleFrame(true);
-                        MainFrame?.Navigate(route.PageType);
+                        MainFrame?.Navigate(route.PageType, queries);
                         break;
                     case RouteType.Single:
                         ToggleFrame(false);
-                        SingleFrame?.Navigate(route.PageType);
+                        SingleFrame?.Navigate(route.PageType, queries);
                         break;
                     case RouteType.None:
                     default:
@@ -135,7 +139,7 @@ namespace ZoDream.Reader.Repositories
                             NavigatePage(MainFrame, MainRoute);
                             break;
                         }
-                        InnerFrame.Navigate(route.PageType);
+                        InnerFrame.Navigate(route.PageType, queries);
                         break;
                 }
             });
@@ -165,7 +169,7 @@ namespace ZoDream.Reader.Repositories
             return route.RouteType;
         }
 
-        private void Navigate(string routeName)
+        private void Navigate(string routeName, IDictionary<string, object>? queries = null)
         {
             if (MainFrame is null)
             {
@@ -176,7 +180,7 @@ namespace ZoDream.Reader.Repositories
             {
                 return;
             }
-            Navigate(route);
+            Navigate(route, queries);
             //var page = CreatePage(route);
             //if (!InnerFrame.Navigate(page))
             //{

@@ -35,20 +35,18 @@ namespace ZoDream.Shared.Repositories.Models
             set => Set(ref example, value);
         }
 
-
-        private bool isEnabled = true;
-
-        public bool IsEnabled
-        {
-            get => isEnabled;
-            set => Set(ref isEnabled, value);
-        }
-
         private int sortOrder = 99;
 
         public int SortOrder {
             get => sortOrder;
             set => Set(ref sortOrder, value);
+        }
+
+        private bool isEnabled = true;
+
+        public bool IsEnabled {
+            get => isEnabled;
+            set => Set(ref isEnabled, value);
         }
 
         private bool isChecked;

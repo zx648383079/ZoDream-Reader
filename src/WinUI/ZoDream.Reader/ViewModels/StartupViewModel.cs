@@ -53,7 +53,8 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            if (!await folder.FileExistsAsync(AppConstants.DatabaseFileName))
+            var checkFile = await folder.GetFileAsync(AppConstants.DatabaseFileName);
+            if (checkFile is null)
             {
                 // 不存在
                 return;

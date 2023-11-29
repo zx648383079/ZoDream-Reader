@@ -5,8 +5,14 @@
     xmlns:local="using:ZoDream.Reader.Pages.Settings"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:lbs="using:CommunityToolkit.Labs.WinUI"
+    xmlns:lbs="using:CommunityToolkit.WinUI.Controls"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
     mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:ThemeViewModel/>
+    </Page.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -23,17 +29,29 @@
                 <lbs:SettingsCard Header="切换图标" Description="切换软件显示在任务栏图标"/>
                 <lbs:SettingsCard Header="字体大小" Description="当前字体大小："/>
                 <lbs:SettingsCard Header="封面设置" IsClickEnabled="True"/>
-                <lbs:SettingsCard Header="主题列表" IsClickEnabled="True"/>
+                <lbs:SettingsCard Header="主题列表" IsClickEnabled="True" Command="{Binding ThemeCommand}"/>
                 <TextBlock Text="亮模式" Style="{StaticResource GroupHeaderStyle}"/>
-                <lbs:SettingsCard Header="主色调"/>
-                <lbs:SettingsCard Header="强调色"/>
-                <lbs:SettingsCard Header="背景色"/>
+                <lbs:SettingsCard Header="主色调">
+                    <ctl:ColorInput/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="强调色">
+                    <ctl:ColorInput/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="背景色">
+                    <ctl:ColorInput/>
+                </lbs:SettingsCard>
                 <lbs:SettingsCard Header="背景图片"/>
                 <lbs:SettingsCard Header="保存主题配置" IsClickEnabled="True"/>
                 <TextBlock Text="暗模式" Style="{StaticResource GroupHeaderStyle}"/>
-                <lbs:SettingsCard Header="主色调"/>
-                <lbs:SettingsCard Header="强调色"/>
-                <lbs:SettingsCard Header="背景色"/>
+                <lbs:SettingsCard Header="主色调">
+                    <ctl:ColorInput/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="强调色">
+                    <ctl:ColorInput/>
+                </lbs:SettingsCard>
+                <lbs:SettingsCard Header="背景色">
+                    <ctl:ColorInput/>
+                </lbs:SettingsCard>
                 <lbs:SettingsCard Header="背景图片"/>
                 <lbs:SettingsCard Header="保存主题配置" IsClickEnabled="True"/>
             </StackPanel>

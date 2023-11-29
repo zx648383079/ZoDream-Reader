@@ -15,11 +15,7 @@
     </Page.DataContext>
 
     <Page.Resources>
-        <ResourceDictionary>
-            <Style TargetType="ListBoxItem">
-                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            </Style>
-        </ResourceDictionary>
+        <ResourceDictionary Source="ms-appx:///Themes/RuleStyle.xaml"/>
     </Page.Resources>
 
     <Grid>

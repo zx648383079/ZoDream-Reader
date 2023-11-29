@@ -34,6 +34,7 @@
             <AppBarButton Icon="Add" Label="添加" Command="{Binding AddCommand}"/>
             <CommandBar.SecondaryCommands>
                 <AppBarButton Icon="Library" Label="分组"/>
+                <AppBarButton Icon="Sync" Label="同步"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
     </Grid>

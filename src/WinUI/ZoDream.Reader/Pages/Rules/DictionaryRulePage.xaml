@@ -13,11 +13,7 @@
     </Page.DataContext>
 
     <Page.Resources>
-        <ResourceDictionary>
-            <Style TargetType="ListBoxItem">
-                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            </Style>
-        </ResourceDictionary>
+        <ResourceDictionary Source="ms-appx:///Themes/RuleStyle.xaml"/>
     </Page.Resources>
 
     <Grid>
@@ -53,6 +49,9 @@
             <AppBarButton Icon="Edit" Label="编辑"/>
             <AppBarButton Icon="Delete" Label="删除"/>
             <AppBarButton Icon="Add" Label="添加" Command="{Binding AddCommand}"/>
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Icon="Import" Label="导入" Command="{Binding ImportCommand}"/>
+            </CommandBar.SecondaryCommands>
         </CommandBar>
     </Grid>
 </Page>
