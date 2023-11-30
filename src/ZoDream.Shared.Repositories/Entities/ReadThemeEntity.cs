@@ -7,8 +7,10 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("read_themes")]
+    [PrimaryKey("Id", AutoIncrement = true)]
     public class ReadThemeEntity: IReadTheme
     {
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
         public string FontFamily { get; set; } = string.Empty;
@@ -40,6 +42,10 @@ namespace ZoDream.Shared.Repositories.Entities
 
         public string DarkBackgroundImage { get; set; } = string.Empty;
         public string DarkBackground { get; set; } = string.Empty;
-        public string DarForeground { get; set; } = string.Empty;
+        public string DarkForeground { get; set; } = string.Empty;
+
+        public string EInkBackgroundImage { get; set; } = string.Empty;
+        public string EInkBackground { get; set; } = string.Empty;
+        public string EInkForeground { get; set; } = string.Empty;
     }
 }

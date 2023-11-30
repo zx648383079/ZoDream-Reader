@@ -4,6 +4,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("search_histories")]
+    [PrimaryKey("Word")]
     public class SearchHistoryEntity: ISearchHistory
     {
         

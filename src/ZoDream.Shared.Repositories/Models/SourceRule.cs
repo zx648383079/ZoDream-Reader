@@ -11,6 +11,7 @@ namespace ZoDream.Shared.Repositories.Models
 {
     public class SourceRuleModel : BindableBase, ISourceRule
     {
+        public int Id { get; set; }
         private string name = string.Empty;
 
         public string Name
@@ -48,6 +49,7 @@ namespace ZoDream.Shared.Repositories.Models
         public string LoginUrl { get; set; } = string.Empty;
         public IFormInput[] LoginForm { get; set; } = [];
 
+        public long LastUpdatedAt { get; set; }
 
         private bool isEnabled = true;
 
@@ -71,5 +73,13 @@ namespace ZoDream.Shared.Repositories.Models
             get => isChecked;
             set => Set(ref isChecked, value);
         }
+
+        private SourceUpdateStatus status = SourceUpdateStatus.None;
+
+        public SourceUpdateStatus Status {
+            get => status;
+            set => Set(ref status, value);
+        }
+
     }
 }

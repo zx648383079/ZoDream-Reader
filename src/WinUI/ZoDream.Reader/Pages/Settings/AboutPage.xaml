@@ -22,7 +22,7 @@
             Padding="{StaticResource ContainerPadding}"
             HorizontalScrollMode="Disabled"
             VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="4"  Margin="{StaticResource ContainerBodyPadding}">
                 <lbs:SettingsCard Header="开发人员" Description=""/>
                 <lbs:SettingsCard Header="更新日志" Description="版本"/>
                 <lbs:SettingsCard Header="检查更新"/>

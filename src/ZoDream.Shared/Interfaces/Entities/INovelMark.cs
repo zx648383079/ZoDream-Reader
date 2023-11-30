@@ -6,6 +6,7 @@ namespace ZoDream.Shared.Interfaces.Entities
 {
     public interface INovelMark
     {
+        public int Id { get; set; }
 
         public string Title { get; set; }
 

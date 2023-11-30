@@ -24,7 +24,9 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="{TemplateBinding Header}" Style="{StaticResource TitleTextBlockStyle}"/>
+                                <TextBlock Text="{TemplateBinding Header}"
+                                           Margin="10,0"
+                                           Style="{StaticResource TitleTextBlockStyle}"/>
                                 <ContentPresenter Grid.Row="1"/>
                             </Grid>
                         </Border>

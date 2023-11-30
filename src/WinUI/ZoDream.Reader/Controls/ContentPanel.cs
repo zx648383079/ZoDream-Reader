@@ -49,7 +49,7 @@ namespace ZoDream.Reader.Controls
 
         // Using a DependencyProperty as the backing store for PanelWidth.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PanelWidthProperty =
-            DependencyProperty.Register("PanelWidth", typeof(double), typeof(ContentPanel), new PropertyMetadata(200.0));
+            DependencyProperty.Register("PanelWidth", typeof(double), typeof(ContentPanel), new PropertyMetadata(300.0));
 
 
 

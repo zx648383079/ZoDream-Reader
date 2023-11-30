@@ -8,8 +8,10 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("source_rules")]
+    [PrimaryKey("Id", AutoIncrement = true)]
     public class SourceRuleEntity: ISourceRule
     {
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
         public string GroupName { get; set; } = string.Empty;
@@ -33,6 +35,8 @@ namespace ZoDream.Shared.Repositories.Entities
 
         public string LoginUrl { get; set; } = string.Empty;
         public IFormInput[] LoginForm { get; set; } = [];
+
+        public long LastUpdatedAt { get; set; }
 
         public bool IsEnabled { get; set; }
 

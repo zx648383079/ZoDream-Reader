@@ -6,6 +6,7 @@ namespace ZoDream.Shared.Repositories.Models
 {
     public class DictionaryRuleModel : BindableBase, IDictionaryRule
     {
+        public int Id { get; set; }
         private string name = string.Empty;
 
         public string Name

@@ -49,9 +49,11 @@
             Padding="{StaticResource ContainerPadding}"
             HorizontalScrollMode="Disabled"
             VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="4" Margin="{StaticResource ContainerBodyPadding}">
                 <StackPanel.ChildrenTransitions>
-                    <RepositionThemeTransition IsStaggeringEnabled="False" />
+                    <TransitionCollection>
+                        <RepositionThemeTransition IsStaggeringEnabled="False" />
+                    </TransitionCollection>
                 </StackPanel.ChildrenTransitions>
                 <lbs:SettingsCard Header="书源管理" Description="新建、导入、编辑或管理书源" IsClickEnabled="True" Command="{Binding SourceCommand}"/>
                 <lbs:SettingsCard Header="TXT目录规则" Description="配置TXT目录规则" IsClickEnabled="True" Command="{Binding ChapterCommand}"/>

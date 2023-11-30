@@ -8,8 +8,10 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("tts_sources")]
+    [PrimaryKey("Id", AutoIncrement = true)]
     public class TextToSpeechEntity: ITextToSpeech
     {
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
         public string Url { get; set; } = string.Empty;

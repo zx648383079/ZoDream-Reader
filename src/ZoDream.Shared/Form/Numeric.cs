@@ -5,11 +5,11 @@ using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Shared.Form
 {
-    public class Numeric : IFormInput
+    public class NumericFormInput(string name, string label) : IFormInput
     {
-        public string Name { get; private set; }
+        public string Name { get; private set; } = name;
 
-        public string Label { get; private set; }
+        public string Label { get; private set; } = label;
 
         public string Tip { get; private set; } = string.Empty;
 
@@ -26,12 +26,6 @@ namespace ZoDream.Shared.Form
                 input = 0;
             }
             return true;
-        }
-
-        public Numeric(string name, string label)
-        {
-            Name = name;
-            Label = label;
         }
     }
 }

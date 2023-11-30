@@ -9,6 +9,7 @@ namespace ZoDream.Shared.Repositories.Models
 {
     public class AppThemeModel: BindableBase, IAppTheme
     {
+        public int Id { get; set; }
 
         private string name = string.Empty;
 

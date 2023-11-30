@@ -4,6 +4,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("books")]
+    [PrimaryKey("Id")]
     public class BookEntity : INovel
     {
         public string Id { get; set; } = string.Empty;

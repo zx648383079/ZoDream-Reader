@@ -7,9 +7,10 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("app_themes")]
+    [PrimaryKey("Id", AutoIncrement = true)]
     public class AppThemeEntity: IAppTheme
     {
-
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
         public bool IsDarkTheme { get; set; }

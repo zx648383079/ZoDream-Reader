@@ -53,7 +53,7 @@ namespace ZoDream.Shared.Plugins.Importers
                     BackgroundImage = item.BgType != 0 ? item.BgStr : string.Empty,
                     DarkBackground = item.BgTypeNight == 0 ? item.BgStrNight : string.Empty,
                     DarkBackgroundImage = item.BgTypeNight != 0 ? item.BgStrNight : string.Empty,
-                    DarForeground = item.TextColorNight,
+                    DarkForeground = item.TextColorNight,
                     Foreground = item.TextColor,
                     FontSize = item.TextSize ?? 16,
                     PaddingTop = item.PaddingTop ?? 0,

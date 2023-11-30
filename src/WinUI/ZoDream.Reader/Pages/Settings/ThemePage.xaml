@@ -25,8 +25,11 @@
             Padding="{StaticResource ContainerPadding}"
             HorizontalScrollMode="Disabled"
             VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="4">
-                <lbs:SettingsCard Header="切换图标" Description="切换软件显示在任务栏图标"/>
+            <StackPanel Spacing="4" Margin="{StaticResource ContainerBodyPadding}">
+                <lbs:SettingsCard Header="切换图标" Description="切换软件显示在任务栏图标"
+                                  IsClickEnabled="True">
+                    <Image Source="ms-appx:///Assets/StoreLogo.png" Height="40"/>
+                </lbs:SettingsCard>
                 <lbs:SettingsCard Header="字体大小" Description="当前字体大小："/>
                 <lbs:SettingsCard Header="封面设置" IsClickEnabled="True"/>
                 <lbs:SettingsCard Header="主题列表" IsClickEnabled="True" Command="{Binding ThemeCommand}"/>

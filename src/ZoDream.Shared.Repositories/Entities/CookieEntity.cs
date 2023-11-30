@@ -7,6 +7,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("site_cookies")]
+    [PrimaryKey("Url")]
     public class CookieEntity: ISiteCookie
     {
         public string Url { get; set; } = string.Empty;

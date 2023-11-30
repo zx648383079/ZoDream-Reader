@@ -2,13 +2,13 @@
 
 namespace ZoDream.Shared.Form
 {
-    public class File : IFormInput
+    public class FileFormInput(string name, string label, bool required) : IFormInput
     {
-        public string Name { get; private set; }
+        public string Name { get; private set; } = name;
 
-        public string Label { get; private set; }
+        public string Label { get; private set; } = label;
 
-        public bool Required { get; private set; }
+        public bool Required { get; private set; } = required;
         public bool IsSave { get; private set; }
         public bool IsFolder { get; private set; }
         public string Tip { get; private set; } = string.Empty;
@@ -18,14 +18,7 @@ namespace ZoDream.Shared.Form
             return true;
         }
 
-        public File(string name, string label, bool required)
-        {
-            Name = name;
-            Label = label;
-            Required = required;
-        }
-
-        public File(string name, string label, 
+        public FileFormInput(string name, string label, 
             bool required, bool isSave, bool isFolder): this(name, label, required)
         {
             IsSave = isSave;

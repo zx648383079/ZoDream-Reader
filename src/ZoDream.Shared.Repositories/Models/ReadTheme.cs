@@ -9,6 +9,7 @@ namespace ZoDream.Shared.Repositories.Models
 {
     public class ReadThemeModel: BindableBase, IReadTheme
     {
+        public int Id { get; set; }
         private string name = string.Empty;
 
         public string Name {
@@ -45,7 +46,11 @@ namespace ZoDream.Shared.Repositories.Models
 
         public string DarkBackgroundImage { get; set; } = string.Empty;
         public string DarkBackground { get; set; } = string.Empty;
-        public string DarForeground { get; set; } = string.Empty;
+        public string DarkForeground { get; set; } = string.Empty;
+
+        public string EInkBackgroundImage { get; set; } = string.Empty;
+        public string EInkBackground { get; set; } = string.Empty;
+        public string EInkForeground { get; set; } = string.Empty;
 
         private bool isEnabled;
 

@@ -6,7 +6,7 @@ using ZoDream.Shared.Models;
 
 namespace ZoDream.Shared.Form
 {
-    public class Select(string name, string label, DataItem[] items) : IFormInput
+    public class SelectFormInput(string name, string label, DataItem[] items) : IFormInput
     {
         public string Name { get; private set; } = name;
 

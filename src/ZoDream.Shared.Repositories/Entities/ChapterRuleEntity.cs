@@ -7,8 +7,10 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("chapter_rules")]
+    [PrimaryKey("Id", AutoIncrement = true)]
     public class ChapterRuleEntity: IChapterRule
     {
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
         public string MatchRule { get; set; } = string.Empty;

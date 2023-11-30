@@ -7,9 +7,10 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("book_chapters")]
+    [PrimaryKey("Id", AutoIncrement = true)]
     public class ChapterEntity: INovelChapter
     {
-
+        public int Id { get; set; }
         public string Url { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string BookId { get; set; } = string.Empty;

@@ -19,7 +19,7 @@
             Padding="{StaticResource ContainerPadding}"
             HorizontalScrollMode="Disabled"
             VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="4" Margin="{StaticResource ContainerBodyPadding}">
                 <lbs:SettingsCard Header="备份路径"/>
                 <lbs:SettingsCard Header="备份"/>
                 <lbs:SettingsCard Header="恢复"/>

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Shared.Models
 {
-    public class AppOption
+    public class AppOption: IAppOption
     {
         public int FontSize { get; set; } = 18;
 
@@ -37,8 +38,15 @@ namespace ZoDream.Shared.Models
 
         public float FlipSpace { get; set; } = 100;
 
-        public bool OpenSpeek { get; set; } = false;
+        public bool OpenSpeak { get; set; } = false;
 
-        public float SpeekSpeed { get; set; } = 1;
+        public float SpeakSpeed { get; set; } = 1;
+
+
+        public int ColumnMaxWidth { get; set; } = 700;
+
+        public int AppTheme { get; set; }
+
+        public int ReadTheme { get; set; }
     }
 }

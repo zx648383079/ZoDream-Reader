@@ -10,6 +10,7 @@ namespace ZoDream.Shared.Repositories.Models
 {
     public class ReplaceRuleModel : BindableBase, IReplaceRule
     {
+        public int Id { get; set; }
         private string name = string.Empty;
 
         public string Name

@@ -22,6 +22,7 @@
     <None Remove="Dialogs\AddReplaceDialog.xaml" />
     <None Remove="Dialogs\AddSourceDialog.xaml" />
     <None Remove="Dialogs\ConfirmDialog.xaml" />
+    <None Remove="Dialogs\FormDialog.xaml" />
     <None Remove="Dialogs\GroupDialog.xaml" />
     <None Remove="Dialogs\ImportDialog.xaml" />
     <None Remove="Dialogs\SearchNovelDialog.xaml" />
@@ -303,6 +304,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="Pages\Settings\AppThemePage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\FormDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Themes\Input.xaml">

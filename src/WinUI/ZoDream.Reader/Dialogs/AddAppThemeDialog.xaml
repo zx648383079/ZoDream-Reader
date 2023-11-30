@@ -8,7 +8,6 @@
     xmlns:vm="using:ZoDream.Shared.Repositories.Models"
     xmlns:ctl="using:ZoDream.Reader.Controls"
     mc:Ignorable="d"
-    Title="编辑主题"
     PrimaryButtonText="保存"
     SecondaryButtonText="取消">
 
@@ -16,11 +15,20 @@
         <vm:AppThemeModel/>
     </ContentDialog.DataContext>
 
-    <ScrollViewer>
-        <StackPanel>
-            <ctl:ColorInput Header="主色调" Height="32"/>
-            <ctl:ColorInput Header="强调色" Height="32"/>
-            <ctl:ColorInput Header="背景色" Height="32"/>
-        </StackPanel>
-    </ScrollViewer>
+    <Pivot Width="300">
+        <PivotItem Header="亮主题">
+            <StackPanel>
+                <ctl:ColorInput Header="主色调" Height="32"/>
+                <ctl:ColorInput Header="强调色" Height="32"/>
+                <ctl:ColorInput Header="背景色" Height="32"/>
+            </StackPanel>
+        </PivotItem>
+        <PivotItem Header="暗主题">
+            <StackPanel>
+                <ctl:ColorInput Header="主色调" Height="32"/>
+                <ctl:ColorInput Header="强调色" Height="32"/>
+                <ctl:ColorInput Header="背景色" Height="32"/>
+            </StackPanel>
+        </PivotItem>
+    </Pivot>
 </ContentDialog>

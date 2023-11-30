@@ -6,6 +6,7 @@ namespace ZoDream.Shared.Interfaces.Entities
 {
     public interface IReadTheme
     {
+        public int Id { get; set; }
         public string Name { get; set; }
 
         public string FontFamily { get; set; }
@@ -41,7 +42,11 @@ namespace ZoDream.Shared.Interfaces.Entities
 
         public string DarkBackgroundImage { get; set; }
         public string DarkBackground { get; set; }
-        public string DarForeground { get; set; }
+        public string DarkForeground { get; set; }
+
+        public string EInkBackgroundImage { get; set; }
+        public string EInkBackground { get; set; }
+        public string EInkForeground { get; set; }
 
     }
 }

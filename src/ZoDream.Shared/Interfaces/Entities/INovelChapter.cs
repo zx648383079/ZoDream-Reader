@@ -4,6 +4,7 @@ namespace ZoDream.Shared.Interfaces.Entities
 {
     public interface INovelChapter
     {
+        public int Id { get; set; }
         public string Title { get; }
 
         public string Url { get; }

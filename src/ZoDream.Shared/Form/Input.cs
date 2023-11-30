@@ -7,36 +7,36 @@ namespace ZoDream.Shared.Form
 {
     public static class Input
     {
-        public static Text Text(string name, string label, bool required = false)
+        public static TextFormInput Text(string name, string label, bool required = false)
         {
-            return new Text(name, label, required);
+            return new TextFormInput(name, label, required);
         }
 
-        public static Text Url(string name, string label, bool required = false)
+        public static TextFormInput Url(string name, string label, bool required = false)
         {
-            return new Text(name, label, required);
+            return new TextFormInput(name, label, required);
         }
 
-        public static Switch Switch(string name, string label)
+        public static SwitchFormInput Switch(string name, string label)
         {
-            return new Switch(name, label);
+            return new SwitchFormInput(name, label);
         }
 
-        public static Numeric Numeric(string name, string label)
+        public static NumericFormInput Numeric(string name, string label)
         {
-            return new Numeric(name, label);
+            return new NumericFormInput(name, label);
         }
 
-        public static File File(string name, string label, 
+        public static FileFormInput File(string name, string label, 
             bool required = false, 
             bool isSave = false, bool isFolder = false)
         {
-            return new File(name, label, required, isSave, isFolder);
+            return new FileFormInput(name, label, required, isSave, isFolder);
         }
 
-        public static Select Select(string name, string label, DataItem[] items)
+        public static SelectFormInput Select(string name, string label, DataItem[] items)
         {
-            return new Select(name, label, items);
+            return new SelectFormInput(name, label, items);
         }
     }
 }

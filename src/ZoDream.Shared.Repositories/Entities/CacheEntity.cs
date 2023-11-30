@@ -7,6 +7,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("caches")]
+    [PrimaryKey("Key")]
     public class CacheEntity: INovelCache
     {
 

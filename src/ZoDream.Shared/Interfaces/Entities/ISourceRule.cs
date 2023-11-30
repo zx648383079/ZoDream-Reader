@@ -24,6 +24,8 @@
         public string LoginUrl { get; set; }
         public IFormInput[] LoginForm { get; set; }
 
+        public long LastUpdatedAt { get; set; }
+
     }
 
     public enum SourceType
@@ -33,5 +35,13 @@
         Image,
         Video,
         File
+    }
+
+    public enum SourceUpdateStatus
+    {
+        None,
+        Add,
+        Update,
+        Delete
     }
 }

@@ -7,6 +7,7 @@ namespace ZoDream.Shared.Interfaces.Entities
     public interface IAppTheme
     {
 
+        public int Id { get; set; }
         public string Name { get; set; }
 
         public bool IsDarkTheme { get; set; }

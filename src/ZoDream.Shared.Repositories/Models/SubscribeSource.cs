@@ -9,6 +9,7 @@ namespace ZoDream.Shared.Repositories.Models
 {
     public class SubscribeSourceModel: BindableBase, ISubscribeSource
     {
+        public int Id { get; set; }
         private string name = string.Empty;
 
         public string Name {

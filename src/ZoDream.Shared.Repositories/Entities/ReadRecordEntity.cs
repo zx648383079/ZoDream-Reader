@@ -7,6 +7,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("read_records")]
+    [PrimaryKey("Name")]
     public class ReadRecordEntity: IReadRecord
     {
 
