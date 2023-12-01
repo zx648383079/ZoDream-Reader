@@ -52,6 +52,26 @@ namespace ZoDream.Shared.Database
             return data;
         }
 
+        public static PropertyInfo? GetPropertyInfo(string name, Type type)
+        {
+            var info = type.GetProperty(name);
+            if (info is not null)
+            {
+                return info;
+            }
+            foreach (var item in type.GetProperties())
+            {
+                foreach (var attr in item.GetCustomAttributes<ColumnAttribute>())
+                {
+                    if (attr.Name == name)
+                    {
+                        return item;
+                    }
+                }
+            }
+            return null;
+        }
+
         public static string GetTableName(Type info)
         {
             foreach (var item in info.GetCustomAttributes())

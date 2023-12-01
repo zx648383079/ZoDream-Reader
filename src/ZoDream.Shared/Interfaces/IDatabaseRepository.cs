@@ -9,21 +9,23 @@ namespace ZoDream.Shared.Interfaces
     {
 
         public Task<List<T>> GetBookAsync<T>() where T: INovel;
-        public Task<T> GetBookAsync<T>(object id) where T: INovel;
+        public Task<T?> GetBookAsync<T>(object id) where T: INovel;
 
         public Task SaveBookAsync(INovel item);
 
         public Task DeleteBookAsync(object id);
 
+        public Task<List<T>> GetChapterAsync<T>(object bookId) where T : INovelChapter;
+
         public Task<List<T>> GetThemeAsync<T>() where T : IAppTheme;
-        public Task<T> GetThemeAsync<T>(object id) where T : IAppTheme;
+        public Task<T?> GetThemeAsync<T>(object id) where T : IAppTheme;
 
         public Task SaveThemeAsync(IAppTheme item);
 
         public Task DeleteThemeAsync(object id);
 
         public Task<List<T>> GetReadThemeAsync<T>() where T : IReadTheme;
-        public Task<T> GetReadThemeAsync<T>(object id) where T : IReadTheme;
+        public Task<T?> GetReadThemeAsync<T>(object id) where T : IReadTheme;
 
         public Task SaveReadThemeAsync(IReadTheme item);
 
@@ -45,13 +47,13 @@ namespace ZoDream.Shared.Interfaces
         public Task DeleteChapterRuleAsync(object id);
 
         public Task<List<T>> GetSourceRuleAsync<T>() where T : ISourceRule;
-        public Task<T> GetSourceRuleAsync<T>(object id) where T : ISourceRule;
+        public Task<T?> GetSourceRuleAsync<T>(object id) where T : ISourceRule;
         public Task SaveSourceRuleAsync(ISourceRule item);
 
         public Task DeleteSourceRuleAsync(object id);
 
         public Task<List<T>> GetTTSSourceAsync<T>() where T : ITextToSpeech;
-        public Task<T> GetTTSSourceAsync<T>(object id) where T : ITextToSpeech;
+        public Task<T?> GetTTSSourceAsync<T>(object id) where T : ITextToSpeech;
         public Task SaveTTSSourceAsync(ITextToSpeech item);
 
         public Task DeleteTTSSourceAsync(object id);

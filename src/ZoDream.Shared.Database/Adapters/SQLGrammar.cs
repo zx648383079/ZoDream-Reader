@@ -84,6 +84,25 @@ namespace ZoDream.Shared.Database.Adapters
             return $"INSERT INTO {WrapName(tableName)}({field}) VALUES({value});";
         }
 
+        public SQLStringBuilder CompileUpdate(Dictionary<string, SQLStringBuilder> data)
+        {
+
+        }
+
+        public SQLStringBuilder CompileInsert(Dictionary<string, SQLStringBuilder> data)
+        {
+
+        }
+
+        public SQLStringBuilder CompileDelete(Dictionary<string, SQLStringBuilder> data)
+        {
+
+        }
+        public SQLStringBuilder CompileSelect(Dictionary<string, SQLStringBuilder> data)
+        {
+
+        }
+
         public void CompileCreateTable(StringBuilder builder, Table table)
         {
             builder.AppendLine($"CREATE TABLE IF NOT EXISTS {WrapName(table.Name)} (");

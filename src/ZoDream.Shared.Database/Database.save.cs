@@ -186,5 +186,36 @@ namespace ZoDream.Shared.Database
         {
             return Execute(Grammar.CompileUpdateJoin(ReflectionHelper.GetTableName(typeof(T)), sql), args);
         }
+
+        public bool Save<T>(ref T data) where T : class
+        {
+            var type = typeof(T);
+            var key = ReflectionHelper.GetPrimaryKey(type);
+            var field = ReflectionHelper.GetPropertyInfo(key, type);
+            if (field is null)
+            {
+                return Update(data) > 0;
+            }
+            var val = field.GetValue(data);
+            if (!ReflectionHelper.IsEmpty(val, type))
+            {
+                return Update(data) > 0;
+            }
+            var res = Insert(data);
+            if (res is null)
+            {
+                return false;
+            }
+            if (field.CanWrite)
+            {
+                field.SetValue(data, val);
+            }
+            return true;
+        }
+
+        public bool Save<T>(T data) where T : class
+        {
+            return Save(ref data);
+        }
     }
 }

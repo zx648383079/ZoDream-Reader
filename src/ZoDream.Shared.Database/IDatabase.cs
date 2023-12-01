@@ -42,5 +42,8 @@ namespace ZoDream.Shared.Database
   
         public int Delete<T>(object dataOrPrimaryKey) where T : class;
 
+        public bool Save<T>(ref T data) where T : class;
+        public bool Save<T>(T data) where T : class;
+
     }
 }

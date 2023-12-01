@@ -16,6 +16,14 @@ namespace ZoDream.Shared.Database.Adapters
         
         public string CompileDelete(string tableName, string primaryKeyName);
         public string CompileDeleteJoin(string tableName, string sql);
+
+        public SQLStringBuilder CompileUpdate(Dictionary<string, SQLStringBuilder> data);
+
+        public SQLStringBuilder CompileInsert(Dictionary<string, SQLStringBuilder> data);
+
+        public SQLStringBuilder CompileDelete(Dictionary<string, SQLStringBuilder> data);
+        public SQLStringBuilder CompileSelect(Dictionary<string, SQLStringBuilder> data);
+
         public string CompileUpdate(string tableName, string primaryKeyName, IEnumerable<string> columns);
         public string CompileUpdateJoin(string tableName, string sql);
 
@@ -27,6 +35,11 @@ namespace ZoDream.Shared.Database.Adapters
         public string CompileDropTable(string tableName);
         public string CompileDropTable(Table table);
         public object MapParameterValue(object value);
-        
+
+        public string WrapTable(string table, string? schema = null);
+
+        public string WrapName(string name);
+
+
     }
 }

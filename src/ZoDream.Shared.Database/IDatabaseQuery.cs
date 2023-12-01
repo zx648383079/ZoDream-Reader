@@ -28,8 +28,8 @@ namespace ZoDream.Shared.Database
 
         public List<T> Pluck<T>(string sql, params object[] args);
 
-        public IQuery<T> Query<T>();
+        public IQuery<T> Query<T>() where T : class;
 
-        public ISqlBuilder<T> Build<T>();
+        public ISqlBuilder<T> Build<T>() where T : class;
     }
 }
