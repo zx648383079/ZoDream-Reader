@@ -21,6 +21,7 @@ namespace ZoDream.Reader.ViewModels
             AddCommand = new RelayCommand(TapAdd);
             GroupCommand = new RelayCommand(TapGroup);
             ImportCommand = new RelayCommand(TapImport);
+            LoadAsync();
         }
 
         private ObservableCollection<SourceRuleModel> ruleItems = new();
@@ -70,6 +71,17 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             var items = await dialog.Importer.LoadSourceAsync<SourceRuleModel>(file.Path);
+            foreach (var item in items)
+            {
+                RuleItems.Add(item);
+            }
+        }
+
+        public async void LoadAsync()
+        {
+            RuleItems.Clear();
+            var app = App.GetService<AppViewModel>();
+            var items = await app.Database.GetSourceRuleAsync<SourceRuleModel>();
             foreach (var item in items)
             {
                 RuleItems.Add(item);

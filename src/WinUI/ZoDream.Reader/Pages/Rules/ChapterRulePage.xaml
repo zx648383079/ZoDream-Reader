@@ -7,7 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
-     xmlns:ctl="using:ZoDream.Reader.Controls"
+    x:Name="root"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
     mc:Ignorable="d">
 
     <Page.DataContext>
@@ -37,27 +38,29 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <CheckBox IsChecked="{Binding IsChecked}"/>
+                        <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay}"/>
                         <TextBlock Text="{Binding Name}" VerticalAlignment="Center" 
                            Grid.Column="1"/>
 
                         <TextBlock Text="{Binding Example}" VerticalAlignment="Center" Grid.Row="1" Grid.ColumnSpan="2"/>
 
-                        <ToggleSwitch IsOn="{Binding IsEnabled}" 
+                        <ToggleSwitch IsOn="{Binding IsEnabled,Mode=TwoWay}" 
                                       Style="{StaticResource InlineSwitchStyle}"
                                       Grid.Column="2" Grid.RowSpan="2"/>
                         <CommandBar Grid.Column="3" Grid.RowSpan="2">
-                            <AppBarButton Icon="Edit" Label="编辑"/>
-                            <AppBarButton Icon="Delete" Label="删除"/> 
+                            <AppBarButton Icon="Edit" Label="编辑" Command="{Binding ElementName=root,Path=DataContext.EditCommand}"      
+                                CommandParameter="{Binding}"/>
+                            <AppBarButton Icon="Delete" Label="删除" Command="{Binding ElementName=root,Path=DataContext.DeleteCommand}"      
+                                CommandParameter="{Binding}"/> 
                         </CommandBar>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         <CommandBar Grid.Row="1">
-            <AppBarButton Icon="List" Label="切换选择"/>
-            <AppBarButton Icon="Edit" Label="编辑"/>
-            <AppBarButton Icon="Delete" Label="删除"/>
+            <AppBarButton Icon="List" Label="切换选择" Command="{Binding ToggleCheckCommand}"/>
+            <AppBarButton Icon="Edit" Label="编辑" Command="{Binding EditCommand}"/>
+            <AppBarButton Icon="Delete" Label="删除" Command="{Binding DeleteCommand}"/>
             <AppBarButton Icon="Add" Label="添加" Command="{Binding AddCommand}"/>
             <CommandBar.SecondaryCommands>
                 <AppBarButton Icon="Import" Label="导入" Command="{Binding ImportCommand}"/>

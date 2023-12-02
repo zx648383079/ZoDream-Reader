@@ -9,6 +9,11 @@ namespace ZoDream.Shared.Database.Adapters.SQLite
     internal class SQLiteBuilderGrammar : SQLGrammar, IBuilderGrammar, ILinqGrammar
     {
 
+        protected override string CompileLastInsertId()
+        {
+            return string.Empty;
+        }
+
         protected override void CompileFieldExtra(StringBuilder builder, TableField field)
         {
             if (field.IsPrimaryKey)

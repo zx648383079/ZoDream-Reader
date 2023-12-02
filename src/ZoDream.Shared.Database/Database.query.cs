@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using ZoDream.Shared.Database.Mappers;
 
 namespace ZoDream.Shared.Database
@@ -79,7 +80,7 @@ namespace ZoDream.Shared.Database
 
         public List<T> Fetch<T>(string sql, params object[] args)
         {
-            return (List<T>)(object)Fetch(typeof(T), sql, args);
+            return Fetch(typeof(T), sql, args).Select(item => (T)item).ToList();
         }
 
         public List<T> Fetch<T>(long page, long perPage, string sql, params object[] args)

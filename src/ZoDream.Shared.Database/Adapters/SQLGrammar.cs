@@ -55,7 +55,7 @@ namespace ZoDream.Shared.Database.Adapters
                 i++;
                 sql += $"{WrapName(item)}={ParamPrefix}{i}";
             }
-            return $"UPDATE {WrapName(tableName)} SET  WHERE {WrapName(primaryKeyName)}={ParamPrefix}0";
+            return $"UPDATE {WrapName(tableName)} SET {sql} WHERE {WrapName(primaryKeyName)}={ParamPrefix}0";
         }
 
         public string CompileUpdateJoin(string tableName, string sql)
@@ -74,7 +74,7 @@ namespace ZoDream.Shared.Database.Adapters
             {
                 return sql;
             }
-            return $"{sql}SELECT LAST_INSERT_ID();";
+            return $"{sql}{CompileLastInsertId()}";
         }
 
         public string CompileInsert(string tableName, List<string> columns, int begin = 0)
@@ -172,6 +172,11 @@ namespace ZoDream.Shared.Database.Adapters
         public string CompileDropTable(Table table)
         {
             return CompileDropTable(table.Name);
+        }
+
+        protected virtual string CompileLastInsertId()
+        {
+            return "SELECT LAST_INSERT_ID();";
         }
         protected virtual void CompileFieldExtra(StringBuilder builder,
             TableField field)

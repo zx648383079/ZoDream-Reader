@@ -19,6 +19,7 @@ using Windows.Storage.AccessCache;
 using Windows.UI;
 using WinRT.Interop;
 using ZoDream.Reader.Controls;
+using ZoDream.Reader.Dialogs;
 using ZoDream.Reader.Repositories;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Route;
@@ -101,6 +102,16 @@ namespace ZoDream.Reader.ViewModels
         public void InitializePicker(object target)
         {
             InitializeWithWindow.Initialize(target, _baseWindowHandle);
+        }
+
+        public async Task<bool> ConfirmAsync(string message, string title = "提示")
+        {
+            var dialog = new ConfirmDialog
+            {
+                Title = title,
+                Content = message
+            };
+            return await OpenDialogAsync(dialog) == ContentDialogResult.Primary;
         }
 
         public IAsyncOperation<ContentDialogResult> OpenDialogAsync(ContentDialog target)

@@ -45,7 +45,7 @@ namespace ZoDream.Shared.Database.Mappers
             var items = new List<object>();
             while (reader.Read())
             {
-                if (itemType.IsClass)
+                if (!itemType.IsClass)
                 {
                     items.Add(Map(reader, itemType, 0)!);
                     continue;

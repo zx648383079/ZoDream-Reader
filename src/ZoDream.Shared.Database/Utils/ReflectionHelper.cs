@@ -141,6 +141,22 @@ namespace ZoDream.Shared.Database
             {
                 return string.IsNullOrWhiteSpace(s);
             }
+            if (val is int i)
+            {
+                return i == 0;
+            }
+            if (val is long l)
+            {
+                return l == 0L;
+            }
+            if (val is float f)
+            {
+                return f == 0f;
+            }
+            if (val is double d)
+            {
+                return d == 0d;
+            }
             return false;
         }
     }

@@ -26,12 +26,7 @@ namespace ZoDream.Reader.ViewModels
             var app = App.GetService<AppViewModel>();
             //var dialog = new MessageDialog("确定要删除文件");
             //app.InitializePicker(dialog);
-            var dialog = new ConfirmDialog
-            {
-                Content = "确定要删除文件"
-            };
-            var res = await app.OpenDialogAsync(dialog);
-            if (res != Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
+            if (!await app.ConfirmAsync("确定要删除文件"))
             {
                 return;
             }

@@ -75,7 +75,7 @@ namespace ZoDream.Reader.Repositories
             {
                 item = item.Clone<BookEntity>();
             }
-            connection.Save(item);
+            connection.Save((BookEntity)item);
             return Task.CompletedTask;
         }
 
@@ -102,7 +102,12 @@ namespace ZoDream.Reader.Repositories
 
         public Task SaveThemeAsync(IAppTheme item)
         {
-            throw new NotImplementedException();
+            if (item is not AppThemeEntity)
+            {
+                item = item.Clone<AppThemeEntity>();
+            }
+            connection.Save((AppThemeEntity)item);
+            return Task.CompletedTask;
         }
 
         public Task DeleteThemeAsync(object id)
@@ -127,7 +132,7 @@ namespace ZoDream.Reader.Repositories
             {
                 item = item.Clone<ReadThemeEntity>();
             }
-            connection.Save(item);
+            connection.Save((ReadThemeEntity)item);
             return Task.CompletedTask;
         }
 
@@ -148,7 +153,7 @@ namespace ZoDream.Reader.Repositories
             {
                 item = item.Clone<DictionaryRuleEntity>();
             }
-            connection.Save(item);
+            connection.Save((DictionaryRuleEntity)item);
             return Task.CompletedTask;
         }
 
@@ -169,7 +174,7 @@ namespace ZoDream.Reader.Repositories
             {
                 item = item.Clone<ReplaceRuleEntity>();
             }
-            connection.Save(item);
+            connection.Save((ReplaceRuleEntity)item);
             return Task.CompletedTask;
         }
 
@@ -190,13 +195,13 @@ namespace ZoDream.Reader.Repositories
             {
                 item = item.Clone<ChapterRuleEntity>();
             }
-            connection.Save(item);
+            connection.Save((ChapterRuleEntity)item);
             return Task.CompletedTask;
         }
 
-        public Task DeleteChapterRuleAsync(object id)
+        public Task DeleteChapterRuleAsync(params int[] items)
         {
-            connection.Delete<ChapterRuleEntity>(id);
+            connection.Build<ChapterRuleEntity>().WhereIn("Id", items).Delete();
             return Task.CompletedTask;
         }
 
@@ -216,7 +221,7 @@ namespace ZoDream.Reader.Repositories
             {
                 item = item.Clone<SourceRuleEntity>();
             }
-            connection.Save(item);
+            connection.Save((SourceRuleEntity)item);
             return Task.CompletedTask;
         }
 
@@ -242,7 +247,7 @@ namespace ZoDream.Reader.Repositories
             {
                 item = item.Clone<TextToSpeechEntity>();
             }
-            connection.Save(item);
+            connection.Save((TextToSpeechEntity)item);
             return Task.CompletedTask;
         }
 

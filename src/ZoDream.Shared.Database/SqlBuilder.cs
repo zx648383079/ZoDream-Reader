@@ -127,6 +127,10 @@ namespace ZoDream.Shared.Database
 
         public T? First()
         {
+            if (!Data.ContainsKey("select"))
+            {
+                Select("*");
+            }
             FromIfEmpty();
             var builder = Database.Grammar.CompileSelect(Data);
             using var cmd = Database.CreateCommand(Database.Connection, CommandType.Text, 
@@ -380,6 +384,10 @@ namespace ZoDream.Shared.Database
 
         public K? Scalar<K>()
         {
+            if (!Data.ContainsKey("select"))
+            {
+                Select("*");
+            }
             FromIfEmpty();
             var builder = Database.Grammar.CompileSelect(Data);
             return Database.ExecuteScalar<K>(ParameterFormat(builder.ToString()), builder.Parameters);
@@ -431,6 +439,14 @@ namespace ZoDream.Shared.Database
 
         public List<T> ToList()
         {
+            if (_isEmpty)
+            {
+                return [];
+            }
+            if (!Data.ContainsKey("select"))
+            {
+                Select("*");
+            }
             FromIfEmpty();
             var builder = Database.Grammar.CompileSelect(Data);
             return Database.Fetch<T>(ParameterFormat(builder.ToString()), builder.Parameters);

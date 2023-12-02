@@ -44,7 +44,7 @@ namespace ZoDream.Shared.Interfaces
         public Task<List<T>> GetChapterRuleAsync<T>() where T : IChapterRule;
         public Task SaveChapterRuleAsync(IChapterRule item);
 
-        public Task DeleteChapterRuleAsync(object id);
+        public Task DeleteChapterRuleAsync(params int[] items);
 
         public Task<List<T>> GetSourceRuleAsync<T>() where T : ISourceRule;
         public Task<T?> GetSourceRuleAsync<T>(object id) where T : ISourceRule;

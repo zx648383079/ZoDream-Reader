@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -86,11 +87,15 @@ namespace ZoDream.Shared.Database
                 sql = ParameterHelper.RawParamsPrefix.Replace(sql, m => Grammar.ParamPrefix + m.Value.Substring(1));
             }
             sql = sql.Replace("@@", "@");
+            Debug.WriteLine($"SQL: {sql}");
             DbCommand cmd = connection.CreateCommand();
             cmd.Connection = connection;
             cmd.CommandText = sql;
             // cmd.Transaction = _transaction;
-
+            if (args.Length == 1 && args[0] is List<object> o)
+            {
+                args = [.. o];
+            }
             foreach (var item in args)
             {
                 AddParameter(cmd, item);

@@ -192,12 +192,7 @@ namespace ZoDream.Shared.Database
             var type = typeof(T);
             var key = ReflectionHelper.GetPrimaryKey(type);
             var field = ReflectionHelper.GetPropertyInfo(key, type);
-            if (field is null)
-            {
-                return Update(data) > 0;
-            }
-            var val = field.GetValue(data);
-            if (!ReflectionHelper.IsEmpty(val, type))
+            if (field is not null && !ReflectionHelper.IsEmpty(field.GetValue(data), type))
             {
                 return Update(data) > 0;
             }
@@ -206,9 +201,9 @@ namespace ZoDream.Shared.Database
             {
                 return false;
             }
-            if (field.CanWrite)
+            if (field is not null && field.CanWrite)
             {
-                field.SetValue(data, val);
+                field.SetValue(data, res);
             }
             return true;
         }
