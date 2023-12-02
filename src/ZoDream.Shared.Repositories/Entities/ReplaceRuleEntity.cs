@@ -7,7 +7,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("replace_rules")]
-    [PrimaryKey("Id", AutoIncrement = true)]
+    [PrimaryKey("Id")]
     public class ReplaceRuleEntity: IReplaceRule
     {
         public int Id { get; set; }

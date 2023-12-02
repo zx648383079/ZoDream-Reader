@@ -8,7 +8,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("source_rules")]
-    [PrimaryKey("Id", AutoIncrement = true)]
+    [PrimaryKey("Id")]
     public class SourceRuleEntity: ISourceRule
     {
         public int Id { get; set; }

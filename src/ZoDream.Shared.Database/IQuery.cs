@@ -6,7 +6,6 @@ using System.Text;
 namespace ZoDream.Shared.Database
 {
     public interface IQuery<T>
-        where T : class
     {
 
         public IQuery<TResult> Select<TResult>(Expression<Func<T, TResult>> selector);

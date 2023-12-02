@@ -7,7 +7,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("book_marks")]
-    [PrimaryKey("Id", AutoIncrement = true)]
+    [PrimaryKey("Id")]
     public class BookmarkEntity: INovelMark
     {
         public int Id { get; set; }

@@ -4,15 +4,14 @@ using System.Text;
 
 namespace ZoDream.Shared.Database
 {
-    public interface ISqlBuilder<T> 
-        where T : class
+    public interface ISqlBuilder<T>
     {
         public ISqlBuilder<T> From<K>() where K : class;
         public ISqlBuilder<T> From(string tableName);
         public ISqlBuilder<T> IsEmpty();
 
-        public ISqlBuilder<T> When(bool condition, Action<SqlBuilder<T>> trueFunc);
-        public ISqlBuilder<T> When(bool condition, Action<SqlBuilder<T>> trueFunc, Action<SqlBuilder<T>> falseFunc);
+        public ISqlBuilder<T> When(bool condition, Action<ISqlBuilder<T>> trueFunc);
+        public ISqlBuilder<T> When(bool condition, Action<ISqlBuilder<T>> trueFunc, Action<ISqlBuilder<T>> falseFunc);
         public ISqlBuilder<T> Where(string key, object val);
         public ISqlBuilder<T> Where(string key, string @operator, object val);
 

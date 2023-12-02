@@ -4,7 +4,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("search_histories")]
-    [PrimaryKey("Word")]
+    [PrimaryKey("Word", AutoIncrement = false)]
     public class SearchHistoryEntity: ISearchHistory
     {
         

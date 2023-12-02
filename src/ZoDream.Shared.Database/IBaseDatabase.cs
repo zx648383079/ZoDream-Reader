@@ -8,6 +8,8 @@ namespace ZoDream.Shared.Database
 {
     public interface IBaseDatabase: IDisposable
     {
+
+        public DbConnection Connection { get; }
         public DbCommand CreateCommand(DbConnection connection, CommandType commandType, string sql, params object[] args);
 
         public void AddParameter(DbCommand cmd, object value);

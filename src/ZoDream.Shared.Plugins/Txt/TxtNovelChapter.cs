@@ -20,6 +20,7 @@ namespace ZoDream.Shared.Plugins.Txt
         {
             PublishedAt = publishedAt;
         }
+        public int Id { get; set; }
         public string Title { get; private set; }
 
         public string Description { get; private set; } = string.Empty;

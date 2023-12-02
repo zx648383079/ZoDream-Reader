@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using ZoDream.Shared.Database.Mappers;
 using ZoDream.Shared.Database.Models;
 
 namespace ZoDream.Shared.Database
 {
     public class SqlBuilder<T>(IDatabase database): ISqlBuilder<T>
-        where T : class
     {
 
         private readonly Dictionary<string, SQLStringBuilder> Data = [];
@@ -128,7 +129,14 @@ namespace ZoDream.Shared.Database
         {
             FromIfEmpty();
             var builder = Database.Grammar.CompileSelect(Data);
-            return Database.First<T>(ParameterFormat(builder.ToString()), builder.Parameters);
+            using var cmd = Database.CreateCommand(Database.Connection, CommandType.Text, 
+                ParameterFormat(builder.ToString()), builder.Parameters);
+            var reader = cmd.ExecuteReader();
+            if (!reader.Read())
+            {
+                return default;
+            }
+            return (T)new TypeMapper().Map(reader, typeof(T))!;
         }
 
         public T FirstOrDefault()
@@ -545,7 +553,7 @@ namespace ZoDream.Shared.Database
             return Database.ExecuteScalar<K>(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
-        public ISqlBuilder<T> When(bool condition, Action<SqlBuilder<T>> trueFunc)
+        public ISqlBuilder<T> When(bool condition, Action<ISqlBuilder<T>> trueFunc)
         {
             if (condition)
             {
@@ -554,7 +562,7 @@ namespace ZoDream.Shared.Database
             return this;
         }
 
-        public ISqlBuilder<T> When(bool condition, Action<SqlBuilder<T>> trueFunc, Action<SqlBuilder<T>> falseFunc)
+        public ISqlBuilder<T> When(bool condition, Action<ISqlBuilder<T>> trueFunc, Action<ISqlBuilder<T>> falseFunc)
         {
             if (condition)
             {

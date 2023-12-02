@@ -160,10 +160,7 @@ namespace ZoDream.Shared.Database.Adapters
             }
             foreach (var item in table.Items)
             {
-                if (item.IsPrimaryKey)
-                {
-                    builder.AppendLine($",PRIMARY KEY ({WrapName(item.Name)})");
-                }
+                CompileFieldExtra(builder, item);
             }
             builder.AppendLine(");");
         }
@@ -176,7 +173,14 @@ namespace ZoDream.Shared.Database.Adapters
         {
             return CompileDropTable(table.Name);
         }
-
+        protected virtual void CompileFieldExtra(StringBuilder builder,
+            TableField field)
+        {
+            if (field.IsPrimaryKey)
+            {
+                builder.AppendLine($",PRIMARY KEY ({WrapName(field.Name)})");
+            }
+        }
         protected virtual void CompileCreateField(StringBuilder builder, 
             TableField field, bool isFristLine)
         {
@@ -185,10 +189,16 @@ namespace ZoDream.Shared.Database.Adapters
             {
                 extra += " AUTO_INCREMENT";
             }
+            if (field.IsUnique)
+            {
+                extra += "UNIQUE";
+            }
+
             if (field.Default is not null)
             {
                 extra += " DEFAULT " + field.Default is string ? WrapText(field.Default) : field.Default;
             }
+           
             if (!isFristLine)
             {
                 builder.Append(',');

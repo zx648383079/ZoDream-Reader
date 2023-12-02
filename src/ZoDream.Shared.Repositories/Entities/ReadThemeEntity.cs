@@ -7,7 +7,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("read_themes")]
-    [PrimaryKey("Id", AutoIncrement = true)]
+    [PrimaryKey("Id")]
     public class ReadThemeEntity: IReadTheme
     {
         public int Id { get; set; }

@@ -7,7 +7,7 @@ using ZoDream.Shared.Interfaces.Entities;
 namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("rss_sources")]
-    [PrimaryKey("Id", AutoIncrement = true)]
+    [PrimaryKey("Id")]
     public class SubscribeSourceEntity: ISubscribeSource
     {
         public int Id { get; set; }

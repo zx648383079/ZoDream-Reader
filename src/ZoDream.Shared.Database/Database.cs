@@ -30,9 +30,11 @@ namespace ZoDream.Shared.Database
             Grammar = grammar;
         }
 
-        private DbConnection _sharedConnection;
+        private readonly DbConnection _sharedConnection;
 
         public IBuilderGrammar Grammar { get; private set; }
+
+        public DbConnection Connection  => _sharedConnection;
 
         public void Open()
         {
@@ -131,14 +133,12 @@ namespace ZoDream.Shared.Database
             return cmd;
         }
 
-        public IQuery<T> Query<T>() 
-            where T : class
+        public IQuery<T> Query<T>()
         {
             throw new NotImplementedException();
         }
 
-        public ISqlBuilder<T> Build<T>() 
-            where T : class
+        public ISqlBuilder<T> Build<T>()
         {
             return new SqlBuilder<T>(this);
         }
