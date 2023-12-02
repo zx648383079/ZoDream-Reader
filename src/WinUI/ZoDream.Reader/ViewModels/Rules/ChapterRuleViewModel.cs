@@ -20,8 +20,11 @@ namespace ZoDream.Reader.ViewModels
             EditCommand = new RelayCommand(TapEdit);
             DeleteCommand = new RelayCommand(TapDelete);
             ToggleCheckCommand = new RelayCommand(TapToggleCheck);
+            ToggleCommand = new RelayCommand(TapToggle);
             LoadAsync();
         }
+
+        private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
         private ObservableCollection<ChapterRuleModel> ruleItems = new();
 
@@ -37,6 +40,16 @@ namespace ZoDream.Reader.ViewModels
         public ICommand DeleteCommand { get; private set; }
 
         public ICommand ToggleCheckCommand { get; private set; }
+        public ICommand ToggleCommand { get; private set; }
+
+        private void TapToggle(object? arg)
+        {
+            if (arg is not ChapterRuleModel data)
+            {
+                return;
+            }
+            _app.Database.ToggleChapterRuleAsync(data.IsEnabled, data.Id);
+        }
 
         private void TapToggleCheck(object? _)
         {
@@ -71,12 +84,11 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            var app = App.GetService<AppViewModel>();
-            if (!await app.ConfirmAsync($"确定删除 {items.Length} 条规则？"))
+            if (!await _app.ConfirmAsync($"确定删除 {items.Length} 条规则？"))
             {
                 return;
             }
-            await app.Database.DeleteChapterRuleAsync(items);
+            await _app.Database.DeleteChapterRuleAsync(items);
             for (int i = RuleItems.Count - 1; i >= 0; i--)
             {
                 if (items.Contains(RuleItems[i].Id))
@@ -109,12 +121,11 @@ namespace ZoDream.Reader.ViewModels
 
         private async void EditRule(ChapterRuleModel data)
         {
-            var app = App.GetService<AppViewModel>();
             var picker = new AddChapterRuleDialog
             {
                 DataContext = data.Clone<ChapterRuleModel>()
             };
-            var res = await app.OpenDialogAsync(picker);
+            var res = await _app.OpenDialogAsync(picker);
             if (res != Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
             {
                 return;
@@ -124,14 +135,13 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             picker.ViewModel.CopyTo(data);
-            await app.Database.SaveChapterRuleAsync(data);
+            await _app.Database.SaveChapterRuleAsync(data);
         }
 
         private async void TapAdd(object? _)
         {
-            var app = App.GetService<AppViewModel>();
             var picker = new AddChapterRuleDialog();
-            var res = await app.OpenDialogAsync(picker);
+            var res = await _app.OpenDialogAsync(picker);
             if (res != Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
             {
                 return;
@@ -142,21 +152,20 @@ namespace ZoDream.Reader.ViewModels
             }
             var item = picker.ViewModel.Clone<ChapterRuleModel>();
             RuleItems.Add(item);
-            await app.Database.SaveChapterRuleAsync(item);
+            await _app.Database.SaveChapterRuleAsync(item);
         }
 
         private async void TapImport(object? _)
         {
-            var app = App.GetService<AppViewModel>();
             var dialog = new ImportDialog();
-            var res = await app.OpenDialogAsync(dialog);
+            var res = await _app.OpenDialogAsync(dialog);
             if (res != Microsoft.UI.Xaml.Controls.ContentDialogResult.None)
             {
                 return;
             }
             var picker = new FileOpenPicker();
             picker.FileTypeFilter.Add(".json");
-            app.InitializePicker(picker);
+            _app.InitializePicker(picker);
             var file = await picker.PickSingleFileAsync();
             if (file is null)
             {
@@ -170,7 +179,7 @@ namespace ZoDream.Reader.ViewModels
                     continue;
                 }
                 RuleItems.Add(item);
-                await app.Database.SaveChapterRuleAsync(item);
+                await _app.Database.SaveChapterRuleAsync(item);
             }
         }
 
@@ -194,8 +203,7 @@ namespace ZoDream.Reader.ViewModels
         public async void LoadAsync()
         {
             RuleItems.Clear();
-            var app = App.GetService<AppViewModel>();
-            var items = await app.Database.GetChapterRuleAsync<ChapterRuleModel>();
+            var items = await _app.Database.GetChapterRuleAsync<ChapterRuleModel>();
             foreach (var item in items)
             {
                 RuleItems.Add(item);

@@ -32,7 +32,10 @@
                 </lbs:SettingsCard>
                 <lbs:SettingsCard Header="字体大小" Description="当前字体大小："/>
                 <lbs:SettingsCard Header="封面设置" IsClickEnabled="True"/>
-                <lbs:SettingsCard Header="主题列表" IsClickEnabled="True" Command="{Binding ThemeCommand}"/>
+                <lbs:SettingsCard Header="主题列表" Description="软件页面主题风格" 
+                                  IsClickEnabled="True" Command="{Binding ThemeCommand}"/>
+                <lbs:SettingsCard Header="阅读主题列表" Description="阅读页面样式" 
+                                  IsClickEnabled="True" Command="{Binding ReadThemeCommand}"/>
                 <TextBlock Text="亮模式" Style="{StaticResource GroupHeaderStyle}"/>
                 <lbs:SettingsCard Header="主色调">
                     <ctl:ColorInput/>

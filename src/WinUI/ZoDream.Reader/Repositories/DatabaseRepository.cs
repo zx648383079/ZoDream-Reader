@@ -79,9 +79,9 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteBookAsync(object id)
+        public Task DeleteBookAsync(params object[] items)
         {
-            connection.Delete<BookEntity>(id);
+            connection.Build<BookEntity>().WhereIn("Id", items).Delete();
             return Task.CompletedTask;
         }
 
@@ -110,9 +110,9 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteThemeAsync(object id)
+        public Task DeleteThemeAsync(params object[] items)
         {
-            connection.Delete<AppThemeEntity>(id);
+            connection.Build<AppThemeEntity>().WhereIn("Id", items).Delete();
             return Task.CompletedTask;
         }
 
@@ -136,9 +136,9 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteReadThemeAsync(object id)
+        public Task DeleteReadThemeAsync(params object[] items)
         {
-            connection.Delete<ReadThemeEntity>(id);
+            connection.Build<ReadThemeEntity>().WhereIn("Id", items).Delete();
             return Task.CompletedTask;
         }
 
@@ -157,9 +157,9 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteDictionaryRuleAsync(object id)
+        public Task DeleteDictionaryRuleAsync(params object[] items)
         {
-            connection.Delete<DictionaryRuleEntity>(id);
+            connection.Build<DictionaryRuleEntity>().WhereIn("Id", items).Delete();
             return Task.CompletedTask;
         }
 
@@ -178,9 +178,9 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteReplaceRuleAsync(object id)
+        public Task DeleteReplaceRuleAsync(params object[] items)
         {
-            connection.Delete<ReplaceRuleEntity>(id);
+            connection.Build<ReplaceRuleEntity>().WhereIn("Id", items).Delete();
             return Task.CompletedTask;
         }
 
@@ -199,9 +199,16 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteChapterRuleAsync(params int[] items)
+        public Task DeleteChapterRuleAsync(params object[] items)
         {
             connection.Build<ChapterRuleEntity>().WhereIn("Id", items).Delete();
+            return Task.CompletedTask;
+        }
+
+        public Task ToggleChapterRuleAsync(bool enabled, params object[] items)
+        {
+            connection.Build<ChapterRuleEntity>().WhereIn("Id", items)
+                .Update("IsEnabled", enabled);
             return Task.CompletedTask;
         }
 
@@ -225,9 +232,9 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteSourceRuleAsync(object id)
+        public Task DeleteSourceRuleAsync(params object[] items)
         {
-            connection.Delete<SourceRuleEntity>(id);
+            connection.Build<SourceRuleEntity>().WhereIn("Id", items).Delete();
             return Task.CompletedTask;
         }
 
@@ -251,9 +258,9 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteTTSSourceAsync(object id)
+        public Task DeleteTTSSourceAsync(params object[] items)
         {
-            connection.Delete<TextToSpeechEntity>(id);
+            connection.Build<TextToSpeechEntity>().WhereIn("Id", items).Delete();
             return Task.CompletedTask;
         }
 
@@ -336,11 +343,38 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteMarkAsync(object id)
+        public Task DeleteMarkAsync(params object[] items)
         {
-            connection.Delete<BookmarkEntity>(id);
+            connection.Build<BookmarkEntity>().WhereIn("Id", items).Delete();
             return Task.CompletedTask;
         }
 
+        public Task ToggleDictionaryRuleAsync(bool enabled, params object[] items)
+        {
+            connection.Build<DictionaryRuleEntity>().WhereIn("Id", items)
+                .Update("IsEnabled", enabled);
+            return Task.CompletedTask;
+        }
+
+        public Task ToggleReplaceRuleAsync(bool enabled, params object[] items)
+        {
+            connection.Build<ReplaceRuleEntity>().WhereIn("Id", items)
+                .Update("IsEnabled", enabled);
+            return Task.CompletedTask;
+        }
+
+        public Task ToggleSourceRuleAsync(bool enabled, params object[] items)
+        {
+            connection.Build<SourceRuleEntity>().WhereIn("Id", items)
+                .Update("IsEnabled", enabled);
+            return Task.CompletedTask;
+        }
+
+        public Task ToggleTTSSourceAsync(bool enabled, params object[] items)
+        {
+            connection.Build<TextToSpeechEntity>().WhereIn("Id", items)
+                .Update("IsEnabled", enabled);
+            return Task.CompletedTask;
+        }
     }
 }

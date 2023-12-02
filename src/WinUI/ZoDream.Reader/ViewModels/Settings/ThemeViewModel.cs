@@ -15,10 +15,16 @@ namespace ZoDream.Reader.ViewModels
         public ThemeViewModel()
         {
             ThemeCommand = new RelayCommand(TapTheme);
+            ReadThemeCommand = new RelayCommand(TapReadTheme);
         }
 
         public ICommand ThemeCommand { get; private set; }
+        public ICommand ReadThemeCommand { get; private set; }
 
+        private void TapReadTheme(object? _)
+        {
+            App.GetService<IRouter>().GoToAsync("setting/read_theme");
+        }
 
         private void TapTheme(object? _)
         {

@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ZoDream.Reader.Dialogs;
+using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
+using ZoDream.Shared.Repositories.Models;
 using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
@@ -16,11 +18,10 @@ namespace ZoDream.Reader.ViewModels
         public ShelfViewModel()
         {
             AddCommand = new RelayCommand(TapAdd);
-            for (int i = 0; i < 10; i++)
-            {
-                NovelItems.Add(new BookEntity() { Name = $"小说{i}" });
-            }
+            LoadAsync();
         }
+
+        private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
         private ObservableCollection<BookEntity> novelItems = new();
 
@@ -33,12 +34,21 @@ namespace ZoDream.Reader.ViewModels
 
         public ICommand AddCommand { get; private set; }
 
-        private async void TapAdd(object _)
+        private async void TapAdd(object? _)
         {
             var picker = new AddNovelDialog();
-            await App.GetService<AppViewModel>().OpenDialogAsync(picker);
+            await _app.OpenDialogAsync(picker);
         }
 
+        public async void LoadAsync()
+        {
+            NovelItems.Clear();
+            var items = await _app.Database.GetBookAsync<BookEntity>();
+            foreach (var item in items)
+            {
+                NovelItems.Add(item);
+            }
+        }
 
     }
 }

@@ -7,8 +7,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
+    xmlns:bhv="using:ZoDream.Reader.Behaviors"
+    xmlns:ity="using:Microsoft.Xaml.Interactivity"
     x:Name="root"
-    xmlns:ctl="using:ZoDream.Reader.Controls"
     mc:Ignorable="d">
 
     <Page.DataContext>
@@ -46,7 +47,13 @@
 
                         <ToggleSwitch IsOn="{Binding IsEnabled,Mode=TwoWay}" 
                                       Style="{StaticResource InlineSwitchStyle}"
-                                      Grid.Column="2" Grid.RowSpan="2"/>
+                                      Grid.Column="2" Grid.RowSpan="2">
+                            <ity:Interaction.Behaviors>
+                                <bhv:ToggleSwitchBehavior ToggleCommand="{Binding ElementName=root,Path=DataContext.ToggleCommand}"      
+                                CommandParameter="{Binding}"/>
+                            </ity:Interaction.Behaviors>
+
+                        </ToggleSwitch>
                         <CommandBar Grid.Column="3" Grid.RowSpan="2">
                             <AppBarButton Icon="Edit" Label="编辑" Command="{Binding ElementName=root,Path=DataContext.EditCommand}"      
                                 CommandParameter="{Binding}"/>

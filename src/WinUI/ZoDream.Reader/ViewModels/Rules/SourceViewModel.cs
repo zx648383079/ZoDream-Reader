@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Dialogs;
+using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Repositories.Extensions;
 using ZoDream.Shared.Repositories.Models;
@@ -21,8 +22,14 @@ namespace ZoDream.Reader.ViewModels
             AddCommand = new RelayCommand(TapAdd);
             GroupCommand = new RelayCommand(TapGroup);
             ImportCommand = new RelayCommand(TapImport);
+            EditCommand = new RelayCommand(TapEdit);
+            DeleteCommand = new RelayCommand(TapDelete);
+            ToggleCheckCommand = new RelayCommand(TapToggleCheck);
+            ToggleCommand = new RelayCommand(TapToggle);
             LoadAsync();
         }
+
+        private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
         private ObservableCollection<SourceRuleModel> ruleItems = new();
 
@@ -33,18 +40,124 @@ namespace ZoDream.Reader.ViewModels
 
         public ICommand AddCommand { get; private set; }
         public ICommand GroupCommand { get; private set; }
-
         public ICommand ImportCommand { get; private set; }
+        public ICommand EditCommand { get; private set; }
+        public ICommand DeleteCommand { get; private set; }
 
-        private async void TapAdd(object? _)
+        public ICommand ToggleCheckCommand { get; private set; }
+        public ICommand ToggleCommand { get; private set; }
+
+        private void TapToggle(object? arg)
         {
-            var picker = new AddSourceDialog();
-            var res = await App.GetService<AppViewModel>().OpenDialogAsync(picker);
+            if (arg is not SourceRuleModel data)
+            {
+                return;
+            }
+            _app.Database.ToggleSourceRuleAsync(data.IsEnabled, data.Id);
+        }
+
+        private void TapToggleCheck(object? _)
+        {
+            if (RuleItems.Count == 0)
+            {
+                return;
+            }
+            var isChecked = !RuleItems[0].IsChecked;
+            foreach (var item in RuleItems)
+            {
+                item.IsChecked = isChecked;
+            }
+        }
+
+        private void TapDelete(object? arg)
+        {
+
+            if (arg is null)
+            {
+                DeleteRule(RuleItems.Where(item => item.IsChecked).Select(item => item.Id).ToArray());
+                return;
+            }
+            if (arg is SourceRuleModel data)
+            {
+                DeleteRule(data.Id);
+            }
+        }
+
+        private async void DeleteRule(params int[] items)
+        {
+            if (items.Length == 0)
+            {
+                return;
+            }
+            if (!await _app.ConfirmAsync($"确定删除 {items.Length} 条规则？"))
+            {
+                return;
+            }
+            await _app.Database.DeleteSourceRuleAsync(items);
+            for (int i = RuleItems.Count - 1; i >= 0; i--)
+            {
+                if (items.Contains(RuleItems[i].Id))
+                {
+                    RuleItems.RemoveAt(i);
+                }
+            }
+        }
+
+        private void TapEdit(object? arg)
+        {
+            if (arg is null)
+            {
+                foreach (var item in RuleItems)
+                {
+                    if (item.IsChecked)
+                    {
+                        EditRule(item);
+                        break;
+                    }
+                }
+                return;
+            }
+            if (arg is SourceRuleModel data)
+            {
+                EditRule(data);
+            }
+
+        }
+
+        private async void EditRule(SourceRuleModel data)
+        {
+            var picker = new AddSourceDialog
+            {
+                DataContext = data.Clone<SourceRuleModel>()
+            };
+            var res = await _app.OpenDialogAsync(picker);
             if (res != Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
             {
                 return;
             }
-            RuleItems.Add(picker.ViewModel.Clone<SourceRuleModel>());
+            if (string.IsNullOrWhiteSpace(picker.ViewModel.BaseUri))
+            {
+                return;
+            }
+            picker.ViewModel.CopyTo(data);
+            await _app.Database.SaveSourceRuleAsync(data);
+        }
+
+        private async void TapAdd(object? _)
+        {
+            var picker = new AddSourceDialog();
+            var res = await _app.OpenDialogAsync(picker);
+            if (res != Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
+            {
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(picker.ViewModel.BaseUri))
+            {
+                return;
+            }
+            var item = picker.ViewModel.Clone<SourceRuleModel>();
+            RuleItems.Add(item);
+            await _app.Database.SaveSourceRuleAsync(item);
         }
 
         public void TapGroup(object? _)
@@ -55,16 +168,15 @@ namespace ZoDream.Reader.ViewModels
 
         private async void TapImport(object? _)
         {
-            var app = App.GetService<AppViewModel>();
             var dialog = new ImportDialog();
-            var res = await app.OpenDialogAsync(dialog);
+            var res = await _app.OpenDialogAsync(dialog);
             if (res != Microsoft.UI.Xaml.Controls.ContentDialogResult.None)
             {
                 return;
             }
             var picker = new FileOpenPicker();
             picker.FileTypeFilter.Add(".json");
-            app.InitializePicker(picker);
+            _app.InitializePicker(picker);
             var file = await picker.PickSingleFileAsync();
             if (file is null)
             {
@@ -73,15 +185,31 @@ namespace ZoDream.Reader.ViewModels
             var items = await dialog.Importer.LoadSourceAsync<SourceRuleModel>(file.Path);
             foreach (var item in items)
             {
+                if (Contains(item))
+                {
+                    continue;
+                }
                 RuleItems.Add(item);
+                await _app.Database.SaveSourceRuleAsync(item);
             }
+        }
+
+        public bool Contains(ISourceRule rule)
+        {
+            foreach (var item in RuleItems)
+            {
+                if (item.BaseUri == rule.BaseUri)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public async void LoadAsync()
         {
             RuleItems.Clear();
-            var app = App.GetService<AppViewModel>();
-            var items = await app.Database.GetSourceRuleAsync<SourceRuleModel>();
+            var items = await _app.Database.GetSourceRuleAsync<SourceRuleModel>();
             foreach (var item in items)
             {
                 RuleItems.Add(item);

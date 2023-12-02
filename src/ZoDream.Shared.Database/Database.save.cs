@@ -60,9 +60,9 @@ namespace ZoDream.Shared.Database
             var sql = Grammar.CompileInsert(tableName, primaryKeyName, keys);
             if (i == -1)
             {
-                return ExecuteScalar(primaryKeyType, sql, CommandType.Text, items);
+                return ExecuteScalar(primaryKeyType, sql, CommandType.Text, [..items]);
             }
-            var res = Execute(Grammar.CompileInsert(tableName, primaryKeyName, keys), items);
+            var res = Execute(Grammar.CompileInsert(tableName, primaryKeyName, keys), [.. items]);
             if (res > 0)
             {
                 return items[i];
@@ -122,7 +122,7 @@ namespace ZoDream.Shared.Database
                 sb.AppendLine(Grammar.CompileInsert(ReflectionHelper.GetTableName(type), keys, index));
                 index += keys.Count;
             }
-            return Execute(sb.ToString(), items);
+            return Execute(sb.ToString(), [..items]);
         }
 
         public int Update(string tableName, string primaryKeyName, object primaryKeyValue, object data, IEnumerable<string>? columns = null)
@@ -135,7 +135,7 @@ namespace ZoDream.Shared.Database
                 {
                     items.Add(ReflectionHelper.GetPropertyValue(key, type, data));
                 }
-                return Execute(Grammar.CompileUpdate(tableName, primaryKeyName, columns), primaryKeyValue, items);
+                return Execute(Grammar.CompileUpdate(tableName, primaryKeyName, columns), [primaryKeyValue, .. items]);
             }
             var keys = new List<string>();
             foreach (var item in type.GetProperties())
@@ -148,7 +148,7 @@ namespace ZoDream.Shared.Database
                 keys.Add(name);
                 items.Add(item.GetValue(data));
             }
-            return Execute(Grammar.CompileUpdate(tableName, primaryKeyName, keys), primaryKeyValue, items);
+            return Execute(Grammar.CompileUpdate(tableName, primaryKeyName, keys), [primaryKeyValue, ..items]);
         }
 
         public int Update(string tableName, string primaryKeyName, object data, IEnumerable<string>? columns = null)
