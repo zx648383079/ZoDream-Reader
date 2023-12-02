@@ -68,7 +68,6 @@ namespace ZoDream.Shared.Database
             cmd.Parameters.Add(p);
         }
 
-        // Create a command
         private DbCommand CreateCommand(DbConnection connection, string sql, params object[] args)
         {
             return CreateCommand(connection, CommandType.Text, sql, args);
@@ -132,12 +131,14 @@ namespace ZoDream.Shared.Database
             return cmd;
         }
 
-        public IQuery<T> Query<T>()
+        public IQuery<T> Query<T>() 
+            where T : class
         {
             throw new NotImplementedException();
         }
 
-        public ISqlBuilder<T> Build<T>()
+        public ISqlBuilder<T> Build<T>() 
+            where T : class
         {
             return new SqlBuilder<T>(this);
         }

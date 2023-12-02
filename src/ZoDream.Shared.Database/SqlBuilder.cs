@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using ZoDream.Shared.Database.Models;
 
@@ -39,12 +40,39 @@ namespace ZoDream.Shared.Database
                 item.Value.Clear();
             }
         }
-
+        /// <summary>
+        /// 生成值占位符
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public string ParameterPlaceholder(params object[] val)
         {
-            return string.Join(", ", val.Select(_ => '?'));
+            return ParameterPlaceholder(val.Length);
         }
-
+        /// <summary>
+        /// 生成值占位符
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public string ParameterPlaceholder(int count, string separator = ",")
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i < count; i++)
+            {
+                if (i > 0)
+                {
+                    sb.Append(separator);
+                }
+                sb.Append("?");
+            }
+            return sb.ToString();
+        }
+        /// <summary>
+        /// 替换值占位符
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
         public string ParameterFormat(string sql)
         {
             var i = -1;
@@ -93,14 +121,14 @@ namespace ZoDream.Shared.Database
         {
             FromIfEmpty();
             var builder = Database.Grammar.CompileDelete(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public T? First()
         {
             FromIfEmpty();
             var builder = Database.Grammar.CompileSelect(Data);
-            return Database.First<T>(builder.ToString(), builder.Parameters);
+            return Database.First<T>(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public T FirstOrDefault()
@@ -135,17 +163,51 @@ namespace ZoDream.Shared.Database
 
         public object? Insert(IDictionary<string, object> data)
         {
-            throw new NotImplementedException();
+            foreach(var item in  data)
+            {
+                Append("field", Database.Grammar.WrapName(item.Key), [], ",");
+                Append("values", "?", [item.Value], ",");
+            }
+            FromIfEmpty();
+            var builder = Database.Grammar.CompileInsert(Data);
+            return Database.ExecuteScalar<string>(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public object? Insert(T data)
         {
-            throw new NotImplementedException();
+            var (field, atts) = ReflectionHelper.GetProperties(typeof(T));
+            foreach(var key in field)
+            {
+                Append("field", Database.Grammar.WrapName(key), [], ",");
+            }
+            foreach (var item in atts)
+            {
+                Append("values", "?", [item.GetValue(data)], ",");
+            }
+            FromIfEmpty();
+            var builder = Database.Grammar.CompileInsert(Data);
+            return Database.ExecuteScalar<string>(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int Insert(IEnumerable<T> items)
         {
-            throw new NotImplementedException();
+            var (field, atts) = ReflectionHelper.GetProperties(typeof(T));
+            foreach (var key in field)
+            {
+                Append("field", Database.Grammar.WrapName(key), [], ",");
+            }
+            var i = 0;
+            foreach (var item in items)
+            {
+                var name = $"values {i++}";
+                foreach(var attr in atts)
+                {
+                    Append(name, "?", [attr.GetValue(item)], ",");
+                }
+            }
+            FromIfEmpty();
+            var builder = Database.Grammar.CompileInsert(Data);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public ISqlBuilder<T> IsEmpty()
@@ -312,7 +374,7 @@ namespace ZoDream.Shared.Database
         {
             FromIfEmpty();
             var builder = Database.Grammar.CompileSelect(Data);
-            return Database.ExecuteScalar<K>(builder.ToString(), builder.Parameters);
+            return Database.ExecuteScalar<K>(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public ISqlBuilder<T> Select(params string[] items)
@@ -363,7 +425,7 @@ namespace ZoDream.Shared.Database
         {
             FromIfEmpty();
             var builder = Database.Grammar.CompileSelect(Data);
-            return Database.Fetch<T>(builder.ToString(), builder.Parameters);
+            return Database.Fetch<T>(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int Update(T data)
@@ -386,7 +448,7 @@ namespace ZoDream.Shared.Database
             }
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int Update(string key, object val)
@@ -395,7 +457,7 @@ namespace ZoDream.Shared.Database
             Append("set", $"{key}=?", [val], ",");
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int Update(IDictionary<string, object> data)
@@ -406,7 +468,7 @@ namespace ZoDream.Shared.Database
             }
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int UpdateBool(string key)
@@ -415,7 +477,7 @@ namespace ZoDream.Shared.Database
             Append("set", $"{key} = CASE WHEN {key} = 1 THEN 0 ELSE 1 END", [], ",");
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int UpdateDecrement(string key, int offset = 1)
@@ -424,7 +486,7 @@ namespace ZoDream.Shared.Database
             Append("set", $"{key} = {key} - {offset}", [], ",");
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int UpdateDecrement(string key, float offset)
@@ -433,7 +495,7 @@ namespace ZoDream.Shared.Database
             Append("set", $"{key} = {key} - {offset}", [], ",");
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int UpdateDecrement(string key, double offset)
@@ -442,7 +504,7 @@ namespace ZoDream.Shared.Database
             Append("set", $"{key} = {key} - {offset}", [], ",");
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int UpdateIncrement(string key, int offset = 1)
@@ -451,7 +513,7 @@ namespace ZoDream.Shared.Database
             Append("set", $"{key} = {key} + {offset}", [], ",");
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int UpdateIncrement(string key, float offset)
@@ -460,7 +522,7 @@ namespace ZoDream.Shared.Database
             Append("set", $"{key} = {key} + {offset}", [], ",");
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public int UpdateIncrement(string key, double offset)
@@ -469,7 +531,7 @@ namespace ZoDream.Shared.Database
             Append("set", $"{key} = {key} + {offset}", [], ",");
             FromIfEmpty();
             var builder = Database.Grammar.CompileUpdate(Data);
-            return Database.Execute(builder.ToString(), builder.Parameters);
+            return Database.Execute(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public K? Value<K>(string key)
@@ -480,7 +542,7 @@ namespace ZoDream.Shared.Database
             }
             FromIfEmpty();
             var builder = Database.Grammar.CompileSelect(Data);
-            return Database.ExecuteScalar<K>(builder.ToString(), builder.Parameters);
+            return Database.ExecuteScalar<K>(ParameterFormat(builder.ToString()), builder.Parameters);
         }
 
         public ISqlBuilder<T> When(bool condition, Action<SqlBuilder<T>> trueFunc)

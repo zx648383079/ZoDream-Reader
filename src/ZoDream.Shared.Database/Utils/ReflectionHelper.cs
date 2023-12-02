@@ -102,6 +102,35 @@ namespace ZoDream.Shared.Database
             return "ID";
         }
 
+        public static (string[], PropertyInfo[]) GetProperties(Type info, bool isUpdated = false)
+        {
+            var fields = new List<string>();
+            var atts = new List<PropertyInfo>();
+            var attr = info.GetCustomAttribute<PrimaryKeyAttribute>();
+            var key = string.Empty;
+            if (attr is not null)
+            {
+                if (isUpdated)
+                {
+                    key = attr.Value;
+                } else if (attr.AutoIncrement)
+                {
+                    key = attr.Value;
+                }
+            }
+            foreach (var item in info.GetProperties())
+            {
+                var name = GetPropertyName(item);
+                if (string.IsNullOrEmpty(name) || key == name || key == item.Name)
+                {
+                    continue;
+                }
+                fields.Add(name);
+                atts.Add(item);
+            }
+            return (fields.ToArray(), atts.ToArray());
+        }
+
         public static bool IsEmpty(object val, Type type)
         {
             if (val is null)

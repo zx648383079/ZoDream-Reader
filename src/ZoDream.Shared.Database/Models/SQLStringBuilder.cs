@@ -25,6 +25,11 @@ namespace ZoDream.Shared.Database.Models
 
         public SQLStringBuilder Append(SQLStringBuilder builder)
         {
+            return Append(builder, true);
+        }
+
+        public SQLStringBuilder Append(SQLStringBuilder builder, bool addPrefix)
+        {
             if (builder.IsEmpty)
             {
                 return this;
@@ -33,8 +38,35 @@ namespace ZoDream.Shared.Database.Models
             {
                 Sql.Append(' ');
             }
-            Sql.Append(builder.ToString());
+            Sql.Append(addPrefix ? builder.ToString() : builder.Sql.ToString());
             Parameters.AddRange(builder.Parameters);
+            return this;
+        }
+
+        public SQLStringBuilder Append(StringBuilder builder)
+        {
+            if (builder.Length == 0)
+            {
+                return this;
+            }
+            if (!IsEmpty)
+            {
+                Sql.Append(' ');
+            }
+            Sql.Append(builder.ToString());
+            return this;
+        }
+        public SQLStringBuilder Append(string builder)
+        {
+            if (string.IsNullOrWhiteSpace(builder))
+            {
+                return this;
+            }
+            if (!IsEmpty)
+            {
+                Sql.Append(' ');
+            }
+            Sql.Append(builder);
             return this;
         }
 

@@ -86,21 +86,67 @@ namespace ZoDream.Shared.Database.Adapters
 
         public SQLStringBuilder CompileUpdate(Dictionary<string, SQLStringBuilder> data)
         {
-
+            var sb = new SQLStringBuilder("UPDATE");
+            sb.Append(data["from"], false);
+            var maps = new[] { "set", "where", "limit", "offset" };
+            foreach (var name in maps)
+            {
+                if (data.TryGetValue(name, out var item))
+                {
+                    sb.Append(item);
+                }
+            }
+            return sb;
         }
 
         public SQLStringBuilder CompileInsert(Dictionary<string, SQLStringBuilder> data)
         {
-
+            var sb = new SQLStringBuilder("INSERT INTO");
+            sb.Append(data["from"], false)
+                .Append("(")
+                .Append(data["field"], false)
+                .Append(") VALUES");
+            var isFirst = true;
+            foreach (var item in data)
+            {
+                if (item.Key.StartsWith("values "))
+                {
+                    if (!isFirst)
+                    {
+                        sb.Append(",");
+                    }
+                    sb.Append("(").Append(item.Value, false).Append(")");
+                    isFirst = false;
+                }
+            }
+            return sb.Append(";");
         }
 
         public SQLStringBuilder CompileDelete(Dictionary<string, SQLStringBuilder> data)
         {
-
+            var sb = new SQLStringBuilder("DELETE");
+            var maps = new[] { "from", "where", "limit", "offset" };
+            foreach (var name in maps)
+            {
+                if (data.TryGetValue(name, out var item))
+                {
+                    sb.Append(item);
+                }
+            }
+            return sb;
         }
         public SQLStringBuilder CompileSelect(Dictionary<string, SQLStringBuilder> data)
         {
-
+            var maps = new[] { "select", "from", "where", "group by", "having", "order by", "limit", "offset"};
+            var sb = new SQLStringBuilder(string.Empty);
+            foreach (var name in maps)
+            {
+                if (data.TryGetValue(name, out var item))
+                {
+                    sb.Append(item);
+                }
+            }
+            return sb;
         }
 
         public void CompileCreateTable(StringBuilder builder, Table table)
