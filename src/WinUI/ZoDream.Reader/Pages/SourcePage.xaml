@@ -8,6 +8,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     xmlns:ctl="using:ZoDream.Reader.Controls"
+       xmlns:bhv="using:ZoDream.Reader.Behaviors"
+   xmlns:ity="using:Microsoft.Xaml.Interactivity"
+   x:Name="root"
     mc:Ignorable="d">
 
     <Page.DataContext>
@@ -23,13 +26,55 @@
             <RowDefinition/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <ListBox ItemsSource="{Binding RuleItems}">
-            <ListBox.ItemTemplate>
+        <ListView ItemsSource="{Binding RuleItems}"
+                  CanDragItems="True" 
+                  CanReorderItems="True" 
+                  AllowDrop="True"
+                  SelectionMode="Single">
+            <ity:Interaction.Behaviors>
+                <bhv:DragSortBehavior DragCommand="{Binding SortCommand}"/>
+            </ity:Interaction.Behaviors>
+            <ListView.ItemTemplate>
                 <DataTemplate>
-                    <ctl:SourceRuleItem/>
+                    <Grid Padding="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay}"/>
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" 
+                            Grid.Column="1"/>
+
+                        <ToggleSwitch IsOn="{Binding IsEnabled,Mode=TwoWay}" 
+                                  Style="{StaticResource InlineSwitchStyle}"
+                                  Grid.Column="2" Grid.RowSpan="2">
+                            <ity:Interaction.Behaviors>
+                                <bhv:ToggleSwitchBehavior ToggleCommand="{Binding ElementName=root,Path=DataContext.ToggleCommand}"      
+                                    CommandParameter="{Binding}"/>
+                            </ity:Interaction.Behaviors>
+                        </ToggleSwitch>
+                        <CommandBar Grid.Column="3" Grid.RowSpan="2">
+                            <AppBarButton Icon="Edit" Label="编辑" Command="{Binding ElementName=root,Path=DataContext.EditCommand}"      
+                                        CommandParameter="{Binding}"/>
+                            <AppBarButton Icon="Delete" Label="删除" Command="{Binding ElementName=root,Path=DataContext.DeleteCommand}"      
+                                        CommandParameter="{Binding}"/>
+                            <CommandBar.SecondaryCommands>
+                                <AppBarButton Icon="Upload" Label="置顶" Command="{Binding ElementName=root,Path=DataContext.SortTopCommand}"      
+                                        CommandParameter="{Binding}"/>
+                                <AppBarButton Icon="Download" Label="置底" Command="{Binding ElementName=root,Path=DataContext.SortBottomCommand}"      
+                                        CommandParameter="{Binding}"/>
+                                <AppBarButton Icon="OtherUser" Label="登录"/>
+                                <AppBarButton Icon="Find" Label="搜索"/>
+                                <AppBarButton Icon="Play" Label="调试"/>
+                                <AppBarButton Icon="UnPin" Label="禁用发现"/>
+                            </CommandBar.SecondaryCommands>
+                        </CommandBar>
+                    </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ListView.ItemTemplate>
+        </ListView>
         <CommandBar Grid.Row="1">
             <AppBarButton Icon="List" Label="切换选择" Command="{Binding ToggleCheckCommand}"/>
             <AppBarButton Icon="Edit" Label="编辑" Command="{Binding EditCommand}"/>

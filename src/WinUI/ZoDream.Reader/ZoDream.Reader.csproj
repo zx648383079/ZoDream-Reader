@@ -55,7 +55,6 @@
     <None Remove="Themes\LightTheme.xaml" />
     <None Remove="Themes\Novel.xaml" />
     <None Remove="Themes\Panel.xaml" />
-    <None Remove="Themes\Rule.xaml" />
     <None Remove="Themes\RuleStyle.xaml" />
     <None Remove="Themes\TitleBar.xaml" />
   </ItemGroup>
@@ -122,11 +121,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Pages\NovelPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Themes\Rule.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

@@ -8,9 +8,9 @@ namespace ZoDream.Shared.Interfaces
 {
     public interface INovelReader: IDisposable
     {
-        public Task<INovelChapter> GetChaptersAsync();
+        public Task<List<INovelChapter>> GetChaptersAsync(string fileName);
 
-        public Task<string> GetChapter(INovelChapter chapter);
+        public Task<string> GetChapter(string fileName, INovelChapter chapter);
 
         public string Serialize(INovelChapter chapter);
         public INovelChapter UnSerialize(string data);

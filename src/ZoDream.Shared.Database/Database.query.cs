@@ -94,7 +94,40 @@ namespace ZoDream.Shared.Database
 
         public IPage<T> Page<T>(long page, long perPage, string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            var i = sql.IndexOf("FROM", StringComparison.CurrentCultureIgnoreCase);
+            var select = string.Empty;
+            if (i < 0)
+            {
+                sql = string.Format("FROM {0} {1}", Grammar.WrapTable(ReflectionHelper.GetTableName(typeof(T))), sql);
+            } else
+            {
+                select = sql.Substring(0, i);
+                sql = sql.Substring(i);
+            }
+            var total = ExecuteScalar<long>($"SELECT COUNT(*) AS c {sql}", args);
+            var offset = (page - 1) * perPage;
+            if (total < offset)
+            {
+                return new Page<T>()
+                {
+                    CurrentPage = page,
+                    TotalItems = total,
+                    PerPage = perPage,
+                    Items = []
+                };
+            }
+            if (string.IsNullOrWhiteSpace(select))
+            {
+                select = "SELECT * ";
+            }
+            var items = Fetch<T>($"{select}{sql} LIMIT {perPage} OFFSET {offset}", args);
+            return new Page<T>()
+            {
+                CurrentPage = page,
+                TotalItems = total,
+                PerPage = perPage,
+                Items = items
+            };
         }
 
 

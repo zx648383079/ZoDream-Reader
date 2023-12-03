@@ -25,10 +25,17 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <ListBox ItemsSource="{Binding RuleItems}">
-            <ListBox.ItemTemplate>
+        <ListView ItemsSource="{Binding RuleItems}"
+                  CanDragItems="True" 
+                  CanReorderItems="True" 
+                  AllowDrop="True"
+                  SelectionMode="Single">
+            <ity:Interaction.Behaviors>
+                <bhv:DragSortBehavior DragCommand="{Binding SortCommand}"/>
+            </ity:Interaction.Behaviors>
+            <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid Padding="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="40"/>
                             <ColumnDefinition/>
@@ -51,11 +58,17 @@
                                     CommandParameter="{Binding}"/>
                             <AppBarButton Icon="Delete" Label="删除" Command="{Binding ElementName=root,Path=DataContext.DeleteCommand}"      
                                     CommandParameter="{Binding}"/>
+                            <CommandBar.SecondaryCommands>
+                                <AppBarButton Icon="Upload" Label="置顶" Command="{Binding ElementName=root,Path=DataContext.SortTopCommand}"      
+                                        CommandParameter="{Binding}"/>
+                                <AppBarButton Icon="Download" Label="置底" Command="{Binding ElementName=root,Path=DataContext.SortBottomCommand}"      
+                                        CommandParameter="{Binding}"/>
+                            </CommandBar.SecondaryCommands>
                         </CommandBar>
                     </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ListView.ItemTemplate>
+        </ListView>
         <CommandBar Grid.Row="1">
             <AppBarButton Icon="List" Label="切换选择" Command="{Binding ToggleCheckCommand}"/>
             <AppBarButton Icon="Edit" Label="编辑" Command="{Binding EditCommand}"/>

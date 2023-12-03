@@ -87,7 +87,7 @@ namespace ZoDream.Shared.Database
                 sql = ParameterHelper.RawParamsPrefix.Replace(sql, m => Grammar.ParamPrefix + m.Value.Substring(1));
             }
             sql = sql.Replace("@@", "@");
-            Debug.WriteLine($"SQL: {sql}");
+            // Debug.WriteLine($"SQL: {sql}");
             DbCommand cmd = connection.CreateCommand();
             cmd.Connection = connection;
             cmd.CommandText = sql;

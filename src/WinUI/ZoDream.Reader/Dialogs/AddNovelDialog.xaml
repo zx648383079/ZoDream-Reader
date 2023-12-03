@@ -16,8 +16,9 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ctl:IconButton Icon="&#xE703;" Header="从本地导入" Meta="支持.txt"/>
-        <ctl:IconButton Icon="&#xF6FA;" Header="在线搜索" 
-                        Meta="从书源中搜索书籍" Grid.Column="1"/>
+        <ctl:IconButton x:Name="LocalBtn" Icon="&#xE703;" Header="从本地导入" 
+                        Meta="支持.txt,.epub" Click="LocalBtn_Click"/>
+        <ctl:IconButton x:Name="NetBtn" Icon="&#xF6FA;" Header="在线搜索" 
+                        Meta="从书源中搜索书籍" Grid.Column="1" Click="NetBtn_Click"/>
     </Grid>
 </ContentDialog>

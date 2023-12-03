@@ -19,6 +19,8 @@ namespace ZoDream.Shared.Repositories.Entities
 
         public long End { get; set; }
 
+        public int Index { get; set; }
+
         public string Description { get; } = string.Empty;
 
         public DateTime PublishedAt { get; }

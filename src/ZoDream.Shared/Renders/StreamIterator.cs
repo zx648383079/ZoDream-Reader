@@ -10,17 +10,10 @@ using ZoDream.Shared.Storage;
 
 namespace ZoDream.Shared.Renders
 {
-    public class StreamIterator : ICharIterator
+    public class StreamIterator(string fileName) : ICharIterator
     {
-
-        public StreamIterator(string fileName)
-        {
-            _fileName = fileName;
-            _reader = new FileStream(fileName, FileMode.Open);
-        }
-
-        private readonly string _fileName;
-        private readonly FileStream _reader;
+        private readonly string _fileName = fileName;
+        private readonly FileStream _reader = new(fileName, FileMode.Open);
         private Encoding? _encoding;
         private volatile bool _isLoading = false;
 
@@ -96,7 +89,7 @@ namespace ZoDream.Shared.Renders
             {
                 return isEnd ? null : string.Empty;
             }
-            return _encoding!.GetString(bytes.ToArray());
+            return _encoding!.GetString([.. bytes]);
         }
 
         private void GetEncoding()

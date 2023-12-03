@@ -11,7 +11,7 @@ namespace ZoDream.Shared.Database.Adapters.SQLite
 
         protected override string CompileLastInsertId()
         {
-            return string.Empty;
+            return "SELECT last_insert_rowid();";
         }
 
         protected override void CompileFieldExtra(StringBuilder builder, TableField field)

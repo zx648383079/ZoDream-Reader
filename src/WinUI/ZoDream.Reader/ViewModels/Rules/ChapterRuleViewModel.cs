@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -21,6 +22,9 @@ namespace ZoDream.Reader.ViewModels
             DeleteCommand = new RelayCommand(TapDelete);
             ToggleCheckCommand = new RelayCommand(TapToggleCheck);
             ToggleCommand = new RelayCommand(TapToggle);
+            SortCommand = new RelayCommand(TapSort);
+            SortBottomCommand = new RelayCommand(TapSortBottom);
+            SortTopCommand = new RelayCommand(TapSortTop);
             LoadAsync();
         }
 
@@ -41,6 +45,43 @@ namespace ZoDream.Reader.ViewModels
 
         public ICommand ToggleCheckCommand { get; private set; }
         public ICommand ToggleCommand { get; private set; }
+        public ICommand SortCommand { get; private set; }
+        public ICommand SortBottomCommand { get; private set; }
+        public ICommand SortTopCommand { get; private set; }
+
+        private void TapSort(object? arg)
+        {
+            if (arg is not ChapterRuleModel)
+            {
+                return;
+            }
+            SaveSort();
+        }
+
+        private void TapSortTop(object? arg)
+        {
+            if (arg is not ChapterRuleModel data)
+            {
+                return;
+            }
+            RuleItems.MoveToFirst(RuleItems.IndexOf(data));
+            SaveSort();
+        }
+
+        private void TapSortBottom(object? arg)
+        {
+            if (arg is not ChapterRuleModel data)
+            {
+                return;
+            }
+            RuleItems.MoveToLast(RuleItems.IndexOf(data));
+            SaveSort();
+        }
+
+        private async void SaveSort()
+        {
+            await _app.Database.SortChapterRuleAsync(RuleItems);
+        }
 
         private void TapToggle(object? arg)
         {

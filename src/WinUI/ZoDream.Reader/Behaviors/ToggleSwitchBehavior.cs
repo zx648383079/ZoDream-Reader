@@ -2,16 +2,12 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Xaml.Interactivity;
 using System.Windows.Input;
-using Windows.System;
 
 namespace ZoDream.Reader.Behaviors
 {
     [TypeConstraint(typeof(ToggleSwitch))]
     public class ToggleSwitchBehavior : Trigger<ToggleSwitch>
     {
-
-
-
 
         public ICommand ToggleCommand {
             get { return (ICommand)GetValue(ToggleCommandProperty); }
@@ -38,6 +34,7 @@ namespace ZoDream.Reader.Behaviors
 
         protected override void OnAttached()
         {
+            base.OnAttached();
             AssociatedObject.Toggled += AssociatedObject_Toggled;
         }
 
@@ -52,6 +49,7 @@ namespace ZoDream.Reader.Behaviors
 
         protected override void OnDetaching()
         {
+            base.OnDetaching();
             AssociatedObject.Toggled -= AssociatedObject_Toggled;
         }
     }

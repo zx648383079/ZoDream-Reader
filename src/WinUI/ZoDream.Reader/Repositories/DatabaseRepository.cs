@@ -20,6 +20,7 @@ namespace ZoDream.Reader.Repositories
 {
     public class DatabaseRepository : IDatabaseRepository
     {
+        const int SortBegin = 10;
         public DatabaseRepository(StorageFile dbFile)
         {
             AppData.DefaultFileName = Path.Combine(ApplicationData.Current.LocalFolder.Path, "setting.xml");
@@ -60,7 +61,7 @@ namespace ZoDream.Reader.Repositories
             return Task.FromResult(connection.Build<T>().From<BookEntity>().ToList());
         }
 
-        public Task<T?> GetBookAsync<T>(object id) where T : INovel
+        public Task<T?> GetBookAsync<T>(string id) where T : INovel
         {
             return Task.FromResult(connection.Build<T>().Where("Id", id).First());
         }
@@ -71,21 +72,21 @@ namespace ZoDream.Reader.Repositories
             {
                 item.Cover = Utils.Converter.RandomCover();
             }
-            if (item is not BookEntity)
-            {
-                item = item.Clone<BookEntity>();
-            }
-            connection.Save((BookEntity)item);
+            var data = item is BookEntity o ? o :
+                 item.Clone<BookEntity>();
+            connection.Save(data);
+            item.Id = data.Id;
             return Task.CompletedTask;
         }
 
-        public Task DeleteBookAsync(params object[] items)
+        public Task DeleteBookAsync(params string[] items)
         {
-            connection.Build<BookEntity>().WhereIn("Id", items).Delete();
+            connection.Build<BookEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i)).Delete();
+            connection.Build<ChapterEntity>().WhereIn("BookId", Array.ConvertAll(items, i => (object)i)).Delete();
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetChapterAsync<T>(object bookId) where T : INovelChapter
+        public Task<List<T>> GetChapterAsync<T>(string bookId) where T : INovelChapter
         {
             return Task.FromResult(connection.Build<T>().From<ChapterEntity>().Where("BookId", bookId).ToList());
         }
@@ -95,24 +96,23 @@ namespace ZoDream.Reader.Repositories
             return Task.FromResult(connection.Build<T>().From<AppThemeEntity>().ToList());
         }
 
-        public Task<T?> GetThemeAsync<T>(object id) where T : IAppTheme
+        public Task<T?> GetThemeAsync<T>(int id) where T : IAppTheme
         {
             return Task.FromResult(connection.Build<T>().From<AppThemeEntity>().Where("Id", id).First());
         }
 
         public Task SaveThemeAsync(IAppTheme item)
         {
-            if (item is not AppThemeEntity)
-            {
-                item = item.Clone<AppThemeEntity>();
-            }
-            connection.Save((AppThemeEntity)item);
+            var data = item is AppThemeEntity o ? o :
+             item.Clone<AppThemeEntity>();
+            connection.Save(data);
+            item.Id = data.Id;
             return Task.CompletedTask;
         }
 
-        public Task DeleteThemeAsync(params object[] items)
+        public Task DeleteThemeAsync(params int[] items)
         {
-            connection.Build<AppThemeEntity>().WhereIn("Id", items).Delete();
+            connection.Build<AppThemeEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i)).Delete();
             return Task.CompletedTask;
         }
 
@@ -121,24 +121,22 @@ namespace ZoDream.Reader.Repositories
             return Task.FromResult(connection.Build<T>().From<ReadThemeEntity>().ToList());
         }
 
-        public Task<T?> GetReadThemeAsync<T>(object id) where T : IReadTheme
+        public Task<T?> GetReadThemeAsync<T>(int id) where T : IReadTheme
         {
             return Task.FromResult(connection.Build<T>().From<ReadThemeEntity>().Where("Id", id).First());
         }
 
         public Task SaveReadThemeAsync(IReadTheme item)
         {
-            if (item is not ReadThemeEntity)
-            {
-                item = item.Clone<ReadThemeEntity>();
-            }
-            connection.Save((ReadThemeEntity)item);
+            var data = item is ReadThemeEntity o ? o : item.Clone<ReadThemeEntity>();
+            connection.Save(data);
+            item.Id = data.Id;
             return Task.CompletedTask;
         }
 
-        public Task DeleteReadThemeAsync(params object[] items)
+        public Task DeleteReadThemeAsync(params int[] items)
         {
-            connection.Build<ReadThemeEntity>().WhereIn("Id", items).Delete();
+            connection.Build<ReadThemeEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i)).Delete();
             return Task.CompletedTask;
         }
 
@@ -149,17 +147,15 @@ namespace ZoDream.Reader.Repositories
 
         public Task SaveDictionaryRuleAsync(IDictionaryRule item)
         {
-            if (item is not DictionaryRuleEntity)
-            {
-                item = item.Clone<DictionaryRuleEntity>();
-            }
-            connection.Save((DictionaryRuleEntity)item);
+            var data = item is DictionaryRuleEntity o ? o : item.Clone<DictionaryRuleEntity>();
+            connection.Save(data);
+            item.Id = data.Id;
             return Task.CompletedTask;
         }
 
-        public Task DeleteDictionaryRuleAsync(params object[] items)
+        public Task DeleteDictionaryRuleAsync(params int[] items)
         {
-            connection.Build<DictionaryRuleEntity>().WhereIn("Id", items).Delete();
+            connection.Build<DictionaryRuleEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i)).Delete();
             return Task.CompletedTask;
         }
 
@@ -170,45 +166,60 @@ namespace ZoDream.Reader.Repositories
 
         public Task SaveReplaceRuleAsync(IReplaceRule item)
         {
-            if (item is not ReplaceRuleEntity)
-            {
-                item = item.Clone<ReplaceRuleEntity>();
-            }
-            connection.Save((ReplaceRuleEntity)item);
+            var data = item is ReplaceRuleEntity o ? o : item.Clone<ReplaceRuleEntity>();
+            connection.Save(data);
+            item.Id = data.Id;
             return Task.CompletedTask;
         }
 
-        public Task DeleteReplaceRuleAsync(params object[] items)
+        public Task DeleteReplaceRuleAsync(params int[] items)
         {
-            connection.Build<ReplaceRuleEntity>().WhereIn("Id", items).Delete();
+            connection.Build<ReplaceRuleEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i)).Delete();
             return Task.CompletedTask;
         }
 
         public Task<List<T>> GetChapterRuleAsync<T>() where T : IChapterRule
         {
-            return Task.FromResult(connection.Build<T>().From<ChapterRuleEntity>().ToList());
+            return Task.FromResult(connection.Build<T>().From<ChapterRuleEntity>().OrderByAsc("SortOrder")
+                .OrderByAsc("Id").ToList());
         }
 
         public Task SaveChapterRuleAsync(IChapterRule item)
         {
-            if (item is not ChapterRuleEntity)
-            {
-                item = item.Clone<ChapterRuleEntity>();
-            }
-            connection.Save((ChapterRuleEntity)item);
+            var data = item is ChapterRuleEntity o ? o :
+                item.Clone<ChapterRuleEntity>();
+            connection.Save(data);
+            item.Id = data.Id;
             return Task.CompletedTask;
         }
 
-        public Task DeleteChapterRuleAsync(params object[] items)
+        public Task DeleteChapterRuleAsync(int[] items)
         {
-            connection.Build<ChapterRuleEntity>().WhereIn("Id", items).Delete();
+            connection.Build<ChapterRuleEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i)).Delete();
             return Task.CompletedTask;
         }
 
-        public Task ToggleChapterRuleAsync(bool enabled, params object[] items)
+        public Task ToggleChapterRuleAsync(bool enabled, params int[] items)
         {
-            connection.Build<ChapterRuleEntity>().WhereIn("Id", items)
+            connection.Build<ChapterRuleEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i))
                 .Update("IsEnabled", enabled);
+            return Task.CompletedTask;
+        }
+
+        public Task SortChapterRuleAsync<T>(IEnumerable<T> items) where T : IChapterRule
+        {
+            var sort = SortBegin;
+            foreach (var item in items)
+            {
+                sort++;
+                if (item.SortOrder == sort)
+                {
+                    continue;
+                }
+                item.SortOrder = sort;
+                connection.Build<ChapterRuleEntity>().Where(nameof(item.Id), item.Id)
+                 .Update(nameof(item.SortOrder), sort);
+            }
             return Task.CompletedTask;
         }
 
@@ -217,24 +228,22 @@ namespace ZoDream.Reader.Repositories
             return Task.FromResult(connection.Build<T>().From<SourceRuleEntity>().ToList());
         }
 
-        public Task<T?> GetSourceRuleAsync<T>(object id) where T : ISourceRule
+        public Task<T?> GetSourceRuleAsync<T>(int id) where T : ISourceRule
         {
             return Task.FromResult(connection.Build<T>().From<SourceRuleEntity>().Where("Id", id).First());
         }
 
         public Task SaveSourceRuleAsync(ISourceRule item)
         {
-            if (item is not SourceRuleEntity)
-            {
-                item = item.Clone<SourceRuleEntity>();
-            }
-            connection.Save((SourceRuleEntity)item);
+            var data = item is SourceRuleEntity o ? o : item.Clone<SourceRuleEntity>();
+            connection.Save(data);
+            item.Id = data.Id;
             return Task.CompletedTask;
         }
 
-        public Task DeleteSourceRuleAsync(params object[] items)
+        public Task DeleteSourceRuleAsync(params int[] items)
         {
-            connection.Build<SourceRuleEntity>().WhereIn("Id", items).Delete();
+            connection.Build<SourceRuleEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i)).Delete();
             return Task.CompletedTask;
         }
 
@@ -243,24 +252,22 @@ namespace ZoDream.Reader.Repositories
             return Task.FromResult(connection.Build<T>().From<TextToSpeechEntity>().ToList());
         }
 
-        public Task<T?> GetTTSSourceAsync<T>(object id) where T : ITextToSpeech
+        public Task<T?> GetTTSSourceAsync<T>(int id) where T : ITextToSpeech
         {
             return Task.FromResult(connection.Build<T>().From<TextToSpeechEntity>().Where("Id", id).First());
         }
 
         public Task SaveTTSSourceAsync(ITextToSpeech item)
         {
-            if (item is not TextToSpeechEntity)
-            {
-                item = item.Clone<TextToSpeechEntity>();
-            }
-            connection.Save((TextToSpeechEntity)item);
+            var data = item is TextToSpeechEntity o ? o : item.Clone<TextToSpeechEntity>();
+            connection.Save(data);
+            item.Id = data.Id;
             return Task.CompletedTask;
         }
 
-        public Task DeleteTTSSourceAsync(params object[] items)
+        public Task DeleteTTSSourceAsync(params int[] items)
         {
-            connection.Build<TextToSpeechEntity>().WhereIn("Id", items).Delete();
+            connection.Build<TextToSpeechEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i)).Delete();
             return Task.CompletedTask;
         }
 
@@ -343,37 +350,105 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task DeleteMarkAsync(params object[] items)
+        public Task DeleteMarkAsync(params int[] items)
         {
-            connection.Build<BookmarkEntity>().WhereIn("Id", items).Delete();
+            connection.Build<BookmarkEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i)).Delete();
             return Task.CompletedTask;
         }
 
-        public Task ToggleDictionaryRuleAsync(bool enabled, params object[] items)
+        public Task ToggleDictionaryRuleAsync(bool enabled, params int[] items)
         {
-            connection.Build<DictionaryRuleEntity>().WhereIn("Id", items)
+            connection.Build<DictionaryRuleEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i))
                 .Update("IsEnabled", enabled);
             return Task.CompletedTask;
         }
 
-        public Task ToggleReplaceRuleAsync(bool enabled, params object[] items)
+        public Task ToggleReplaceRuleAsync(bool enabled, params int[] items)
         {
-            connection.Build<ReplaceRuleEntity>().WhereIn("Id", items)
+            connection.Build<ReplaceRuleEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i))
                 .Update("IsEnabled", enabled);
             return Task.CompletedTask;
         }
 
-        public Task ToggleSourceRuleAsync(bool enabled, params object[] items)
+        public Task ToggleSourceRuleAsync(bool enabled, params int[] items)
         {
-            connection.Build<SourceRuleEntity>().WhereIn("Id", items)
+            connection.Build<SourceRuleEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i))
                 .Update("IsEnabled", enabled);
             return Task.CompletedTask;
         }
 
-        public Task ToggleTTSSourceAsync(bool enabled, params object[] items)
+        public Task ToggleTTSSourceAsync(bool enabled, params int[] items)
         {
-            connection.Build<TextToSpeechEntity>().WhereIn("Id", items)
+            connection.Build<TextToSpeechEntity>().WhereIn("Id", Array.ConvertAll(items, i => (object)i))
                 .Update("IsEnabled", enabled);
+            return Task.CompletedTask;
+        }
+
+        public Task SortDictionaryRuleAsync<T>(IEnumerable<T> items) where T : IDictionaryRule
+        {
+            var sort = SortBegin;
+            foreach (var item in items)
+            {
+                sort++;
+                if (item.SortOrder == sort)
+                {
+                    continue;
+                }
+                item.SortOrder = sort;
+                connection.Build<DictionaryRuleEntity>().Where(nameof(item.Id), item.Id)
+                 .Update(nameof(item.SortOrder), sort);
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task SortReplaceRuleAsync<T>(IEnumerable<T> items) where T : IReplaceRule
+        {
+            var sort = SortBegin;
+            foreach (var item in items)
+            {
+                sort++;
+                if (item.SortOrder == sort)
+                {
+                    continue;
+                }
+                item.SortOrder = sort;
+                connection.Build<ReplaceRuleEntity>().Where(nameof(item.Id), item.Id)
+                 .Update(nameof(item.SortOrder), sort);
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task SortSourceRuleAsync<T>(IEnumerable<T> items) where T : ISourceRule
+        {
+            var sort = SortBegin;
+            foreach (var item in items)
+            {
+                sort++;
+                if (item.SortOrder == sort)
+                {
+                    continue;
+                }
+                item.SortOrder = sort;
+                connection.Build<SourceRuleEntity>().Where(nameof(item.Id), item.Id)
+                 .Update(nameof(item.SortOrder), sort);
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task SortTTSSourceAsync<T>(IEnumerable<T> items) where T : ITextToSpeech
+        {
+            var sort = SortBegin;
+            foreach (var item in items)
+            {
+                sort++;
+                if (item.SortOrder == sort)
+                {
+                    continue;
+                }
+                item.SortOrder = sort;
+                connection.Build<TextToSpeechEntity>().Where(nameof(item.Id), item.Id)
+                 .Update(nameof(item.SortOrder), sort);
+            }
             return Task.CompletedTask;
         }
     }

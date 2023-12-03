@@ -61,28 +61,6 @@
         </Setter>
     </Style>
 
-    <Style TargetType="ctl:CatalogPanel">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ctl:CatalogPanel">
-                    <Border
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="目录"/>
-                            <ListBox Grid.Row="1"/>
-                        </Grid>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
 
     <Style TargetType="ctl:GroupListItem">
         <Setter Property="Template">

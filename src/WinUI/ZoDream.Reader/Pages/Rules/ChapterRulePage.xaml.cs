@@ -27,5 +27,7 @@ namespace ZoDream.Reader.Pages.Rules
         {
             this.InitializeComponent();
         }
+
+
     }
 }

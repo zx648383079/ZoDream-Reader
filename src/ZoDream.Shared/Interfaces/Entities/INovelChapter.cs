@@ -15,6 +15,8 @@ namespace ZoDream.Shared.Interfaces.Entities
 
         public long End { get; }
 
+        public int Index { get; set; }
+
         public string Description { get; }
 
         public DateTime PublishedAt { get; }

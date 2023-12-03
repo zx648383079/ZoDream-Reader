@@ -25,6 +25,9 @@ namespace ZoDream.Reader.ViewModels
             DeleteCommand = new RelayCommand(TapDelete);
             ToggleCheckCommand = new RelayCommand(TapToggleCheck);
             ToggleCommand = new RelayCommand(TapToggle);
+            SortCommand = new RelayCommand(TapSort);
+            SortBottomCommand = new RelayCommand(TapSortBottom);
+            SortTopCommand = new RelayCommand(TapSortTop);
             LoadAsync();
         }
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
@@ -44,6 +47,43 @@ namespace ZoDream.Reader.ViewModels
 
         public ICommand ToggleCheckCommand { get; private set; }
         public ICommand ToggleCommand { get; private set; }
+        public ICommand SortCommand { get; private set; }
+        public ICommand SortBottomCommand { get; private set; }
+        public ICommand SortTopCommand { get; private set; }
+
+        private void TapSort(object? arg)
+        {
+            if (arg is not DictionaryRuleModel)
+            {
+                return;
+            }
+            SaveSort();
+        }
+
+        private void TapSortTop(object? arg)
+        {
+            if (arg is not DictionaryRuleModel data)
+            {
+                return;
+            }
+            RuleItems.MoveToFirst(RuleItems.IndexOf(data));
+            SaveSort();
+        }
+
+        private void TapSortBottom(object? arg)
+        {
+            if (arg is not DictionaryRuleModel data)
+            {
+                return;
+            }
+            RuleItems.MoveToLast(RuleItems.IndexOf(data));
+            SaveSort();
+        }
+
+        private async void SaveSort()
+        {
+            await _app.Database.SortDictionaryRuleAsync(RuleItems);
+        }
 
         private void TapToggle(object? arg)
         {

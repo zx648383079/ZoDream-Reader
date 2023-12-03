@@ -23,6 +23,7 @@ using ZoDream.Reader.Dialogs;
 using ZoDream.Reader.Repositories;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Route;
+using ZoDream.Shared.Models;
 using ZoDream.Shared.Repositories;
 using ZoDream.Shared.ViewModels;
 
@@ -62,6 +63,8 @@ namespace ZoDream.Reader.ViewModels
 
         public IDatabaseRepository Database { get; private set; }
         public DiskRepository Storage { get; private set; }
+
+        public IAppOption Option { get; private set; } = new AppOption();
 
 
         public bool IsFirstLaunchEver => !_setting.Exist(SettingNames.AppInstalled);
@@ -144,6 +147,7 @@ namespace ZoDream.Reader.ViewModels
             Storage = new DiskRepository(folder);
             Database = createNew ? await Storage.CreateDatabaseAsync() : 
                 await Storage.OpenDatabaseAsync();
+            Option = await Database.LoadSettingAsync();
         }
 
         internal async Task InitializeWorkspaceAsync()

@@ -8,6 +8,7 @@ namespace ZoDream.Shared.Repositories.Models
 {
     public class BookModel: BindableBase, INovel
     {
+        public string Id { get; set; } = string.Empty;
 
         private string name = string.Empty;
 
@@ -38,5 +39,7 @@ namespace ZoDream.Shared.Repositories.Models
             set => Set(ref author, value);
         }
 
+
+        public string FileName { get; set; } = string.Empty;
     }
 }

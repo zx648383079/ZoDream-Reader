@@ -20,8 +20,8 @@
     </ContentDialog.Resources>
 
     <Grid>
-        <ListBox ItemsSource="{Binding SourceItems}">
-            <ListBox.ItemTemplate>
+        <ListView ItemsSource="{Binding SourceItems}">
+            <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -41,7 +41,7 @@
                                   Visibility="{Binding IsChecked,Converter={StaticResource ToggleCvt}}" Grid.Row="1" Grid.Column="1"/>
                     </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </ContentDialog>
