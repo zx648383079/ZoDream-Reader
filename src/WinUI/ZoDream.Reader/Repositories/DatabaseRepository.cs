@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +19,7 @@ using ZoDream.Shared.Utils;
 
 namespace ZoDream.Reader.Repositories
 {
-    public class DatabaseRepository : IDatabaseRepository
+    public class DatabaseRepository : IDatabaseRepository, ICache
     {
         const int SortBegin = 10;
         public DatabaseRepository(StorageFile dbFile)
@@ -448,6 +449,40 @@ namespace ZoDream.Reader.Repositories
                 item.SortOrder = sort;
                 connection.Build<TextToSpeechEntity>().Where(nameof(item.Id), item.Id)
                  .Update(nameof(item.SortOrder), sort);
+            }
+            return Task.CompletedTask;
+        }
+
+        public async Task SetAsync<T>(string key, T value)
+        {
+            if (await HasAsync(key))
+            {
+                connection.Build<CacheEntity>().Where("Key", key).Update("Value", value!);
+            } else
+            {
+                connection.Build<CacheEntity>().Insert(new CacheEntity()
+                {
+                    Key = key,
+                    Value = value?.ToString()!
+                });
+            }
+        }
+
+        public Task<T?> GetAsync<T>(string key)
+        {
+            return Task.FromResult(connection.Build<CacheEntity>().Where("Key", key).Value<T>("Value"));
+        }
+
+        public Task<bool> HasAsync(string key)
+        {
+            return Task.FromResult(connection.Build<CacheEntity>().Where("Key", key).Any());
+        }
+
+        public Task RemoveAsync(params string[] keys)
+        {
+            if (keys.Length > 0)
+            {
+                connection.Build<CacheEntity>().WhereIn("Key", Array.ConvertAll(keys, i => (object)i)).Delete();
             }
             return Task.CompletedTask;
         }
