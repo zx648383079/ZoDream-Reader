@@ -16,7 +16,7 @@ namespace ZoDream.Shared.Script
         /// <summary>
         /// 上一次获取到的Token
         /// </summary>
-        protected Token? CurrentToken;
+        public Token? CurrentToken { get; private set; }
         private int _lineIndex = 0;
         private int _columnIndex = 0;
         private int _charIndex = -1;

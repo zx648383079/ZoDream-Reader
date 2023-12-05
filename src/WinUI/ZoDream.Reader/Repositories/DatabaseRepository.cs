@@ -1,12 +1,10 @@
 ﻿using Microsoft.Data.Sqlite;
-using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Database;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
@@ -485,6 +483,11 @@ namespace ZoDream.Reader.Repositories
                 connection.Build<CacheEntity>().WhereIn("Key", Array.ConvertAll(keys, i => (object)i)).Delete();
             }
             return Task.CompletedTask;
+        }
+
+        public async Task SetImageAsync(string key, byte[] value)
+        {
+            await App.GetService<AppViewModel>().Storage.AddImageAsync(key, value);
         }
     }
 }

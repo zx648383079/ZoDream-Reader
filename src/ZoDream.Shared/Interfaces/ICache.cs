@@ -9,6 +9,8 @@ namespace ZoDream.Shared.Interfaces
     {
         public Task SetAsync<T>(string key, T value);
 
+        public Task SetImageAsync(string key, byte[] value);
+
         public Task<T?> GetAsync<T>(string key);
 
         public Task<bool> HasAsync(string key);

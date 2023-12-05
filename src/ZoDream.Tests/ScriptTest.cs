@@ -23,7 +23,7 @@ namespace ZoDream.Tests
             code = "post('http://zodream.cn',{a:'b'}).json.query('b').text.match('use (\\d+)',1)";
             code = "url('http://zodream.cn').query({a:'b'}).proxy('http://192.168.0.1:8080').header('Referrer','https://www.baid.com').execute.json.query('b').text";
             code = "get('http://zodream.cn').jsonp.query('b').text";
-            var res = interpreter.Execute(code);
+            var res = interpreter.Execute(code, new {});
             Assert.IsTrue(res is null);
         }
     }

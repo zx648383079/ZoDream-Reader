@@ -56,6 +56,7 @@ namespace ZoDream.Reader.ViewModels
             var picker = new FileOpenPicker();
             picker.FileTypeFilter.Add(".txt");
             picker.FileTypeFilter.Add(".epub");
+            picker.FileTypeFilter.Add(".umd");
             _app.InitializePicker(picker);
             var file = await picker.PickSingleFileAsync();
             if (file is null)

@@ -13,6 +13,11 @@ using Microsoft.Graphics.Canvas.Text;
 using ZoDream.Shared.Repositories;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
+using Windows.Graphics.Imaging;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Newtonsoft.Json.Linq;
+using Windows.Storage.Streams;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -194,10 +199,62 @@ namespace ZoDream.Reader.Repositories
         }
 
 
-        public Task<string?> AddImageAsync<T>(T file)
+        public async Task<string?> AddImageAsync<T>(T file)
         {
-            throw new NotImplementedException();
+            if (file is StorageFile f)
+            {
+                var img = await f.CopyAsync(ThemeFolder);
+                return img.Path;
+            }
+            return null;
         }
 
+        public async Task AddImageAsync(string fileName, Stream stream)
+        {
+            var bi = new BitmapImage();
+            using var s = stream.AsRandomAccessStream();
+            await bi.SetSourceAsync(s);
+            var wb = new WriteableBitmap(bi.PixelWidth, bi.PixelHeight);
+            s.Seek(0);
+            await wb.SetSourceAsync(s);
+            await AddImageAsync(fileName, wb);
+        }
+
+        public async Task AddImageAsync(string fileName, byte[] buffer)
+        {
+            var bi = new BitmapImage();
+            using var stream = new InMemoryRandomAccessStream();
+            await stream.WriteAsync(buffer.AsBuffer());
+            await bi.SetSourceAsync(stream);
+            var wb = new WriteableBitmap(bi.PixelWidth, bi.PixelHeight);
+            stream.Seek(0);
+            await wb.SetSourceAsync(stream);
+            await AddImageAsync(fileName, wb);
+        }
+
+        public async Task AddImageAsync(string fileName, WriteableBitmap writeable)
+        {
+            var bitmapEncoder = Path.GetExtension(fileName)[1..].ToLower() switch
+            {
+                "png" => BitmapEncoder.PngEncoderId,
+                "bmp" => BitmapEncoder.BmpEncoderId,
+                "tiff" => BitmapEncoder.TiffEncoderId,
+                "gif" => BitmapEncoder.GifEncoderId,
+                _ => BitmapEncoder.JpegEncoderId
+            };
+            var file = await ThemeFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+            using var stream = await file.OpenAsync(FileAccessMode.ReadWrite);
+            var encoder = await BitmapEncoder.CreateAsync(bitmapEncoder, stream);
+            var pixelStream = writeable.PixelBuffer.AsStream();
+            byte[] pixels = new byte[pixelStream.Length];
+            await pixelStream.ReadAsync(pixels, 0, pixels.Length);
+            encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
+                        (uint)writeable.PixelWidth,
+                        (uint)writeable.PixelHeight,
+                        96.0,
+                        96.0,
+                        pixels);
+            await encoder.FlushAsync();
+        }
     }
 }
