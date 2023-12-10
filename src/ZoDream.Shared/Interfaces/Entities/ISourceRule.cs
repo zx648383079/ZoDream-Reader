@@ -14,6 +14,8 @@
 
         public string ExploreUrl { get; set; }
         public string ExploreMatchRule { get; set; }
+
+        public bool EnabledSearch { get; set; }
         public string SearchUrl { get; set; }
 
         public string SearchMatchRule { get; set; }

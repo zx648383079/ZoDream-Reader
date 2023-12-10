@@ -16,44 +16,51 @@ namespace ZoDream.Shared.Plugins.Umd
     {
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
-        public Task<string> GetChapter(string fileName, INovelChapter chapter)
+        public Task<string> GetChapterAsync(string fileName, INovelChapter chapter)
         {
-            var fs = File.OpenRead(fileName);
-            fs.Seek(Convert.ToInt64(chapter.Url), SeekOrigin.Begin);
-            var content = ReadContent(fs);
-            return Task.FromResult(content.Substring((int)chapter.Begin, (int)(chapter.End - chapter.Begin)));
+            return Task.Factory.StartNew(() => {
+                using var fs = File.OpenRead(fileName);
+                return GetChapter(fs, chapter);
+            });
         }
 
-        public async Task<List<INovelChapter>> GetChaptersAsync(string fileName)
+        public Task<List<INovelChapter>> GetChaptersAsync(string fileName)
         {
-            var fs = File.OpenRead(fileName);
+            return Task.Factory.StartNew(() => {
+                using var fs = File.OpenRead(fileName);
+                var (_, items) = GetChapters(fs);
+                return items;
+            });
+        }
+
+        public (INovel?, List<INovelChapter>) GetChapters(Stream input)
+        {
             var buffer = new byte[4];
-            await fs.ReadAsync(buffer, 0, buffer.Length);
+            input.Read(buffer, 0, buffer.Length);
             if (BitConverter.ToUInt32(buffer, 0) != 0xde9a9b89)
             {
                 // TODO 文件错误
             }
-            fs.Seek(5, SeekOrigin.Current);
-            var fileType = fs.ReadByte(); // 1 text 2 图片
-            fs.Seek(2, SeekOrigin.Current);
-            var novel = ReadNovel(fs);
-            var type = ReadHeaderType(fs);
+            input.Seek(5, SeekOrigin.Current);
+            var fileType = input.ReadByte(); // 1 text 2 图片
+            input.Seek(2, SeekOrigin.Current);
+            var novel = ReadNovel(input);
+            var type = ReadHeaderType(input);
             if (type != 0x83)
             {
                 // ChapterOffset
 
             }
-            fs.Seek(11, SeekOrigin.Current);
+            input.Seek(11, SeekOrigin.Current);
             buffer = new byte[4];
-            fs.Read(buffer, 0, buffer.Length);
+            input.Read(buffer, 0, buffer.Length);
             var chapterCount = (BitConverter.ToInt32(buffer, 0) - 9) / 4;
             var items = new List<INovelChapter>(chapterCount);
             for (int i = 0; i < chapterCount; i++)
             {
-                fs.Read(buffer, 0, 4);
+                input.Read(buffer, 0, 4);
                 // 正文的偏移
                 var offset = BitConverter.ToInt32(buffer, 0);
                 items.Add(new ChapterEntity()
@@ -61,36 +68,43 @@ namespace ZoDream.Shared.Plugins.Umd
                     Begin = offset
                 });
             }
-            type = ReadHeaderType(fs);
+            type = ReadHeaderType(input);
             if (type != 0x84)
             {
                 // ChapterTitle
 
             }
-            fs.Seek(11, SeekOrigin.Current);
-            fs.Read(buffer, 0, 4);
+            input.Seek(11, SeekOrigin.Current);
+            input.Read(buffer, 0, 4);
             var len = BitConverter.ToInt32(buffer, 0) - 9;
             for (int i = 0; i < chapterCount; i++)
             {
                 //一个字节，长度
                 //长度的字节，标题
-                var l = fs.ReadByte();
+                var l = input.ReadByte();
                 buffer = new byte[l];
-                fs.Read(buffer, 0, l);
+                input.Read(buffer, 0, l);
                 items[i].Title = Encoding.Unicode.GetString(buffer, 0, l);
                 if (i > 0)
                 {
                     items[i - 1].End = items[i].Begin;
                 }
             }
-            var entry = fs.Position.ToString();
+            var entry = input.Position.ToString();
             foreach (var item in items)
             {
                 item.Url = entry;
             }
-            items[items.Count - 1].End = ReadContent(fs).Length;
-            novel.Cover = ReadCover(fs);
-            return items;
+            items[items.Count - 1].End = ReadContent(input).Length;
+            novel.Cover = ReadCover(input);
+            return (novel, items);
+        }
+
+        public string GetChapter(Stream input, INovelChapter chapter)
+        {
+            input.Seek(Convert.ToInt64(chapter.Url), SeekOrigin.Begin);
+            var content = ReadContent(input);
+            return content.Substring((int)chapter.Begin, (int)(chapter.End - chapter.Begin));
         }
 
         public string Serialize(INovelChapter chapter)

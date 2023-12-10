@@ -18,6 +18,11 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using Newtonsoft.Json.Linq;
 using Windows.Storage.Streams;
 using System.Runtime.InteropServices.WindowsRuntime;
+using ZoDream.Shared.Plugins.EPub;
+using ZoDream.Shared.Plugins.Umd;
+using ZoDream.Shared.Plugins.Pdf;
+using ZoDream.Shared.Plugins.Txt;
+using ZoDream.Reader.ViewModels;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -136,12 +141,30 @@ namespace ZoDream.Reader.Repositories
             var fileId = src.Name;
             if (!src.Path.StartsWith(BookFolder.Path))
             {
-                await src.CopyAsync(BookFolder);
+                src = await src.CopyAsync(BookFolder);
             }
-            return new BookEntity() { 
-                Name = name,
+            var reader = await GetReaderAsync(src.Name, true);
+            var (novel, items) = reader.GetChapters(await src.OpenStreamForReadAsync());
+            novel ??= new BookEntity()
+            {
                 Id = fileId,
                 FileName = fileId
+            };
+            if (string.IsNullOrWhiteSpace(novel.Name))
+            {
+                novel.Name = name;
+            }
+            return novel;
+        }
+
+        public async Task<INovelReader> GetReaderAsync(string fileName, bool init = false)
+        {
+            return Path.GetExtension(fileName)[1..].ToLower() switch
+            {
+                "epub" => new EPubReader(),
+                "umd" => new UmdReader(),
+                "pdf" => new PdfReader(),
+                _ => init ? new TxtReader(await App.GetService<AppViewModel>().Database.GetEnabledChapterRuleAsync()) : new TxtReader()
             };
         }
 

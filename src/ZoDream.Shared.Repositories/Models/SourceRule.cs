@@ -39,6 +39,8 @@ namespace ZoDream.Shared.Repositories.Models
 
         public string ExploreUrl { get; set; } = string.Empty;
         public string ExploreMatchRule { get; set; } = string.Empty;
+
+        public bool EnabledSearch { get; set; }
         public string SearchUrl { get; set; } = string.Empty;
 
         public string SearchMatchRule { get; set; } = string.Empty;

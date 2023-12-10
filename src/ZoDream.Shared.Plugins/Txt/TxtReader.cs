@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -30,16 +31,32 @@ namespace ZoDream.Shared.Plugins.Txt
 
         public IEnumerable<string>? ChapterRuleItems { get; private set; }
 
-        public async Task<List<INovelChapter>> GetChaptersAsync(string fileName)
+        public Task<List<INovelChapter>> GetChaptersAsync(string fileName)
+        {
+            return Task.Factory.StartNew(() => {
+                using var fs = File.OpenRead(fileName);
+                var (_, items) = GetChapters(fs);
+                return items;
+            });
+        }
+
+        public Task<string> GetChapterAsync(string fileName,INovelChapter chapter)
+        {
+            return Task.Factory.StartNew(() => {
+                using var fs = File.OpenRead(fileName);
+                return GetChapter(fs, chapter);
+            });
+        }
+
+        public (INovel?, List<INovelChapter>) GetChapters(Stream input)
         {
             var items = new List<INovelChapter>();
-            var fs = new FileStream(fileName, FileMode.Open);
-            var encoding = TxtEncoder.GetEncoding(fs);
+            var encoding = TxtEncoder.GetEncoding(input);
             var buffer = new byte[BufferSize];
-            await fs.ReadAsync(buffer, 0, buffer.Length);
+            input.Read(buffer, 0, buffer.Length);
             var pattern = GetRule(encoding.GetString(buffer));
-            fs.Seek(0, SeekOrigin.Begin);
-            var reader = new StreamReader(fs, encoding);
+            input.Seek(0, SeekOrigin.Begin);
+            var reader = new StreamReader(input, encoding);
             var isMatchRule = true;
             var bodyLength = 0L;
             ChapterEntity? last = null;
@@ -59,7 +76,7 @@ namespace ZoDream.Shared.Plugins.Txt
                 {
                     continue;
                 }
-                if (items.Count == 0 || 
+                if (items.Count == 0 ||
                     pattern.IsMatch(line))
                 {
                     if (last is not null)
@@ -76,7 +93,7 @@ namespace ZoDream.Shared.Plugins.Txt
                     continue;
                 }
                 bodyLength += line.Length;
-                if (bodyLength > (isMatchRule ? MaxLengthWithRule : MaxLengthWithoutRule) 
+                if (bodyLength > (isMatchRule ? MaxLengthWithRule : MaxLengthWithoutRule)
                     && line.Length < 30)
                 {
                     if (last is not null)
@@ -93,16 +110,15 @@ namespace ZoDream.Shared.Plugins.Txt
                     continue;
                 }
             }
-            return items;
+            return (new BookEntity(), items);
         }
 
-        public async Task<string> GetChapter(string fileName,INovelChapter chapter)
+        public string GetChapter(Stream input, INovelChapter chapter)
         {
-            var fs = new FileStream(fileName, FileMode.Open);
-            var encoding = TxtEncoder.GetEncoding(fs);
-            fs.Seek(chapter.Begin, SeekOrigin.Begin);
+            var encoding = TxtEncoder.GetEncoding(input);
+            input.Seek(chapter.Begin, SeekOrigin.Begin);
             var buffer = new byte[chapter.End - chapter.Begin];
-            await fs.ReadAsync(buffer, 0, buffer.Length);
+            input.Read(buffer, 0, buffer.Length);
             return encoding.GetString(buffer);
         }
 

@@ -41,7 +41,7 @@ namespace ZoDream.Shared.Script
             var inLoop = true;
             while (inLoop)
             {
-                switch(reader.CurrentToken?.Type)
+                switch(reader.CurrentToken!.Type)
                 {
                     case TokenType.Eof:
                         inLoop = false;
@@ -72,7 +72,7 @@ namespace ZoDream.Shared.Script
                         }
                         if (token.Value == "(")
                         {
-
+                            ParseParameter(globalScope, reader);
                         }
                         break;
                     default:
@@ -131,6 +131,10 @@ namespace ZoDream.Shared.Script
                     return Expression.Constant(reader.CurrentToken.Value);
                 case TokenType.Number:
                     return Expression.Constant(Convert.ToInt32(reader.CurrentToken.Value));
+                case TokenType.Comma:
+                    break;
+                case TokenType.Bracket:
+                    break;
                 default:
                     break;
             }

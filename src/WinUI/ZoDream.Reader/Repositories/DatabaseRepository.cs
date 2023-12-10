@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 using ZoDream.Reader.ViewModels;
@@ -181,6 +182,13 @@ namespace ZoDream.Reader.Repositories
         {
             return Task.FromResult(connection.Build<T>().From<ChapterRuleEntity>().OrderByAsc("SortOrder")
                 .OrderByAsc("Id").ToList());
+        }
+
+        public Task<string[]> GetEnabledChapterRuleAsync()
+        {
+            return Task.FromResult(connection.Build<ChapterRuleEntity>()
+                .From<ChapterRuleEntity>().Where("IsEnabled", 1).OrderByAsc("SortOrder")
+                .OrderByAsc("Id").Select("MatchRule").ToList().Select(item => item.MatchRule).ToArray());
         }
 
         public Task SaveChapterRuleAsync(IChapterRule item)

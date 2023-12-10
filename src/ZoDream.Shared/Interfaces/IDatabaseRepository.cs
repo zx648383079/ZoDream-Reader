@@ -50,6 +50,7 @@ namespace ZoDream.Shared.Interfaces
         public Task SortReplaceRuleAsync<T>(IEnumerable<T> items) where T : IReplaceRule;
 
         public Task<List<T>> GetChapterRuleAsync<T>() where T : IChapterRule;
+        public Task<string[]> GetEnabledChapterRuleAsync();
         public Task SaveChapterRuleAsync(IChapterRule item);
 
         public Task DeleteChapterRuleAsync(params int[] items);

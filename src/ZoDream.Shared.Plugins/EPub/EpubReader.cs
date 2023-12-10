@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using VersOne.Epub;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
 using System.Xml;
 using System.Xml.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace ZoDream.Shared.Plugins.EPub
 {
@@ -18,30 +17,39 @@ namespace ZoDream.Shared.Plugins.EPub
         const string EPUB_CONTAINER_FILE_PATH = "META-INF/container.xml";
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
-        public Task<string> GetChapter(string fileName, INovelChapter chapter)
+        public Task<string> GetChapterAsync(string fileName, INovelChapter chapter)
         {
-            var archive = ZipFile.OpenRead(fileName);
-            var doc = Read(archive, chapter.Url);
-            return Task.FromResult(doc.Root.ToString());
+            return Task.Factory.StartNew(() => {
+                using var fs = File.OpenRead(fileName);
+                return GetChapter(fs, chapter);
+            });
         }
 
-        public async Task<List<INovelChapter>> GetChaptersAsync(string fileName)
+        public Task<List<INovelChapter>> GetChaptersAsync(string fileName)
         {
-            var archive = ZipFile.OpenRead(fileName);
+            return Task.Factory.StartNew(() => {
+                using var fs = File.OpenRead(fileName);
+                var (_, items) = GetChapters(fs);
+                return items;
+            });
+        }
+
+        public (INovel?, List<INovelChapter>) GetChapters(Stream input)
+        {
+            using var archive = new ZipArchive(input, ZipArchiveMode.Read);
             var rootFile = GetRootFileName(archive);
             if (rootFile == null)
             {
-                return [];
+                return (null, []);
             }
             var doc = Read(archive, rootFile);
             XNamespace opfNamespace = "http://www.idpf.org/2007/opf";
             var root = doc.Element(opfNamespace + "package");
             if (root is null)
             {
-                return [];
+                return (null, []);
             }
             var maps = new Dictionary<string, string>();
             var folder = Path.GetDirectoryName(rootFile);
@@ -87,8 +95,16 @@ namespace ZoDream.Shared.Plugins.EPub
                     Url = folder + "/" + item.Element(ncxNamespace + "content").Attribute("src").Value
                 });
             }
-            return await Task.FromResult(items);
+            return (novel, items);
         }
+
+        public string GetChapter(Stream input, INovelChapter chapter)
+        {
+            using var archive = new ZipArchive(input, ZipArchiveMode.Read);
+            var doc = Read(archive, chapter.Url);
+            return doc.Root.ToString();
+        }
+
 
         public string Serialize(INovelChapter chapter)
         {

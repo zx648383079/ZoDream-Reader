@@ -80,6 +80,5 @@ namespace ZoDream.Shared.Database
         public object? Insert(IDictionary<string, object> data);
         public object? Insert(T data);
         public int Insert(IEnumerable<T> items);
-
     }
 }
