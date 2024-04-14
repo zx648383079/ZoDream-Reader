@@ -1,14 +1,8 @@
 ﻿using Microsoft.UI;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using Windows.Foundation;
@@ -17,8 +11,6 @@ using Windows.UI;
 using ZoDream.Reader.Controls;
 using ZoDream.Reader.Pages;
 using ZoDream.Reader.Repositories;
-using ZoDream.Shared.Interfaces.Route;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -82,12 +74,12 @@ namespace ZoDream.Reader.ViewModels
             TitleBar.MenuCommand = MenuCommand;
         }
 
-        private void TapBack(object? _)
+        private void TapBack()
         {
             _router.GoBackAsync();
         }
 
-        private void TapMenu(object? _)
+        private void TapMenu()
         {
             if (_router.CurrentRootPage is MainPage o)
             {

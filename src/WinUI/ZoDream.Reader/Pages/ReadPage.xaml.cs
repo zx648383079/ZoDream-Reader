@@ -30,5 +30,14 @@ namespace ZoDream.Reader.Pages
         }
 
         public ReadViewModel ViewModel => (ReadViewModel)DataContext;
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            if (e.Parameter is Dictionary<string, object> o)
+            {
+                ViewModel.ApplyQueryAttributes(o);
+            }
+        }
     }
 }

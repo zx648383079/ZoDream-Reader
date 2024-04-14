@@ -12,6 +12,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using ZoDream.Reader.ViewModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,6 +27,17 @@ namespace ZoDream.Reader.Pages
         public NovelPage()
         {
             this.InitializeComponent();
+        }
+
+        public NovelViewModel ViewModel => (NovelViewModel)DataContext;
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            if (e.Parameter is Dictionary<string, object> o)
+            {
+                ViewModel.ApplyQueryAttributes(o);
+            }
         }
     }
 }

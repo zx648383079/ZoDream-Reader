@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -14,7 +15,7 @@ using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class MainViewModel: BindableBase
+    public class MainViewModel: ObservableObject
     {
         public MainViewModel()
         {

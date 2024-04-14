@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -12,7 +13,7 @@ using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ReadViewModel: BindableBase, ICanvasSource
+    public class ReadViewModel: ObservableObject, ICanvasSource
     {
 
         public PageTokenizer Tokenizer { get; private set; } = new PageTokenizer();
@@ -24,7 +25,7 @@ namespace ZoDream.Reader.ViewModels
             get => book;
             set
             {
-                Set(ref book, value);
+                SetProperty(ref book, value);
                 if (Tokenizer.Content != null)
                 {
 
@@ -47,7 +48,7 @@ namespace ZoDream.Reader.ViewModels
         public string ChapterTitle
         {
             get => chapterTitle;
-            set => Set(ref chapterTitle, value);
+            set => SetProperty(ref chapterTitle, value);
         }
 
         private ObservableCollection<ChapterPositionItem> chapterItems = new ObservableCollection<ChapterPositionItem>();
@@ -55,7 +56,7 @@ namespace ZoDream.Reader.ViewModels
         public ObservableCollection<ChapterPositionItem> ChapterItems
         {
             get => chapterItems;
-            set => Set(ref chapterItems, value);
+            set => SetProperty(ref chapterItems, value);
         }
 
         public void Load()

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,33 +10,32 @@ using ZoDream.Reader.Dialogs;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Extensions;
 using ZoDream.Shared.Repositories.Models;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ChapterRuleViewModel: BindableBase
+    public class ChapterRuleViewModel: ObservableObject
     {
         public ChapterRuleViewModel()
         {
             AddCommand = new RelayCommand(TapAdd);
             ImportCommand = new RelayCommand(TapImport);
-            EditCommand = new RelayCommand(TapEdit);
-            DeleteCommand = new RelayCommand(TapDelete);
+            EditCommand = new RelayCommand<ChapterRuleModel>(TapEdit);
+            DeleteCommand = new RelayCommand<ChapterRuleModel>(TapDelete);
             ToggleCheckCommand = new RelayCommand(TapToggleCheck);
-            ToggleCommand = new RelayCommand(TapToggle);
-            SortCommand = new RelayCommand(TapSort);
-            SortBottomCommand = new RelayCommand(TapSortBottom);
-            SortTopCommand = new RelayCommand(TapSortTop);
+            ToggleCommand = new RelayCommand<ChapterRuleModel>(TapToggle);
+            SortCommand = new RelayCommand<ChapterRuleModel>(TapSort);
+            SortBottomCommand = new RelayCommand<ChapterRuleModel>(TapSortBottom);
+            SortTopCommand = new RelayCommand<ChapterRuleModel>(TapSortTop);
             LoadAsync();
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
-        private ObservableCollection<ChapterRuleModel> ruleItems = new();
+        private ObservableCollection<ChapterRuleModel> ruleItems = [];
 
         public ObservableCollection<ChapterRuleModel> RuleItems {
             get => ruleItems;
-            set => Set(ref ruleItems, value);
+            set => SetProperty(ref ruleItems, value);
         }
 
         public ICommand AddCommand { get; private set; }
@@ -49,32 +50,32 @@ namespace ZoDream.Reader.ViewModels
         public ICommand SortBottomCommand { get; private set; }
         public ICommand SortTopCommand { get; private set; }
 
-        private void TapSort(object? arg)
+        private void TapSort(ChapterRuleModel? arg)
         {
-            if (arg is not ChapterRuleModel)
+            if (arg is null)
             {
                 return;
             }
             SaveSort();
         }
 
-        private void TapSortTop(object? arg)
+        private void TapSortTop(ChapterRuleModel? arg)
         {
-            if (arg is not ChapterRuleModel data)
+            if (arg is null)
             {
                 return;
             }
-            RuleItems.MoveToFirst(RuleItems.IndexOf(data));
+            RuleItems.MoveToFirst(RuleItems.IndexOf(arg));
             SaveSort();
         }
 
-        private void TapSortBottom(object? arg)
+        private void TapSortBottom(ChapterRuleModel? arg)
         {
-            if (arg is not ChapterRuleModel data)
+            if (arg is null)
             {
                 return;
             }
-            RuleItems.MoveToLast(RuleItems.IndexOf(data));
+            RuleItems.MoveToLast(RuleItems.IndexOf(arg));
             SaveSort();
         }
 
@@ -83,16 +84,16 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SortChapterRuleAsync(RuleItems);
         }
 
-        private void TapToggle(object? arg)
+        private void TapToggle(ChapterRuleModel? arg)
         {
-            if (arg is not ChapterRuleModel data)
+            if (arg is null)
             {
                 return;
             }
-            _app.Database.ToggleChapterRuleAsync(data.IsEnabled, data.Id);
+            _app.Database.ToggleChapterRuleAsync(arg.IsEnabled, arg.Id);
         }
 
-        private void TapToggleCheck(object? _)
+        private void TapToggleCheck()
         {
             if (RuleItems.Count == 0)
             {
@@ -105,7 +106,7 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapDelete(object? arg)
+        private void TapDelete(ChapterRuleModel? arg)
         {
             
             if (arg is null)
@@ -113,10 +114,7 @@ namespace ZoDream.Reader.ViewModels
                 DeleteRule(RuleItems.Where(item => item.IsChecked).Select(item => item.Id).ToArray());
                 return;
             }
-            if (arg is ChapterRuleModel data)
-            {
-                DeleteRule(data.Id);
-            }
+            DeleteRule(arg.Id);
         }
 
         private async void DeleteRule(params int[] items)
@@ -139,7 +137,7 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapEdit(object? arg) 
+        private void TapEdit(ChapterRuleModel? arg) 
         {
             if (arg is null)
             {
@@ -153,10 +151,7 @@ namespace ZoDream.Reader.ViewModels
                 }
                 return;
             }
-            if (arg is ChapterRuleModel data)
-            {
-                EditRule(data);
-            }
+            EditRule(arg);
             
         }
 
@@ -179,7 +174,7 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SaveChapterRuleAsync(data);
         }
 
-        private async void TapAdd(object? _)
+        private async void TapAdd()
         {
             var picker = new AddChapterRuleDialog();
             var res = await _app.OpenDialogAsync(picker);
@@ -196,7 +191,7 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SaveChapterRuleAsync(item);
         }
 
-        private async void TapImport(object? _)
+        private async void TapImport()
         {
             var dialog = new ImportDialog();
             var res = await _app.OpenDialogAsync(dialog);

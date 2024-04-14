@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.WinUI.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +13,10 @@ using Windows.Storage.Pickers;
 using ZoDream.Reader.Repositories;
 using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Repositories;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class StartupViewModel : BindableBase
+    public class StartupViewModel : ObservableObject
     {
 
         public StartupViewModel()
@@ -29,21 +30,21 @@ namespace ZoDream.Reader.ViewModels
 
         public string Version {
             get => version;
-            set => Set(ref version, value);
+            set => SetProperty(ref version, value);
         }
 
         private string tip = string.Empty;
 
         public string Tip {
             get => tip;
-            set => Set(ref tip, value);
+            set => SetProperty(ref tip, value);
         }
 
         public ICommand OpenCommand { get; private set; }
 
         public ICommand CreateCommand { get; private set; }
 
-        private async void TapOpen(object _)
+        private async void TapOpen()
         {
             var picker = new FolderPicker();
             App.GetService<AppViewModel>().InitializePicker(picker);
@@ -64,7 +65,7 @@ namespace ZoDream.Reader.ViewModels
             App.GetService<IRouter>().GoToAsync(Router.HomeRoute);
         }
 
-        private async void TapCreate(object _)
+        private async void TapCreate()
         {
             var picker = new FolderPicker();
             App.GetService<AppViewModel>().InitializePicker(picker);

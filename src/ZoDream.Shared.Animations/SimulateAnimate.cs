@@ -5,28 +5,40 @@ using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Shared.Animations
 {
-    public class SimulateAnimate : ICanvasAnimate
+    public class SimulateAnimate : BaseCanvasAnimate
     {
-        public bool HasAnimate => true;
-
-        public double Move(ICanvasLayer layer, double x, double y)
+        public override void Dispose()
         {
-            throw new NotImplementedException();
         }
 
-        public void MoveStart(ICanvasLayer layer, double x, double y)
+        public override void OnDraw(ICanvasRender canvas)
         {
-            throw new NotImplementedException();
+
         }
 
-        public bool Animate(IList<ICanvasLayer> layers, double offset, bool isTouch)
+        public override void OnTouchFinish(double x, double y)
         {
-            throw new NotImplementedException();
+
         }
 
-        public void Dispose()
+        public override void OnTouchMove(double x, double y)
         {
-            throw new NotImplementedException();
+
+        }
+
+        public override void OnTouchStart(double x, double y)
+        {
+
+        }
+
+        public override void TurnNext()
+        {
+
+        }
+
+        public override void TurnPrevious()
+        {
+
         }
     }
 }

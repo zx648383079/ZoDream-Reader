@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -11,34 +13,33 @@ using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Repositories.Extensions;
 using ZoDream.Shared.Repositories.Models;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class SourceViewModel: BindableBase
+    public class SourceViewModel: ObservableObject
     {
         public SourceViewModel()
         {
             AddCommand = new RelayCommand(TapAdd);
             GroupCommand = new RelayCommand(TapGroup);
             ImportCommand = new RelayCommand(TapImport);
-            EditCommand = new RelayCommand(TapEdit);
-            DeleteCommand = new RelayCommand(TapDelete);
+            EditCommand = new RelayCommand<SourceRuleModel>(TapEdit);
+            DeleteCommand = new RelayCommand<SourceRuleModel>(TapDelete);
             ToggleCheckCommand = new RelayCommand(TapToggleCheck);
-            ToggleCommand = new RelayCommand(TapToggle);
-            SortCommand = new RelayCommand(TapSort);
-            SortBottomCommand = new RelayCommand(TapSortBottom);
-            SortTopCommand = new RelayCommand(TapSortTop);
+            ToggleCommand = new RelayCommand<SourceRuleModel>(TapToggle);
+            SortCommand = new RelayCommand<SourceRuleModel>(TapSort);
+            SortBottomCommand = new RelayCommand<SourceRuleModel>(TapSortBottom);
+            SortTopCommand = new RelayCommand<SourceRuleModel>(TapSortTop);
             LoadAsync();
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
-        private ObservableCollection<SourceRuleModel> ruleItems = new();
+        private ObservableCollection<SourceRuleModel> ruleItems = [];
 
         public ObservableCollection<SourceRuleModel> RuleItems {
             get => ruleItems;
-            set => Set(ref ruleItems, value);
+            set => SetProperty(ref ruleItems, value);
         }
 
         public ICommand AddCommand { get; private set; }
@@ -53,32 +54,32 @@ namespace ZoDream.Reader.ViewModels
         public ICommand SortBottomCommand { get; private set; }
         public ICommand SortTopCommand { get; private set; }
 
-        private void TapSort(object? arg)
+        private void TapSort(SourceRuleModel? arg)
         {
-            if (arg is not SourceRuleModel)
+            if (arg is null)
             {
                 return;
             }
             SaveSort();
         }
 
-        private void TapSortTop(object? arg)
+        private void TapSortTop(SourceRuleModel? arg)
         {
-            if (arg is not SourceRuleModel data)
+            if (arg is null)
             {
                 return;
             }
-            RuleItems.MoveToFirst(RuleItems.IndexOf(data));
+            RuleItems.MoveToFirst(RuleItems.IndexOf(arg));
             SaveSort();
         }
 
-        private void TapSortBottom(object? arg)
+        private void TapSortBottom(SourceRuleModel? arg)
         {
-            if (arg is not SourceRuleModel data)
+            if (arg is null)
             {
                 return;
             }
-            RuleItems.MoveToLast(RuleItems.IndexOf(data));
+            RuleItems.MoveToLast(RuleItems.IndexOf(arg));
             SaveSort();
         }
 
@@ -87,16 +88,16 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SortSourceRuleAsync(RuleItems);
         }
 
-        private void TapToggle(object? arg)
+        private void TapToggle(SourceRuleModel? arg)
         {
-            if (arg is not SourceRuleModel data)
+            if (arg is null)
             {
                 return;
             }
-            _app.Database.ToggleSourceRuleAsync(data.IsEnabled, data.Id);
+            _app.Database.ToggleSourceRuleAsync(arg.IsEnabled, arg.Id);
         }
 
-        private void TapToggleCheck(object? _)
+        private void TapToggleCheck()
         {
             if (RuleItems.Count == 0)
             {
@@ -109,7 +110,7 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapDelete(object? arg)
+        private void TapDelete(SourceRuleModel? arg)
         {
 
             if (arg is null)
@@ -117,10 +118,7 @@ namespace ZoDream.Reader.ViewModels
                 DeleteRule(RuleItems.Where(item => item.IsChecked).Select(item => item.Id).ToArray());
                 return;
             }
-            if (arg is SourceRuleModel data)
-            {
-                DeleteRule(data.Id);
-            }
+            DeleteRule(arg.Id);
         }
 
         private async void DeleteRule(params int[] items)
@@ -143,7 +141,7 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapEdit(object? arg)
+        private void TapEdit(SourceRuleModel? arg)
         {
             if (arg is null)
             {
@@ -157,10 +155,7 @@ namespace ZoDream.Reader.ViewModels
                 }
                 return;
             }
-            if (arg is SourceRuleModel data)
-            {
-                EditRule(data);
-            }
+            EditRule(arg);
 
         }
 
@@ -183,7 +178,7 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SaveSourceRuleAsync(data);
         }
 
-        private async void TapAdd(object? _)
+        private async void TapAdd()
         {
             var picker = new AddSourceDialog();
             var res = await _app.OpenDialogAsync(picker);
@@ -200,13 +195,13 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SaveSourceRuleAsync(item);
         }
 
-        public void TapGroup(object? _)
+        public void TapGroup()
         {
             var picker = new GroupDialog();
             _ = App.GetService<AppViewModel>().OpenDialogAsync(picker);
         }
 
-        private async void TapImport(object? _)
+        private async void TapImport()
         {
             var dialog = new ImportDialog();
             var res = await _app.OpenDialogAsync(dialog);

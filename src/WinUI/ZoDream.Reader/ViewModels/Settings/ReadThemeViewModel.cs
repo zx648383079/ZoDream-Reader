@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,20 +15,19 @@ using ZoDream.Shared.Plugins.Importers;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Repositories.Extensions;
 using ZoDream.Shared.Repositories.Models;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ReadThemeViewModel: BindableBase
+    public class ReadThemeViewModel: ObservableObject
     {
         public ReadThemeViewModel()
         {
             AddCommand = new RelayCommand(TapAdd);
             ImportCommand = new RelayCommand(TapImport);
-            EditCommand = new RelayCommand(TapEdit);
-            DeleteCommand = new RelayCommand(TapDelete);
+            EditCommand = new RelayCommand<ReadThemeModel>(TapEdit);
+            DeleteCommand = new RelayCommand<ReadThemeModel>(TapDelete);
             ToggleCheckCommand = new RelayCommand(TapToggleCheck);
-            ToggleCommand = new RelayCommand(TapToggle);
+            ToggleCommand = new RelayCommand<ReadThemeModel>(TapToggle);
             LoadAsync();
         }
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
@@ -35,7 +36,7 @@ namespace ZoDream.Reader.ViewModels
 
         public ObservableCollection<ReadThemeModel> ThemeItems {
             get => themeItems;
-            set => Set(ref themeItems, value);
+            set => SetProperty(ref themeItems, value);
         }
 
         public ICommand AddCommand { get; private set; }
@@ -47,15 +48,15 @@ namespace ZoDream.Reader.ViewModels
         public ICommand ToggleCheckCommand { get; private set; }
         public ICommand ToggleCommand { get; private set; }
 
-        private void TapToggle(object? arg)
+        private void TapToggle(ReadThemeModel? arg)
         {
-            if (arg is not ReadThemeModel data || !data.IsEnabled)
+            if (arg is null || !arg.IsEnabled)
             {
                 return;
             }
             foreach (var item in ThemeItems)
             {
-                if (item == data)
+                if (item == arg)
                 {
                     continue;
                 }
@@ -63,7 +64,7 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapToggleCheck(object? _)
+        private void TapToggleCheck()
         {
             if (ThemeItems.Count == 0)
             {
@@ -76,7 +77,7 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapDelete(object? arg)
+        private void TapDelete(ReadThemeModel? arg)
         {
 
             if (arg is null)
@@ -84,10 +85,7 @@ namespace ZoDream.Reader.ViewModels
                 DeleteTheme(ThemeItems.Where(item => item.IsChecked).Select(item => item.Id).ToArray());
                 return;
             }
-            if (arg is AppThemeModel data)
-            {
-                DeleteTheme(data.Id);
-            }
+            DeleteTheme(arg.Id);
         }
 
         private async void DeleteTheme(params int[] items)
@@ -110,7 +108,7 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapEdit(object? arg)
+        private void TapEdit(ReadThemeModel? arg)
         {
             if (arg is null)
             {
@@ -124,10 +122,7 @@ namespace ZoDream.Reader.ViewModels
                 }
                 return;
             }
-            if (arg is ReadThemeModel data)
-            {
-                EditTheme(data);
-            }
+            EditTheme(arg);
 
         }
 
@@ -150,7 +145,7 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SaveReadThemeAsync(data);
         }
 
-        private async void TapAdd(object? _)
+        private async void TapAdd()
         {
             var picker = new AddReadThemeDialog();
             var res = await _app.OpenDialogAsync(picker);
@@ -167,7 +162,7 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SaveReadThemeAsync(item);
         }
 
-        private async void TapImport(object? _)
+        private async void TapImport()
         {
             var dialog = new ImportDialog();
             var res = await _app.OpenDialogAsync(dialog);

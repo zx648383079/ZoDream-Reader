@@ -1,22 +1,22 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Repositories.Entities;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class GroupViewModel: BindableBase
+    public class GroupViewModel: ObservableObject
     {
 
-        private ObservableCollection<BookGroupEntity> groupItems = new();
+        private ObservableCollection<BookGroupEntity> groupItems = [];
 
         public ObservableCollection<BookGroupEntity> GroupItems {
             get => groupItems;
-            set => Set(ref groupItems, value);
+            set => SetProperty(ref groupItems, value);
         }
 
     }

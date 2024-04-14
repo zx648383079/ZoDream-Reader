@@ -47,6 +47,5 @@ namespace ZoDream.Shared.Interfaces.Entities
         public string EInkBackgroundImage { get; set; }
         public string EInkBackground { get; set; }
         public string EInkForeground { get; set; }
-
     }
 }

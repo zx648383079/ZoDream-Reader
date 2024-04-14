@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +9,10 @@ using System.Windows.Input;
 using Windows.UI.Popups;
 using ZoDream.Reader.Dialogs;
 using ZoDream.Reader.Utils;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class OtherViewModel: BindableBase
+    public class OtherViewModel: ObservableObject
     {
 
         public OtherViewModel()
@@ -21,7 +22,7 @@ namespace ZoDream.Reader.ViewModels
 
         public ICommand ClearCommand { get; private set; }
 
-        private async void TapClear(object? _)
+        private async void TapClear()
         {
             var app = App.GetService<AppViewModel>();
             //var dialog = new MessageDialog("确定要删除文件");

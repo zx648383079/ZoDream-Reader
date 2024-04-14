@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ZoDream.Shared.Database;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.Repositories.Entities;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Shared.Repositories.Models
 {
-    public class SourceRuleModel : BindableBase, ISourceRule
+    public class SourceRuleModel : ObservableObject, ISourceRule
     {
         public int Id { get; set; }
         private string name = string.Empty;
@@ -17,7 +12,7 @@ namespace ZoDream.Shared.Repositories.Models
         public string Name
         {
             get => name;
-            set => Set(ref name, value);
+            set => SetProperty(ref name, value);
         }
 
         private string groupName = string.Empty;
@@ -25,7 +20,7 @@ namespace ZoDream.Shared.Repositories.Models
         public string GroupName
         {
             get => groupName;
-            set => Set(ref groupName, value);
+            set => SetProperty(ref groupName, value);
         }
 
 
@@ -58,14 +53,14 @@ namespace ZoDream.Shared.Repositories.Models
         public bool IsEnabled
         {
             get => isEnabled;
-            set => Set(ref isEnabled, value);
+            set => SetProperty(ref isEnabled, value);
         }
 
         private int sortOrder = 99;
 
         public int SortOrder {
             get => sortOrder;
-            set => Set(ref sortOrder, value);
+            set => SetProperty(ref sortOrder, value);
         }
 
         private bool isChecked;
@@ -73,14 +68,14 @@ namespace ZoDream.Shared.Repositories.Models
         public bool IsChecked
         {
             get => isChecked;
-            set => Set(ref isChecked, value);
+            set => SetProperty(ref isChecked, value);
         }
 
         private SourceUpdateStatus status = SourceUpdateStatus.None;
 
         public SourceUpdateStatus Status {
             get => status;
-            set => Set(ref status, value);
+            set => SetProperty(ref status, value);
         }
 
     }

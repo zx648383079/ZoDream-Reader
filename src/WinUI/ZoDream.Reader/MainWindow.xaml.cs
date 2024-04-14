@@ -3,7 +3,6 @@ using System.Diagnostics;
 using ZoDream.Reader.Repositories;
 using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Interfaces.Route;
-using ZoDream.Shared.ViewModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -22,7 +21,7 @@ namespace ZoDream.Reader
             BindRouter();
         }
 
-        public AppViewModel ViewModel => App.GetService<AppViewModel>();
+        public AppViewModel ViewModel = App.GetService<AppViewModel>();
 
         private void BindRouter()
         {

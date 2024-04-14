@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -10,7 +11,7 @@ using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class MainViewModel: BindableBase
+    public class MainViewModel: ObservableObject
     {
         public MainViewModel()
         {
@@ -34,7 +35,7 @@ namespace ZoDream.Reader.ViewModels
         public ObservableCollection<BookItem> BookItems
         {
             get => bookItems;
-            set => Set(ref bookItems, value);
+            set => SetProperty(ref bookItems, value);
         }
 
         public AppOption Setting { get; set; }

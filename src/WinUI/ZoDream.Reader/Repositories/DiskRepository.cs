@@ -131,9 +131,23 @@ namespace ZoDream.Reader.Repositories
             return Task.FromResult(Path.Combine(BookFolder.Path, item.FileName));
         }
 
+        private static async Task<IStorageFile> CopyOrReplaceFileAsync(IStorageFile src, IStorageFolder folder)
+        {
+            try
+            {
+                var dst = await folder.GetFileAsync(src.Name);
+                await src.CopyAndReplaceAsync(dst);
+                return dst;
+            }
+            catch (FileNotFoundException)
+            {
+            }
+            return await src.CopyAsync(folder);
+        }
+
         public async Task<INovel?> AddBookAsync<T>(T file)
         {
-            if (file is not StorageFile src)
+            if (file is not IStorageFile src)
             {
                 return null;
             }
@@ -141,18 +155,22 @@ namespace ZoDream.Reader.Repositories
             var fileId = src.Name;
             if (!src.Path.StartsWith(BookFolder.Path))
             {
-                src = await src.CopyAsync(BookFolder);
+                src = await CopyOrReplaceFileAsync(src, BookFolder);
             }
             var reader = await GetReaderAsync(src.Name, true);
             var (novel, items) = reader.GetChapters(await src.OpenStreamForReadAsync());
-            novel ??= new BookEntity()
-            {
-                Id = fileId,
-                FileName = fileId
-            };
+            novel ??= new BookEntity();
+            novel.Id = fileId;
+            novel.FileName = fileId;
             if (string.IsNullOrWhiteSpace(novel.Name))
             {
                 novel.Name = name;
+            }
+            var service = App.GetService<AppViewModel>().Database;
+            await service.SaveBookAsync(novel);
+            if (items is not null)
+            {
+                await service.SaveChapterAsync(novel.Id, items);
             }
             return novel;
         }
@@ -270,7 +288,7 @@ namespace ZoDream.Reader.Repositories
             var encoder = await BitmapEncoder.CreateAsync(bitmapEncoder, stream);
             var pixelStream = writeable.PixelBuffer.AsStream();
             byte[] pixels = new byte[pixelStream.Length];
-            await pixelStream.ReadAsync(pixels, 0, pixels.Length);
+            await pixelStream.ReadAsync(pixels);
             encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
                         (uint)writeable.PixelWidth,
                         (uint)writeable.PixelHeight,

@@ -1,10 +1,9 @@
-﻿using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.Repositories.Entities;
-using ZoDream.Shared.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ZoDream.Shared.Interfaces.Entities;
 
 namespace ZoDream.Shared.Repositories.Models
 {
-    public class DictionaryRuleModel : BindableBase, IDictionaryRule
+    public class DictionaryRuleModel : ObservableObject, IDictionaryRule
     {
         public int Id { get; set; }
         private string name = string.Empty;
@@ -12,7 +11,7 @@ namespace ZoDream.Shared.Repositories.Models
         public string Name
         {
             get => name;
-            set => Set(ref name, value);
+            set => SetProperty(ref name, value);
         }
 
 
@@ -21,7 +20,7 @@ namespace ZoDream.Shared.Repositories.Models
         public string UrlRule
         {
             get => urlRule;
-            set => Set(ref urlRule, value);
+            set => SetProperty(ref urlRule, value);
         }
 
         private string showRule = string.Empty;
@@ -29,7 +28,7 @@ namespace ZoDream.Shared.Repositories.Models
         public string ShowRule
         {
             get => showRule;
-            set => Set(ref showRule, value);
+            set => SetProperty(ref showRule, value);
         }
 
 
@@ -38,14 +37,14 @@ namespace ZoDream.Shared.Repositories.Models
         public bool IsEnabled
         {
             get => isEnabled;
-            set => Set(ref isEnabled, value);
+            set => SetProperty(ref isEnabled, value);
         }
 
         private int sortOrder = 99;
 
         public int SortOrder {
             get => sortOrder;
-            set => Set(ref sortOrder, value);
+            set => SetProperty(ref sortOrder, value);
         }
 
         private bool isChecked;
@@ -53,7 +52,7 @@ namespace ZoDream.Shared.Repositories.Models
         public bool IsChecked
         {
             get => isChecked;
-            set => Set(ref isChecked, value);
+            set => SetProperty(ref isChecked, value);
         }
 
 

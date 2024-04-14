@@ -24,7 +24,7 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Image Source="{Binding Cover}"/>
+            <Image Source="{Binding Cover,Converter={StaticResource ImageCvt}}"/>
             <StackPanel Grid.Column="1">
                 <TextBlock Text="{Binding Name}"/>
                 <ctl:IconLabel Icon="&#xE77B;" Text="{Binding Author}"/>
@@ -36,8 +36,8 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Button Content="立即阅读"/>
-                    <Button Content="删除书籍" Grid.Column="1"/>
+                    <Button Content="立即阅读" Command="{Binding ReadCommand}"/>
+                    <Button Content="{Binding SecondaryText}" Command="{Binding SecondaryCommand}" Grid.Column="1"/>
                 </Grid>
             </StackPanel>
         </Grid>

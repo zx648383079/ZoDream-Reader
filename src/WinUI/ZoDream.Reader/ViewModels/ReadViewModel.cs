@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -6,12 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ZoDream.Reader.Dialogs;
+using ZoDream.Shared.Interfaces.Entities;
+using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Repositories.Entities;
-using ZoDream.Shared.ViewModels;
+using ZoDream.Shared.Repositories.Extensions;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ReadViewModel: BindableBase
+    public class ReadViewModel: ObservableObject, IQueryAttributable
     {
 
         public ReadViewModel()
@@ -23,19 +27,19 @@ namespace ZoDream.Reader.ViewModels
             SettingCommand = new RelayCommand(TapSetting);
         }
 
-
-        private ObservableCollection<ChapterModel> item = new();
+        private readonly AppViewModel _app = App.GetService<AppViewModel>();
+        private ObservableCollection<ChapterModel> item = [];
 
         public ObservableCollection<ChapterModel> Items {
             get => item;
-            set => Set(ref item, value);
+            set => SetProperty(ref item, value);
         }
 
         private bool catalogOpen;
 
         public bool CatalogOpen {
             get => catalogOpen;
-            set => Set(ref catalogOpen, value);
+            set => SetProperty(ref catalogOpen, value);
         }
 
         public ICommand CatalogCommand { get; private set; }
@@ -44,30 +48,43 @@ namespace ZoDream.Reader.ViewModels
         public ICommand PreviousCommand { get; private set; }
         public ICommand NextCommand { get; private set; }
 
-        private void TapCatalog(object? _)
+        private void TapCatalog()
         {
             CatalogOpen = !CatalogOpen;
         }
 
-        private void TapPrevious(object? _)
+        private void TapPrevious()
         {
 
         }
-        private void TapNext(object? _)
+        private void TapNext()
         {
 
         }
 
-        private async void TapSource(object? _)
+        private async void TapSource()
         {
             var app = App.GetService<AppViewModel>();
             var dialog = new SearchSourceDialog();
             await app.OpenDialogAsync(dialog);
         }
-        private void TapSetting(object? _)
+        private void TapSetting()
         {
 
         }
 
+        public void ApplyQueryAttributes(IDictionary<string, object> queries)
+        {
+            if (queries.TryGetValue("novel", out var obj) && obj is INovel novel)
+            {
+                _ = LoadAsync(novel.Id);
+            }
+        }
+
+        public async Task LoadAsync(string book)
+        {
+            var data = await _app.Database.GetChapterAsync<ChapterModel>(book);
+            data.ToCollection(Items);
+        }
     }
 }

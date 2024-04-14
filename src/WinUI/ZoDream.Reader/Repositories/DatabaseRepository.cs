@@ -74,8 +74,19 @@ namespace ZoDream.Reader.Repositories
             }
             var data = item is BookEntity o ? o :
                  item.Clone<BookEntity>();
-            connection.Save(data);
-            item.Id = data.Id;
+            var insert = string.IsNullOrEmpty(data.Id);
+            if (!insert)
+            {
+                insert = connection.Build<BookEntity>().Where("Id", data.Id).Count() == 0;
+            }
+            if (insert)
+            {
+                connection.Insert(data);
+                item.Id = data.Id;
+            } else
+            {
+                connection.Update(data);
+            }
             return Task.CompletedTask;
         }
 
@@ -88,7 +99,34 @@ namespace ZoDream.Reader.Repositories
 
         public Task<List<T>> GetChapterAsync<T>(string bookId) where T : INovelChapter
         {
-            return Task.FromResult(connection.Build<T>().From<ChapterEntity>().Where("BookId", bookId).ToList());
+            return Task.FromResult(connection.Build<T>().From<ChapterEntity>().Where("BookId", bookId).OrderByAsc("Index").ToList());
+        }
+
+        public async Task SaveChapterAsync<T>(string bookId, IEnumerable<T> items) 
+            where T : INovelChapter
+        {
+            var data = await GetChapterAsync<T>(bookId);
+            var i = 0;
+            foreach (var item in items)
+            {
+                ++i;
+                item.Index = i;
+                item.BookId = bookId;
+                if (data.Count >= i)
+                {
+                    item.Id = data[i - 1].Id;
+                }
+                var entity = item is ChapterEntity o ? o :
+                        item.Clone<ChapterEntity>();
+                connection.Save(entity);
+                item.Id = entity.Id;
+            }
+            if (data.Count <= i)
+            {
+                return;
+            }
+            connection.Build<ChapterEntity>().WhereIn("Id", 
+                data.Skip(i).Select(item => (object)item.Id).ToArray()).Delete();
         }
 
         public Task<List<T>> GetThemeAsync<T>() where T : IAppTheme

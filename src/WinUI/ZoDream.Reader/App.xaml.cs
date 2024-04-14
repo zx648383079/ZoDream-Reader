@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using System.Globalization;
 using System.Text;
@@ -31,7 +32,6 @@ namespace ZoDream.Reader
         {
             this.InitializeComponent();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            RegisterServices();
             _ = GetService<AppViewModel>().InitializeAsync();
         }
 
@@ -51,22 +51,22 @@ namespace ZoDream.Reader
 
         private Window? m_window;
 
-        private static ServiceLocator? Locator;
-
+        private static bool IsBooted = false;
         public static T GetService<T>()
         {
-            if (Locator is null)
+            if (!IsBooted)
             {
+                IsBooted = true;
                 RegisterServices();
             }
-            return Locator!.GetService<T>();
+            return Ioc.Default.GetService<T>();
         }
 
         private static void RegisterServices()
         {
-            Locator ??= new ServiceLocator();
-            Locator.ServiceCollection.AddSingleton<AppViewModel>();
-            Locator.ServiceCollection.AddSingleton<ISettingRepository, SettingRepository>();
+            var services = new ServiceCollection();
+            services.AddSingleton<AppViewModel>();
+            services.AddSingleton<ISettingRepository, SettingRepository>();
             var router = new Router();
             router.RegisterRoute("startup", typeof(StartupPage));
             router.RegisterRoute(Router.HomeRoute, typeof(HomePage), true);
@@ -88,7 +88,8 @@ namespace ZoDream.Reader
             router.RegisterRoute("rule/replace", typeof(ReplaceRulePage), true);
             router.RegisterRoute("rule/dictionary", typeof(DictionaryRulePage), true);
             router.RegisterRoute("read", typeof(ReadPage), RouteType.Single);
-            Locator.ServiceCollection.AddSingleton<IRouter>(router);
+            services.AddSingleton<IRouter>(router);
+            Ioc.Default.ConfigureServices(services.BuildServiceProvider());
         }
     }
 }

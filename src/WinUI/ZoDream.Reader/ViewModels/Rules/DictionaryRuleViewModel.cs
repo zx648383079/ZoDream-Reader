@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,35 +10,33 @@ using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Dialogs;
 using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Repositories.Extensions;
 using ZoDream.Shared.Repositories.Models;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class DictionaryRuleViewModel: BindableBase
+    public class DictionaryRuleViewModel: ObservableObject
     {
         public DictionaryRuleViewModel()
         {
             AddCommand = new RelayCommand(TapAdd);
             ImportCommand = new RelayCommand(TapImport);
-            EditCommand = new RelayCommand(TapEdit);
-            DeleteCommand = new RelayCommand(TapDelete);
+            EditCommand = new RelayCommand<DictionaryRuleModel>(TapEdit);
+            DeleteCommand = new RelayCommand<DictionaryRuleModel>(TapDelete);
             ToggleCheckCommand = new RelayCommand(TapToggleCheck);
-            ToggleCommand = new RelayCommand(TapToggle);
-            SortCommand = new RelayCommand(TapSort);
-            SortBottomCommand = new RelayCommand(TapSortBottom);
-            SortTopCommand = new RelayCommand(TapSortTop);
+            ToggleCommand = new RelayCommand<DictionaryRuleModel>(TapToggle);
+            SortCommand = new RelayCommand<DictionaryRuleModel>(TapSort);
+            SortBottomCommand = new RelayCommand<DictionaryRuleModel>(TapSortBottom);
+            SortTopCommand = new RelayCommand<DictionaryRuleModel>(TapSortTop);
             LoadAsync();
         }
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
-        private ObservableCollection<DictionaryRuleModel> ruleItems = new();
+        private ObservableCollection<DictionaryRuleModel> ruleItems = [];
 
         public ObservableCollection<DictionaryRuleModel> RuleItems {
             get => ruleItems;
-            set => Set(ref ruleItems, value);
+            set => SetProperty(ref ruleItems, value);
         }
 
         public ICommand AddCommand { get; private set; }
@@ -51,32 +51,32 @@ namespace ZoDream.Reader.ViewModels
         public ICommand SortBottomCommand { get; private set; }
         public ICommand SortTopCommand { get; private set; }
 
-        private void TapSort(object? arg)
+        private void TapSort(DictionaryRuleModel? arg)
         {
-            if (arg is not DictionaryRuleModel)
+            if (arg is null)
             {
                 return;
             }
             SaveSort();
         }
 
-        private void TapSortTop(object? arg)
+        private void TapSortTop(DictionaryRuleModel? arg)
         {
-            if (arg is not DictionaryRuleModel data)
+            if (arg is null)
             {
                 return;
             }
-            RuleItems.MoveToFirst(RuleItems.IndexOf(data));
+            RuleItems.MoveToFirst(RuleItems.IndexOf(arg));
             SaveSort();
         }
 
-        private void TapSortBottom(object? arg)
+        private void TapSortBottom(DictionaryRuleModel? arg)
         {
-            if (arg is not DictionaryRuleModel data)
+            if (arg is null)
             {
                 return;
             }
-            RuleItems.MoveToLast(RuleItems.IndexOf(data));
+            RuleItems.MoveToLast(RuleItems.IndexOf(arg));
             SaveSort();
         }
 
@@ -85,16 +85,16 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SortDictionaryRuleAsync(RuleItems);
         }
 
-        private void TapToggle(object? arg)
+        private void TapToggle(DictionaryRuleModel? arg)
         {
-            if (arg is not DictionaryRuleModel data)
+            if (arg is null)
             {
                 return;
             }
-            _app.Database.ToggleDictionaryRuleAsync(data.IsEnabled, data.Id);
+            _app.Database.ToggleDictionaryRuleAsync(arg.IsEnabled, arg.Id);
         }
 
-        private void TapToggleCheck(object? _)
+        private void TapToggleCheck()
         {
             if (RuleItems.Count == 0)
             {
@@ -107,7 +107,7 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapDelete(object? arg)
+        private void TapDelete(DictionaryRuleModel? arg)
         {
 
             if (arg is null)
@@ -115,10 +115,7 @@ namespace ZoDream.Reader.ViewModels
                 DeleteRule(RuleItems.Where(item => item.IsChecked).Select(item => item.Id).ToArray());
                 return;
             }
-            if (arg is DictionaryRuleModel data)
-            {
-                DeleteRule(data.Id);
-            }
+            DeleteRule(arg.Id);
         }
 
         private async void DeleteRule(params int[] items)
@@ -141,7 +138,7 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapEdit(object? arg)
+        private void TapEdit(DictionaryRuleModel? arg)
         {
             if (arg is null)
             {
@@ -155,10 +152,7 @@ namespace ZoDream.Reader.ViewModels
                 }
                 return;
             }
-            if (arg is DictionaryRuleModel data)
-            {
-                EditRule(data);
-            }
+            EditRule(arg);
 
         }
 
@@ -181,7 +175,7 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SaveDictionaryRuleAsync(data);
         }
 
-        private async void TapAdd(object? _)
+        private async void TapAdd()
         {
             var picker = new AddDictionaryDialog();
             var res = await _app.OpenDialogAsync(picker);
@@ -198,7 +192,7 @@ namespace ZoDream.Reader.ViewModels
             await _app.Database.SaveDictionaryRuleAsync(item);
         }
 
-        private async void TapImport(object? _)
+        private async void TapImport()
         {
             var dialog = new ImportDialog();
             var res = await _app.OpenDialogAsync(dialog);

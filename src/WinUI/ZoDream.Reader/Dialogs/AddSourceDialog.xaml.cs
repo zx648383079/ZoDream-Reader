@@ -26,6 +26,68 @@ namespace ZoDream.Reader.Dialogs
             this.InitializeComponent();
         }
 
+        private int Step = 0;
+
+        private int TotalStep {
+            get {
+                var count = 2;
+                if (ViewModel.EnabledSearch)
+                {
+                    count++;
+                }
+                if (ViewModel.EnabledExplore)
+                {
+                    count++;
+                }
+                return count;
+            }
+        }
         public SourceRuleModel ViewModel => (SourceRuleModel)DataContext;
+
+        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            Step--;
+            if (Step < 0)
+            {
+                return;
+            }
+            OnChangeStep();
+            args.Cancel = true;
+            
+        }
+
+        private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            Step++;
+            if (Step >= TotalStep)
+            {
+                return;
+            }
+            OnChangeStep();
+            args.Cancel = true;
+        }
+
+        private void OnChangeStep()
+        {
+            switch (Step)
+            {
+                case 0:
+                    Title = "编辑信息";
+                    PrimaryButtonText = "取消";
+                    SecondaryButtonText = "下一步";
+                    FirstPanel.Visibility = Visibility.Visible; 
+                    SecondPanel.Visibility = Visibility.Collapsed;
+                    break;
+                case 1:
+                    Title = "编辑内容规则";
+                    PrimaryButtonText = "上一步";
+                    SecondaryButtonText = "下一步";
+                    FirstPanel.Visibility = Visibility.Collapsed;
+                    SecondPanel.Visibility = Visibility.Visible;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

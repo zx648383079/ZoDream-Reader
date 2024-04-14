@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ZoDream.Shared.Database;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Shared.Repositories.Models
 {
-    public class AppThemeModel: BindableBase, IAppTheme
+    public class AppThemeModel: ObservableObject, IAppTheme
     {
         public int Id { get; set; }
 
@@ -15,7 +11,7 @@ namespace ZoDream.Shared.Repositories.Models
 
         public string Name {
             get => name;
-            set => Set(ref name, value);
+            set => SetProperty(ref name, value);
         }
 
         public bool IsDarkTheme { get; set; }
@@ -34,14 +30,14 @@ namespace ZoDream.Shared.Repositories.Models
 
         public bool IsEnabled {
             get => isEnabled;
-            set => Set(ref isEnabled, value);
+            set => SetProperty(ref isEnabled, value);
         }
 
         private bool isChecked;
 
         public bool IsChecked {
             get => isChecked;
-            set => Set(ref isChecked, value);
+            set => SetProperty(ref isChecked, value);
         }
     }
 }

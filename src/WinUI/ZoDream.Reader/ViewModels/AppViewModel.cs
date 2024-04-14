@@ -1,4 +1,5 @@
-﻿using Microsoft.UI;
+﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
@@ -25,7 +26,6 @@ using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Models;
 using ZoDream.Shared.Repositories;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -99,7 +99,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 await InitializeWorkspaceAsync(await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(AppConstants.WorkspaceToken));
             }
-            App.GetService<IRouter>().GoToAsync(HasLibrary ? Router.HomeRoute : "startup");
+            _router.GoToAsync(HasLibrary ? Router.HomeRoute : "startup");
         }
 
         public void InitializePicker(object target)

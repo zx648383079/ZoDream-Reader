@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -6,36 +7,35 @@ using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Repositories.Models;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class SearchNovelViewModel: BindableBase
+    public class SearchNovelViewModel: ObservableObject
     {
 
 
 
-        private ObservableCollection<SourceChannelEntity> channelItems = new();
+        private ObservableCollection<SourceChannelEntity> channelItems = [];
 
         public ObservableCollection<SourceChannelEntity> ChannelItems {
             get => channelItems;
-            set => Set(ref channelItems, value);
+            set => SetProperty(ref channelItems, value);
         }
 
 
-        private ObservableCollection<SearchHistoryEntity> wordItems = new();
+        private ObservableCollection<SearchHistoryEntity> wordItems = [];
 
         public ObservableCollection<SearchHistoryEntity> WordItems {
             get => wordItems;
-            set => Set(ref wordItems, value);
+            set => SetProperty(ref wordItems, value);
         }
 
-        private ObservableCollection<NovelSearchModel> novelItems = new();
+        private ObservableCollection<NovelSearchModel> novelItems = [];
 
         public ObservableCollection<NovelSearchModel> NovelItems 
         {
             get => novelItems;
-            set => Set(ref novelItems, value);
+            set => SetProperty(ref novelItems, value);
         }
 
 

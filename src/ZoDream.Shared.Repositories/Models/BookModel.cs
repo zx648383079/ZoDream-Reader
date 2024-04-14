@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Shared.Repositories.Models
 {
-    public class BookModel: BindableBase, INovel
+    public class BookModel: ObservableObject, INovel
     {
         public string Id { get; set; } = string.Empty;
 
@@ -14,7 +11,7 @@ namespace ZoDream.Shared.Repositories.Models
 
         public string Name {
             get => name;
-            set => Set(ref name, value);
+            set => SetProperty(ref name, value);
         }
 
 
@@ -22,21 +19,21 @@ namespace ZoDream.Shared.Repositories.Models
 
         public string Cover {
             get => cover;
-            set => Set(ref cover, value);
+            set => SetProperty(ref cover, value);
         }
 
         private string description = string.Empty;
 
         public string Description {
             get => description;
-            set => Set(ref description, value);
+            set => SetProperty(ref description, value);
         }
 
         private string author = string.Empty;
 
         public string Author {
             get => author;
-            set => Set(ref author, value);
+            set => SetProperty(ref author, value);
         }
 
 

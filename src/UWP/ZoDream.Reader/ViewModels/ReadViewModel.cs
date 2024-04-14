@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -12,7 +13,7 @@ using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ReadViewModel: BindableBase, ICanvasSource
+    public class ReadViewModel: ObservableObject, ICanvasSource
     {
 
         public PageTokenizer Tokenizer { get; private set; } = new PageTokenizer();

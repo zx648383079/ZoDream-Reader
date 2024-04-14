@@ -9,7 +9,7 @@ namespace ZoDream.Shared.Interfaces.Entities
 
         public string Url { get; set; }
 
-        public string BookId { get; }
+        public string BookId { get; set; }
 
         public long Begin { get; }
 

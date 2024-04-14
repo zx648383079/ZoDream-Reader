@@ -1,31 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ZoDream.Shared.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ZoDream.Shared.Repositories.Models
 {
-    public class SourceNovelModel: BindableBase
+    public class SourceNovelModel: ObservableObject
     {
         private string name = string.Empty;
 
         public string Name {
             get => name;
-            set => Set(ref name, value);
+            set => SetProperty(ref name, value);
         }
 
         private string author = string.Empty;
 
         public string Author {
             get => author;
-            set => Set(ref author, value);
+            set => SetProperty(ref author, value);
         }
 
         private string latestChapterTitle = string.Empty;
 
         public string LatestChapterTitle {
             get => latestChapterTitle;
-            set => Set(ref latestChapterTitle, value);
+            set => SetProperty(ref latestChapterTitle, value);
         }
 
         public string Url { get; set; } = string.Empty;
@@ -34,7 +31,7 @@ namespace ZoDream.Shared.Repositories.Models
 
         public bool IsChecked {
             get => isChecked;
-            set => Set(ref isChecked, value);
+            set => SetProperty(ref isChecked, value);
         }
     }
 }

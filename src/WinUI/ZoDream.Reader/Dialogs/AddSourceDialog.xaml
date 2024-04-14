@@ -6,24 +6,43 @@
     xmlns:local="using:ZoDream.Reader.Dialogs"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ZoDream.Shared.Repositories.Models"
     mc:Ignorable="d"
     Title="编辑书源"
-    PrimaryButtonText="创建"
-    SecondaryButtonText="取消">
+    PrimaryButtonText="取消"
+    SecondaryButtonText="下一步"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
 
-    <ScrollViewer>
-        <StackPanel>
-            <TextBlock Text="书源名" Style="{StaticResource InputHeaderStyle}"/>
-            <TextBox Style="{StaticResource InputEntryStyle}"/>
+    <ContentDialog.DataContext>
+        <vm:SourceRuleModel/>
+    </ContentDialog.DataContext>
 
+    <Grid>
+        <ScrollViewer x:Name="FirstPanel">
+            <StackPanel>
+                <TextBlock Text="书源名" Style="{StaticResource InputHeaderStyle}"/>
+                <TextBox Text="{Binding Name,Mode=TwoWay}" Style="{StaticResource InputEntryStyle}"/>
+
+                <TextBlock Text="网址" Style="{StaticResource InputHeaderStyle}"/>
+                <TextBox Text="{Binding BaseUri,Mode=TwoWay}" Style="{StaticResource InputEntryStyle}"/>
+
+                <CheckBox IsChecked="{Binding EnabledExplore,Mode=TwoWay}" Content="支持发现模块"/>
+                <CheckBox IsChecked="{Binding EnabledSearch,Mode=TwoWay}" Content="支持搜索模块"/>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid x:Name="SecondPanel" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
             <TextBlock Text="网址" Style="{StaticResource InputHeaderStyle}"/>
-            <TextBox Style="{StaticResource InputEntryStyle}"/>
+            <TextBox Style="{StaticResource InputEntryStyle}" Grid.Row="1"/>
 
-            <CheckBox Content="支持发现模块"/>
-            <CheckBox Content="支持搜索模块"/>
-            <CheckBox Content="支持获取书籍详情"/>
-            <CheckBox Content="支持获取目录"/>
-            <CheckBox Content="支持获取章节内容"/>
-        </StackPanel>
-    </ScrollViewer>
+            <TextBlock Text="规则" Style="{StaticResource InputHeaderStyle}" Grid.Row="2"/>
+            <RichEditBox Grid.Row="3"/>
+        </Grid>
+    </Grid>
 </ContentDialog>

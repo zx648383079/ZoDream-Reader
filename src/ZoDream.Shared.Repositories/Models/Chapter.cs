@@ -1,12 +1,12 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Shared.Repositories.Entities
 {
-    public class ChapterModel: BindableBase, INovelChapter
+    public class ChapterModel: ObservableObject, INovelChapter
     {
         public int Id { get; set; }
         public string Url { get; set; } = string.Empty;
@@ -27,7 +27,7 @@ namespace ZoDream.Shared.Repositories.Entities
 
         public bool IsChecked {
             get => isChecked;
-            set => Set(ref isChecked, value);
+            set => SetProperty(ref isChecked, value);
         }
 
     }

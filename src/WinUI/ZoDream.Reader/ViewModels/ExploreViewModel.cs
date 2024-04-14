@@ -1,29 +1,29 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Repositories.Entities;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ExploreViewModel: BindableBase
+    public class ExploreViewModel: ObservableObject
     {
 
-        private ObservableCollection<SourceRuleEntity> siteItems = new();
+        private ObservableCollection<SourceRuleEntity> siteItems = [];
 
         public ObservableCollection<SourceRuleEntity> SiteItems {
             get => siteItems;
-            set => Set(ref siteItems, value);
+            set => SetProperty(ref siteItems, value);
         }
 
-        private ObservableCollection<SourceChannelEntity> channelItems = new();
+        private ObservableCollection<SourceChannelEntity> channelItems = [];
 
         public ObservableCollection<SourceChannelEntity> ChannelItems {
             get => channelItems;
-            set => Set(ref channelItems, value);
+            set => SetProperty(ref channelItems, value);
         }
 
     }

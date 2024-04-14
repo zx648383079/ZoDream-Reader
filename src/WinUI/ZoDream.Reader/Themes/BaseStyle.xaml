@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:cvt="using:ZoDream.Reader.Converters">
     <cvt:ToggleConverter x:Key="ToggleCvt"/>
+    <cvt:ImageConverter x:Key="ImageCvt"/>
 
     <Thickness x:Key="DefaultPagePadding">52,28,0,0</Thickness>
     <Thickness x:Key="GroupGapPadding">0,28,0,0</Thickness>

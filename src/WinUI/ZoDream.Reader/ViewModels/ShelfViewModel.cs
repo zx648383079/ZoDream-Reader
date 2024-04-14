@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,11 +12,10 @@ using ZoDream.Reader.Dialogs;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Repositories.Models;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ShelfViewModel: BindableBase
+    public class ShelfViewModel: ObservableObject
     {
         public ShelfViewModel()
         {
@@ -24,18 +25,18 @@ namespace ZoDream.Reader.ViewModels
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
-        private ObservableCollection<BookEntity> novelItems = new();
+        private ObservableCollection<BookEntity> novelItems = [];
 
         public ObservableCollection<BookEntity> NovelItems {
             get => novelItems;
-            set => Set(ref novelItems, value);
+            set => SetProperty(ref novelItems, value);
         }
 
 
 
         public ICommand AddCommand { get; private set; }
 
-        private async void TapAdd(object? _)
+        private async void TapAdd()
         {
             var picker = new AddNovelDialog();
             if (await _app.OpenDialogAsync(picker) != Microsoft.UI.Xaml.Controls.ContentDialogResult.None)
@@ -64,6 +65,7 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             await _app.Storage.AddBookAsync(file);
+            LoadAsync();
         }
 
         private async void LoadNet()

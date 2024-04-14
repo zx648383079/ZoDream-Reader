@@ -181,7 +181,7 @@ namespace ZoDream.Reader.Controls
             var queries = new Dictionary<string, object>
             {
                 {"novel",  Source},
-                {"id", Source.Name},
+                {"id", Source.Id},
             };
             if (diff.TotalSeconds > 1)
             {

@@ -3,9 +3,9 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using ZoDream.Shared.Interfaces.Route;
-using ZoDream.Reader.Pages;
 using ZoDream.Reader.ViewModels;
 using System.Linq;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -96,21 +96,6 @@ namespace ZoDream.Reader.Repositories
                 return;
             }
             Navigate(routeName, queries);
-            if (queries is null)
-            {
-                return;
-            }
-            var type = GetType(routeName);
-            var current = type switch
-            {
-                RouteType.Main => MainFrame?.Content,
-                RouteType.Single => SingleFrame?.Content,
-                _ => InnerFrame?.Content,
-            } as FrameworkElement;
-            if (current is not null && current.DataContext is IQueryAttributable o)
-            {
-                o.ApplyQueryAttributes(queries);
-            }
         }
 
         public void GoToAsync(string routeName)
@@ -126,10 +111,12 @@ namespace ZoDream.Reader.Repositories
                     case RouteType.Main:
                         ToggleFrame(true);
                         MainFrame?.Navigate(route.PageType, queries);
+                        CallViewModel(MainFrame, queries);
                         break;
                     case RouteType.Single:
                         ToggleFrame(false);
                         SingleFrame?.Navigate(route.PageType, queries);
+                        CallViewModel(SingleFrame, queries);
                         break;
                     case RouteType.None:
                     default:
@@ -140,6 +127,7 @@ namespace ZoDream.Reader.Repositories
                             break;
                         }
                         InnerFrame.Navigate(route.PageType, queries);
+                        CallViewModel(InnerFrame, queries);
                         break;
                 }
             });
@@ -150,6 +138,23 @@ namespace ZoDream.Reader.Repositories
             RouteChanged?.Invoke(this, null);
         }
 
+        private void CallViewModel(Frame? frame, IDictionary<string, object>? queries = null)
+        {
+            if (frame is null || queries is null)
+            {
+                return;
+            }
+            void call(object s, NavigationEventArgs o)
+            {
+                frame.Navigated -= call;
+                if (frame.Content is FrameworkElement target && 
+                    target.DataContext is IQueryAttributable vm)
+                {
+                    vm.ApplyQueryAttributes(queries);
+                }
+            }
+            frame.Navigated += call;
+        }
 
         private void NavigatePage(Frame? frame, string routeName)
         {

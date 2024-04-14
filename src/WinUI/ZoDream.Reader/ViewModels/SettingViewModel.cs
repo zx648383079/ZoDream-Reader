@@ -1,15 +1,16 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ZoDream.Shared.Interfaces.Route;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class SettingViewModel: BindableBase
+    public class SettingViewModel: ObservableObject
     {
         public SettingViewModel()
         {
@@ -37,52 +38,52 @@ namespace ZoDream.Reader.ViewModels
         public ICommand ThemeCommand { get; private set; }
         public ICommand OtherCommand { get; private set; }
 
-        private void TapBookmark(object _)
+        private void TapBookmark()
         {
             App.GetService<IRouter>().GoToAsync("bookmark");
         }
 
-        private void TapBak(object _)
+        private void TapBak()
         {
             App.GetService<IRouter>().GoToAsync("setting/bak");
         }
 
-        private void TapTheme(object _)
+        private void TapTheme()
         {
             App.GetService<IRouter>().GoToAsync("setting/theme");
         }
 
-        private void TapOther(object _)
+        private void TapOther()
         {
             App.GetService<IRouter>().GoToAsync("setting/other");
         }
 
-        private void TapSource(object _)
+        private void TapSource()
         {
             App.GetService<IRouter>().GoToAsync("rule/source");
         }
 
-        private void TapHistory(object _)
+        private void TapHistory()
         {
             App.GetService<IRouter>().GoToAsync("history");
         }
 
-        private void TapReplace(object _)
+        private void TapReplace()
         {
             App.GetService<IRouter>().GoToAsync("rule/replace");
         }
 
-        private void TapDictionary(object _)
+        private void TapDictionary()
         {
             App.GetService<IRouter>().GoToAsync("rule/dictionary");
         }
 
-        private void TapChapter(object _)
+        private void TapChapter()
         {
             App.GetService<IRouter>().GoToAsync("rule/chapter");
         }
 
-        private void TapAbout(object _)
+        private void TapAbout()
         {
             App.GetService<IRouter>().GoToAsync("about");
         }

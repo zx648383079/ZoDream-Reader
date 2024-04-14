@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ZoDream.Shared.Database;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.Repositories.Entities;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Shared.Repositories.Models
 {
-    public class ChapterRuleModel : BindableBase, IChapterRule
+    public class ChapterRuleModel : ObservableObject, IChapterRule
     {
         public int Id { get; set; }
         private string name = string.Empty;
@@ -16,7 +11,7 @@ namespace ZoDream.Shared.Repositories.Models
         public string Name
         {
             get => name;
-            set => Set(ref name, value);
+            set => SetProperty(ref name, value);
         }
 
         private string matchRule = string.Empty;
@@ -24,7 +19,7 @@ namespace ZoDream.Shared.Repositories.Models
         public string MatchRule
         {
             get => matchRule;
-            set => Set(ref matchRule, value);
+            set => SetProperty(ref matchRule, value);
         }
 
 
@@ -33,21 +28,21 @@ namespace ZoDream.Shared.Repositories.Models
         public string Example
         {
             get => example;
-            set => Set(ref example, value);
+            set => SetProperty(ref example, value);
         }
 
         private int sortOrder = 99;
 
         public int SortOrder {
             get => sortOrder;
-            set => Set(ref sortOrder, value);
+            set => SetProperty(ref sortOrder, value);
         }
 
         private bool isEnabled = true;
 
         public bool IsEnabled {
             get => isEnabled;
-            set => Set(ref isEnabled, value);
+            set => SetProperty(ref isEnabled, value);
         }
 
         private bool isChecked;
@@ -55,7 +50,7 @@ namespace ZoDream.Shared.Repositories.Models
         public bool IsChecked
         {
             get => isChecked;
-            set => Set(ref isChecked, value);
+            set => SetProperty(ref isChecked, value);
         }
     }
 }

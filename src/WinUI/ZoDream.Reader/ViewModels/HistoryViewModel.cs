@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Data;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,22 +8,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ZoDream.Shared.Repositories.Entities;
-using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class HistoryViewModel: BindableBase
+    public class HistoryViewModel: ObservableObject
     {
 
         public HistoryViewModel()
         {
         }
 
-        private ObservableCollection<ReadRecordEntity> items = new();
+        private ObservableCollection<ReadRecordEntity> items = [];
 
         public ObservableCollection<ReadRecordEntity> Items {
             get => items;
-            set => Set(ref items, value);
+            set => SetProperty(ref items, value);
         }
 
 

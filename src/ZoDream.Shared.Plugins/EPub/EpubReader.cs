@@ -8,7 +8,6 @@ using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
 using System.Xml;
 using System.Xml.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace ZoDream.Shared.Plugins.EPub
 {

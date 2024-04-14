@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,7 +9,7 @@ using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class SettingViewModel: BindableBase
+    public class SettingViewModel: ObservableObject
     {
         public SettingViewModel()
         {
@@ -31,7 +32,7 @@ namespace ZoDream.Reader.ViewModels
         public ObservableCollection<string> CrumbItems
         {
             get => crumbItems;
-            set => Set(ref crumbItems, value);
+            set => SetProperty(ref crumbItems, value);
         }
 
         private ObservableCollection<FontItem> fontItems = new();
@@ -39,7 +40,7 @@ namespace ZoDream.Reader.ViewModels
         public ObservableCollection<FontItem> FontItems
         {
             get => fontItems;
-            set => Set(ref fontItems, value);
+            set => SetProperty(ref fontItems, value);
         }
 
         private string[] animateItems = new string[] {"无", "仿真", "覆盖", "上下", "滚屏"};
@@ -47,7 +48,7 @@ namespace ZoDream.Reader.ViewModels
         public string[] AnimateItems
         {
             get => animateItems;
-            set => Set(ref animateItems, value);
+            set => SetProperty(ref animateItems, value);
         }
 
 
@@ -56,7 +57,7 @@ namespace ZoDream.Reader.ViewModels
         public int FontSize
         {
             get => fontSize;
-            set => Set(ref fontSize, value);
+            set => SetProperty(ref fontSize, value);
         }
 
         private string fontFamily = string.Empty;
@@ -64,7 +65,7 @@ namespace ZoDream.Reader.ViewModels
         public string FontFamily
         {
             get => fontFamily;
-            set => Set(ref fontFamily, value);
+            set => SetProperty(ref fontFamily, value);
         }
 
 
@@ -73,7 +74,7 @@ namespace ZoDream.Reader.ViewModels
         public string Background
         {
             get => background;
-            set => Set(ref background, value);
+            set => SetProperty(ref background, value);
         }
 
         private string backgroundImage = string.Empty;
@@ -81,7 +82,7 @@ namespace ZoDream.Reader.ViewModels
         public string BackgroundImage
         {
             get => backgroundImage;
-            set => Set(ref backgroundImage, value);
+            set => SetProperty(ref backgroundImage, value);
         }
 
         private string foreground = "#333";
@@ -89,7 +90,7 @@ namespace ZoDream.Reader.ViewModels
         public string Foreground
         {
             get => foreground;
-            set => Set(ref foreground, value);
+            set => SetProperty(ref foreground, value);
         }
 
         private bool openDark;
@@ -97,7 +98,7 @@ namespace ZoDream.Reader.ViewModels
         public bool OpenDark
         {
             get => openDark;
-            set => Set(ref openDark, value);
+            set => SetProperty(ref openDark, value);
         }
 
         private int columnCount;
@@ -105,7 +106,7 @@ namespace ZoDream.Reader.ViewModels
         public int ColumnCount
         {
             get => columnCount;
-            set => Set(ref columnCount, value);
+            set => SetProperty(ref columnCount, value);
         }
 
 
@@ -114,7 +115,7 @@ namespace ZoDream.Reader.ViewModels
         public int LineSpace
         {
             get => lineSpace;
-            set => Set(ref lineSpace, value);
+            set => SetProperty(ref lineSpace, value);
         }
 
 
@@ -123,7 +124,7 @@ namespace ZoDream.Reader.ViewModels
         public int LetterSpace
         {
             get => letterSpace;
-            set => Set(ref letterSpace, value);
+            set => SetProperty(ref letterSpace, value);
         }
 
 
@@ -132,7 +133,7 @@ namespace ZoDream.Reader.ViewModels
         public int Padding
         {
             get => padding;
-            set => Set(ref padding, value);
+            set => SetProperty(ref padding, value);
         }
 
         private bool isSimple;
@@ -140,7 +141,7 @@ namespace ZoDream.Reader.ViewModels
         public bool IsSimple
         {
             get => isSimple;
-            set => Set(ref isSimple, value);
+            set => SetProperty(ref isSimple, value);
         }
 
 
@@ -149,7 +150,7 @@ namespace ZoDream.Reader.ViewModels
         public int Animation
         {
             get => animation;
-            set => Set(ref animation, value);
+            set => SetProperty(ref animation, value);
         }
 
 
@@ -158,7 +159,7 @@ namespace ZoDream.Reader.ViewModels
         public bool AutoFlip
         {
             get => autoFlip;
-            set => Set(ref autoFlip, value);
+            set => SetProperty(ref autoFlip, value);
         }
 
         private float flipSpace;
@@ -166,24 +167,24 @@ namespace ZoDream.Reader.ViewModels
         public float FlipSpace
         {
             get => flipSpace;
-            set => Set(ref flipSpace, value);
+            set => SetProperty(ref flipSpace, value);
         }
 
 
-        private bool openSpeek;
+        private bool openSpeak;
 
-        public bool OpenSpeek
+        public bool OpenSpeak
         {
-            get => openSpeek;
-            set => Set(ref openSpeek, value);
+            get => openSpeak;
+            set => SetProperty(ref openSpeak, value);
         }
 
-        private float speekSpeed;
+        private float speakSpeed;
 
-        public float SpeekSpeed
+        public float SpeakSpeed
         {
-            get => speekSpeed;
-            set => Set(ref speekSpeed, value);
+            get => speakSpeed;
+            set => SetProperty(ref speakSpeed, value);
         }
 
         private AppOption option = new();
@@ -195,7 +196,7 @@ namespace ZoDream.Reader.ViewModels
                 option.OpenDark = OpenDark;
                 option.LetterSpace = LetterSpace;
                 option.LineSpace = LineSpace;
-                option.OpenSpeek = OpenSpeek;
+                option.OpenSpeak = OpenSpeak;
                 option.Padding = Padding;
                 option.FontSize = FontSize;
                 option.FontFamily = FontFamily;
@@ -205,7 +206,7 @@ namespace ZoDream.Reader.ViewModels
                 option.BackgroundImage = BackgroundImage;
                 option.ColumnCount = ColumnCount;
                 option.FlipSpace = FlipSpace;
-                option.SpeekSpeed = SpeekSpeed;
+                option.SpeakSpeed = SpeakSpeed;
                 option.IsSimple = IsSimple;
                 return option;
             }
@@ -215,7 +216,7 @@ namespace ZoDream.Reader.ViewModels
                 OpenDark = option.OpenDark;
                 LetterSpace = option.LetterSpace;
                 LineSpace = option.LineSpace;
-                OpenSpeek = option.OpenSpeek;
+                OpenSpeak = option.OpenSpeak;
                 Padding = option.Padding;
                 FontSize = option.FontSize;
                 FontFamily = option.FontFamily;
@@ -225,7 +226,7 @@ namespace ZoDream.Reader.ViewModels
                 BackgroundImage = option.BackgroundImage;
                 ColumnCount = option.ColumnCount;
                 FlipSpace = option.FlipSpace;
-                SpeekSpeed = option.SpeekSpeed;
+                SpeakSpeed = option.SpeakSpeed;
                 IsSimple = option.IsSimple;
             }
         }

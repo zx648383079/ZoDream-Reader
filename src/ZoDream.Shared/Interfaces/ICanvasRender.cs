@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using ZoDream.Shared.Events;
-using ZoDream.Shared.Models;
+﻿using ZoDream.Shared.Events;
 
 namespace ZoDream.Shared.Interfaces
 {
     public interface ICanvasRender
     {
         public ICanvasSource? Source {  get; set; }
+
+        public double ActualWidth { get; }
+        public double ActualHeight { get; }
 
         /// <summary>
         /// 翻页完成事件
@@ -21,29 +19,35 @@ namespace ZoDream.Shared.Interfaces
         /// </summary>
         public event CanvasReadyEventHandler? OnReady;
 
-      
-        public void SwapTo(IList<PageItem> pages, int page);
-        /// <summary>
-        /// 使用过渡动画切换到新的页面，下一页
-        /// </summary>
-        /// <param name="page"></param>
-        /// <returns></returns>
-        public Task SwapToAsync(int page);
+        public void SetAnimate(ICanvasAnimate animate);
 
-        public void SwapFrom(IList<PageItem> pages, int page);
-        /// <summary>
-        /// 使用过渡动画切换回新的页面，上一页
-        /// </summary>
-        /// <param name="page"></param>
-        public Task SwapFromAsync(int page);
+        public ICanvasLayer CreateLayer(double width, double height);
 
-        public Task SwapNextAsync();
+        public void Invalidate();
 
-        public Task SwapPreviousAsync();
 
-        /// <summary>
-        /// 清空页面内容
-        /// </summary>
-        public void Flush();
+        //public void SwapTo(IList<PageItem> pages, int page);
+        ///// <summary>
+        ///// 使用过渡动画切换到新的页面，下一页
+        ///// </summary>
+        ///// <param name="page"></param>
+        ///// <returns></returns>
+        //public Task SwapToAsync(int page);
+
+        //public void SwapFrom(IList<PageItem> pages, int page);
+        ///// <summary>
+        ///// 使用过渡动画切换回新的页面，上一页
+        ///// </summary>
+        ///// <param name="page"></param>
+        //public Task SwapFromAsync(int page);
+
+        //public Task SwapNextAsync();
+
+        //public Task SwapPreviousAsync();
+
+        ///// <summary>
+        ///// 清空页面内容
+        ///// </summary>
+        //public void Flush();
     }
 }

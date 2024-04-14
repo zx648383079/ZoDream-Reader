@@ -16,6 +16,7 @@ namespace ZoDream.Shared.Interfaces
         public Task DeleteBookAsync(params string[] items);
 
         public Task<List<T>> GetChapterAsync<T>(string bookId) where T : INovelChapter;
+        public Task SaveChapterAsync<T>(string bookId, IEnumerable<T> items) where T : INovelChapter;
 
         public Task<List<T>> GetThemeAsync<T>() where T : IAppTheme;
         public Task<T?> GetThemeAsync<T>(int id) where T : IAppTheme;
