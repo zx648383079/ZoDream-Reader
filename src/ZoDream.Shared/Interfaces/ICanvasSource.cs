@@ -5,9 +5,8 @@ namespace ZoDream.Shared.Interfaces
 {
     public interface ICanvasSource
     {
-        //public Task<IList<PageItem>> GetAsync(int page);
-
-        //public bool Enable(int page);
+        public void Resize(double width);
+        public void Resize(double width, double height);
 
         public INovelPage? Current { get; }
 

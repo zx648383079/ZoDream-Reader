@@ -19,6 +19,8 @@ namespace ZoDream.Shared.Interfaces.Entities
 
         public string Description { get; }
 
+        public bool IsLoaded { get; }
+
         public DateTime PublishedAt { get; }
     }
 }

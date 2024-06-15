@@ -77,14 +77,28 @@ namespace ZoDream.Reader.ViewModels
         {
             if (queries.TryGetValue("novel", out var obj) && obj is INovel novel)
             {
-                _ = LoadAsync(novel.Id);
+                _ = LoadAsync(novel);
             }
         }
 
-        public async Task LoadAsync(string book)
+        public async Task LoadAsync(INovel arg)
         {
-            var data = await _app.Database.GetChapterAsync<ChapterModel>(book);
+            var book = GetBookAsync(arg);
+            if (book == null)
+            {
+                return;
+            }
+            var data = await _app.Database.GetChapterAsync<ChapterModel>(arg.Id);
             data.ToCollection(Items);
+        }
+
+        private async Task<BookEntity?> GetBookAsync(INovel arg)
+        {
+            if (arg is BookEntity e)
+            {
+                return e;
+            }
+            return await _app.Database.GetBookAsync<BookEntity>(arg.Id);
         }
     }
 }

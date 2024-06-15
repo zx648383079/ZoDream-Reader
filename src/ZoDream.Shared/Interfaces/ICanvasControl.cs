@@ -9,7 +9,5 @@ namespace ZoDream.Shared.Interfaces
         public double Width { get; }
         public double Height { get; }
 
-
-        
     }
 }

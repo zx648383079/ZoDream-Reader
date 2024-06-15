@@ -23,6 +23,15 @@ namespace ZoDream.Shared.Repositories.Entities
 
         public DateTime PublishedAt { get; set; }
 
+        private bool isLoaded;
+
+        public bool IsLoaded {
+            get => isLoaded;
+            set => SetProperty(ref isLoaded, value);
+        }
+
+
+
         private bool isChecked;
 
         public bool IsChecked {
