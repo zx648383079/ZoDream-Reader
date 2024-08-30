@@ -8,6 +8,7 @@ using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
 using System.Xml;
 using System.Xml.Linq;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.EPub
 {
@@ -18,7 +19,7 @@ namespace ZoDream.Shared.Plugins.EPub
         {
         }
 
-        public Task<string> GetChapterAsync(string fileName, INovelChapter chapter)
+        public Task<INovelDocument> GetChapterAsync(string fileName, INovelChapter chapter)
         {
             return Task.Factory.StartNew(() => {
                 using var fs = File.OpenRead(fileName);
@@ -97,11 +98,11 @@ namespace ZoDream.Shared.Plugins.EPub
             return (novel, items);
         }
 
-        public string GetChapter(Stream input, INovelChapter chapter)
+        public INovelDocument GetChapter(Stream input, INovelChapter chapter)
         {
             using var archive = new ZipArchive(input, ZipArchiveMode.Read);
             var doc = Read(archive, chapter.Url);
-            return doc.Root.ToString();
+            return new HtmlDocument(doc.Root.ToString());
         }
 
 

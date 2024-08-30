@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using ZoDream.Shared.Database;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Script;
@@ -18,15 +16,15 @@ namespace ZoDream.Shared.Plugins.Net
             throw new NotImplementedException();
         }
 
-        public string GetChapter(Stream input, INovelChapter chapter)
+        public INovelDocument GetChapter(Stream input, INovelChapter chapter)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<string> GetChapterAsync(string fileName, INovelChapter chapter)
+        public async Task<INovelDocument> GetChapterAsync(string fileName, INovelChapter chapter)
         {
             var inter = new Interpreter();
-            return await Task.FromResult(inter.Execute<string>("", new NetSpider()));
+            return await Task.FromResult(inter.Execute<INovelDocument>("", new NetSpider()));
         }
 
         public (INovel?, List<INovelChapter>) GetChapters(Stream input)

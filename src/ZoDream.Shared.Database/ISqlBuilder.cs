@@ -62,7 +62,7 @@ namespace ZoDream.Shared.Database
         public long LongCount();
         public T? First();
         public T FirstOrDefault();
-        public List<T> ToList();
+        public IList<T> ToList();
         public T[] ToArray();
         public Page<T> Page(long page, long perPage);
 

@@ -9,19 +9,19 @@ namespace ZoDream.Shared.Plugins.Txt
 {
     public class TextTokenizer: IPageTokenizer
     {
-        public void Dispose()
-        {
-        }
-
-        public IList<INovelPage> Parse(string title, string content, 
+        public IList<INovelPage> Parse(INovelDocument content, 
             IReadTheme setting, ICanvasControl control)
         {
+            if (content is not TextDocument target)
+            {
+                return [];
+            }
             var theme = new CanvasTheme(setting, control, true);
             var maxH = theme.PageInnerHeight;
-            var lines = ParseBlock(title, theme);
-            if (!string.IsNullOrWhiteSpace(content))
+            var lines = ParseBlock(target.Title, theme);
+            if (!string.IsNullOrWhiteSpace(target.Content))
             {
-                foreach (var item in ParseBlock(content, new CanvasTheme(setting, control)))
+                foreach (var item in ParseBlock(target.Content, new CanvasTheme(setting, control)))
                 {
                     lines.Add(item);
                 }

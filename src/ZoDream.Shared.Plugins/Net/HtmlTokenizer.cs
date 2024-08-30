@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Interfaces.Tokenizers;
@@ -10,14 +8,14 @@ namespace ZoDream.Shared.Plugins.Net
 {
     public class HtmlTokenizer: IPageTokenizer
     {
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
 
-        public IList<INovelPage> Parse(string title, string content,
+        public IList<INovelPage> Parse(INovelDocument content,
             IReadTheme setting, ICanvasControl control)
         {
+            if (content is not HtmlDocument res)
+            {
+                return [];
+            }
             var items = new List<INovelPage>();
 
             return items;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Models;
@@ -25,6 +22,7 @@ namespace ZoDream.Shared.Interfaces
         public Task<string?> AddImageAsync<T>(T file);
 
         public Task DeleteBookAsync(INovel item);
+
 
         public Task<FontItem?> AddFontAsync<T>(T file);
 

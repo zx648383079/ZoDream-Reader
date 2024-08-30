@@ -10,10 +10,16 @@ using ZoDream.Shared.Database;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Models;
+using ZoDream.Shared.Plugins.EPub;
+using ZoDream.Shared.Plugins.Net;
+using ZoDream.Shared.Plugins.Pdf;
+using ZoDream.Shared.Plugins.Txt;
+using ZoDream.Shared.Plugins.Umd;
 using ZoDream.Shared.Repositories;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Repositories.Extensions;
 using ZoDream.Shared.Storage;
+using ZoDream.Shared.Tokenizers;
 using ZoDream.Shared.Utils;
 
 namespace ZoDream.Reader.Repositories
@@ -56,7 +62,7 @@ namespace ZoDream.Reader.Repositories
             new SQLMigration(connection).Up();
         }
 
-        public Task<List<T>> GetBookAsync<T>() where T : INovel
+        public Task<IList<T>> GetBookAsync<T>() where T : INovel
         {
             return Task.FromResult(connection.Build<T>().From<BookEntity>().ToList());
         }
@@ -97,7 +103,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetChapterAsync<T>(string bookId) where T : INovelChapter
+        public Task<IList<T>> GetChapterAsync<T>(string bookId) where T : INovelChapter
         {
             return Task.FromResult(connection.Build<T>().From<ChapterEntity>().Where("BookId", bookId).OrderByAsc("Index").ToList());
         }
@@ -129,7 +135,7 @@ namespace ZoDream.Reader.Repositories
                 data.Skip(i).Select(item => (object)item.Id).ToArray()).Delete();
         }
 
-        public Task<List<T>> GetThemeAsync<T>() where T : IAppTheme
+        public Task<IList<T>> GetThemeAsync<T>() where T : IAppTheme
         {
             return Task.FromResult(connection.Build<T>().From<AppThemeEntity>().ToList());
         }
@@ -154,7 +160,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetReadThemeAsync<T>() where T : IReadTheme
+        public Task<IList<T>> GetReadThemeAsync<T>() where T : IReadTheme
         {
             return Task.FromResult(connection.Build<T>().From<ReadThemeEntity>().ToList());
         }
@@ -178,7 +184,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetDictionaryRuleAsync<T>() where T : IDictionaryRule
+        public Task<IList<T>> GetDictionaryRuleAsync<T>() where T : IDictionaryRule
         {
             return Task.FromResult(connection.Build<T>().From<DictionaryRuleEntity>().ToList());
         }
@@ -197,7 +203,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetReplaceRuleAsync<T>() where T : IReplaceRule
+        public Task<IList<T>> GetReplaceRuleAsync<T>() where T : IReplaceRule
         {
             return Task.FromResult(connection.Build<T>().From<ReplaceRuleEntity>().ToList());
         }
@@ -216,7 +222,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetChapterRuleAsync<T>() where T : IChapterRule
+        public Task<IList<T>> GetChapterRuleAsync<T>() where T : IChapterRule
         {
             return Task.FromResult(connection.Build<T>().From<ChapterRuleEntity>().OrderByAsc("SortOrder")
                 .OrderByAsc("Id").ToList());
@@ -268,7 +274,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetSourceRuleAsync<T>() where T : ISourceRule
+        public Task<IList<T>> GetSourceRuleAsync<T>() where T : ISourceRule
         {
             return Task.FromResult(connection.Build<T>().From<SourceRuleEntity>().ToList());
         }
@@ -292,7 +298,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetTTSSourceAsync<T>() where T : ITextToSpeech
+        public Task<IList<T>> GetTTSSourceAsync<T>() where T : ITextToSpeech
         {
             return Task.FromResult(connection.Build<T>().From<TextToSpeechEntity>().ToList());
         }
@@ -316,7 +322,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetSearchRecordAsync<T>() where T : ISearchHistory
+        public Task<IList<T>> GetSearchRecordAsync<T>() where T : ISearchHistory
         {
             return Task.FromResult(connection.Build<T>().From<SearchHistoryEntity>().ToList());
         }
@@ -347,7 +353,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetReadRecordAsync<T>() where T : IReadRecord
+        public Task<IList<T>> GetReadRecordAsync<T>() where T : IReadRecord
         {
             return Task.FromResult(connection.Build<T>().From<ReadRecordEntity>().ToList());
         }
@@ -379,7 +385,7 @@ namespace ZoDream.Reader.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<List<T>> GetMarkAsync<T>() where T : INovelMark
+        public Task<IList<T>> GetMarkAsync<T>() where T : INovelMark
         {
             return Task.FromResult(connection.Build<T>().From<BookmarkEntity>().ToList());
         }
@@ -534,6 +540,31 @@ namespace ZoDream.Reader.Repositories
         public async Task SetImageAsync(string key, byte[] value)
         {
             await App.GetService<AppViewModel>().Storage.AddImageAsync(key, value);
+        }
+
+        public async Task<INovelReader> GetReaderAsync(INovelSource novel)
+        {
+            var type = (NovelSourceType)novel.Type;
+            if (type == NovelSourceType.Network)
+            {
+                return new NetReader();
+            }
+            return Path.GetExtension(novel.FileName)[1..].ToLower() switch
+            {
+                "epub" => new EPubReader(),
+                "umd" => new UmdReader(),
+                "pdf" => new PdfReader(),
+                _ => new TxtReader()
+            };
+        }
+
+        public async Task<IPageTokenizer> GetTokenizerAsync(INovelDocument content)
+        {
+            if (content is HtmlDocument)
+            {
+                return new HtmlTokenizer();
+            }
+            return new TextTokenizer();
         }
     }
 }

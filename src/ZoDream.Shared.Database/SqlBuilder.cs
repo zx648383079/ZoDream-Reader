@@ -437,7 +437,7 @@ namespace ZoDream.Shared.Database
             return [.. ToList()];
         }
 
-        public List<T> ToList()
+        public IList<T> ToList()
         {
             if (_isEmpty)
             {

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Storage;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Txt
 {
@@ -40,7 +38,7 @@ namespace ZoDream.Shared.Plugins.Txt
             });
         }
 
-        public Task<string> GetChapterAsync(string fileName,INovelChapter chapter)
+        public Task<INovelDocument> GetChapterAsync(string fileName,INovelChapter chapter)
         {
             return Task.Factory.StartNew(() => {
                 using var fs = File.OpenRead(fileName);
@@ -113,13 +111,13 @@ namespace ZoDream.Shared.Plugins.Txt
             return (new BookEntity(), items);
         }
 
-        public string GetChapter(Stream input, INovelChapter chapter)
+        public INovelDocument GetChapter(Stream input, INovelChapter chapter)
         {
             var encoding = TxtEncoder.GetEncoding(input);
             input.Seek(chapter.Begin, SeekOrigin.Begin);
             var buffer = new byte[chapter.End - chapter.Begin];
             input.Read(buffer, 0, buffer.Length);
-            return encoding.GetString(buffer);
+            return new TextDocument(chapter.Title, encoding.GetString(buffer));
         }
 
         public string Serialize(INovelChapter chapter)
