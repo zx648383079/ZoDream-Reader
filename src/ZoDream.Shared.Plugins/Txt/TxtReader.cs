@@ -154,7 +154,69 @@ namespace ZoDream.Shared.Plugins.Txt
             }
             return maxPattern;
         }
+        #region 编解码书籍文件名信息
 
+        public string Encode(INovel novel)
+        {
+            if (string.IsNullOrWhiteSpace(novel.Author))
+            {
+                return novel.Name;
+            }
+            return $"{novel.Name} 作者：{novel.Author}";
+        }
+
+        public void Decode(string str, INovel novel)
+        {
+            // [科幻]书名 作者：z
+            // 【科幻】书名 作者：z
+            // 《书名》z
+            // 书名 作者：z
+            str = str.Replace('【', '[').Replace('】', ']')
+                .Replace('《', '<').Replace('》', '>')
+                .Replace("作者：", "作者:").Trim();
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                return;
+            }
+            var i = str.IndexOf('[');
+            var category = string.Empty;
+            if (i >= 0)
+            {
+                var j = str.IndexOf(']', i);
+                category = str.Substring(i + 1, j - i - 1);
+                str = str.Substring(j + 1);
+            }
+            i = str.IndexOf('<');
+            var name = string.Empty;
+            var author = string.Empty;
+            if (i >= 0)
+            {
+                var j = str.IndexOf('>', i);
+                name = str.Substring(i + 1, (j - i) - 1);
+                str = str.Substring(j + 1);
+            } else if ((i = str.IndexOf(' ')) > 0)
+            {
+                name = str.Substring(0, i);
+                str = str.Substring(i + 1);
+            } else
+            {
+                name = str;
+                str = string.Empty;
+            }
+            i = str.IndexOf("作者:");
+            if (i >= 0)
+            {
+                author = str.Substring(i + 3).Trim();
+            } else
+            {
+                author = str.Trim();
+            }
+            novel.Name = name;
+            novel.Author = author;
+            novel.Description = category;
+            return;
+        }
+        #endregion
 
     }
 }

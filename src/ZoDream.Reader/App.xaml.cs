@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using System.Text;
 using System.Windows;
+using ZoDream.Reader.Repositories;
 using ZoDream.Reader.ViewModels;
+using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Reader
 {
@@ -14,12 +13,34 @@ namespace ZoDream.Reader
     /// </summary>
     public partial class App : Application
     {
-        public static MainViewModel ViewModel = new MainViewModel();
-        public static void ChangeTheme()
+
+
+        protected override async void OnStartup(StartupEventArgs e)
         {
-            ResourceDictionary dict = new ResourceDictionary();
-            dict.Source = new Uri("Skins/LightTheme.xaml", UriKind.Relative);
-            Application.Current.Resources.MergedDictionaries.Add(dict);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            await GetService<AppViewModel>().InitializeAsync();
+            base.OnStartup(e);
+            
+        }
+
+
+        private static bool IsBooted = false;
+        public static T GetService<T>()
+        {
+            if (!IsBooted)
+            {
+                IsBooted = true;
+                RegisterServices();
+            }
+            return Ioc.Default.GetService<T>();
+        }
+
+        private static void RegisterServices()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton<AppViewModel>();
+            services.AddSingleton<ISettingRepository, SettingRepository>();
+            Ioc.Default.ConfigureServices(services.BuildServiceProvider());
         }
     }
 }

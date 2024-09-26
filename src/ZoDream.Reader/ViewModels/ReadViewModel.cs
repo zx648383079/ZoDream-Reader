@@ -2,46 +2,30 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Interfaces.Entities;
+using ZoDream.Shared.Interfaces.Tokenizers;
 using ZoDream.Shared.Models;
+using ZoDream.Shared.Plugins.EPub;
+using ZoDream.Shared.Plugins.Net;
+using ZoDream.Shared.Plugins.Txt;
 using ZoDream.Shared.Renders;
+using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ReadViewModel: ObservableObject, ICanvasSource
+    public class ReadViewModel: ObservableObject, INovelEnvironment
     {
-
-        public PageTokenizer Tokenizer { get; private set; } = new PageTokenizer();
-
-        private BookItem book;
-
-        public BookItem Book
+        public ReadViewModel()
         {
-            get => book;
-            set
-            {
-                SetProperty(ref book, value);
-                if (Tokenizer.Content != null)
-                {
-
-                }
-                if (value == null)
-                {
-                    return;
-                }
-                ApplyTokenizer();
-            }
+            _app = App.GetService<AppViewModel>();
         }
 
-        private async void ApplyTokenizer()
-        {
-            Tokenizer.Content = new StreamIterator(await App.ViewModel.DiskRepository.GetBookPathAsync(book));
-        }
+        private readonly AppViewModel _app;
+        private BookEntity _novel;
 
         private string chapterTitle = string.Empty;
 
@@ -51,56 +35,99 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref chapterTitle, value);
         }
 
-        private ObservableCollection<ChapterPositionItem> chapterItems = new ObservableCollection<ChapterPositionItem>();
+        private ObservableCollection<ChapterModel> chapterItems = [];
 
-        public ObservableCollection<ChapterPositionItem> ChapterItems
+        public ObservableCollection<ChapterModel> ChapterItems
         {
             get => chapterItems;
             set => SetProperty(ref chapterItems, value);
         }
 
-        public void Load()
-        {
-            Task.Factory.StartNew(async () =>
-            {
-                var items = await Tokenizer.GetChaptersAsync();
-                if (items == null)
-                {
-                    return;
-                }
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    foreach (var item in items)
-                    {
-                        if (item == null)
-                        {
-                            continue;
-                        }
-                        ChapterItems.Add(item);
-                    }
-                    ReloadChapter();
-                });
-            });
-        }
-
-        public void ReloadChapter()
-        {
-            var i = Tokenizer.GetChapter(ChapterItems, Book.Position);
-            if (i < 0)
-            {
-                return;
+        public int ChapterIndex { 
+            get {
+                return _novel.CurrentChapterIndex;
             }
-            ChapterTitle = ChapterItems[i].Title;
+            set {
+                _novel.CurrentChapterIndex = value;
+            } 
         }
 
-        public Task<IList<PageItem>> GetAsync(int page)
-        {
-            return Tokenizer.GetAsync(page);
+        public double ChapterProgresss {
+            get {
+                return _novel.CurrentChapterOffset / 10000;
+            }
+            set {
+                _novel.CurrentChapterIndex = (int)(value * 10000);
+            }
         }
 
-        public bool Enable(int page)
+        public string NovelId => _novel.Id;
+
+        public double Width { get; internal set; }
+
+        public double Height { get; internal set; }
+
+
+        public async Task<INovelReader> GetReaderAsync()
         {
-            return Tokenizer.Enable(page);
+            switch (_novel.Type)
+            {
+                case 2:
+                    return new NetReader();
+                case 1:
+                    return new EPubReader();
+                default:
+                    return new TxtReader();
+            }
         }
+
+        public async Task<IPageTokenizer> GetTokenizerAsync(INovelDocument document)
+        {
+            if (document is HtmlDocument)
+            {
+                return new HtmlTokenizer();
+            }
+            return new TextTokenizer();
+        }
+
+        public async Task<IList<INovelPage>> PageParseAsync(INovelDocument document)
+        {
+            var tokenizer = await GetTokenizerAsync(document);
+            return tokenizer.Parse(document, _app.ReadTheme, this);
+        }
+
+        public Task<IList<INovelChapter>> LoadChaptersAsync()
+        {
+            return Task.FromResult(ChapterItems as IList<INovelChapter>);
+        }
+
+        public async Task<INovelDocument> GetChapterAsync(int chapterId)
+        {
+            var reader = await GetReaderAsync();
+            return await reader.GetChapterAsync(_novel.FileName, ChapterItems.Where(i => i.Id == chapterId).First());
+        }
+
+        public Task<IReadTheme> GetReadThemeAsync()
+        {
+            return Task.FromResult(_app.ReadTheme);
+        }
+
+        public async Task LoadAsync(INovel novel)
+        {
+            if (novel is BookEntity e)
+            {
+                _novel = e;
+            } else
+            {
+                _novel = await _app.Database.GetBookAsync<BookEntity>(novel.Id);
+            }
+            var items = await _app.Database.GetChapterAsync<ChapterModel>(NovelId);
+            foreach (var item in items)
+            {
+                ChapterItems.Add(item);
+            }
+            ChapterTitle = ChapterItems[_novel.CurrentChapterIndex].Title;
+        }
+
     }
 }

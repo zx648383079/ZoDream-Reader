@@ -1,44 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Interfaces.Tokenizers;
-using ZoDream.Shared.Repositories.Entities;
 
 namespace ZoDream.Shared.Repositories
 {
     public class NovelService(
-        IDatabaseRepository database,
-        BookEntity book) : INovelService, ICanvasSource, ICanvasControl
+        INovelEnvironment environment) : INovelService, ICanvasSource
     {
-        private INovelReader _reader;
         private IList<INovelChapter>? _chapterRecordItems;
         private IList<INovelDocument> _cacheChapters = [];
         private IList<INovelPage> _cachePages = [];
+        private string _novelId = string.Empty;
         private int _recordIndex = 0;
         private int _cacheRecordIndex = -1;
         private readonly int _cacheCount = 5;
         private int _chapterIndex = -1;
         private int _pageIndex = -1;
-        private IReadTheme _theme;
-
-        public double Width { get; private set; }
-        public double Height { get; private set; }
 
         public bool IsLoading { get; private set; }
 
         public INovelPage? Current => _pageIndex >= 0 && _pageIndex < _cachePages.Count ? _cachePages[_pageIndex] : null;
 
-        public void Resize(double width)
+        public async Task InvalidateAsync()
         {
-            Width = width;
-        }
-        public void Resize(double width, double height)
-        {
-            Width = width;
-            Height = height;
+            if (_novelId != environment.NovelId)
+            {
+                await LoadChapterAsync();
+                _novelId = environment.NovelId;
+            }
+            await ParsePageAsync();
         }
 
         public async Task<bool> ReadNextAsync()
@@ -76,15 +69,13 @@ namespace ZoDream.Shared.Repositories
                 _pageIndex = -1;
                 return;
             }
-            var tokenizer = await database.GetTokenizerAsync(content);
-            _cachePages = tokenizer.Parse(content, _theme, this);
+            _cachePages = await environment.PageParseAsync(content);
             _pageIndex = -1;
         }
 
         private async Task LoadChapterAsync()
         {
             IsLoading = true;
-            _reader ??= await database.GetReaderAsync(book);
             _chapterRecordItems ??= await GetChaptersAsync();
             var items = new INovelDocument[_cacheCount];
             var begin = Math.Max(0, _recordIndex - _cacheCount / 3);
@@ -101,19 +92,16 @@ namespace ZoDream.Shared.Repositories
                     items[i] = _cacheChapters[j];
                     continue;
                 }
-                var res = await _reader.GetChapterAsync(book.FileName, _chapterRecordItems[n]);
+                var res = await environment.GetChapterAsync(_chapterRecordItems[n].Id);
                 items[i] = res;
             }
             _cacheChapters = items;
             _cacheRecordIndex = begin;
         }
 
-        
-
-        protected virtual async Task<List<INovelChapter>> GetChaptersAsync()
+        protected virtual async Task<IList<INovelChapter>> GetChaptersAsync()
         {
-            var res = await database.GetChapterAsync<ChapterEntity>(book.Id);
-            return res.Select(i => i as INovelChapter).ToList();
+            return await environment.LoadChaptersAsync();
         }
     }
 }

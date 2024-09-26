@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ZoDream.Reader.Events;
+using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Controls
@@ -27,17 +28,28 @@ namespace ZoDream.Reader.Controls
             InitializeComponent();
         }
 
-        public event ActionItemEventHandler? OnAction;
 
-        public BookItem Source
+
+        public ICommand Command {
+            get { return (ICommand)GetValue(CommandProperty); }
+            set { SetValue(CommandProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Command.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CommandProperty =
+            DependencyProperty.Register("Command", typeof(ICommand), typeof(BookListBoxItem), new PropertyMetadata(null));
+
+
+
+        public INovel Source
         {
-            get { return (BookItem)GetValue(SourceProperty); }
+            get { return (INovel)GetValue(SourceProperty); }
             set { SetValue(SourceProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(BookItem), typeof(BookListBoxItem), new PropertyMetadata(null, OnSourceChange));
+            DependencyProperty.Register("Source", typeof(INovel), typeof(BookListBoxItem), new PropertyMetadata(null, OnSourceChange));
 
         private static void OnSourceChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -53,23 +65,23 @@ namespace ZoDream.Reader.Controls
 
         private void MoreBtn_Click(object sender, RoutedEventArgs e)
         {
-            OnAction?.Invoke(this, Source, ActionEvent.NONE);
+            Command?.Execute(new ActionHanlderArgs(Source, ActionEvent.NONE));
             e.Handled = true;
         }
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
         {
-            OnAction?.Invoke(this, Source, ActionEvent.EDIT);
+            Command?.Execute(new ActionHanlderArgs(Source, ActionEvent.EDIT));
         }
 
         private void RemoveBtn_Click(object sender, RoutedEventArgs e)
         {
-            OnAction?.Invoke(this, Source, ActionEvent.DELETE);
+            Command?.Execute(new ActionHanlderArgs(Source, ActionEvent.DELETE));
         }
 
         private void MainBox_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            OnAction?.Invoke(this, Source, ActionEvent.CLICK);
+            Command?.Execute(new ActionHanlderArgs(Source, ActionEvent.CLICK));
         }
     }
 }

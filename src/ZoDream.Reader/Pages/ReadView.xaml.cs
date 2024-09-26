@@ -4,7 +4,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using ZoDream.Reader.ViewModels;
+using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Models;
+using ZoDream.Shared.Repositories;
 
 namespace ZoDream.Reader.Pages
 {
@@ -13,38 +15,36 @@ namespace ZoDream.Reader.Pages
     /// </summary>
     public partial class ReadView : Window
     {
-        public ReadView(BookItem book)
+        public ReadView(INovel book)
         {
             InitializeComponent();
-            DataContext = ViewModel;
-            ViewModel.Book = book;
+            _ = ViewModel.LoadAsync(book);
             Title = book.Name;
             loadingRing.IsActive = true;
         }
 
-        public ReadViewModel ViewModel = new();
+        public ReadViewModel ViewModel => (ReadViewModel)DataContext;
         private bool isBooted = false;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // BootAsync();
+            BootAsync();
         }
 
         private async void BootAsync()
         {
             if (!isBooted && PageRender.ActualWidth > 0)
             {
-                var setting = App.ViewModel.Setting;
-                PageRender.Setting = App.ViewModel.Setting;
-                ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
-                    ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
-                ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
-                ViewModel.Tokenizer.LineSpace = setting.LineSpace;
-                ViewModel.Tokenizer.Gap = setting.Padding * 2;
-                PageRender.Source = ViewModel;
-                ViewModel.Tokenizer.ColumnCount = App.ViewModel.Setting.ColumnCount;
+                //var setting = App.ViewModel.Setting;
+                //PageRender.Setting = App.ViewModel.Setting;
+                //ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
+                //    ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
+                //ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
+                //ViewModel.Tokenizer.LineSpace = setting.LineSpace;
+                //ViewModel.Tokenizer.Gap = setting.Padding * 2;
+                PageRender.Source = new NovelService(ViewModel);
+                //ViewModel.Tokenizer.ColumnCount = App.ViewModel.Setting.ColumnCount;
                 await OnResizeAsync();
-                ViewModel.Load();
                 isBooted = true;
             }
         }
@@ -53,23 +53,25 @@ namespace ZoDream.Reader.Pages
         {
             var width = PageRender.ActualWidth;
             var height = PageRender.ActualHeight - 20;
-            var tokenizer = ViewModel.Tokenizer;
-            if (tokenizer.Width == width && tokenizer.Height == height)
-            {
-                return;
-            }
-            tokenizer.Width = width;
-            tokenizer.Height = height;
-            await tokenizer.Refresh();
-            ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
-            PageRender.Flush();
-            await PageRender.SwapToAsync(tokenizer.Page);
-            loadingRing.IsActive = false;
+            ViewModel.Width = width;
+            ViewModel.Height = height;
+            //var tokenizer = ViewModel.Tokenizer;
+            //if (tokenizer.Width == width && tokenizer.Height == height)
+            //{
+            //    return;
+            //}
+            //tokenizer.Width = width;
+            //tokenizer.Height = height;
+            //await tokenizer.Refresh();
+            ////ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
+            //PageRender.Flush();
+            //await PageRender.SwapToAsync(tokenizer.Page);
+            //loadingRing.IsActive = false;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            ViewModel.Tokenizer.Dispose();
+            //ViewModel.Tokenizer.Dispose();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -89,7 +91,7 @@ namespace ZoDream.Reader.Pages
             if (isOpen)
             {
                 OptionPanel.Show();
-                OptionPanel.ViewModel.Option = App.ViewModel.Setting;
+                //OptionPanel.ViewModel.Option = App.ViewModel.Setting;
             } else
             {
                 OptionPanel.Hide();
@@ -102,27 +104,27 @@ namespace ZoDream.Reader.Pages
             var setting = OptionPanel.ViewModel.Option;
             if (OptionPanel.IsOptionChanged)
             {
-                _ = App.ViewModel.DatabaseRepository.SaveSettingAsync(setting);
-                App.ViewModel.Setting = setting;
+                //_ = App.ViewModel.DatabaseRepository.SaveSettingAsync(setting);
+                //App.ViewModel.Setting = setting;
             }
-            var tokenizer = ViewModel.Tokenizer;
-            if (OptionPanel.IsSizeChanged)
-            {
-                PageRender.Setting = setting;
-                ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
-                    ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
-                ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
-                ViewModel.Tokenizer.LineSpace = setting.LineSpace;
-                ViewModel.Tokenizer.Gap = setting.Padding * 2;
-                await tokenizer.Refresh();
-                ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
-                PageRender.Flush();
-                await PageRender.SwapToAsync(tokenizer.Page);
-                return;
-            }
+            //var tokenizer = ViewModel.Tokenizer;
+            //if (OptionPanel.IsSizeChanged)
+            //{
+            //    PageRender.Setting = setting;
+            //    ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
+            //        ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
+            //    ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
+            //    ViewModel.Tokenizer.LineSpace = setting.LineSpace;
+            //    ViewModel.Tokenizer.Gap = setting.Padding * 2;
+            //    await tokenizer.Refresh();
+            //    ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
+            //    PageRender.Flush();
+            //    await PageRender.SwapToAsync(tokenizer.Page);
+            //    return;
+            //}
             if (OptionPanel.IsLayerChanged)
             {
-                PageRender.Setting = setting;
+                // PageRender.Setting = setting;
             }
         }
 
@@ -136,17 +138,17 @@ namespace ZoDream.Reader.Pages
             MorePanel.Visibility = Visibility.Collapsed;
             var chapter = ViewModel.ChapterItems[i];
             ViewModel.ChapterTitle = chapter.Title;
-            ViewModel.Tokenizer.SetPage(chapter);
-            await PageRender.SwapToAsync(ViewModel.Tokenizer.Page);
+            //ViewModel.Tokenizer.SetPage(chapter);
+            //await PageRender.SwapToAsync(ViewModel.Tokenizer.Page);
             // App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
         }
 
         private void PageRender_PageChanged(object sender, int page, PositionItem pagePosition)
         {
-            ViewModel.Tokenizer.Page = page;
-            ViewModel.Book.Position = pagePosition;
-            ViewModel.ReloadChapter();
-            App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+            // ViewModel.Tokenizer.Page = page;
+            // ViewModel.Book.Position = pagePosition;
+            // ViewModel.ReloadChapter();
+            //App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
         }
 
         private void PageRender_OnReady(object sender)

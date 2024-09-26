@@ -94,7 +94,5 @@ namespace ZoDream.Shared.Interfaces
 
         public Task SaveSettingAsync(IAppOption data);
 
-        public Task<INovelReader> GetReaderAsync(INovelSource novel);
-        public Task<IPageTokenizer> GetTokenizerAsync(INovelDocument content);
     }
 }

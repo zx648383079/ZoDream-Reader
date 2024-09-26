@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
-    <LangVersion>11</LangVersion>
+    <LangVersion>12</LangVersion>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Assets\reader.ico</ApplicationIcon>
   </PropertyGroup>
@@ -66,13 +66,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\shared\ZoDream.Shared.Controls\ZoDream.Shared.Controls.csproj" />
+    <ProjectReference Include="..\ZoDream.Shared.Animations\ZoDream.Shared.Animations.csproj" />
+    <ProjectReference Include="..\ZoDream.Shared.Font\ZoDream.Shared.Font.csproj" />
+    <ProjectReference Include="..\ZoDream.Shared.Plugins\ZoDream.Shared.Plugins.csproj" />
+    <ProjectReference Include="..\ZoDream.Shared.Repositories\ZoDream.Shared.Repositories.csproj" />
     <ProjectReference Include="..\ZoDream.Shared\ZoDream.Shared.csproj" />
   </ItemGroup>
 

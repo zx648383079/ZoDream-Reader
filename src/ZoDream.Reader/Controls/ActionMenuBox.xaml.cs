@@ -34,6 +34,7 @@ namespace ZoDream.Reader.Controls
             Canvas.SetLeft(MenuBox, position.X);
             Canvas.SetTop(MenuBox, position.Y);
             MenuBox.Visibility = Visibility.Visible;
+
         }
 
         public void Hide()

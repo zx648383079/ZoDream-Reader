@@ -51,12 +51,12 @@ namespace ZoDream.Shared.Repositories
 
         public override void Seed()
         {
-            Database.Insert<ReplaceRuleEntity>([
-                new()
-                {
+            //Database.Insert<ReplaceRuleEntity>([
+            //    new()
+            //    {
                     
-                }
-            ]);
+            //    }
+            //]);
         }
 
      

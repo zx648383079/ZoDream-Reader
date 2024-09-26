@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using ZoDream.Shared.Animations;
 using ZoDream.Shared.Controls;
 using ZoDream.Shared.Events;
@@ -76,26 +68,11 @@ namespace ZoDream.Reader.Controls
         private ICanvasAnimate Animate = new NoneAnimate();
         private Tween<double>? SwapTween;
         private bool IsTouchMove = false;
-        private readonly List<ICanvasLayer> LayerItems = new();
+        private readonly List<ICanvasLayer> LayerItems = [];
         public ICanvasSource? Source { get; set; }
 
         public event PageChangedEventHandler? PageChanged;
         public event CanvasReadyEventHandler? OnReady;
-
-
-        public AppOption Setting
-        {
-            get { return (AppOption)GetValue(SettingProperty); }
-            set { SetValue(SettingProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Setting.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SettingProperty =
-            DependencyProperty.Register("Setting", typeof(AppOption), typeof(PageCanvas), 
-                new PropertyMetadata(null, (d, e) =>
-                {
-                    (d as PageCanvas)?.UpdateSetting();
-                }));
 
 
         public override void OnApplyTemplate()
@@ -108,6 +85,7 @@ namespace ZoDream.Reader.Controls
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
+            Animate.Resize(ActualWidth, ActualHeight);
             foreach (var item in LayerItems)
             {
                 item.Resize(0, 0, ActualWidth, ActualHeight);
@@ -132,12 +110,12 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
-            var isEnd = Animate.Animate(LayerItems, SwapTween.Get(), false);
-            if (!isEnd)
-            {
-                return;
-            }
-            SwapFinished();
+            //var isEnd = Animate.Animate(LayerItems, SwapTween.Get(), false);
+            //if (!isEnd)
+            //{
+            //    return;
+            //}
+            //SwapFinished();
         }
 
         private void SwapFinished()
@@ -154,98 +132,98 @@ namespace ZoDream.Reader.Controls
         /// 使用过渡动画切换到新的页面，下一页
         /// </summary>
         /// <param name="pages"></param>
-        public void SwapTo(IList<PageItem> pages)
-        {
-            SwapTo(pages, 0);
-        }
+        //public void SwapTo(IList<PageItem> pages)
+        //{
+        //    SwapTo(pages, 0);
+        //}
 
 
-        public void SwapTo(IList<PageItem> pages, int page)
-        {
-            SetPage(0, 1);
-            SetPage(1, page, pages);
-            SwapAnimate(true, () =>
-            {
-                CurrentPage = page;
-                PageChanged?.Invoke(this, page, pages[0].Begin);
-            });
-        }
+        //public void SwapTo(IList<PageItem> pages, int page)
+        //{
+        //    SetPage(0, 1);
+        //    SetPage(1, page, pages);
+        //    SwapAnimate(true, () =>
+        //    {
+        //        CurrentPage = page;
+        //        PageChanged?.Invoke(this, page, pages[0].Begin);
+        //    });
+        //}
 
         public async Task SwapToAsync(int page)
         {
-            if (Source == null || !Source.Enable(page))
-            {
-                return;
-            }
-            SwapTo(await Source.GetAsync(page), page);
+            //if (Source == null || !Source.Enable(page))
+            //{
+            //    return;
+            //}
+            //SwapTo(await Source.GetAsync(page), page);
         }
 
         /// <summary>
         /// 使用过渡动画切换回新的页面，上一页
         /// </summary>
         /// <param name="pages"></param>
-        public void SwapFrom(IList<PageItem> pages)
-        {
-            SwapFrom(pages, 0);
-        }
+        //public void SwapFrom(IList<PageItem> pages)
+        //{
+        //    SwapFrom(pages, 0);
+        //}
 
         #region 设置layer的数据
-        private void SetPage(ICanvasLayer dist, ICanvasLayer source)
-        {
-            SetPage(dist, source.Page, source.Content);
-        }
+        //private void SetPage(ICanvasLayer dist, ICanvasLayer source)
+        //{
+        //    SetPage(dist, source.Page, source.Content);
+        //}
 
-        private void SetPage(int dist, int page, IList<PageItem> items)
-        {
-            if (dist < 0 || dist >= LayerItems.Count)
-            {
-                return;
-            }
-            SetPage(LayerItems[dist], page, items);
-        }
+        //private void SetPage(int dist, int page, IList<PageItem> items)
+        //{
+        //    if (dist < 0 || dist >= LayerItems.Count)
+        //    {
+        //        return;
+        //    }
+        //    SetPage(LayerItems[dist], page, items);
+        //}
 
-        private void SetPage(ICanvasLayer dist, int page, IList<PageItem> items)
-        {
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                dist.Page = page;
-                if (items != null)
-                {
-                    dist.Add(items);
-                } else
-                {
-                    dist.Clear();
-                }
-            });
-        }
+        //private void SetPage(ICanvasLayer dist, int page, IList<PageItem> items)
+        //{
+        //    App.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        dist.Page = page;
+        //        if (items != null)
+        //        {
+        //            dist.Add(items);
+        //        } else
+        //        {
+        //            dist.Clear();
+        //        }
+        //    });
+        //}
 
-        private void SetPage(int dist, int source)
-        {
-            if (dist < 0 || dist >= LayerItems.Count || source < 0 || source >= LayerItems.Count)
-            {
-                return;
-            }
-            SetPage(LayerItems[dist], LayerItems[source]);
-        }
+        //private void SetPage(int dist, int source)
+        //{
+        //    if (dist < 0 || dist >= LayerItems.Count || source < 0 || source >= LayerItems.Count)
+        //    {
+        //        return;
+        //    }
+        //    SetPage(LayerItems[dist], LayerItems[source]);
+        //}
         #endregion
 
-        public void SwapFrom(IList<PageItem> pages, int page)
-        {
-            SetPage(2, 1);
-            SetPage(1, page, pages);
-            SwapAnimate(false, () =>
-            {
-                CurrentPage = page;
-                PageChanged?.Invoke(this, page, pages[0].Begin);
-            });
-        }
+        //public void SwapFrom(IList<PageItem> pages, int page)
+        //{
+        //    SetPage(2, 1);
+        //    SetPage(1, page, pages);
+        //    SwapAnimate(false, () =>
+        //    {
+        //        CurrentPage = page;
+        //        PageChanged?.Invoke(this, page, pages[0].Begin);
+        //    });
+        //}
         public async Task SwapFromAsync(int page)
         {
-            if (Source == null || !Source.Enable(page))
-            {
-                return;
-            }
-            SwapFrom(await Source.GetAsync(page), page);
+            //if (Source == null || !Source.Enable(page))
+            //{
+            //    return;
+            //}
+            //SwapFrom(await Source.GetAsync(page), page);
         }
 
         private void SwapAnimate(bool toNext, Action finished)
@@ -275,7 +253,7 @@ namespace ZoDream.Reader.Controls
             base.OnMouseDown(e);
             IsTouchMove = false;
             LastMousePoint = e.GetPosition(this);
-            Animate.MoveStart(LayerItems[1], LastMousePoint.X, LastMousePoint.Y);
+            Animate.OnTouchStart(LastMousePoint.X, LastMousePoint.Y);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -287,8 +265,8 @@ namespace ZoDream.Reader.Controls
             }
             IsTouchMove = true;
             var p = e.GetPosition(this);
-            var offset = Animate.Move(LayerItems[1], p.X, p.Y);
-            Animate.Animate(LayerItems, offset, true);
+            Animate.OnTouchMove(p.X, p.Y);
+            // Animate.Animate(LayerItems, offset, true);
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
@@ -308,19 +286,19 @@ namespace ZoDream.Reader.Controls
                 }
                 return;
             }
-            var offset = Animate.Move(LayerItems[1], p.X, p.Y);
-            if (Math.Abs(offset) < 30)
-            {
-                SwapTween = new Tween<double>(offset, 0, 300, Tween<double>.EaseIn);
-                return;
-            }
-            if (offset > 0)
-            {
-                _ = SwapNextAsync();
-            } else
-            {
-                _ = SwapPreviousAsync();
-            }
+            Animate.OnTouchMove(p.X, p.Y);
+            //if (Math.Abs(offset) < 30)
+            //{
+            //    SwapTween = new Tween<double>(offset, 0, 300, Tween<double>.EaseIn);
+            //    return;
+            //}
+            //if (offset > 0)
+            //{
+            //    _ = SwapNextAsync();
+            //} else
+            //{
+            //    _ = SwapPreviousAsync();
+            //}
         }
 
 
@@ -366,33 +344,56 @@ namespace ZoDream.Reader.Controls
 
         private void UpdateSetting()
         {
-            if (Setting == null)
+            //if (Setting == null)
+            //{
+            //    return;
+            //}
+            //Background = string.IsNullOrWhiteSpace(Setting.BackgroundImage) ?
+            //    ColorHelper.ColorToBrush(Setting.Background) : ColorHelper.ImageToBrush(Setting.BackgroundImage);
+            //if (!string.IsNullOrWhiteSpace(Setting.FontFamily))
+            //{
+            //    FontFamily = new FontFamily(Setting.FontFamily);
+            //}
+            //FontSize = Setting.FontSize;
+            //Foreground = ColorHelper.ColorToBrush(Setting.Foreground);
+            //foreach (PageLayer item in LayerItems)
+            //{
+            //    item.FontFamily = FontFamily;
+            //    item.FontSize = FontSize;
+            //    item.Background = Background;
+            //    item.Foreground = Foreground;
+            //}
+            //Animate = Setting.Animation switch
+            //{
+            //    1 => new CoverAnimate(),
+            //    2 => new VerticalCoverAnimate(),
+            //    3 => new SimulateAnimate(),
+            //    4 => new ScrollAnimate(),
+            //    _ => new NoneAnimate(),
+            //};
+        }
+
+        public void SetAnimate(ICanvasAnimate animate)
+        {
+            Animate = animate;
+            animate.Ready(this);
+        }
+
+        public ICanvasLayer CreateLayer(double width, double height)
+        {
+            var layer = new PageLayer
             {
-                return;
-            }
-            Background = string.IsNullOrWhiteSpace(Setting.BackgroundImage) ?
-                ColorHelper.ColorToBrush(Setting.Background) : ColorHelper.ImageToBrush(Setting.BackgroundImage);
-            if (!string.IsNullOrWhiteSpace(Setting.FontFamily))
-            {
-                FontFamily = new FontFamily(Setting.FontFamily);
-            }
-            FontSize = Setting.FontSize;
-            Foreground = ColorHelper.ColorToBrush(Setting.Foreground);
-            foreach (PageLayer item in LayerItems)
-            {
-                item.FontFamily = FontFamily;
-                item.FontSize = FontSize;
-                item.Background = Background;
-                item.Foreground = Foreground;
-            }
-            Animate = Setting.Animation switch
-            {
-                1 => new CoverAnimate(),
-                2 => new VerticalCoverAnimate(),
-                3 => new SimulateAnimate(),
-                4 => new ScrollAnimate(),
-                _ => new NoneAnimate(),
+                Width = width,
+                Height = height
             };
+            LayerItems.Add(layer);
+            LayerPanel?.Children.Add(layer);
+            return layer;
+        }
+
+        public void Invalidate()
+        {
+            Animate.OnDraw(this);
         }
     }
 }

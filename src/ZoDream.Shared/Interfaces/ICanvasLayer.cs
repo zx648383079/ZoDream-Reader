@@ -13,12 +13,12 @@ namespace ZoDream.Shared.Interfaces
         public double ActualWidth { get; }
         public double ActualHeight { get; }
 
-        public IList<PageItem> Content { get; set; }
+        //public IList<PageItem> Content { get; set; }
         public int Page { get; set; }
 
-        public void Add(IEnumerable<CharItem> items);
+        //public void Add(IEnumerable<CharItem> items);
 
-        public void Add(IEnumerable<PageItem> items);
+        //public void Add(IEnumerable<PageItem> items);
 
         public bool IsVisible { get; }
 

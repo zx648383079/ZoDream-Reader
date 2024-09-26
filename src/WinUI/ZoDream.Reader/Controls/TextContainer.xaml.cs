@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Windows.System;
 using ZoDream.Shared.Animations;
+using ZoDream.Shared.Events;
 using ZoDream.Shared.Interfaces;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -18,6 +19,11 @@ namespace ZoDream.Reader.Controls
         }
 
         private ICanvasAnimate _animate = new NoneAnimate();
+
+        public event PageChangedEventHandler? PageChanged;
+        public event CanvasReadyEventHandler? OnReady;
+
+        public ICanvasSource? Source { get; set; }
 
         private void PaintCanvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
         {
@@ -45,7 +51,6 @@ namespace ZoDream.Reader.Controls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -89,6 +94,21 @@ namespace ZoDream.Reader.Controls
         {
             var point = e.GetCurrentPoint(this).Position;
             _animate.OnTouchMove(point.X, point.Y);
+        }
+
+        public void SetAnimate(ICanvasAnimate animate)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICanvasLayer CreateLayer(double width, double height)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Invalidate()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

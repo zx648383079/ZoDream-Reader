@@ -1,10 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
-using System.Globalization;
 using System.Text;
 using Windows.ApplicationModel.Activation;
-using Windows.Globalization;
 using ZoDream.Reader.Pages;
 using ZoDream.Reader.Pages.Rules;
 using ZoDream.Reader.Pages.Settings;
@@ -12,7 +10,6 @@ using ZoDream.Reader.Repositories;
 using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Route;
-using ZoDream.Shared.Repositories;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

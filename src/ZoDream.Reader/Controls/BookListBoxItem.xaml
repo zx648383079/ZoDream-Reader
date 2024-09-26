@@ -1,34 +1,51 @@
-﻿<UserControl x:Class="ZoDream.Reader.Controls.BookListBoxItem"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ZoDream.Reader.Controls"
-             mc:Ignorable="d"
-             x:Name="root"
-             Margin="5"
-             d:DesignHeight="200" d:DesignWidth="160">
-    <Grid x:Name="MainBox" Background="{Binding ElementName=root, Path=Background}" 
-          Margin="{Binding ElementName=root, Path=Margin}" MouseLeftButtonUp="MainBox_MouseLeftButtonUp">
-        <Image x:Name="CoverImg" Source="/Assets/cover1.jpg" Stretch="UniformToFill"/>
-        <Image Source="/Assets/flow_base.png" Stretch="UniformToFill"/>
-        <TextBlock x:Name="NameTb" Margin="10" Text="书的名字"
-                   FontSize="20"
-                   VerticalAlignment="Center"
-                   TextAlignment="Center"
-                   TextWrapping="Wrap"
-                   HorizontalAlignment="Center"/>
-        <Button x:Name="MoreBtn" 
-                Content="&#xE10C;" 
-                FontFamily="{DynamicResource IconFontFamily}"
-                Background="Transparent"
-                Click="MoreBtn_Click"
-                Foreground="#777"
-                FontSize="30"
-                BorderThickness="0"
-                VerticalAlignment="Top" HorizontalAlignment="Right"/>
+﻿<UserControl
+    x:Class="ZoDream.Reader.Controls.BookListBoxItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ZoDream.Reader.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="root"
+    Margin="5"
+    d:DesignHeight="200"
+    d:DesignWidth="160"
+    mc:Ignorable="d">
+    <Grid
+        x:Name="MainBox"
+        Margin="{Binding ElementName=root, Path=Margin}"
+        Background="{Binding ElementName=root, Path=Background}"
+        MouseLeftButtonUp="MainBox_MouseLeftButtonUp">
+        <Image
+            x:Name="CoverImg"
+            Source="/Assets/cover1.jpg"
+            Stretch="UniformToFill" />
+        <Image Source="/Assets/flow_base.png" Stretch="UniformToFill" />
+        <TextBlock
+            x:Name="NameTb"
+            Margin="10"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontSize="20"
+            Text="书的名字"
+            TextAlignment="Center"
+            TextWrapping="Wrap" />
+        <Button
+            x:Name="MoreBtn"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Background="Transparent"
+            BorderThickness="0"
+            Click="MoreBtn_Click"
+            Content="&#xE10C;"
+            FontFamily="{DynamicResource IconFontFamily}"
+            FontSize="30"
+            Foreground="#777" />
         <Grid.Effect>
-            <DropShadowEffect Color="Black" BlurRadius="16" ShadowDepth="0" Opacity=".5" />
+            <DropShadowEffect
+                BlurRadius="16"
+                Opacity=".5"
+                ShadowDepth="0"
+                Color="Black" />
         </Grid.Effect>
     </Grid>
 </UserControl>

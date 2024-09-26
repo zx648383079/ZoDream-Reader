@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ZoDream.Shared.Repositories.Entities;
 
 namespace ZoDream.Shared.Repositories.Extensions
 {

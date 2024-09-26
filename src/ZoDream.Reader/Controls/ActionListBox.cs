@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -16,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ZoDream.Reader.Events;
+using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Models;
 
 namespace ZoDream.Reader.Controls
@@ -49,25 +51,85 @@ namespace ZoDream.Reader.Controls
     ///     <MyNamespace:ActionListBox/>
     ///
     /// </summary>
-    [TemplatePart(Name = "PART_Container", Type = typeof(Panel))]
-    [TemplatePart(Name = "PART_Menu", Type = typeof(ActionMenuBox))]
+    [TemplatePart(Name = ContainerName, Type = typeof(Panel))]
+    [TemplatePart(Name = MenuName, Type = typeof(ActionMenuBox))]
     public class ActionListBox : Control
     {
+
+        const string ContainerName = "PART_Container";
+        const string MenuName = "PART_Menu";
+
         static ActionListBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ActionListBox), new FrameworkPropertyMetadata(typeof(ActionListBox)));
         }
 
+        public ActionListBox()
+        {
+            PreviewDragOver += ActionListBox_PreviewDragOver;
+            PreviewDrop += ActionListBox_PreviewDrop;
+        }
 
+        private void ActionListBox_PreviewDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var items = (IEnumerable<string>)e.Data.GetData(DataFormats.FileDrop);
+                if (!items.Any())
+                {
+                    return;
+                }
+                DragCommand?.Execute(items);
+            }
+        }
 
-        private Panel? boxContianer;
-        private ActionMenuBox? boxMenu;
+        private void ActionListBox_PreviewDragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Link;
+            e.Handled = true;
+        }
+
+        private Panel? _contianer;
+        private ActionMenuBox? _menuBar;
+        private INovel? _selectedItem;
 
         private double ItemWidth = 160;
         private double ItemHeight = 200;
 
-        public event ControlEventHandler? OnAdd;
-        public event ActionItemEventHandler? OnAction;
+
+
+        public ICommand AddCommand {
+            get { return (ICommand)GetValue(AddCommandProperty); }
+            set { SetValue(AddCommandProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for AddCommand.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty AddCommandProperty =
+            DependencyProperty.Register("AddCommand", typeof(ICommand), typeof(ActionListBox), new PropertyMetadata(null));
+
+
+
+
+        public ICommand Command {
+            get { return (ICommand)GetValue(CommandProperty); }
+            set { SetValue(CommandProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Command.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CommandProperty =
+            DependencyProperty.Register("Command", typeof(ICommand), typeof(ActionListBox), new PropertyMetadata(null));
+
+
+
+        public ICommand DragCommand {
+            get { return (ICommand)GetValue(DragCommandProperty); }
+            set { SetValue(DragCommandProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for DragCommand.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DragCommandProperty =
+            DependencyProperty.Register("DragCommand", typeof(ICommand), typeof(ActionListBox), new PropertyMetadata(null));
+
 
         public bool ActionOnBefore
         {
@@ -86,15 +148,15 @@ namespace ZoDream.Reader.Controls
 
 
 
-        public IEnumerable<BookItem> Items
+        public IEnumerable<INovel> Items
         {
-            get { return (IEnumerable<BookItem>)GetValue(ItemsProperty); }
+            get { return (IEnumerable<INovel>)GetValue(ItemsProperty); }
             set { SetValue(ItemsProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Items.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ItemsProperty =
-            DependencyProperty.Register("Items", typeof(IEnumerable<BookItem>), typeof(ActionListBox), new PropertyMetadata(null, OnItemsChange));
+            DependencyProperty.Register("Items", typeof(IEnumerable<INovel>), typeof(ActionListBox), new PropertyMetadata(null, OnItemsChange));
 
         private static void OnItemsChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -103,7 +165,7 @@ namespace ZoDream.Reader.Controls
 
         private void RefreshItems()
         {
-            if (boxContianer == null)
+            if (_contianer == null)
             {
                 return;
             }
@@ -112,9 +174,9 @@ namespace ZoDream.Reader.Controls
             var count = data == null ? 0 : data.Count();
             var j = 0;
             var removeItems = new List<int>();
-            for (int i = 0; i < boxContianer.Children.Count; i++)
+            for (int i = 0; i < _contianer.Children.Count; i++)
             {
-                var item = boxContianer.Children[i];
+                var item = _contianer.Children[i];
                 if (item is AddListBoxItem)
                 {
                     continue;
@@ -132,7 +194,7 @@ namespace ZoDream.Reader.Controls
             {
                 for (int i = removeItems.Count - 1; i >= 0; i--)
                 {
-                    boxContianer.Children.RemoveAt(removeItems[i]);
+                    _contianer.Children.RemoveAt(removeItems[i]);
                 }
             }
             if (j >= count)
@@ -147,16 +209,25 @@ namespace ZoDream.Reader.Controls
                     Width = ItemWidth,
                     Height = ItemHeight
                 };
-                book.OnAction += (_, item, e) =>
+                book.Command = new RelayCommand<ActionHanlderArgs>(e =>
                 {
-                    if (e == ActionEvent.NONE)
+                    if (e is null)
                     {
-                        boxMenu?.Show(GetActionPosition(book));
                         return;
                     }
-                    OnAction?.Invoke(this, item, e);
-                };
-                boxContianer.Children.Add(book);
+                    if (e.Action == ActionEvent.CLICK && _selectedItem == e.Source)
+                    {
+                        return;
+                    }
+                    if (e.Action == ActionEvent.NONE)
+                    {
+                        _selectedItem = e.Source;
+                        _menuBar?.Show(GetActionPosition(book));
+                        return;
+                    }
+                    Command?.Execute(e);
+                });
+                _contianer.Children.Add(book);
                 book.Source = data[j];
             }
             MoveActionButton();
@@ -202,7 +273,7 @@ namespace ZoDream.Reader.Controls
 
         private void MoveActionButton()
         {
-            if (boxContianer == null)
+            if (_contianer == null)
             {
                 return;
             }
@@ -217,14 +288,14 @@ namespace ZoDream.Reader.Controls
                 };
                 button.MouseLeftButtonUp += (_, _) =>
                 {
-                    OnAdd?.Invoke(this);
+                    AddCommand?.Execute(null);
                 };
                 if (ActionOnBefore)
                 {
-                    boxContianer.Children.Insert(0, button);
+                    _contianer.Children.Insert(0, button);
                 } else
                 {
-                    boxContianer.Children.Add(button);
+                    _contianer.Children.Add(button);
                 }
                 return;
             }
@@ -232,29 +303,29 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
-            if ((index == 0 && ActionOnBefore) || (index == boxContianer.Children.Count - 1 
+            if ((index == 0 && ActionOnBefore) || (index == _contianer.Children.Count - 1 
                 && !ActionOnBefore))
             {
                 return;
             }
             if (ActionOnBefore)
             {
-                boxContianer.Children.Insert(0, boxContianer.Children[index]);
+                _contianer.Children.Insert(0, _contianer.Children[index]);
             } else
             {
-                boxContianer.Children.Add(boxContianer.Children[index]);
+                _contianer.Children.Add(_contianer.Children[index]);
             }
         }
 
         private int ActionButtonIndex()
         {
-            if (boxContianer == null)
+            if (_contianer == null)
             {
                 return -1;
             }
-            for (int i = 0; i < boxContianer.Children.Count; i++)
+            for (int i = 0; i < _contianer.Children.Count; i++)
             {
-                if (boxContianer.Children[i] is AddListBoxItem)
+                if (_contianer.Children[i] is AddListBoxItem)
                 {
                     return i;
                 }
@@ -265,8 +336,25 @@ namespace ZoDream.Reader.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            boxContianer = GetTemplateChild("PART_Container") as Panel;
-            boxMenu = GetTemplateChild("PART_Menu") as ActionMenuBox;
+            _contianer = GetTemplateChild(ContainerName) as Panel;
+            _menuBar = GetTemplateChild(MenuName) as ActionMenuBox;
+            if (_menuBar is not null)
+            {
+                _menuBar.OnAction += (_, e) => {
+                    if (_selectedItem is null)
+                    {
+                        return;
+                    }
+                    Command?.Execute(new ActionHanlderArgs(_selectedItem, e));
+                    _selectedItem = null;
+                };
+                _menuBar.IsVisibleChanged += (_, e) => {
+                    if (!(bool)e.NewValue)
+                    {
+                        _selectedItem = null;
+                    }
+                };
+            }
             RefreshItems();
         }
     }

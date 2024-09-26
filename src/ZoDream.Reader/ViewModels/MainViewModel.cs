@@ -1,13 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using ZoDream.Reader.Repositories;
-using ZoDream.Shared.Models;
+using System.Windows.Input;
+using ZoDream.Reader.Events;
+using ZoDream.Reader.Pages;
+using ZoDream.Shared.Interfaces.Entities;
+using ZoDream.Shared.Repositories.Entities;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -15,63 +15,97 @@ namespace ZoDream.Reader.ViewModels
     {
         public MainViewModel()
         {
-            Initialize();
+            AddCommand = new RelayCommand(TapAdd);
+            DragCommand = new RelayCommand<IEnumerable<string>>(TapDrag);
+            ActionCommand = new RelayCommand<ActionHanlderArgs>(TapAction);
+            LoadAsync();
         }
 
-        private async void Initialize()
+        private readonly AppViewModel _app = App.GetService<AppViewModel>();
+
+        private ObservableCollection<BookEntity> novelItems = [];
+
+        public ObservableCollection<BookEntity> NovelItems
         {
-            var dbFile = await DiskRepository.CreateDatabaseAsync();
-            Database.Initialize(dbFile);
-            DatabaseRepository = new Database(dbFile);
-            Load();
-            Setting = await DatabaseRepository.LoadSettingAsync();
+            get => novelItems;
+            set => SetProperty(ref novelItems, value);
         }
+        public ICommand AddCommand { get; private set; }
+        public ICommand DragCommand { get; private set; }
+        public ICommand ActionCommand { get; private set; }
 
-        public Database DatabaseRepository { get; private set; }
-        public Disk DiskRepository { get; private set; } = new Disk();
-
-        private ObservableCollection<BookItem> bookItems = new ObservableCollection<BookItem>();
-
-        public ObservableCollection<BookItem> BookItems
+        private void TapDrag(IEnumerable<string>? items)
         {
-            get => bookItems;
-            set => SetProperty(ref bookItems, value);
-        }
-
-        public AppOption Setting { get; set; }
-
-        public void Load()
-        {
-            var items = DatabaseRepository.GetBooks();
-            foreach (var item in items)
-            {
-                BookItems.Add(item);
-            }
-        }
-        public void Load(IEnumerable<string> fileNames)
-        {
-            foreach (var item in fileNames)
-            {
-                Load(item);
-            }
-        }
-
-        public void Load(string fileName)
-        {
-            var item = DiskRepository.AddTxt(fileName);
-            if (item == null)
+            if (items is null)
             {
                 return;
             }
-            DatabaseRepository.AddBook(item);
-            BookItems.Add(item);
+            _ = LoadAsync(items);
+        }
+        private void TapAction(ActionHanlderArgs? arg)
+        {
+            if (arg is null)
+            {
+                return;
+            }
+            if (arg.Action == ActionEvent.CLICK)
+            {
+                var page = new ReadView(arg.Source);
+                page.ShowDialog();
+                return;
+            }
+            if (arg.Action == ActionEvent.DELETE)
+            {
+                RemoveAsync(arg.Source);
+                return;
+            }
         }
 
-        public void RemoveBook(BookItem item)
+        private void TapAdd()
         {
-            BookItems.Remove(item);
-            DatabaseRepository.DeleteBook(item);
-            _ = DiskRepository.DeleteBookAsync(item);
+            var open = new Microsoft.Win32.OpenFileDialog
+            {
+                Multiselect = true,
+                Filter = "文本文件|*.txt|所有文件|*.*",
+                Title = "选择文件"
+            };
+            if (open.ShowDialog() != true)
+            {
+                return;
+            }
+            _ = LoadAsync(open.FileNames);
+        }
+
+        public async void LoadAsync()
+        {
+            NovelItems.Clear();
+            var items = await _app.Database.GetBookAsync<BookEntity>();
+            foreach (var item in items)
+            {
+                NovelItems.Add(item);
+            }
+        }
+        public async Task LoadAsync(IEnumerable<string> fileNames)
+        {
+            foreach (var item in fileNames)
+            {
+                await _app.Storage.AddBookAsync(item);
+            }
+            LoadAsync();
+        }
+
+
+        public async void RemoveAsync(INovel item)
+        {
+            for (int i = NovelItems.Count - 1; i >= 0; i--)
+            {
+                if (NovelItems[i].Id == item.Id)
+                {
+                    NovelItems.RemoveAt(i);
+                }
+            }
+            await _app.Storage.DeleteBookAsync(item);
+            await _app.Database.DeleteBookAsync(item.Id);
         }
     }
 }

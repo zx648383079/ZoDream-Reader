@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZoDream.Shared.Models;
+﻿using ZoDream.Shared.Interfaces.Entities;
 
 namespace ZoDream.Reader.Events
 {
-    public delegate void ActionItemEventHandler(object sender, BookItem item, ActionEvent e);
+
+    public class ActionHanlderArgs(INovel novel, ActionEvent e)
+    {
+        public INovel Source { get; private set; } = novel;
+
+        public ActionEvent Action { get; private set; } = e;
+    }
 
     public delegate void ActionEventHandler(object sender, ActionEvent e);
-
     public enum ActionEvent
     {
         NONE,

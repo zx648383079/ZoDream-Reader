@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace ZoDream.Shared.Repositories
+﻿namespace ZoDream.Shared.Repositories
 {
-    public class AppConstants
+    public static class AppConstants
     {
         public const string SettingContainerName = "ZoDreamReader";
         public const string DatabaseFileName = "zodream.db";

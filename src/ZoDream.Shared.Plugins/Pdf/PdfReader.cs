@@ -15,15 +15,6 @@ namespace ZoDream.Shared.Plugins.Pdf
             throw new NotImplementedException();
         }
 
-        public string GetChapter(Stream input, INovelChapter chapter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<string> GetChapterAsync(string fileName, INovelChapter chapter)
-        {
-            throw new NotImplementedException();
-        }
 
         public (INovel?, List<INovelChapter>) GetChapters(Stream input)
         {
@@ -41,6 +32,16 @@ namespace ZoDream.Shared.Plugins.Pdf
         }
 
         public INovelChapter UnSerialize(string data)
+        {
+            throw new NotImplementedException();
+        }
+
+        INovelDocument INovelReader.GetChapter(Stream input, INovelChapter chapter)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<INovelDocument> INovelReader.GetChapterAsync(string fileName, INovelChapter chapter)
         {
             throw new NotImplementedException();
         }

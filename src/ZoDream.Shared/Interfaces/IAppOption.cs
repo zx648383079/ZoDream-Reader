@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ZoDream.Shared.Interfaces
+﻿namespace ZoDream.Shared.Interfaces
 {
     public interface IAppOption
     {

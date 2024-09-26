@@ -102,7 +102,7 @@ namespace ZoDream.Shared.Plugins.EPub
         {
             using var archive = new ZipArchive(input, ZipArchiveMode.Read);
             var doc = Read(archive, chapter.Url);
-            return new HtmlDocument(doc.Root.ToString());
+            return new HtmlDocument(chapter.Title, doc.Root.ToString());
         }
 
 

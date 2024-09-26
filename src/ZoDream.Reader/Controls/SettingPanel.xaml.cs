@@ -36,10 +36,10 @@ namespace ZoDream.Reader.Controls
                     IsSizeChanged = true;
                     return;
                 }
-                if (e.PropertyName == nameof(ViewModel.OpenSpeek) || 
+                if (e.PropertyName == nameof(ViewModel.OpenSpeak) || 
                 e.PropertyName == nameof(ViewModel.AutoFlip) || 
                 e.PropertyName == nameof(ViewModel.FlipSpace) ||
-                e.PropertyName == nameof(ViewModel.SpeekSpeed))
+                e.PropertyName == nameof(ViewModel.SpeakSpeed))
                 {
                     return;
                 }
@@ -81,13 +81,13 @@ namespace ZoDream.Reader.Controls
 
         private async void AddFont(string font)
         {
-            var item = await App.ViewModel.DiskRepository.AddFontAsync(font);
-            if (item == null)
-            {
-                return;
-            }
-            ViewModel.FontItems.Add(item);
-            ViewModel.FontFamily = item.FontFamily;
+            //var item = await App.ViewModel.DiskRepository.AddFontAsync(font);
+            //if (item == null)
+            //{
+            //    return;
+            //}
+            //ViewModel.FontItems.Add(item);
+            //ViewModel.FontFamily = item.FontFamily;
         }
     }
 }

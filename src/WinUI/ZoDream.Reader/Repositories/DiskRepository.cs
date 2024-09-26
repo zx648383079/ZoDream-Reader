@@ -79,7 +79,7 @@ namespace ZoDream.Reader.Repositories
 
         private async void Init()
         {
-            BookFolder = BaseFolder;//await BaseFolder.CreateFolderAsync("txt", CreationCollisionOption.OpenIfExists);
+            BookFolder = BaseFolder;
             ThemeFolder = await BaseFolder.CreateFolderAsync("theme", CreationCollisionOption.OpenIfExists);
         }
 

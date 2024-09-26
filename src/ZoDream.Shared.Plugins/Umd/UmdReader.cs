@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Umd
 {
@@ -18,7 +19,7 @@ namespace ZoDream.Shared.Plugins.Umd
         {
         }
 
-        public Task<string> GetChapterAsync(string fileName, INovelChapter chapter)
+        public Task<INovelDocument> GetChapterAsync(string fileName, INovelChapter chapter)
         {
             return Task.Factory.StartNew(() => {
                 using var fs = File.OpenRead(fileName);
@@ -100,11 +101,11 @@ namespace ZoDream.Shared.Plugins.Umd
             return (novel, items);
         }
 
-        public string GetChapter(Stream input, INovelChapter chapter)
+        public INovelDocument GetChapter(Stream input, INovelChapter chapter)
         {
             input.Seek(Convert.ToInt64(chapter.Url), SeekOrigin.Begin);
             var content = ReadContent(input);
-            return content.Substring((int)chapter.Begin, (int)(chapter.End - chapter.Begin));
+            return new HtmlDocument(chapter.Title, content.Substring((int)chapter.Begin, (int)(chapter.End - chapter.Begin)));
         }
 
         public string Serialize(INovelChapter chapter)
