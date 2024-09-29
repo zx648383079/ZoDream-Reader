@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
@@ -19,24 +18,37 @@ namespace ZoDream.Shared.Plugins.Umd
         {
         }
 
-        public Task<INovelDocument> GetChapterAsync(string fileName, INovelChapter chapter)
+        public INovelSource CreateSource(INovelSourceEntity entry)
+        {
+            return new FileSource(entry);
+        }
+
+        public Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter)
         {
             return Task.Factory.StartNew(() => {
-                using var fs = File.OpenRead(fileName);
+                using var fs = File.OpenRead(((FileSource)source).FileName);
                 return GetChapter(fs, chapter);
             });
         }
 
-        public Task<List<INovelChapter>> GetChaptersAsync(string fileName)
+        public Task<INovelChapter[]> GetChaptersAsync(INovelSource source)
         {
             return Task.Factory.StartNew(() => {
-                using var fs = File.OpenRead(fileName);
+                using var fs = File.OpenRead(((FileSource)source).FileName);
                 var (_, items) = GetChapters(fs);
                 return items;
             });
         }
 
-        public (INovel?, List<INovelChapter>) GetChapters(Stream input)
+        public Task<(INovel?, INovelChapter[])> LoadAsync(INovelSource source)
+        {
+            return Task.Factory.StartNew(() => {
+                using var fs = File.OpenRead(((FileSource)source).FileName);
+                return GetChapters(fs);
+            });
+        }
+
+        public (INovel?, INovelChapter[]) GetChapters(Stream input)
         {
             var buffer = new byte[4];
             input.Read(buffer, 0, buffer.Length);
@@ -98,7 +110,7 @@ namespace ZoDream.Shared.Plugins.Umd
             }
             items[items.Count - 1].End = ReadContent(input).Length;
             novel.Cover = ReadCover(input);
-            return (novel, items);
+            return (novel, [..items]);
         }
 
         public INovelDocument GetChapter(Stream input, INovelChapter chapter)

@@ -16,6 +16,11 @@ namespace ZoDream.Shared.Interfaces
         public void TurnPrevious();
         public void TurnNext();
 
+        /// <summary>
+        /// 直接重新跟新内容
+        /// </summary>
+        public void Invalidate();
+
         public void OnDraw(ICanvasRender canvas);
     }
 }

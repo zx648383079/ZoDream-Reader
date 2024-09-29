@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Models;
@@ -66,7 +64,8 @@ namespace ZoDream.Reader.Pages
             ////ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
             //PageRender.Flush();
             //await PageRender.SwapToAsync(tokenizer.Page);
-            //loadingRing.IsActive = false;
+            await PageRender.ReloadAsync();
+            loadingRing.IsActive = false;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -136,11 +135,8 @@ namespace ZoDream.Reader.Pages
                 return;
             }
             MorePanel.Visibility = Visibility.Collapsed;
-            var chapter = ViewModel.ChapterItems[i];
-            ViewModel.ChapterTitle = chapter.Title;
-            //ViewModel.Tokenizer.SetPage(chapter);
-            //await PageRender.SwapToAsync(ViewModel.Tokenizer.Page);
-            // App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
+            ViewModel.GotoChapter(i);
+            await PageRender.ReloadAsync();
         }
 
         private void PageRender_PageChanged(object sender, int page, PositionItem pagePosition)

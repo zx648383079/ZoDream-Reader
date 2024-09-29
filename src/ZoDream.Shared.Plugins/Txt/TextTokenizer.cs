@@ -65,21 +65,32 @@ namespace ZoDream.Shared.Plugins.Txt
 
         private INovelPageLine? ParseLine(string content, ref int index, ICanvasTheme theme)
         {
-            if (index < content.Length)
+            if (index >= content.Length)
             {
                 return null;
             }
-            var line = new NovelPageLine();
+            var line = new NovelPageLine(theme);
             var maxW = theme.PageInnerWidth;
             var x = .0;
             while (index < content.Length)
             {
-                var (fontW, fontH) = theme.FontBound(content[index]);
+                var code = content[index];
+                if (code == 0x0 || code == '\r')
+                {
+                    index++;
+                    continue;
+                }
+                if (code == '\n')
+                {
+                    index++;
+                    break;
+                }
+                var (fontW, fontH) = theme.FontBound(code);
                 if (x + fontW > maxW)
                 {
                     break;
                 }
-                line.Add(new NovelPageChar(content[index].ToString())
+                line.Add(new NovelPageChar(code.ToString())
                 {
                     X = x,
                     Width = fontW,

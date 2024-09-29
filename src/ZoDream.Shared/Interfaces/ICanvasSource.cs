@@ -5,10 +5,21 @@ namespace ZoDream.Shared.Interfaces
 {
     public interface ICanvasSource
     {
-        public Task InvalidateAsync();
-
         public INovelPage? Current { get; }
-
+        /// <summary>
+        /// 更新了字体大小，页面尺寸修改要重新生成
+        /// </summary>
+        /// <returns></returns>
+        public Task InvalidateAsync();
+        /// <summary>
+        /// 下一页
+        /// </summary>
+        /// <returns></returns>
         public Task<bool> ReadNextAsync();
+        /// <summary>
+        /// 上一页
+        /// </summary>
+        /// <returns></returns>
+        public Task<bool> ReadPreviousAsync();
     }
 }

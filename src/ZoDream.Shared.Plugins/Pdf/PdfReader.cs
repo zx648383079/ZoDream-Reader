@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Pdf
 {
@@ -15,13 +16,22 @@ namespace ZoDream.Shared.Plugins.Pdf
             throw new NotImplementedException();
         }
 
+        public INovelSource CreateSource(INovelSourceEntity entry)
+        {
+            return new FileSource(entry);
+        }
 
-        public (INovel?, List<INovelChapter>) GetChapters(Stream input)
+        public Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<INovelChapter>> GetChaptersAsync(string fileName)
+        public Task<INovelChapter[]> GetChaptersAsync(INovelSource source)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<(INovel?, INovelChapter[])> LoadAsync(INovelSource source)
         {
             throw new NotImplementedException();
         }
@@ -32,16 +42,6 @@ namespace ZoDream.Shared.Plugins.Pdf
         }
 
         public INovelChapter UnSerialize(string data)
-        {
-            throw new NotImplementedException();
-        }
-
-        INovelDocument INovelReader.GetChapter(Stream input, INovelChapter chapter)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<INovelDocument> INovelReader.GetChapterAsync(string fileName, INovelChapter chapter)
         {
             throw new NotImplementedException();
         }

@@ -5,7 +5,7 @@ namespace ZoDream.Shared.Repositories.Entities
 {
     [TableName("books")]
     [PrimaryKey("Id", AutoIncrement = false)]
-    public class BookEntity : INovel, INovelSource
+    public class BookEntity : INovel, INovelSourceEntity
     {
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;

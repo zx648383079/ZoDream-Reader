@@ -18,6 +18,7 @@ using ZoDream.Shared.Plugins.Txt;
 using ZoDream.Shared.Plugins.Umd;
 using ZoDream.Shared.Repositories;
 using ZoDream.Shared.Repositories.Entities;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -234,8 +235,7 @@ namespace ZoDream.Reader.Repositories
                 src = CopyOrReplaceFile(src, BookFolder);
             }
             var reader = await GetReaderAsync(fileId, true);
-            using var fs = File.OpenRead(src);
-            var (novel, items) = reader.GetChapters(fs);
+            var (novel, items) = await reader.LoadAsync(new FileSource(src));
             novel ??= new BookEntity();
             novel.Id = fileId;
             novel.FileName = fileId;
@@ -303,11 +303,11 @@ namespace ZoDream.Reader.Repositories
         private static string CopyOrReplaceFile(string src, string folder)
         {
             var dist = Path.Combine(folder, Path.GetFileName(src));
-            if (File.Exists(dist))
-            {
-                return dist;
-            }
-            File.Copy(src, dist);
+            //if (File.Exists(dist))
+            //{
+            //    return dist;
+            //}
+            File.Copy(src, dist, true);
             return dist;
         }
     }

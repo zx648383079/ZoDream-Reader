@@ -8,13 +8,12 @@ namespace ZoDream.Shared.Interfaces
 {
     public interface INovelReader: IDisposable
     {
-        public Task<List<INovelChapter>> GetChaptersAsync(string fileName);
 
-        public Task<INovelDocument> GetChapterAsync(string fileName, INovelChapter chapter);
+        public INovelSource CreateSource(INovelSourceEntity entry);
+        public Task<(INovel?, INovelChapter[])> LoadAsync(INovelSource source);
+        public Task<INovelChapter[]> GetChaptersAsync(INovelSource source);
 
-        public (INovel?, List<INovelChapter>) GetChapters(Stream input);
-
-        public INovelDocument GetChapter(Stream input, INovelChapter chapter);
+        public Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter);
 
         public string Serialize(INovelChapter chapter);
         public INovelChapter UnSerialize(string data);

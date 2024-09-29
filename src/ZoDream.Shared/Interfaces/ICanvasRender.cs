@@ -25,6 +25,7 @@ namespace ZoDream.Shared.Interfaces
 
         public void Invalidate();
 
+        public void DrawLayer(ICanvasLayer layer);
 
         //public void SwapTo(IList<PageItem> pages, int page);
         ///// <summary>

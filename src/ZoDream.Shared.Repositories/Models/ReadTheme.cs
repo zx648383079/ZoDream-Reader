@@ -28,7 +28,7 @@ namespace ZoDream.Shared.Repositories.Models
         public int LineSpacing { get; set; }
         public int LetterSpacing { get; set; }
 
-        public int TitleFontSize { get; set; }
+        public int TitleFontSize { get; set; } = 25;
         public int TitleSpacing { get; set; }
 
         public int TitleAlign { get; set; }

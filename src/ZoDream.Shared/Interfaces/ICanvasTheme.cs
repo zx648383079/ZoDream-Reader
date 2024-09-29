@@ -17,7 +17,7 @@ namespace ZoDream.Shared.Interfaces
         /// 字体加粗，500 正常
         /// </summary>
         public int FontWeight { get; }
-
+        public bool FontItalic { get; }
         public bool Underline { get; }
         public int PaddingTop { get; }
         public int PaddingLeft { get; }

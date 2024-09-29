@@ -19,24 +19,37 @@ namespace ZoDream.Shared.Plugins.EPub
         {
         }
 
-        public Task<INovelDocument> GetChapterAsync(string fileName, INovelChapter chapter)
+        public INovelSource CreateSource(INovelSourceEntity entry)
+        {
+            return new FileSource(entry);
+        }
+
+        public Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter)
         {
             return Task.Factory.StartNew(() => {
-                using var fs = File.OpenRead(fileName);
+                using var fs = File.OpenRead(((FileSource)source).FileName);
                 return GetChapter(fs, chapter);
             });
         }
 
-        public Task<List<INovelChapter>> GetChaptersAsync(string fileName)
+        public Task<INovelChapter[]> GetChaptersAsync(INovelSource source)
         {
             return Task.Factory.StartNew(() => {
-                using var fs = File.OpenRead(fileName);
+                using var fs = File.OpenRead(((FileSource)source).FileName);
                 var (_, items) = GetChapters(fs);
                 return items;
             });
         }
 
-        public (INovel?, List<INovelChapter>) GetChapters(Stream input)
+        public Task<(INovel?, INovelChapter[])> LoadAsync(INovelSource source)
+        {
+            return Task.Factory.StartNew(() => {
+                using var fs = File.OpenRead(((FileSource)source).FileName);
+                return GetChapters(fs);
+            });
+        }
+
+        public (INovel?, INovelChapter[]) GetChapters(Stream input)
         {
             using var archive = new ZipArchive(input, ZipArchiveMode.Read);
             var rootFile = GetRootFileName(archive);
@@ -95,7 +108,7 @@ namespace ZoDream.Shared.Plugins.EPub
                     Url = folder + "/" + item.Element(ncxNamespace + "content").Attribute("src").Value
                 });
             }
-            return (novel, items);
+            return (novel, [..items]);
         }
 
         public INovelDocument GetChapter(Stream input, INovelChapter chapter)

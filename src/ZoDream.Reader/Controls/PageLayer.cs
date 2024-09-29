@@ -14,8 +14,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ZoDream.Shared.Database;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Interfaces.Tokenizers;
 using ZoDream.Shared.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ZoDream.Reader.Controls
 {
@@ -61,53 +64,48 @@ namespace ZoDream.Reader.Controls
 
         public int Page { get; set; }
 
-        //public IList<PageItem> Content
-        //{
-        //    get { return (IList<PageItem>)GetValue(ContentProperty); }
-        //    set { SetValue(ContentProperty, value); }
-        //}
-
-        // Using a DependencyProperty as the backing store for Content.  This enables animation, styling, binding, etc...
-        //public static readonly DependencyProperty ContentProperty =
-        //    DependencyProperty.Register("Content", typeof(IList<PageItem>), 
-        //        typeof(PageLayer), new PropertyMetadata(null, (d, e) =>
-        //        {
-        //            (d as PageLayer)?.InvalidateVisual();
-        //        }));
+        private INovelPage? _data;
 
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
             drawingContext.DrawRectangle(Background, new Pen(BorderBrush, BorderThickness.Top), new Rect(
                 0, 0, ActualWidth, ActualHeight));
-            //if (Content is null)
-            //{
-            //    return;
-            //}
-            //var font = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
-            //foreach (var page in Content)
-            //{
-            //    foreach (var item in page)
-            //    {
-            //        var format = new FormattedText(item.Code.ToString(), CultureInfo.CurrentCulture,
-            //            FlowDirection.LeftToRight, font, FontSize, Foreground, 1.25);
-            //        drawingContext.DrawText(format, new Point(item.X, item.Y));
-            //    }
-            //}
+            if (_data is null)
+            {
+                return;
+            }
+            var baseFont = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+            FormattedText formatted;
+            foreach (var page in _data)
+            {
+                var font = baseFont;
+                if (!string.IsNullOrWhiteSpace(page.FontFamily))
+                {
+                    font = new Typeface(FontFamily, 
+                        page.FontItalic ? FontStyles.Italic : FontStyle, 
+                        page.FontWeight <= 0 ? FontWeight : FontWeight.FromOpenTypeWeight(page.FontWeight),
+                        FontStretch);
+                }
+                var fontSize = page.FontSize > 0 ? page.FontSize : FontSize;
+                foreach (var item in page)
+                {
+                    if (item is INovelPageChar c)
+                    {
+                        formatted = new FormattedText(c.Text, CultureInfo.CurrentCulture,
+                        FlowDirection.LeftToRight, font, fontSize, Foreground, 1.25);
+                        drawingContext.DrawText(formatted, new Point(page.X + item.X, page.Y + item.Y));
+                    }
+                    if (item is INovelPageImage i)
+                    {
+                        drawingContext.DrawImage(
+                            new BitmapImage(new Uri(i.Source, UriKind.Absolute))
+                            , new Rect(page.X + item.X, page.Y + item.Y, item.Width, item.Height));
+                    }
+                }
+            }
         }
 
-        //public void Add(IEnumerable<CharItem> items)
-        //{
-        //    Add(new List<PageItem>
-        //    {
-        //        new PageItem() { Data = items.ToList() }
-        //    });
-        //}
-
-        //public void Add(IEnumerable<PageItem> items)
-        //{
-        //    Content = items.ToList();
-        //}
 
         public void Clear()
         {
@@ -134,6 +132,14 @@ namespace ZoDream.Reader.Controls
                 return;
             }
             Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public void DrawText(INovelPage data)
+        {
+            Canvas.SetLeft(this, data.X);
+            Canvas.SetTop(this, data.Y);
+            _data = data;
+            InvalidateVisual();
         }
 
         public void Dispose()

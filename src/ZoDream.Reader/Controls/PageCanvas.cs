@@ -79,7 +79,7 @@ namespace ZoDream.Reader.Controls
         {
             base.OnApplyTemplate();
             LayerPanel = GetTemplateChild(LayerPanelName) as Canvas;
-            InitLayer();
+            // InitLayer();
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -102,6 +102,7 @@ namespace ZoDream.Reader.Controls
             // Timer.Start();
             CompositionTarget.Rendering += CompositionTarget_Rendering;
             OnReady?.Invoke(this);
+            Animate.Ready(this);
         }
 
         private void CompositionTarget_Rendering(object? sender, EventArgs e)
@@ -118,54 +119,7 @@ namespace ZoDream.Reader.Controls
             //SwapFinished();
         }
 
-        private void SwapFinished()
-        {
-            SwapTween = null;
-            OnSwapFinished?.Invoke();
-            //var layer = LayerItems[1] as PageLayer;
-            //layer.Background = ColorHelper.ColorToBrush("red");
-            //layer.Foreground = ColorHelper.ColorToBrush("#fff");
-        }
 
-
-        /// <summary>
-        /// 使用过渡动画切换到新的页面，下一页
-        /// </summary>
-        /// <param name="pages"></param>
-        //public void SwapTo(IList<PageItem> pages)
-        //{
-        //    SwapTo(pages, 0);
-        //}
-
-
-        //public void SwapTo(IList<PageItem> pages, int page)
-        //{
-        //    SetPage(0, 1);
-        //    SetPage(1, page, pages);
-        //    SwapAnimate(true, () =>
-        //    {
-        //        CurrentPage = page;
-        //        PageChanged?.Invoke(this, page, pages[0].Begin);
-        //    });
-        //}
-
-        public async Task SwapToAsync(int page)
-        {
-            //if (Source == null || !Source.Enable(page))
-            //{
-            //    return;
-            //}
-            //SwapTo(await Source.GetAsync(page), page);
-        }
-
-        /// <summary>
-        /// 使用过渡动画切换回新的页面，上一页
-        /// </summary>
-        /// <param name="pages"></param>
-        //public void SwapFrom(IList<PageItem> pages)
-        //{
-        //    SwapFrom(pages, 0);
-        //}
 
         #region 设置layer的数据
         //private void SetPage(ICanvasLayer dist, ICanvasLayer source)
@@ -207,24 +161,6 @@ namespace ZoDream.Reader.Controls
         //}
         #endregion
 
-        //public void SwapFrom(IList<PageItem> pages, int page)
-        //{
-        //    SetPage(2, 1);
-        //    SetPage(1, page, pages);
-        //    SwapAnimate(false, () =>
-        //    {
-        //        CurrentPage = page;
-        //        PageChanged?.Invoke(this, page, pages[0].Begin);
-        //    });
-        //}
-        public async Task SwapFromAsync(int page)
-        {
-            //if (Source == null || !Source.Enable(page))
-            //{
-            //    return;
-            //}
-            //SwapFrom(await Source.GetAsync(page), page);
-        }
 
         private void SwapAnimate(bool toNext, Action finished)
         {
@@ -232,16 +168,6 @@ namespace ZoDream.Reader.Controls
             SwapTween = new Tween<double>(.0, toNext ? 100 : -100, 500, Tween<double>.EaseIn);
         }
 
-
-        public async Task SwapNextAsync()
-        {
-            await SwapToAsync(CurrentPage + 1);
-        }
-
-        public async Task SwapPreviousAsync()
-        {
-            await SwapFromAsync(CurrentPage - 1);
-        }
 
         public void Flush()
         {
@@ -278,11 +204,11 @@ namespace ZoDream.Reader.Controls
                 // TODO 点击
                 if (p.X < ActualWidth / 3)
                 {
-                    _ = SwapPreviousAsync();
+                    Animate.TurnPrevious();
                 }
                 else if (p.X > ActualWidth * .7)
                 {
-                    _ = SwapNextAsync();
+                    Animate.TurnNext();
                 }
                 return;
             }
@@ -307,12 +233,12 @@ namespace ZoDream.Reader.Controls
             base.OnKeyDown(e);
             if (e.Key == Key.Right || e.Key == Key.PageDown)
             {
-                _ = SwapNextAsync();
+                Animate.TurnNext();
                 return;
             }
             if (e.Key == Key.Left || e.Key == Key.PageUp)
             {
-                _ = SwapPreviousAsync();
+                Animate.TurnPrevious();
                 return;
             }
         }
@@ -381,19 +307,42 @@ namespace ZoDream.Reader.Controls
 
         public ICanvasLayer CreateLayer(double width, double height)
         {
-            var layer = new PageLayer
+            return new PageLayer
             {
                 Width = width,
                 Height = height
             };
-            LayerItems.Add(layer);
-            LayerPanel?.Children.Add(layer);
-            return layer;
         }
 
         public void Invalidate()
         {
+            Animate.Invalidate();
             Animate.OnDraw(this);
+        }
+
+        public void DrawLayer(ICanvasLayer layer)
+        {
+            if (layer is null)
+            {
+                return;
+            }
+            var l = (FrameworkElement)layer;
+            Canvas.SetZIndex(l, 1);
+            if (LayerPanel!.Children.Contains(l))
+            {
+                return;
+            }
+            LayerPanel.Children.Add(l);
+        }
+
+        public async Task ReloadAsync()
+        {
+            if (Source is null)
+            {
+                return;
+            }
+            await Source.InvalidateAsync();
+            Invalidate();
         }
     }
 }

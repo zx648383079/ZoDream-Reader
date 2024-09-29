@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Script;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Net
 {
@@ -16,26 +17,31 @@ namespace ZoDream.Shared.Plugins.Net
             throw new NotImplementedException();
         }
 
+        public INovelSource CreateSource(INovelSourceEntity entry)
+        {
+            return new NetSource(entry);
+        }
+
         public INovelDocument GetChapter(Stream input, INovelChapter chapter)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<INovelDocument> GetChapterAsync(string fileName, INovelChapter chapter)
+        public async Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter)
         {
             var inter = new Interpreter();
             return await Task.FromResult(inter.Execute<INovelDocument>("", new NetSpider()));
         }
 
-        public (INovel?, List<INovelChapter>) GetChapters(Stream input)
+        public Task<(INovel?, INovelChapter[])> LoadAsync(INovelSource source)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<List<INovelChapter>> GetChaptersAsync(string fileName)
+        public async Task<INovelChapter[]> GetChaptersAsync(INovelSource source)
         {
             var inter = new Interpreter();
-            return await Task.FromResult(inter.Execute<List<INovelChapter>>("", new NetSpider()));
+            return await Task.FromResult(inter.Execute<INovelChapter[]>("", new NetSpider()));
         }
 
         public async Task<string> GetChapterAsync(ISourceRule rule,

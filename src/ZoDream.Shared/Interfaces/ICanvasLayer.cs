@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ZoDream.Shared.Models;
+using ZoDream.Shared.Interfaces.Tokenizers;
 
 namespace ZoDream.Shared.Interfaces
 {
@@ -13,12 +11,7 @@ namespace ZoDream.Shared.Interfaces
         public double ActualWidth { get; }
         public double ActualHeight { get; }
 
-        //public IList<PageItem> Content { get; set; }
         public int Page { get; set; }
-
-        //public void Add(IEnumerable<CharItem> items);
-
-        //public void Add(IEnumerable<PageItem> items);
 
         public bool IsVisible { get; }
 
@@ -30,5 +23,7 @@ namespace ZoDream.Shared.Interfaces
 
         public void Toggle(bool visible);
 
+
+        public void DrawText(INovelPage data);
     }
 }

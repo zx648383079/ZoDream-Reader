@@ -40,5 +40,9 @@ namespace ZoDream.Shared.Animations
         {
             
         }
+
+        public override void Invalidate()
+        {
+        }
     }
 }

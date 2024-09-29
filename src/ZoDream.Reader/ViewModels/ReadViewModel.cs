@@ -8,6 +8,7 @@ using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Interfaces.Tokenizers;
 using ZoDream.Shared.Models;
+using ZoDream.Shared.Plugins;
 using ZoDream.Shared.Plugins.EPub;
 using ZoDream.Shared.Plugins.Net;
 using ZoDream.Shared.Plugins.Txt;
@@ -26,6 +27,8 @@ namespace ZoDream.Reader.ViewModels
 
         private readonly AppViewModel _app;
         private BookEntity _novel;
+        private INovelSource? _source;
+        private INovelReader? _reader;
 
         private string chapterTitle = string.Empty;
 
@@ -57,7 +60,7 @@ namespace ZoDream.Reader.ViewModels
                 return _novel.CurrentChapterOffset / 10000;
             }
             set {
-                _novel.CurrentChapterIndex = (int)(value * 10000);
+                _novel.CurrentChapterOffset = (int)(value * 10000);
             }
         }
 
@@ -68,26 +71,14 @@ namespace ZoDream.Reader.ViewModels
         public double Height { get; internal set; }
 
 
-        public async Task<INovelReader> GetReaderAsync()
+        public Task<INovelReader> GetReaderAsync()
         {
-            switch (_novel.Type)
-            {
-                case 2:
-                    return new NetReader();
-                case 1:
-                    return new EPubReader();
-                default:
-                    return new TxtReader();
-            }
+            return Task.FromResult(_reader ??= ReaderFactory.GetReader(_novel));
         }
 
-        public async Task<IPageTokenizer> GetTokenizerAsync(INovelDocument document)
+        public Task<IPageTokenizer> GetTokenizerAsync(INovelDocument document)
         {
-            if (document is HtmlDocument)
-            {
-                return new HtmlTokenizer();
-            }
-            return new TextTokenizer();
+            return Task.FromResult(ReaderFactory.GetTokenizer(document));
         }
 
         public async Task<IList<INovelPage>> PageParseAsync(INovelDocument document)
@@ -96,15 +87,25 @@ namespace ZoDream.Reader.ViewModels
             return tokenizer.Parse(document, _app.ReadTheme, this);
         }
 
-        public Task<IList<INovelChapter>> LoadChaptersAsync()
+        public Task<INovelChapter[]> LoadChaptersAsync()
         {
-            return Task.FromResult(ChapterItems as IList<INovelChapter>);
+            return Task.FromResult(ChapterItems.Select(i => (INovelChapter)i).ToArray());
         }
 
         public async Task<INovelDocument> GetChapterAsync(int chapterId)
         {
+            
             var reader = await GetReaderAsync();
-            return await reader.GetChapterAsync(_novel.FileName, ChapterItems.Where(i => i.Id == chapterId).First());
+            if (_source is null)
+            {
+                _source = reader.CreateSource(_novel);
+                if (_source is FileSource s)
+                {
+                    s.FileName = await _app.Storage.GetBookPathAsync(_novel);
+                }
+            }
+            return await reader.GetChapterAsync(_source, 
+                ChapterItems.Where(i => i.Id == chapterId).First());
         }
 
         public Task<IReadTheme> GetReadThemeAsync()
@@ -129,5 +130,12 @@ namespace ZoDream.Reader.ViewModels
             ChapterTitle = ChapterItems[_novel.CurrentChapterIndex].Title;
         }
 
+        public void GotoChapter(int index)
+        {
+            var chapter = ChapterItems[index];
+            ChapterTitle = chapter.Title;
+            ChapterIndex = index;
+            ChapterProgresss = 0;
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace ZoDream.Shared.Interfaces.Entities
 {
-    public interface INovelSource
+    public interface INovelSourceEntity
     {
         public int Type { get; }
 

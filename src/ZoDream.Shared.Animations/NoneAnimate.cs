@@ -4,13 +4,24 @@ namespace ZoDream.Shared.Animations
 {
     public class NoneAnimate : BaseCanvasAnimate
     {
-        public override void Dispose()
+
+        private ICanvasLayer? _layer;
+
+        protected override void OnResize()
         {
+            var page = Canvas?.Source?.Current;
+            if (page is null)
+            {
+                return;
+            }
+            _layer = Canvas?.CreateLayer(Width, Height);
+            _layer?.DrawText(page);
         }
 
         public override void OnDraw(ICanvasRender canvas)
         {
-
+            base.OnDraw(canvas);
+            canvas.DrawLayer(_layer!);
         }
 
         public override void OnTouchFinish(double x, double y)
@@ -30,14 +41,35 @@ namespace ZoDream.Shared.Animations
 
         public override void TurnNext()
         {
-
+            var res = Canvas?.Source?.ReadNextAsync().GetAwaiter().GetResult();
+            if (res != true)
+            {
+                return;
+            }
+            Invalidate();
         }
 
         public override void TurnPrevious()
         {
-
+            var res = Canvas?.Source?.ReadPreviousAsync().GetAwaiter().GetResult();
+            if (res != true)
+            {
+                return;
+            }
+            Invalidate();
         }
 
+        public override void Invalidate()
+        {
+            if (_layer is null)
+            {
+                return;
+            }
+            _layer!.DrawText(Canvas!.Source!.Current!);
+        }
 
+        public override void Dispose()
+        {
+        }
     }
 }

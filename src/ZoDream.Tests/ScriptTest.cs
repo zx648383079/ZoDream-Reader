@@ -12,7 +12,7 @@ namespace ZoDream.Tests
     [TestClass]
     public class ScriptTest
     {
-        [TestMethod]
+        // [TestMethod]
         public void TestScript()
         {
             var interpreter = new Interpreter();

@@ -1,12 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Tokenizers;
 
 namespace ZoDream.Shared.Tokenizers
 {
     public class NovelPageLine: List<INovelPageLinePart>, INovelPageLine
     {
+        public NovelPageLine()
+        {
+        }
+
+        public NovelPageLine(ICanvasTheme theme)
+        {
+            FontSize = theme.FontSize;
+            FontFamily = theme.FontFamily;
+            FontWeight = theme.FontWeight;
+            FontItalic = theme.FontItalic;
+        }
+
         public double X { get; set; }
         public double Y { get; set; }
 

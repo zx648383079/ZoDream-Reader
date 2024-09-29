@@ -17,7 +17,7 @@ namespace ZoDream.Shared.Interfaces
 
         public Task<IPageTokenizer> GetTokenizerAsync(INovelDocument document);
         public Task<IList<INovelPage>> PageParseAsync(INovelDocument document);
-        public Task<IList<INovelChapter>> LoadChaptersAsync();
+        public Task<INovelChapter[]> LoadChaptersAsync();
 
         public Task<INovelDocument> GetChapterAsync(int chapterId);
 
