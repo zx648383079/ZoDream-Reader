@@ -71,6 +71,7 @@ namespace ZoDream.Reader.Pages
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             //ViewModel.Tokenizer.Dispose();
+            _ = ViewModel.SaveAsync();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -100,11 +101,10 @@ namespace ZoDream.Reader.Pages
 
         private async Task ApplyOpitonAsync()
         {
-            var setting = OptionPanel.ViewModel.Option;
             if (OptionPanel.IsOptionChanged)
             {
-                //_ = App.ViewModel.DatabaseRepository.SaveSettingAsync(setting);
-                //App.ViewModel.Setting = setting;
+                await OptionPanel.ViewModel.SaveAsync();
+                await PageRender.ReloadAsync();
             }
             //var tokenizer = ViewModel.Tokenizer;
             //if (OptionPanel.IsSizeChanged)
@@ -125,6 +125,7 @@ namespace ZoDream.Reader.Pages
             {
                 // PageRender.Setting = setting;
             }
+            
         }
 
         private async void ChapterListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)

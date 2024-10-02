@@ -23,6 +23,7 @@ using ZoDream.Shared.Plugins.Umd;
 using ZoDream.Shared.Plugins.Pdf;
 using ZoDream.Shared.Plugins.Txt;
 using ZoDream.Reader.ViewModels;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.Repositories
 {
@@ -158,13 +159,13 @@ namespace ZoDream.Reader.Repositories
                 src = await CopyOrReplaceFileAsync(src, BookFolder);
             }
             var reader = await GetReaderAsync(src.Name, true);
-            var (novel, items) = reader.GetChapters(await src.OpenStreamForReadAsync());
+            var (novel, items) = await reader.LoadAsync(new FileSource(src.Path));
             novel ??= new BookEntity();
             novel.Id = fileId;
             novel.FileName = fileId;
             if (string.IsNullOrWhiteSpace(novel.Name))
             {
-                novel.Name = name;
+                new TxtReader().Decode(name, novel);
             }
             var service = App.GetService<AppViewModel>().Database;
             await service.SaveBookAsync(novel);

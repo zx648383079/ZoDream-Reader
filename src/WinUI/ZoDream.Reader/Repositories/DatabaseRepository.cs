@@ -542,7 +542,7 @@ namespace ZoDream.Reader.Repositories
             await App.GetService<AppViewModel>().Storage.AddImageAsync(key, value);
         }
 
-        public async Task<INovelReader> GetReaderAsync(INovelSource novel)
+        public async Task<INovelReader> GetReaderAsync(INovelSourceEntity novel)
         {
             var type = (NovelSourceType)novel.Type;
             if (type == NovelSourceType.Network)
@@ -558,13 +558,5 @@ namespace ZoDream.Reader.Repositories
             };
         }
 
-        public async Task<IPageTokenizer> GetTokenizerAsync(INovelDocument content)
-        {
-            if (content is HtmlDocument)
-            {
-                return new HtmlTokenizer();
-            }
-            return new TextTokenizer();
-        }
     }
 }

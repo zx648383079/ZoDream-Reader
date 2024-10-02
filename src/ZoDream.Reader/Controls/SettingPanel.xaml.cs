@@ -24,7 +24,6 @@ namespace ZoDream.Reader.Controls
         public SettingPanel()
         {
             InitializeComponent();
-            DataContext = ViewModel;
             ViewModel.PropertyChanged += (_, e) =>
             {
                 IsOptionChanged = true;
@@ -47,7 +46,7 @@ namespace ZoDream.Reader.Controls
             };
         }
 
-        public SettingViewModel ViewModel = new();
+        public SettingViewModel ViewModel => (SettingViewModel)DataContext;
 
         public bool IsSizeChanged { get; private set; } = false;
         public bool IsLayerChanged { get; private set; } = false;

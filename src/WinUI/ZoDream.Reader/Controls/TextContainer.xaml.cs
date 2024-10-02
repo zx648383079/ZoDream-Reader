@@ -110,5 +110,10 @@ namespace ZoDream.Reader.Controls
         {
             throw new System.NotImplementedException();
         }
+
+        public void DrawLayer(ICanvasLayer layer)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

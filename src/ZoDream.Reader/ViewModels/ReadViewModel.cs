@@ -15,6 +15,7 @@ using ZoDream.Shared.Plugins.Txt;
 using ZoDream.Shared.Renders;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Tokenizers;
+using ZoDream.Shared.Utils;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -52,6 +53,7 @@ namespace ZoDream.Reader.ViewModels
             }
             set {
                 _novel.CurrentChapterIndex = value;
+                ChapterTitle = ChapterItems[value].Title;
             } 
         }
 
@@ -136,6 +138,13 @@ namespace ZoDream.Reader.ViewModels
             ChapterTitle = chapter.Title;
             ChapterIndex = index;
             ChapterProgresss = 0;
+        }
+
+        public async Task SaveAsync()
+        {
+            _novel.CurrentChapterAt = Time.TimestampFrom(DateTime.Now);
+            _novel.CurrentChapterTitle = ChapterTitle;
+            await _app.Database.SaveBookAsync(_novel);
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ZoDream.Shared.Interfaces.Entities
+﻿namespace ZoDream.Shared.Interfaces.Entities
 {
     public interface IReadTheme
     {
