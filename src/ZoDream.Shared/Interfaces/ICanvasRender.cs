@@ -19,12 +19,15 @@ namespace ZoDream.Shared.Interfaces
         /// </summary>
         public event CanvasReadyEventHandler? OnReady;
 
-        public void SetAnimate(ICanvasAnimate animate);
-
         public ICanvasLayer CreateLayer(double width, double height);
-
+        /// <summary>
+        /// 刷新重绘画板内容
+        /// </summary>
         public void Invalidate();
-
+        /// <summary>
+        /// 画一层
+        /// </summary>
+        /// <param name="layer"></param>
         public void DrawLayer(ICanvasLayer layer);
 
         //public void SwapTo(IList<PageItem> pages, int page);

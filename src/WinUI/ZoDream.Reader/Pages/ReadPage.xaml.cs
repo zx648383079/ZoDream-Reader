@@ -39,5 +39,11 @@ namespace ZoDream.Reader.Pages
                 ViewModel.ApplyQueryAttributes(o);
             }
         }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            _ = ViewModel.SaveAsync();
+        }
     }
 }

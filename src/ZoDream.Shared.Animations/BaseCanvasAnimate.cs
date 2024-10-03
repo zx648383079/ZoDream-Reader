@@ -17,6 +17,8 @@ namespace ZoDream.Shared.Animations
 
         public virtual void Ready(ICanvasRender canvas)
         {
+            Width = 0;
+            Height = 0;
             Canvas = canvas;
             Resize(canvas.ActualWidth, canvas.ActualHeight);
         }
@@ -50,12 +52,14 @@ namespace ZoDream.Shared.Animations
             LastY = y;
             IsMoving = false;
         }
+
         public virtual void OnTouchMove(double x, double y)
         {
             LastX = x;
             LastY = y;
             IsMoving = true;
         }
+
         public virtual void OnTouchStart(double x, double y)
         {
             LastX = BeginX = x;
@@ -63,6 +67,7 @@ namespace ZoDream.Shared.Animations
             DirectNext = null;
             IsMoving = false;
         }
+
         public abstract void TurnNext();
         public abstract void TurnPrevious();
 

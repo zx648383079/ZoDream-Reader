@@ -142,6 +142,10 @@ namespace ZoDream.Reader.Repositories
 
         public Task<T?> GetThemeAsync<T>(int id) where T : IAppTheme
         {
+            if (id <= 0)
+            {
+                return Task.FromResult(default(T));
+            }
             return Task.FromResult(_connection.Build<T>().From<AppThemeEntity>().Where("Id", id).First());
         }
 
@@ -167,6 +171,10 @@ namespace ZoDream.Reader.Repositories
 
         public Task<T?> GetReadThemeAsync<T>(int id) where T : IReadTheme
         {
+            if (id <= 0)
+            {
+                return Task.FromResult(default(T));
+            }
             return Task.FromResult(_connection.Build<T>().From<ReadThemeEntity>().Where("Id", id).First());
         }
 

@@ -17,9 +17,11 @@ using WinRT.Interop;
 using ZoDream.Reader.Dialogs;
 using ZoDream.Reader.Repositories;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Models;
 using ZoDream.Shared.Repositories;
+using ZoDream.Shared.Repositories.Models;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -60,6 +62,9 @@ namespace ZoDream.Reader.ViewModels
 
         public IAppOption Option { get; private set; } = new AppOption();
 
+        public IAppTheme Theme { get; private set; }
+
+        public IReadTheme ReadTheme { get; private set; }
 
         public bool IsFirstLaunchEver => !_setting.Exist(SettingNames.AppInstalled);
 
@@ -141,12 +146,20 @@ namespace ZoDream.Reader.ViewModels
             Storage = new DiskRepository(folder);
             Database = createNew ? await Storage.CreateDatabaseAsync() : 
                 await Storage.OpenDatabaseAsync();
-            Option = await Database.LoadSettingAsync();
+            await LoadThemeAsync();
         }
 
         internal async Task InitializeWorkspaceAsync()
         {
             Database = await Storage.CreateDatabaseAsync();
+            await LoadThemeAsync();
+        }
+
+        private async Task LoadThemeAsync()
+        {
+            Option = await Database.LoadSettingAsync();
+            Theme = await Database.GetThemeAsync<AppThemeModel>(Option.AppTheme) ?? new AppThemeModel();
+            ReadTheme = await Database.GetReadThemeAsync<ReadThemeModel>(Option.ReadTheme) ?? new ReadThemeModel();
         }
     }
 }

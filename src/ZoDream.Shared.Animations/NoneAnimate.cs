@@ -26,17 +26,30 @@ namespace ZoDream.Shared.Animations
 
         public override void OnTouchFinish(double x, double y)
         {
-
+            base.OnTouchFinish(x, y);
+            if (!IsMoving)
+            {
+                if (x < Width / 3)
+                {
+                    TurnPrevious();
+                }
+                else if (x > Width * .7)
+                {
+                    TurnNext();
+                }
+                return;
+            }
         }
 
         public override void OnTouchMove(double x, double y)
         {
-
+            DirectNext = x > LastX;
+            base.OnTouchMove(x, y);
         }
 
         public override void OnTouchStart(double x, double y)
         {
-
+            base.OnTouchStart(x, y);
         }
 
         public override void TurnNext()
@@ -66,6 +79,7 @@ namespace ZoDream.Shared.Animations
                 return;
             }
             _layer!.DrawText(Canvas!.Source!.Current!);
+            Canvas.Invalidate();
         }
 
         public override void Dispose()

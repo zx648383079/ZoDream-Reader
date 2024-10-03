@@ -25,8 +25,15 @@ namespace ZoDream.Reader.Utils
                     var bi = new BitmapImage();
                     using var stream = new InMemoryRandomAccessStream();
                     stream.WriteAsync(Convert.FromBase64String(imageUrl).AsBuffer()).GetAwaiter().GetResult();
-                    bi.SetSourceAsync(stream).GetAwaiter().GetResult();
-                    return bi;
+                    try
+                    {
+                        bi.SetSourceAsync(stream).GetAwaiter().GetResult();
+                        return bi;
+                    }
+                    catch (Exception)
+                    {
+                        imageUrl = RandomCover();
+                    }
                 }
                 imageUrl = string.Concat("ms-appx:///", imageUrl);
             }

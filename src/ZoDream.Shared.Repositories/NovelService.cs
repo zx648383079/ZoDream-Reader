@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
@@ -23,6 +22,15 @@ namespace ZoDream.Shared.Repositories
         public bool IsLoading { get; private set; }
 
         public INovelPage? Current => _pageIndex >= 0 && _pageIndex < _cachePages.Count ? _cachePages[_pageIndex] : null;
+
+        public ICanvasAnimate Animator => environment.Animator;
+
+        public async Task ReadyAsync(ICanvasRender render)
+        {
+            await environment.ReadyAsync(render);
+            await InvalidateAsync();
+            render.Invalidate();
+        }
 
         public async Task InvalidateAsync()
         {

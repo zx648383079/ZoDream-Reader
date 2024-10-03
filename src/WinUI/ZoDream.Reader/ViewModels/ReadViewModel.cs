@@ -8,14 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ZoDream.Reader.Dialogs;
+using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Interfaces.Route;
+using ZoDream.Shared.Repositories;
 using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Repositories.Extensions;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ReadViewModel: ObservableObject, IQueryAttributable
+    public partial class ReadViewModel: ObservableObject, IQueryAttributable
     {
 
         public ReadViewModel()
@@ -25,14 +27,32 @@ namespace ZoDream.Reader.ViewModels
             NextCommand = new RelayCommand(TapNext);
             SourceCommand = new RelayCommand(TapSource);
             SettingCommand = new RelayCommand(TapSetting);
+            SourceService = new NovelService(this);
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
-        private ObservableCollection<ChapterModel> item = [];
 
-        public ObservableCollection<ChapterModel> Items {
-            get => item;
-            set => SetProperty(ref item, value);
+        private ICanvasSource _sourceService;
+
+        public ICanvasSource SourceService {
+            get => _sourceService;
+            set => SetProperty(ref _sourceService, value);
+        }
+
+
+
+        private string chapterTitle = string.Empty;
+
+        public string ChapterTitle {
+            get => chapterTitle;
+            set => SetProperty(ref chapterTitle, value);
+        }
+
+        private ObservableCollection<ChapterModel> _chapterItems = [];
+
+        public ObservableCollection<ChapterModel> ChapterItems {
+            get => _chapterItems;
+            set => SetProperty(ref _chapterItems, value);
         }
 
         private bool catalogOpen;
@@ -55,7 +75,7 @@ namespace ZoDream.Reader.ViewModels
 
         private void TapPrevious()
         {
-
+            
         }
         private void TapNext()
         {
@@ -68,6 +88,7 @@ namespace ZoDream.Reader.ViewModels
             var dialog = new SearchSourceDialog();
             await app.OpenDialogAsync(dialog);
         }
+
         private void TapSetting()
         {
 
@@ -83,13 +104,15 @@ namespace ZoDream.Reader.ViewModels
 
         public async Task LoadAsync(INovel arg)
         {
-            var book = GetBookAsync(arg);
+            var book = await GetBookAsync(arg);
             if (book == null)
             {
                 return;
             }
+            _novel = book;
             var data = await _app.Database.GetChapterAsync<ChapterModel>(arg.Id);
-            data.ToCollection(Items);
+            data.ToCollection(ChapterItems);
+            ChapterTitle = ChapterItems[_novel.CurrentChapterIndex].Title;
         }
 
         private async Task<BookEntity?> GetBookAsync(INovel arg)

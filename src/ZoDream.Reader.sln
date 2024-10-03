@@ -9,10 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Tests", "ZoDream.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Shared", "ZoDream.Shared\ZoDream.Shared.csproj", "{8EF038F2-3365-486C-A33D-A276BA6B039B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UWP", "UWP", "{239C273F-7D2A-4586-A0D7-A5D1528156DC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoDream.Reader", "UWP\ZoDream.Reader\ZoDream.Reader.csproj", "{15F0607C-43A5-4D6A-9513-07A1B610A4A7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Shared.Controls", "..\shared\ZoDream.Shared.Controls\ZoDream.Shared.Controls.csproj", "{5D78A002-F73E-46EC-A2F3-D68CB857F37C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WinUI", "WinUI", "{32413EC9-CCB5-4247-A842-E13F08FF6BEB}"
@@ -33,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Shared.Animations",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Shared.Script", "ZoDream.Shared.Script\ZoDream.Shared.Script.csproj", "{CEBC45CA-18B7-4822-9EBD-24220F758D50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoDream.Shared.Database", "ZoDream.Shared.Database\ZoDream.Shared.Database.csproj", "{777260E1-BB1F-4393-AB5A-3C615792E620}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoDream.Shared.Database", "ZoDream.Shared.Database\ZoDream.Shared.Database.csproj", "{777260E1-BB1F-4393-AB5A-3C615792E620}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,32 +105,6 @@ Global
 		{8EF038F2-3365-486C-A33D-A276BA6B039B}.Release|x64.Build.0 = Release|Any CPU
 		{8EF038F2-3365-486C-A33D-A276BA6B039B}.Release|x86.ActiveCfg = Release|Any CPU
 		{8EF038F2-3365-486C-A33D-A276BA6B039B}.Release|x86.Build.0 = Release|Any CPU
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|ARM.ActiveCfg = Debug|ARM
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|ARM.Build.0 = Debug|ARM
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|ARM.Deploy.0 = Debug|ARM
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|ARM64.Build.0 = Debug|ARM64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|ARM64.Deploy.0 = Debug|ARM64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|x64.ActiveCfg = Debug|x64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|x64.Build.0 = Debug|x64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|x64.Deploy.0 = Debug|x64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|x86.ActiveCfg = Debug|x86
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|x86.Build.0 = Debug|x86
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Debug|x86.Deploy.0 = Debug|x86
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|Any CPU.ActiveCfg = Release|x86
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|ARM.ActiveCfg = Release|ARM
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|ARM.Build.0 = Release|ARM
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|ARM.Deploy.0 = Release|ARM
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|ARM64.ActiveCfg = Release|ARM64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|ARM64.Build.0 = Release|ARM64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|ARM64.Deploy.0 = Release|ARM64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|x64.ActiveCfg = Release|x64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|x64.Build.0 = Release|x64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|x64.Deploy.0 = Release|x64
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|x86.ActiveCfg = Release|x86
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|x86.Build.0 = Release|x86
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7}.Release|x86.Deploy.0 = Release|x86
 		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D78A002-F73E-46EC-A2F3-D68CB857F37C}.Debug|ARM.ActiveCfg = Debug|Any CPU
@@ -350,7 +320,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{15F0607C-43A5-4D6A-9513-07A1B610A4A7} = {239C273F-7D2A-4586-A0D7-A5D1528156DC}
 		{02952287-F945-40E6-8E7C-5E62BEAA7AE7} = {32413EC9-CCB5-4247-A842-E13F08FF6BEB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

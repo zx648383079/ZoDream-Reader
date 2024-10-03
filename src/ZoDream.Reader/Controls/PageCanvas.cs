@@ -59,17 +59,16 @@ namespace ZoDream.Reader.Controls
         }
 
         private Canvas? LayerPanel;
-        private Point LastMousePoint = new();
-        private int CurrentPage = -1;
-        private Action? OnSwapFinished;
-        /// <summary>
-        /// 翻页动画方向
-        /// </summary>
-        private ICanvasAnimate Animate = new NoneAnimate();
-        private Tween<double>? SwapTween;
-        private bool IsTouchMove = false;
         private readonly List<ICanvasLayer> LayerItems = [];
-        public ICanvasSource? Source { get; set; }
+        public ICanvasSource Source {
+            get { return (ICanvasSource)GetValue(SourceProperty); }
+            set { SetValue(SourceProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SourceProperty =
+            DependencyProperty.Register("Source", typeof(ICanvasSource), typeof(PageCanvas), new PropertyMetadata(null));
+
 
         public event PageChangedEventHandler? PageChanged;
         public event CanvasReadyEventHandler? OnReady;
@@ -85,7 +84,7 @@ namespace ZoDream.Reader.Controls
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
-            Animate.Resize(ActualWidth, ActualHeight);
+            Source!.ReadyAsync(this);
             foreach (var item in LayerItems)
             {
                 item.Resize(0, 0, ActualWidth, ActualHeight);
@@ -94,31 +93,13 @@ namespace ZoDream.Reader.Controls
 
         private void PageCanvas_Unloaded(object sender, RoutedEventArgs e)
         {
-            CompositionTarget.Rendering -= CompositionTarget_Rendering;
         }
 
         private void PageCanvas_Loaded(object sender, RoutedEventArgs e)
         {
-            // Timer.Start();
-            CompositionTarget.Rendering += CompositionTarget_Rendering;
             OnReady?.Invoke(this);
-            Animate.Ready(this);
+            Source?.ReadyAsync(this);
         }
-
-        private void CompositionTarget_Rendering(object? sender, EventArgs e)
-        {
-            if (SwapTween == null)
-            {
-                return;
-            }
-            //var isEnd = Animate.Animate(LayerItems, SwapTween.Get(), false);
-            //if (!isEnd)
-            //{
-            //    return;
-            //}
-            //SwapFinished();
-        }
-
 
 
         #region 设置layer的数据
@@ -162,12 +143,6 @@ namespace ZoDream.Reader.Controls
         #endregion
 
 
-        private void SwapAnimate(bool toNext, Action finished)
-        {
-            OnSwapFinished = finished;
-            SwapTween = new Tween<double>(.0, toNext ? 100 : -100, 500, Tween<double>.EaseIn);
-        }
-
 
         public void Flush()
         {
@@ -177,9 +152,8 @@ namespace ZoDream.Reader.Controls
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
-            IsTouchMove = false;
-            LastMousePoint = e.GetPosition(this);
-            Animate.OnTouchStart(LastMousePoint.X, LastMousePoint.Y);
+            var p = e.GetPosition(this);
+            Source.Animator.OnTouchStart(p.X, p.Y);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -189,42 +163,15 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
-            IsTouchMove = true;
             var p = e.GetPosition(this);
-            Animate.OnTouchMove(p.X, p.Y);
-            // Animate.Animate(LayerItems, offset, true);
+            Source.Animator.OnTouchMove(p.X, p.Y);
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             base.OnMouseUp(e);
             var p = e.GetPosition(this);
-            if (!IsTouchMove)
-            {
-                // TODO 点击
-                if (p.X < ActualWidth / 3)
-                {
-                    Animate.TurnPrevious();
-                }
-                else if (p.X > ActualWidth * .7)
-                {
-                    Animate.TurnNext();
-                }
-                return;
-            }
-            Animate.OnTouchMove(p.X, p.Y);
-            //if (Math.Abs(offset) < 30)
-            //{
-            //    SwapTween = new Tween<double>(offset, 0, 300, Tween<double>.EaseIn);
-            //    return;
-            //}
-            //if (offset > 0)
-            //{
-            //    _ = SwapNextAsync();
-            //} else
-            //{
-            //    _ = SwapPreviousAsync();
-            //}
+            Source.Animator.OnTouchFinish(p.X, p.Y);
         }
 
 
@@ -233,12 +180,12 @@ namespace ZoDream.Reader.Controls
             base.OnKeyDown(e);
             if (e.Key == Key.Right || e.Key == Key.PageDown)
             {
-                Animate.TurnNext();
+                Source.Animator.TurnNext();
                 return;
             }
             if (e.Key == Key.Left || e.Key == Key.PageUp)
             {
-                Animate.TurnPrevious();
+                Source.Animator.TurnPrevious();
                 return;
             }
         }
@@ -268,42 +215,6 @@ namespace ZoDream.Reader.Controls
             }
         }
 
-        private void UpdateSetting()
-        {
-            //if (Setting == null)
-            //{
-            //    return;
-            //}
-            //Background = string.IsNullOrWhiteSpace(Setting.BackgroundImage) ?
-            //    ColorHelper.ColorToBrush(Setting.Background) : ColorHelper.ImageToBrush(Setting.BackgroundImage);
-            //if (!string.IsNullOrWhiteSpace(Setting.FontFamily))
-            //{
-            //    FontFamily = new FontFamily(Setting.FontFamily);
-            //}
-            //FontSize = Setting.FontSize;
-            //Foreground = ColorHelper.ColorToBrush(Setting.Foreground);
-            //foreach (PageLayer item in LayerItems)
-            //{
-            //    item.FontFamily = FontFamily;
-            //    item.FontSize = FontSize;
-            //    item.Background = Background;
-            //    item.Foreground = Foreground;
-            //}
-            //Animate = Setting.Animation switch
-            //{
-            //    1 => new CoverAnimate(),
-            //    2 => new VerticalCoverAnimate(),
-            //    3 => new SimulateAnimate(),
-            //    4 => new ScrollAnimate(),
-            //    _ => new NoneAnimate(),
-            //};
-        }
-
-        public void SetAnimate(ICanvasAnimate animate)
-        {
-            Animate = animate;
-            animate.Ready(this);
-        }
 
         public ICanvasLayer CreateLayer(double width, double height)
         {
@@ -316,8 +227,7 @@ namespace ZoDream.Reader.Controls
 
         public void Invalidate()
         {
-            Animate.Invalidate();
-            Animate.OnDraw(this);
+            Source.Animator.OnDraw(this);
         }
 
         public void DrawLayer(ICanvasLayer layer)

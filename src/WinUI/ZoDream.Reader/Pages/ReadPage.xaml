@@ -1,59 +1,84 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Page
     x:Class="ZoDream.Reader.Pages.ReadPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ZoDream.Reader.Pages"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ctl="using:ZoDream.Reader.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:ZoDream.Reader.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     mc:Ignorable="d">
 
     <Page.DataContext>
-        <vm:ReadViewModel/>
+        <vm:ReadViewModel />
     </Page.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
+        <ctl:TextContainer Source="{Binding SourceService}" />
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Margin="20,0" Text="标题" VerticalAlignment="Center"/>
-            <TextBlock Text="0/10" Grid.Column="1" VerticalAlignment="Center"/>
+            <TextBlock
+                Margin="20,0"
+                VerticalAlignment="Center"
+                Text="{Binding ChapterTitle}" />
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Text="0/10" />
             <CommandBar Grid.Column="2">
-                <AppBarButton Icon="Previous" Label="上一章" Command="{Binding PreviousCommand}"/>
-                <AppBarButton Icon="List" Label="目录" Command="{Binding CatalogCommand}"/>
-                <AppBarButton Icon="Next" Label="下一章" Command="{Binding NextCommand}"/>
+                <AppBarButton
+                    Command="{Binding PreviousCommand}"
+                    Icon="Previous"
+                    Label="上一章" />
+                <AppBarButton
+                    Command="{Binding CatalogCommand}"
+                    Icon="List"
+                    Label="目录" />
+                <AppBarButton
+                    Command="{Binding NextCommand}"
+                    Icon="Next"
+                    Label="下一章" />
                 <CommandBar.SecondaryCommands>
-                    <AppBarButton Icon="Setting" Label="设置" Command="{Binding SettingCommand}"/>
-                    <AppBarButton Icon="Switch" Label="换源" Command="{Binding SourceCommand}"/>
+                    <AppBarButton
+                        Command="{Binding SettingCommand}"
+                        Icon="Setting"
+                        Label="设置" />
+                    <AppBarButton
+                        Command="{Binding SourceCommand}"
+                        Icon="Switch"
+                        Label="换源" />
                 </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>
 
-        <ctl:ContentPanel Header="目录" IsOpen="{Binding CatalogOpen,Mode=TwoWay}"
-                          Grid.RowSpan="2">
-            <ListBox ItemsSource="{Binding Items}">
+        <ctl:ContentPanel
+            Grid.RowSpan="2"
+            Header="目录"
+            IsOpen="{Binding CatalogOpen, Mode=TwoWay}">
+            <ListBox ItemsSource="{Binding ChapterItems}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Title}" VerticalAlignment="Center"/>
-                            <FontIcon Glyph="&#xE73E;" 
-                                      VerticalAlignment="Center"
-                                      Visibility="{Binding IsChecked,Converter={StaticResource ToggleCvt}}"/>
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Title}" />
+                            <FontIcon
+                                VerticalAlignment="Center"
+                                Glyph="&#xE73E;"
+                                Visibility="{Binding IsChecked, Converter={StaticResource ToggleCvt}}" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

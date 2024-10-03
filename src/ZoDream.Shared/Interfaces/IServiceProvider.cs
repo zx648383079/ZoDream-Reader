@@ -7,11 +7,16 @@ namespace ZoDream.Shared.Interfaces
 {
     public interface INovelEnvironment: ICanvasControl
     {
+
         public string NovelId { get; }
 
         public int ChapterIndex { get; set; }
 
         public double ChapterProgresss { get; set; }
+
+        public ICanvasAnimate Animator { get; }
+
+        public Task ReadyAsync(ICanvasRender render);
 
         public Task<INovelReader> GetReaderAsync();
 

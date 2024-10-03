@@ -18,7 +18,6 @@ namespace ZoDream.Reader.Pages
             InitializeComponent();
             _ = ViewModel.LoadAsync(book);
             Title = book.Name;
-            loadingRing.IsActive = true;
         }
 
         public ReadViewModel ViewModel => (ReadViewModel)DataContext;
@@ -26,47 +25,9 @@ namespace ZoDream.Reader.Pages
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            BootAsync();
+            // BootAsync();
         }
 
-        private async void BootAsync()
-        {
-            if (!isBooted && PageRender.ActualWidth > 0)
-            {
-                //var setting = App.ViewModel.Setting;
-                //PageRender.Setting = App.ViewModel.Setting;
-                //ViewModel.Tokenizer.Left = ViewModel.Tokenizer.Right =
-                //    ViewModel.Tokenizer.Top = ViewModel.Tokenizer.Bottom = setting.Padding;
-                //ViewModel.Tokenizer.LetterSpace = setting.LetterSpace;
-                //ViewModel.Tokenizer.LineSpace = setting.LineSpace;
-                //ViewModel.Tokenizer.Gap = setting.Padding * 2;
-                PageRender.Source = new NovelService(ViewModel);
-                //ViewModel.Tokenizer.ColumnCount = App.ViewModel.Setting.ColumnCount;
-                await OnResizeAsync();
-                isBooted = true;
-            }
-        }
-
-        private async Task OnResizeAsync()
-        {
-            var width = PageRender.ActualWidth;
-            var height = PageRender.ActualHeight - 20;
-            ViewModel.Width = width;
-            ViewModel.Height = height;
-            //var tokenizer = ViewModel.Tokenizer;
-            //if (tokenizer.Width == width && tokenizer.Height == height)
-            //{
-            //    return;
-            //}
-            //tokenizer.Width = width;
-            //tokenizer.Height = height;
-            //await tokenizer.Refresh();
-            ////ViewModel.Tokenizer.SetPage(ViewModel.Book.Position);
-            //PageRender.Flush();
-            //await PageRender.SwapToAsync(tokenizer.Page);
-            await PageRender.ReloadAsync();
-            loadingRing.IsActive = false;
-        }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -74,15 +35,6 @@ namespace ZoDream.Reader.Pages
             _ = ViewModel.SaveAsync();
         }
 
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (!isBooted)
-            {
-                BootAsync();
-                return;
-            }
-            _ = OnResizeAsync();
-        }
 
         private void MoreBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -140,17 +92,5 @@ namespace ZoDream.Reader.Pages
             await PageRender.ReloadAsync();
         }
 
-        private void PageRender_PageChanged(object sender, int page, PositionItem pagePosition)
-        {
-            // ViewModel.Tokenizer.Page = page;
-            // ViewModel.Book.Position = pagePosition;
-            // ViewModel.ReloadChapter();
-            //App.ViewModel.DatabaseRepository.UpdateBook(ViewModel.Book);
-        }
-
-        private void PageRender_OnReady(object sender)
-        {
-            BootAsync();
-        }
     }
 }
