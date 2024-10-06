@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Script;
-using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Net
 {
@@ -21,11 +19,7 @@ namespace ZoDream.Shared.Plugins.Net
         {
             return new NetSource(entry);
         }
-
-        public INovelDocument GetChapter(Stream input, INovelChapter chapter)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public async Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter)
         {
@@ -49,7 +43,7 @@ namespace ZoDream.Shared.Plugins.Net
         {
             var inter = new Interpreter();
             var client = new NetSpider();
-            client.From(url);
+            client.Url(url);
             return await Task.FromResult(inter.Execute<string>(rule.ContentMatchRule, client));
         }
 
@@ -58,7 +52,7 @@ namespace ZoDream.Shared.Plugins.Net
         {
             var inter = new Interpreter();
             var client = new NetSpider();
-            client.From(url);
+            client.Url(url);
             return await Task.FromResult(inter.Execute<List<INovelChapter>>(rule.DetailMatchRule, client));
         }
 
@@ -70,7 +64,7 @@ namespace ZoDream.Shared.Plugins.Net
             }
             var inter = new Interpreter();
             var client = new NetSpider();
-            client.From(rule.ExploreUrl.Replace("{{page}}", page.ToString()));
+            client.Url(rule.ExploreUrl.Replace("{{page}}", page.ToString()));
             return await Task.FromResult(inter.Execute<List<INovel>>(rule.ExploreMatchRule, 
                 client));
         }
@@ -83,7 +77,7 @@ namespace ZoDream.Shared.Plugins.Net
             }
             var inter = new Interpreter();
             var client = new NetSpider();
-            client.From(rule.SearchUrl.Replace("{{keywords}}", keywords).Replace("{{page}}", page.ToString()));
+            client.Url(rule.SearchUrl.Replace("{{keywords}}", keywords).Replace("{{page}}", page.ToString()));
             return await Task.FromResult(inter.Execute<List<INovel>>(rule.SearchMatchRule,
                 client));
         }

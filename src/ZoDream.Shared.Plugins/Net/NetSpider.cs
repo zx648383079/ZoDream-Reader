@@ -1,90 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Net.Http;
+using ZoDream.Shared.Http;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
 {
-    public class NetSpider : ISpider
+    public class NetSpider : ISpider, IGobalFactory
     {
+        public NetSpider()
+        {
+            
+        }
+        public NetSpider(string uri)
+        {
+            Uri.TryCreate(uri, UriKind.Absolute, out BaseUri);
+        }
+
+        private readonly Uri? BaseUri;
+
+        public IHttpClient Create(string url)
+        {
+            if (BaseUri is not null && !url.Contains("://"))
+            {
+                url = new Uri(BaseUri, url).ToString();
+            }
+            return new Client(url);
+        }
+
+        public ITextObject Get(string url)
+        {
+            return new SpiderText(this, Create(url).ReadAsync().GetAwaiter().GetResult() ?? string.Empty);
+        }
+
+        public ITextObject Post(string url, IDictionary<string, object> body)
+        {
+            var client = Create(url);
+            client.Body = Convert(body);
+            client.Method = RequestMethod.Post;
+            return new SpiderText(this, client.ReadAsync().GetAwaiter().GetResult()?? string.Empty);
+        }
+
+        public IUrlObject Url(string url)
+        {
+            return new SpiderUrl(this, url);
+        }
+
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
-        public ISpider From(string uri)
+        public HttpContent Convert(IDictionary<string, object> data)
         {
-            throw new NotImplementedException();
+            if (false)
+            {
+                return new JsonStringContent(data).ToHttpContent();
+            }
+            var res = new MultipartFormDataContent();
+            foreach (var item in data)
+            {
+                res.Add(new StringContent(item.Value.ToString()), item.Key);
+            }
+            return res;
         }
 
-        public ISpider Header(IDictionary<string, object> data)
+        public static IObjectCollection<K> ToObjectCollection<K>(IEnumerable<K> items)
         {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Header(string key, string value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Html()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Json()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Map()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Match(string pattern)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Match(string pattern, int tag)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Match(string pattern, string tag)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Post(IDictionary<string, object> data)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Query(string query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Split(string separator)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Split(string separator, int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Text()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISpider Xml()
-        {
-            throw new NotImplementedException();
+            if (items is IObjectCollection<K> i)
+            {
+                return i;
+            }
+            var res = new SpiderObjectCollection<K>();
+            foreach (var item in items)
+            {
+                res.Add(item);
+            }
+            return res;
         }
     }
 }

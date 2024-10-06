@@ -17,6 +17,6 @@ public class PageTest
         var novel = new BookEntity();
         new TxtReader().Decode("【科幻】《书名》作者：明", novel);
 
-        Assert.IsTrue(string.IsNullOrWhiteSpace(novel.Name));
+        Assert.AreEqual(novel.Name, "书名");
     }
 }
