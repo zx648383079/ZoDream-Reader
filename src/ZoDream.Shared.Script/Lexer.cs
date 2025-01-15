@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 
 namespace ZoDream.Shared.Script
@@ -35,6 +33,10 @@ namespace ZoDream.Shared.Script
                 if (code is '\'' or '"')
                 {
                     return GetStringToken(code);
+                }
+                if (code is '/' or '#')
+                {
+                    return GetRegexToken(code);
                 }
                 if (code is >= '0' and <= '9')
                 {
@@ -165,6 +167,14 @@ namespace ZoDream.Shared.Script
 
         private Token GetStringToken(char end)
         {
+            return new Token(TokenType.String, GetStringBlock(end));
+        }
+        private Token GetRegexToken(char end)
+        {
+            return new Token(TokenType.Regex, GetStringBlock(end));
+        }
+        private string GetStringBlock(char end)
+        {
             var reverseCount = 0;
             var sb = new StringBuilder();
             while (true)
@@ -191,7 +201,7 @@ namespace ZoDream.Shared.Script
                 reverseCount = 0;
                 sb.Append((char)codeInt);
             }
-            return new Token(TokenType.String, sb.ToString());
+            return sb.ToString();
         }
 
     }

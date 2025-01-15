@@ -7,7 +7,7 @@ using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
 {
-    public class NetSpider : ISpider, IGobalFactory
+    public class NetSpider : ISpider, IGlobalFactory
     {
         public NetSpider()
         {
@@ -65,14 +65,11 @@ namespace ZoDream.Shared.Plugins.Net
             return res;
         }
 
-        public static IObjectCollection<K> ToObjectCollection<K>(IEnumerable<K> items)
+        public static IArrayObject ToArray<TSource>(IEnumerable<TSource> source)
+            where TSource : IBaseObject
         {
-            if (items is IObjectCollection<K> i)
-            {
-                return i;
-            }
-            var res = new SpiderObjectCollection<K>();
-            foreach (var item in items)
+            var res = new SpiderArray();
+            foreach (var item in source)
             {
                 res.Add(item);
             }

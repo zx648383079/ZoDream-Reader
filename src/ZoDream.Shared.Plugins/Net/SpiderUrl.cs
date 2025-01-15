@@ -100,5 +100,15 @@ namespace ZoDream.Shared.Plugins.Net
                 c.Body = spider.Convert(body);
             });
         }
+
+        public IBaseObject As(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBaseObject Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

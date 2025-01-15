@@ -30,5 +30,15 @@ namespace ZoDream.Shared.Plugins.Net
         {
             return new SpiderJson(_spider, string.Empty);
         }
+
+        public IBaseObject As(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        IBaseObject IBaseObject.Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

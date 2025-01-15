@@ -20,6 +20,7 @@ namespace ZoDream.Shared.Plugins.Net
         public IQueryableObject Query(string selector)
         {
             _doc.QuerySelectorAll(selector);
+            return this;
         }
 
         public ITextObject Text()
@@ -27,9 +28,14 @@ namespace ZoDream.Shared.Plugins.Net
             return new SpiderText(_spider, _doc.TextContent);
         }
 
-        public object Clone()
+        public IBaseObject Clone()
         {
-            throw new NotImplementedException();
+            return this;
+        }
+
+        public IBaseObject As(string name)
+        {
+            return this;
         }
     }
 }

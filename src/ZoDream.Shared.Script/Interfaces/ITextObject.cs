@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace ZoDream.Shared.Script.Interfaces
+﻿namespace ZoDream.Shared.Script.Interfaces
 {
-    public interface ITextObject : ICloneable
+    public interface ITextObject : IBaseObject
     {
 
         public IQueryableObject Html();
@@ -14,10 +12,10 @@ namespace ZoDream.Shared.Script.Interfaces
         public IQueryableObject Json();
 
 
-        public IObjectCollection<ITextObject> Split(string tag);
-        public IObjectCollection<ITextObject> Split(string tag, int count);
+        public IArrayObject Split(string tag);
+        public IArrayObject Split(string tag, int count);
 
-        public IObjectCollection<ITextObject> Match(string pattern);
+        public IArrayObject Match(string pattern);
         public ITextObject Match(string pattern, int group);
         public ITextObject Match(string pattern, string group);
 

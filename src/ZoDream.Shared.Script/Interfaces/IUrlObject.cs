@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ZoDream.Shared.Script.Interfaces
 {
-    public interface IUrlObject
+    public interface IUrlObject: IBaseObject
     {
         public IUrlObject Method(string method);
         public IUrlObject Query(string key, string value);

@@ -27,9 +27,14 @@ namespace ZoDream.Shared.Plugins.Net
             return new SpiderText(_spider, _doc.TextContent);
         }
 
-        public object Clone()
+        public IBaseObject Clone()
         {
             return new SpiderXml(_spider, string.Empty);
+        }
+
+        public IBaseObject As(string name)
+        {
+            throw new NotImplementedException();
         }
     }
 }

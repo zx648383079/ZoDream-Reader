@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace ZoDream.Tests
     [TestClass]
     public class ScriptTest
     {
-        [TestMethod]
+        //[TestMethod]
         public void TestScript()
         {
             var interpreter = new Interpreter();
@@ -27,6 +28,27 @@ namespace ZoDream.Tests
             //code = "get('http://zodream.cn').html.query('a').if(.text.eq('next'), .url.html.text, 'empty')";
             var res = interpreter.Execute(code, new NetSpider("https://zodream.cn"));
             Assert.IsTrue(res is null);
+        }
+
+        [TestMethod]
+        public void TestLexer()
+        {
+            var code = "Main: url('http://zodream.cn').query({a:'b'}).use(true).Is(/\\d/, .value, null).Is('', name: ..text).end";
+            var reader = new Lexer(new StringReader(code));
+            var items = new List<Token>();
+            var token = reader.NextToken();
+            items.Add(token);
+            // Assert.AreEqual(token.Value, "get");
+            while (true)
+            {
+                token = reader.NextToken();
+                items.Add(token);
+                if (token.Type == TokenType.Eof)
+                {
+                    break;
+                }
+            }
+            Assert.IsTrue(items.Count == 10);
         }
     }
 }

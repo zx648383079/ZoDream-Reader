@@ -22,7 +22,6 @@ namespace ZoDream.Shared.Script
 
         public LambdaExpression ParseChunk(Lexer reader, GlobalScope globalScope, IEnumerable<KeyValuePair<string, Type>> args)
         {
-            
             var parameters = new List<ParameterExpression>();
             foreach (var arg in args)
             {

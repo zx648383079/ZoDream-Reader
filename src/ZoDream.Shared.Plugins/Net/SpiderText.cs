@@ -37,10 +37,10 @@ namespace ZoDream.Shared.Plugins.Net
             return new SpiderXml(spider, content);
         }
 
-        public IObjectCollection<ITextObject> Match(string pattern)
+        public IArrayObject Match(string pattern)
         {
             var matches = Regex.Matches(content, pattern);
-            var res = new SpiderObjectCollection<ITextObject>();
+            var res = new SpiderArray();
             if (matches is null || matches.Count == 0)
             {
                 return res;
@@ -72,19 +72,25 @@ namespace ZoDream.Shared.Plugins.Net
             return new SpiderText(spider, match.Groups[group].Value);
         }
 
-        public IObjectCollection<ITextObject> Split(string tag)
+        public IArrayObject Split(string tag)
         {
-            return NetSpider.ToObjectCollection<ITextObject>(content.Split(new string[] { tag }, StringSplitOptions.None).Select(i => new SpiderText(spider, i)));
+            return NetSpider.ToArray(content.Split([tag], StringSplitOptions.None)
+                .Select(i => new SpiderText(spider, i)));
         }
 
-        public IObjectCollection<ITextObject> Split(string tag, int count)
+        public IArrayObject Split(string tag, int count)
         {
-            return NetSpider.ToObjectCollection<ITextObject>(content.Split(new string[] { tag }, count, StringSplitOptions.None).Select(i => new SpiderText(spider, i)));
+            return NetSpider.ToArray(content.Split([tag], count, StringSplitOptions.None).Select(i => new SpiderText(spider, i)));
         }
 
-        public object Clone()
+        public IBaseObject Clone()
         {
             return new SpiderText(spider, content);
+        }
+
+        public IBaseObject As(string name)
+        {
+            throw new NotImplementedException();
         }
     }
 }

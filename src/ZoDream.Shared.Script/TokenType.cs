@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ZoDream.Shared.Script
+﻿namespace ZoDream.Shared.Script
 {
     public enum TokenType
     {
@@ -16,6 +12,9 @@ namespace ZoDream.Shared.Script
         String,
         Number,
         Identifier,
+
+        Regex,
+
         /// <summary>
         /// 分隔符 ,;
         /// </summary>

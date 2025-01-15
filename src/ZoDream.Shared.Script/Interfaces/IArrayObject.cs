@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace ZoDream.Shared.Script.Interfaces
+{
+    public interface IArrayObject : IList<IBaseObject>, IBaseObject
+    {
+
+        public IArrayObject Map(Func<IBaseObject, IBaseObject> func);
+
+
+        public IBaseObject First();
+
+        public IBaseObject Last();
+
+        public IBaseObject Nth(int index);
+    }
+}

@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace ZoDream.Shared.Script.Interfaces
+﻿namespace ZoDream.Shared.Script.Interfaces
 {
-    public interface IQueryableObject : ICloneable
+    public interface IQueryableObject : IBaseObject
     {
         public IQueryableObject Query(string selector);
 
