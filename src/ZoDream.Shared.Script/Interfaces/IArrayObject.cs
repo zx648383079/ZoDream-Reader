@@ -8,7 +8,6 @@ namespace ZoDream.Shared.Script.Interfaces
 
         public IArrayObject Map(Func<IBaseObject, IBaseObject> func);
 
-
         public IBaseObject First();
 
         public IBaseObject Last();

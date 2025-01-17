@@ -7,5 +7,8 @@ namespace ZoDream.Shared.Script.Interfaces
         public ITextObject Get(string url);
         public ITextObject Post(string url, IDictionary<string, object> body);
         public IUrlObject Url(string url);
+
+        public INullObject Null(IBaseObject parent);
+        public IArrayObject Array(IBaseObject parent);
     }
 }

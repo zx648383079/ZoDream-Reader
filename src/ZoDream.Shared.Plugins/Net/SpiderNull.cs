@@ -27,9 +27,9 @@ namespace ZoDream.Shared.Plugins.Net
             return this;
         }
 
-        public IBaseObject Map(Func<IBaseObject, IBaseObject> func)
+        public IArrayObject Map(Func<IBaseObject, IBaseObject> func)
         {
-            return this;
+            return _factory.Array(this);
         }
 
         public IBaseObject First()
@@ -52,6 +52,14 @@ namespace ZoDream.Shared.Plugins.Net
             return this;
         }
 
+        public IBaseObject Attr(string name)
+        {
+            return this;
+        }
+        public ITextObject Href()
+        {
+            return this;
+        }
         public ITextObject Text()
         {
             return this;

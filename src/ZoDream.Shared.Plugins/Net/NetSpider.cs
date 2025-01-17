@@ -50,6 +50,16 @@ namespace ZoDream.Shared.Plugins.Net
             return new SpiderUrl(this, url);
         }
 
+        public INullObject Null(IBaseObject parent)
+        {
+            return new SpiderNull(this);
+        }
+
+        public IArrayObject Array(IBaseObject parent)
+        {
+            return new SpiderArray(this);
+        }
+
         public IBaseObject As(string name)
         {
             Alias = name;

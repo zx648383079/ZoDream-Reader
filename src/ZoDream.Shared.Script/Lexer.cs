@@ -42,10 +42,6 @@ namespace ZoDream.Shared.Script
                 {
                     return GetNumericToken(code);
                 }
-                if (IsSeparator(code))
-                {
-                    return new Token(TokenType.Separator, code.ToString());
-                }
                 if (IsBracketOpen(codeInt) || IsBracketClose(codeInt))
                 {
                     return new Token(TokenType.Bracket, code.ToString());
@@ -71,6 +67,10 @@ namespace ZoDream.Shared.Script
                 if (IsAlphabet(code) || code == '_')
                 {
                     return GetNameToken(code);
+                }
+                if (IsSeparator(code))
+                {
+                    return new Token(TokenType.Separator, code.ToString());
                 }
             }
         }

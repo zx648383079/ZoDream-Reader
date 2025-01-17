@@ -25,10 +25,22 @@ namespace ZoDream.Shared.Plugins.Net
             Alias = name;
             return this;
         }
-
+        public IArrayObject Map(Func<IBaseObject, IBaseObject> func)
+        {
+            return _factory.Array(this);
+        }
         public IQueryableObject Query(string selector)
         {
             throw new NotImplementedException();
+        }
+
+        public IBaseObject Attr(string name)
+        {
+            return _factory.Null(this);
+        }
+        public ITextObject Href()
+        {
+            return new SpiderText(_factory, string.Empty);
         }
 
         public ITextObject Text()

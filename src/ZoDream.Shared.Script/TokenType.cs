@@ -16,7 +16,7 @@
         Regex,
 
         /// <summary>
-        /// 分隔符 ,;
+        /// 分隔符 ;
         /// </summary>
         Separator,
         Comma,
