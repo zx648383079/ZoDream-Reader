@@ -20,7 +20,5 @@
         public ITextObject Match(string pattern, string group);
 
         public bool Eq(string text);
-
-        public bool Empty();
     }
 }

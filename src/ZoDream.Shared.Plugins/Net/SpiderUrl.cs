@@ -1,22 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using ZoDream.Shared.Http;
 using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
 {
-    public class SpiderUrl(NetSpider spider, string url) : IUrlObject
+    public class SpiderUrl : IUrlObject
     {
+
+        public SpiderUrl(NetSpider spider, string url)
+        {
+            Parent = this;
+            _factory = spider;
+            _url = url;
+        }
+        private readonly NetSpider _factory;
+        private string _url;
         private string? _proxy;
-
-
         private readonly Dictionary<string, string> _headers = [];
 
         private readonly Dictionary<string, string> _queries = [];
 
         private RequestMethod _method = RequestMethod.Get;
 
+        public string Alias { get; private set; } = string.Empty;
+        public IBaseObject Parent { get; private set; }
+        public IBaseObject As(string name)
+        {
+            Alias = name;
+            return this;
+        }
 
         public IUrlObject Method(string method)
         {
@@ -76,7 +89,7 @@ namespace ZoDream.Shared.Plugins.Net
 
         public ITextObject Execute(Action<IHttpClient>? cb)
         {
-            var client = spider.Create(url);
+            var client = _factory.Create(_url);
             RestRequest.AppendPath(client, string.Empty, _queries);
             foreach (var item in _headers)
             {
@@ -84,7 +97,7 @@ namespace ZoDream.Shared.Plugins.Net
             }
             client.Method = _method;
             cb?.Invoke(client);
-            return new SpiderText(spider, client.ReadAsync().GetAwaiter().GetResult() ?? string.Empty);
+            return new SpiderText(_factory, client.ReadAsync().GetAwaiter().GetResult() ?? string.Empty);
         }
 
         public ITextObject Get()
@@ -97,16 +110,27 @@ namespace ZoDream.Shared.Plugins.Net
         {
             _method = RequestMethod.Post;
             return Execute(c => {
-                c.Body = spider.Convert(body);
+                c.Body = _factory.Convert(body);
             });
         }
 
-        public IBaseObject As(string name)
+
+        public IBaseObject Clone()
         {
             throw new NotImplementedException();
         }
 
-        public IBaseObject Clone()
+        public bool Empty()
+        {
+            return true;
+        }
+
+        public IBaseObject Is(bool condition, IBaseObject trueResult)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
         {
             throw new NotImplementedException();
         }

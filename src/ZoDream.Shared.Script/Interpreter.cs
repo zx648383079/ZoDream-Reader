@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
+using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Script
 {
     public class Interpreter
     {
-        public object Execute(string code, object target)
+        public IBaseObject Execute(string code, object target)
         {
-            var globalScope = new GlobalScope(target.GetType(), typeof(object));
+            var globalScope = new GlobalScope(target.GetType(), typeof(IBaseObject));
             return Execute(code, globalScope, target);
         }
 
-        public object Execute(string code, GlobalScope scope, object target)
+        public IBaseObject Execute(string code, GlobalScope scope, object target)
         {
             var func = new Parser().ParseProgram(code, scope, [new KeyValuePair<string, Type>(GlobalScope.InstanceName, target.GetType())]);
-            return func.Compile().DynamicInvoke(target);
+            return (IBaseObject)func.Compile().DynamicInvoke(target);
         }
 
         public T Execute<T>(string code, object target)

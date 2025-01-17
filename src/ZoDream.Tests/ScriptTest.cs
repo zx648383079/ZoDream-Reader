@@ -13,7 +13,7 @@ namespace ZoDream.Tests
     [TestClass]
     public class ScriptTest
     {
-        //[TestMethod]
+        [TestMethod]
         public void TestScript()
         {
             var interpreter = new Interpreter();
@@ -48,7 +48,7 @@ namespace ZoDream.Tests
                     break;
                 }
             }
-            Assert.IsTrue(items.Count == 10);
+            Assert.IsTrue(items.Count == 43);
         }
     }
 }

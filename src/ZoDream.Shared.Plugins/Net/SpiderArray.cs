@@ -6,8 +6,19 @@ namespace ZoDream.Shared.Plugins.Net
 {
     public class SpiderArray : List<IBaseObject>, IArrayObject
     {
+        public SpiderArray(NetSpider spider)
+        {
+            _factory = spider;
+            Parent = this;
+        }
+
+        private readonly NetSpider _factory;
+
+        public string Alias { get; private set; } = string.Empty;
+        public IBaseObject Parent { get; private set; }
         public IBaseObject As(string name)
         {
+            Alias = name;
             return this;
         }
 
@@ -28,7 +39,7 @@ namespace ZoDream.Shared.Plugins.Net
 
         public IArrayObject Map(Func<IBaseObject, IBaseObject> func)
         {
-            var items = new SpiderArray();
+            var items = new SpiderArray(_factory);
             foreach (var item in this) 
             {
                 items.Add(func.Invoke(item.Clone()));
@@ -41,7 +52,19 @@ namespace ZoDream.Shared.Plugins.Net
             return this[index];
         }
 
+        public bool Empty()
+        {
+            return Count == 0;
+        }
 
-        
+        public IBaseObject Is(bool condition, IBaseObject trueResult)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Text.Json;
 using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
@@ -9,12 +9,20 @@ namespace ZoDream.Shared.Plugins.Net
 
         public SpiderJson(NetSpider spider, string content)
         {
-            _spider = spider;
-            _doc = JsonConvert.DeserializeObject(content);
+            Parent = this;
+            _factory = spider;
+            _doc = JsonDocument.Parse(content);
         }
 
-        private readonly NetSpider _spider;
-        private readonly object? _doc;
+        private readonly NetSpider _factory;
+        private readonly JsonDocument _doc;
+        public string Alias { get; private set; } = string.Empty;
+        public IBaseObject Parent { get; private set; }
+        public IBaseObject As(string name)
+        {
+            Alias = name;
+            return this;
+        }
 
         public IQueryableObject Query(string selector)
         {
@@ -23,20 +31,25 @@ namespace ZoDream.Shared.Plugins.Net
 
         public ITextObject Text()
         {
-            return new SpiderText(_spider, string.Empty);
+            return new SpiderText(_factory, string.Empty);
         }
 
-        public object Clone()
+        public IBaseObject Clone()
         {
-            return new SpiderJson(_spider, string.Empty);
+            return new SpiderJson(_factory, string.Empty);
         }
 
-        public IBaseObject As(string name)
+        public bool Empty()
+        {
+            return _doc.RootElement.GetPropertyCount() == 0;
+        }
+
+        public IBaseObject Is(bool condition, IBaseObject trueResult)
         {
             throw new NotImplementedException();
         }
 
-        IBaseObject IBaseObject.Clone()
+        public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
         {
             throw new NotImplementedException();
         }

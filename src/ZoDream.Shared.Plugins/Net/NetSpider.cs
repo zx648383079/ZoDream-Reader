@@ -19,6 +19,9 @@ namespace ZoDream.Shared.Plugins.Net
         }
 
         private readonly Uri? BaseUri;
+        public string Alias { get; private set; } = string.Empty;
+
+        public IBaseObject Parent => this;
 
         public IHttpClient Create(string url)
         {
@@ -47,8 +50,15 @@ namespace ZoDream.Shared.Plugins.Net
             return new SpiderUrl(this, url);
         }
 
-        public void Dispose()
+        public IBaseObject As(string name)
         {
+            Alias = name;
+            return this;
+        }
+
+        public IBaseObject Clone()
+        {
+            return this;
         }
 
         public HttpContent Convert(IDictionary<string, object> data)
@@ -65,15 +75,34 @@ namespace ZoDream.Shared.Plugins.Net
             return res;
         }
 
-        public static IArrayObject ToArray<TSource>(IEnumerable<TSource> source)
+        public IArrayObject ToArray<TSource>(IEnumerable<TSource> source)
             where TSource : IBaseObject
         {
-            var res = new SpiderArray();
+            var res = new SpiderArray(this);
             foreach (var item in source)
             {
                 res.Add(item);
             }
             return res;
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public bool Empty()
+        {
+            return true;
+        }
+
+        public IBaseObject Is(bool condition, IBaseObject trueResult)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
+        {
+            throw new NotImplementedException();
         }
     }
 }

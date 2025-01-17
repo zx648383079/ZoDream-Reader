@@ -9,11 +9,14 @@ namespace ZoDream.Shared.Script
     public class GlobalScope(Type instanceType, Type returnType): Scope(null)
     {
         public const string InstanceName = "#instance";
+        public const string ReturnName = "#return";
 
         private readonly Dictionary<string, ParameterExpression> ParameterItems = [];
         public Type InstanceType { get; private set; } = instanceType;
 
-        public LabelTarget ReturnLabel { get; set; } = Expression.Label(returnType, "#return");
+        public override Type? ReturnType => returnType;
+
+        public LabelTarget ReturnLabel { get; set; } = Expression.Label(returnType, ReturnName);
 
         public ParameterExpression RegisterParameter(Type type, string name)
                 => ParameterItems[name] = Expression.Parameter(type, name);
@@ -45,7 +48,7 @@ namespace ZoDream.Shared.Script
             foreach (var item in data)
             {
                 res.Append(item.Substring(0, 1).ToUpper());
-                res.Append(item.Substring(1).ToLower());
+                res.Append(item.Substring(1));
             }
             return res.ToString();
         }
