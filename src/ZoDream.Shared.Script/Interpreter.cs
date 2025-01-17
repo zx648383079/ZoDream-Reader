@@ -7,6 +7,19 @@ namespace ZoDream.Shared.Script
 {
     public class Interpreter
     {
+
+        public Compiler Render(string code)
+        {
+            var globalScope = new GlobalScope(typeof(IGlobalFactory), typeof(IBaseObject));
+            return Render(code, globalScope);
+        }
+
+        public Compiler Render(string code, GlobalScope scope)
+        {
+            var func = new Parser().ParseProgram(code, scope, [new KeyValuePair<string, Type>(GlobalScope.InstanceName, target.GetType())]);
+            return new Compiler(scope, func.Compile());
+        }
+
         public IBaseObject Execute(string code, IGlobalFactory target)
         {
             var globalScope = new GlobalScope(target.GetType(), typeof(IBaseObject));

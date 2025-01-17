@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
@@ -23,27 +24,27 @@ namespace ZoDream.Shared.Plugins.Net
 
         public IBaseObject Clone()
         {
-            throw new NotImplementedException();
+            return new SpiderMap(_factory);
         }
 
         public IBaseObject First()
         {
-            throw new NotImplementedException();
+            return Empty() ? _factory.Null(this) : Values.First();
         }
 
         public IBaseObject Last()
         {
-            throw new NotImplementedException();
+            return Empty() ? _factory.Null(this) : Values.Last();
         }
 
         public IArrayObject Map(Func<IBaseObject, IBaseObject> func)
         {
-            throw new NotImplementedException();
+            return _factory.ToArray(Values.Select(func));
         }
 
         public IBaseObject Nth(int index)
         {
-            throw new NotImplementedException();
+            return Count > index ? Values.Skip(index).Take(1).First() : _factory.Null(this);
         }
 
         public bool Empty()
@@ -51,14 +52,39 @@ namespace ZoDream.Shared.Plugins.Net
             return Count == 0;
         }
 
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult)
+        {
+            return Is(condition.Empty(), trueResult);
+        }
+
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult, IBaseObject falseResult)
+        {
+            return Is(condition.Empty(), trueResult, falseResult);
+        }
+
         public IBaseObject Is(bool condition, IBaseObject trueResult)
         {
-            throw new NotImplementedException();
+            return Is(condition, trueResult, this);
         }
 
         public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
         {
-            throw new NotImplementedException();
+            return condition ? trueResult : falseResult;
+        }
+
+        public void Add(IBaseObject item)
+        {
+            if (ContainsKey(item.Alias))
+            {
+                this[item.Alias] = item;
+                return;
+            }
+            Add(item.Alias, item);
+        }
+
+        IEnumerator<IBaseObject> IEnumerable<IBaseObject>.GetEnumerator()
+        {
+            return Values.GetEnumerator();
         }
     }
 }

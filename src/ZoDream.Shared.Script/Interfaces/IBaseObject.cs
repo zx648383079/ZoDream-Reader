@@ -11,7 +11,9 @@
         public IBaseObject Clone();
 
         public bool Empty();
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult);
         public IBaseObject Is(bool condition, IBaseObject trueResult);
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult, IBaseObject falseResult);
         public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult);
     }
 }

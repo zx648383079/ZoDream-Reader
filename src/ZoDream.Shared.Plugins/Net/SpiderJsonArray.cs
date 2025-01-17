@@ -1,30 +1,31 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
 {
-    public class SpiderJson : IQueryableObject
+    public class SpiderJsonArray : IQueryableObject, IArrayObject
     {
 
-        public SpiderJson(NetSpider spider, string content)
+        public SpiderJsonArray(NetSpider spider, IEnumerable<JsonElement> items)
         {
             Parent = this;
             _factory = spider;
-            _node = JsonDocument.Parse(content).RootElement;
-        }
-
-        public SpiderJson(NetSpider spider, JsonElement node)
-        {
-            Parent = this;
-            _factory = spider;
-            _node = node;
+            _items = items.ToArray();
         }
 
         private readonly NetSpider _factory;
-        private readonly JsonElement _node;
+
+        private readonly JsonElement[] _items;
+
         public string Alias { get; private set; } = string.Empty;
         public IBaseObject Parent { get; private set; }
+
+        public int Count => _items.Count();
+
         public IBaseObject As(string name)
         {
             Alias = name;
@@ -33,14 +34,14 @@ namespace ZoDream.Shared.Plugins.Net
 
         public IArrayObject Map(Func<IBaseObject, IBaseObject> func)
         {
-            var res = _factory.Array(this);
-            res.Add(func.Invoke(this));
-            return res;
+            return _factory.Array(this);
         }
+
         public IQueryableObject Query(string selector)
         {
-            throw new NotImplementedException();
+            return this;
         }
+
         public IBaseObject Attr(string name)
         {
             if (name.Equals(nameof(Text), StringComparison.CurrentCultureIgnoreCase))
@@ -53,23 +54,24 @@ namespace ZoDream.Shared.Plugins.Net
             }
             return _factory.Null(this);
         }
+
         public ITextObject Href()
         {
-            return new SpiderText(_factory, string.Empty);
+            return new SpiderText(_factory, _items.First().GetProperty("href").GetString());
         }
         public ITextObject Text()
         {
-            return new SpiderText(_factory, string.Empty);
+            return new SpiderText(_factory, _items.First().GetString());
         }
 
         public IBaseObject Clone()
         {
-            return new SpiderJson(_factory, string.Empty);
+            return this;
         }
 
         public bool Empty()
         {
-            return _node.GetPropertyCount() == 0;
+            return !_items.Any();
         }
 
         public IBaseObject Is(IBaseObject condition, IBaseObject trueResult)
@@ -90,6 +92,43 @@ namespace ZoDream.Shared.Plugins.Net
         public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
         {
             return condition ? trueResult : falseResult;
+        }
+
+        public void Add(IBaseObject item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IBaseObject First()
+        {
+            return Empty() ? _factory.Null(this) : new SpiderJson(_factory,
+                _items.First());
+        }
+
+        public IBaseObject Last()
+        {
+            return Empty() ? _factory.Null(this) : new SpiderJson(_factory,
+                _items.Last());
+        }
+
+        public IBaseObject Nth(int index)
+        {
+            return Count <= index ? _factory.Null(this) : 
+                new SpiderJson(_factory,
+                _items[index]);
+        }
+
+        public IEnumerator<IBaseObject> GetEnumerator()
+        {
+            foreach (var item in _items)
+            {
+                yield return new SpiderJson(_factory, item);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _items.GetEnumerator();
         }
     }
 }

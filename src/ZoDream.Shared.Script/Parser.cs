@@ -313,7 +313,7 @@ namespace ZoDream.Shared.Script
                     core,
                     core?.Type.GetMethod("Array", [typeof(IBaseObject)]),
                     fnParameter)));
-            var func = typeof(ICollection<IBaseObject>).GetMethod("Add", [typeof(IBaseObject)]);
+            var func = host.Type.GetMethod("Add", [typeof(IBaseObject)]);
             while (reader.CurrentToken!.Value != ")" && reader.CurrentToken.Type != TokenType.Eof)
             {
                 var next = ParseParameter(block, fnParameter, reader);

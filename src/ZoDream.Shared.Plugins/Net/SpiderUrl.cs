@@ -117,22 +117,35 @@ namespace ZoDream.Shared.Plugins.Net
 
         public IBaseObject Clone()
         {
-            throw new NotImplementedException();
+            return new SpiderUrl(_factory, _url)
+            {
+
+            };
         }
 
         public bool Empty()
         {
-            return true;
+            return false;
+        }
+
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult)
+        {
+            return Is(condition.Empty(), trueResult);
+        }
+
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult, IBaseObject falseResult)
+        {
+            return Is(condition.Empty(), trueResult, falseResult);
         }
 
         public IBaseObject Is(bool condition, IBaseObject trueResult)
         {
-            throw new NotImplementedException();
+            return Is(condition, trueResult, this);
         }
 
         public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
         {
-            throw new NotImplementedException();
+            return condition ? trueResult : falseResult;
         }
     }
 }

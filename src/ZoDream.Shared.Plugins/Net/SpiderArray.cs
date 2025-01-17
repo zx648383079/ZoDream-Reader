@@ -57,14 +57,24 @@ namespace ZoDream.Shared.Plugins.Net
             return Count == 0;
         }
 
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult)
+        {
+            return Is(condition.Empty(), trueResult);
+        }
+
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult, IBaseObject falseResult)
+        {
+            return Is(condition.Empty(), trueResult, falseResult);
+        }
+
         public IBaseObject Is(bool condition, IBaseObject trueResult)
         {
-            throw new NotImplementedException();
+            return Is(condition, trueResult, this);
         }
 
         public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
         {
-            throw new NotImplementedException();
+            return condition ? trueResult : falseResult;
         }
     }
 }

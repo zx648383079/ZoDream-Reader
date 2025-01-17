@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
 {
     public class SpiderNull : INullObject, ITextObject, IQueryableObject, 
-        IUrlObject
+        IUrlObject, IArrayObject
     {
         public SpiderNull(NetSpider spider)
         {
@@ -16,6 +17,9 @@ namespace ZoDream.Shared.Plugins.Net
         private readonly NetSpider _factory;
         public string Alias { get; private set; } = string.Empty;
         public IBaseObject Parent { get; private set; }
+
+        public int Count => throw new NotImplementedException();
+
         public IBaseObject As(string name)
         {
             Alias = name;
@@ -132,17 +136,17 @@ namespace ZoDream.Shared.Plugins.Net
 
         public IArrayObject Split(string tag)
         {
-            return new SpiderArray(_factory);
+            return this;
         }
 
         public IArrayObject Split(string tag, int count)
         {
-            return new SpiderArray(_factory);
+            return this;
         }
 
         public IArrayObject Match(string pattern)
         {
-            return new SpiderArray(_factory);
+            return this;
         }
 
         public ITextObject Match(string pattern, int group)
@@ -180,6 +184,16 @@ namespace ZoDream.Shared.Plugins.Net
             return true;
         }
 
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult)
+        {
+            return Is(condition.Empty(), trueResult);
+        }
+
+        public IBaseObject Is(IBaseObject condition, IBaseObject trueResult, IBaseObject falseResult)
+        {
+            return Is(condition.Empty(), trueResult, falseResult);
+        }
+
         public IBaseObject Is(bool condition, IBaseObject trueResult)
         {
             return Is(condition, trueResult, this);
@@ -188,6 +202,21 @@ namespace ZoDream.Shared.Plugins.Net
         public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
         {
             return condition ? trueResult : falseResult;
+        }
+
+        public void Add(IBaseObject item)
+        {
+            
+        }
+
+        public IEnumerator<IBaseObject> GetEnumerator()
+        {
+            yield break;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
