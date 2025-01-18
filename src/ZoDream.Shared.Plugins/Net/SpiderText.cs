@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ZoDream.Shared.Script.Interfaces;
@@ -62,7 +63,7 @@ namespace ZoDream.Shared.Plugins.Net
         public IArrayObject Match(string pattern)
         {
             var matches = Regex.Matches(_body, pattern);
-            var res = new SpiderArray(_factory);
+            var res = _factory.Array(this);
             if (matches is null || matches.Count == 0)
             {
                 return res;
@@ -79,7 +80,7 @@ namespace ZoDream.Shared.Plugins.Net
             var match = Regex.Match(_body, pattern);
             if (!match.Success)
             {
-                return new SpiderText(_factory, string.Empty);
+                return (ITextObject)_factory.Null(this);
             }
             return new SpiderText(_factory, match.Groups[group].Value);
         }
@@ -89,9 +90,69 @@ namespace ZoDream.Shared.Plugins.Net
             var match = Regex.Match(_body, pattern);
             if (!match.Success)
             {
-                return new SpiderText(_factory, string.Empty);
+                return (ITextObject)_factory.Null(this);
             }
             return new SpiderText(_factory, match.Groups[group].Value);
+        }
+
+        public IArrayObject Match(Regex pattern)
+        {
+            var matches = pattern.Matches(_body);
+            var res = _factory.Array(this);
+            if (matches is null || matches.Count == 0)
+            {
+                return res;
+            }
+            foreach (var item in matches)
+            {
+                res.Add(new SpiderText(_factory, item.ToString()));
+            }
+            return res;
+        }
+        public ITextObject Match(Regex pattern, int group)
+        {
+            var match = pattern.Match(_body);
+            if (!match.Success)
+            {
+                return (ITextObject)_factory.Null(this);
+            }
+            return new SpiderText(_factory, match.Groups[group].Value);
+        }
+        public ITextObject Match(Regex pattern, string group)
+        {
+            var match = pattern.Match(_body);
+            if (!match.Success)
+            {
+                return (ITextObject)_factory.Null(this);
+            }
+            return new SpiderText(_factory, match.Groups[group].Value);
+        }
+
+        public ITextObject Replace(string pattern, string replacement)
+        {
+            return new SpiderText(_factory, _body.Replace(pattern, replacement));
+        }
+
+        public ITextObject Replace(Regex pattern, string replacement)
+        {
+            return new SpiderText(_factory, pattern.Replace(_body, replacement));
+        }
+
+        public ITextObject Append(string text)
+        {
+            return new SpiderText(_factory, _body + "\r\n" + text);
+        }
+        public ITextObject Append(IBaseObject text)
+        {
+            if (text is IQueryableObject q)
+            {
+                return Append(q.Text());
+            }
+            if (text is SpiderText o)
+            {
+                return Append(o._body);
+            }
+            return Append(text.ToString());
         }
 
         public IArrayObject Split(string tag)
@@ -129,6 +190,11 @@ namespace ZoDream.Shared.Plugins.Net
         public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
         {
             return condition ? trueResult : falseResult;
+        }
+
+        public override string ToString()
+        {
+            return _body;
         }
     }
 }

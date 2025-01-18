@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
@@ -85,6 +86,16 @@ namespace ZoDream.Shared.Plugins.Net
         IEnumerator<IBaseObject> IEnumerable<IBaseObject>.GetEnumerator()
         {
             return Values.GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var item in Values)
+            {
+                sb.AppendLine(item.ToString());
+            }
+            return sb.ToString();
         }
     }
 }

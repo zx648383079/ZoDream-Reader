@@ -147,5 +147,10 @@ namespace ZoDream.Shared.Plugins.Net
         {
             return condition ? trueResult : falseResult;
         }
+
+        public override string ToString()
+        {
+            return _url;
+        }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
@@ -133,6 +134,16 @@ namespace ZoDream.Shared.Plugins.Net
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _items.GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var item in this)
+            {
+                sb.AppendLine(item.ToString());
+            }
+            return sb.ToString();
         }
     }
 }

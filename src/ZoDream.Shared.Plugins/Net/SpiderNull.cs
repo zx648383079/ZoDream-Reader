@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
@@ -154,7 +155,40 @@ namespace ZoDream.Shared.Plugins.Net
             return this;
         }
 
+
+
         public ITextObject Match(string pattern, string group)
+        {
+            return this;
+        }
+
+        public IArrayObject Match(Regex pattern)
+        {
+            return this;
+        }
+        public ITextObject Match(Regex pattern, int group)
+        {
+            return this;
+        }
+        public ITextObject Match(Regex pattern, string group)
+        {
+            return this;
+        }
+
+        public ITextObject Replace(string pattern, string replacement)
+        {
+            return this;
+        }
+        public ITextObject Replace(Regex pattern, string replacement)
+        {
+            return this;
+        }
+
+        public ITextObject Append(string text)
+        {
+            return this;
+        }
+        public ITextObject Append(IBaseObject text)
         {
             return this;
         }
@@ -217,6 +251,11 @@ namespace ZoDream.Shared.Plugins.Net
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return string.Empty;
         }
     }
 }

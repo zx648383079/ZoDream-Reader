@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using ZoDream.Shared.Script.Interfaces;
 
 namespace ZoDream.Shared.Plugins.Net
@@ -75,6 +76,16 @@ namespace ZoDream.Shared.Plugins.Net
         public IBaseObject Is(bool condition, IBaseObject trueResult, IBaseObject falseResult)
         {
             return condition ? trueResult : falseResult;
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var item in this)
+            {
+                sb.AppendLine(item.ToString());
+            }
+            return sb.ToString();
         }
     }
 }
