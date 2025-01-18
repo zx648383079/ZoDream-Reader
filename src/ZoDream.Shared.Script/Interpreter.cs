@@ -16,7 +16,7 @@ namespace ZoDream.Shared.Script
 
         public Compiler Render(string code, GlobalScope scope)
         {
-            var func = new Parser().ParseProgram(code, scope, [new KeyValuePair<string, Type>(GlobalScope.InstanceName, target.GetType())]);
+            var func = new Parser().ParseProgram(code, scope, [new KeyValuePair<string, Type>(GlobalScope.InstanceName, scope.InstanceType)]);
             return new Compiler(scope, func.Compile());
         }
 

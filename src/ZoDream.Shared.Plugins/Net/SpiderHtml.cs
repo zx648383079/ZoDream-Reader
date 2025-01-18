@@ -12,18 +12,24 @@ namespace ZoDream.Shared.Plugins.Net
         {
             Parent = this;
             _factory = spider;
-            _doc = BrowsingContext.New(Configuration.Default).OpenAsync(req => req.Content(content)).GetAwaiter().GetResult();
+            _node = BrowsingContext.New(Configuration.Default).OpenAsync(req => req.Content(content)).GetAwaiter().GetResult();
         }
 
         public SpiderHtml(NetSpider spider, INode node)
         {
             Parent = this;
             _factory = spider;
-            _doc = node;
+            _node = node;
+        }
+
+        public SpiderHtml(NetSpider spider, INode node, string alias)
+            : this (spider, node)
+        {
+            Alias = alias;
         }
 
         private readonly NetSpider _factory;
-        private readonly INode _doc;
+        private readonly INode _node;
 
         public string Alias { get; private set; } = string.Empty;
         public IBaseObject Parent { get; private set; }
@@ -42,7 +48,7 @@ namespace ZoDream.Shared.Plugins.Net
 
         public IQueryableObject Query(string selector)
         {
-            if (_doc is not IParentNode o)
+            if (_node is not IParentNode o)
             {
                 return new SpiderNull(_factory);
             }
@@ -64,21 +70,25 @@ namespace ZoDream.Shared.Plugins.Net
 
         public ITextObject Href()
         {
-            return new SpiderText(_factory, string.Empty);
+            if (_node is IElement ele)
+            {
+                return new SpiderText(_factory, ele.GetAttribute("href") ?? string.Empty, Alias);
+            }
+            return new SpiderText(_factory, string.Empty, Alias);
         }
         public ITextObject Text()
         {
-            return new SpiderText(_factory, _doc.TextContent);
+            return new SpiderText(_factory, _node.TextContent, Alias);
         }
 
         public IBaseObject Clone()
         {
-            return this;
+            return new SpiderHtml(_factory, _node, Alias);
         }
 
         public bool Empty()
         {
-            return _doc is null;
+            return _node is null;
         }
 
         public IBaseObject Is(IBaseObject condition, IBaseObject trueResult)

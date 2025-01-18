@@ -13,6 +13,13 @@ namespace ZoDream.Shared.Plugins.Net
             _factory = spider;
             Parent = this;
         }
+
+        public SpiderText(NetSpider spider, string content, string alias)
+            : this (spider, content)
+        {
+            Alias = alias;
+        }
+
         private readonly string _body;
         private readonly NetSpider _factory;
         public string Alias { get; private set; } = string.Empty;

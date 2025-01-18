@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using ZoDream.Shared.Plugins.Net;
@@ -18,7 +19,7 @@ namespace ZoDream.Tests
         {
             var interpreter = new Interpreter();
             var code = "get('http://zodream.cn').html.query('a.href').text";
-            code = "get('http://zodream.cn').html.query('a').map(url:.href,name:.text)";
+            code = "get('http://zodream.cn').html.query('a').map(url: .href, name: .text)";
             //code = "post('http://zodream.cn',{a:'b'}).json.query('b').text.split('-').first";
             //code = "post('http://zodream.cn',{a:'b'}).json.query('b').text.split('-').last";
             //code = "post('http://zodream.cn',{a:'b'}).json.query('b').text.split('-',3).nth(1)";
@@ -29,6 +30,8 @@ namespace ZoDream.Tests
             var res = interpreter.Execute(code, new NetSpider("https://zodream.cn"));
             Assert.IsTrue(res is null);
         }
+
+
 
         [TestMethod]
         public void TestLexer()

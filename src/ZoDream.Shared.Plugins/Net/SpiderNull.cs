@@ -18,7 +18,7 @@ namespace ZoDream.Shared.Plugins.Net
         public string Alias { get; private set; } = string.Empty;
         public IBaseObject Parent { get; private set; }
 
-        public int Count => throw new NotImplementedException();
+        public int Count => 0;
 
         public IBaseObject As(string name)
         {

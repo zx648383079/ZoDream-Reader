@@ -11,6 +11,10 @@ namespace ZoDream.Shared.Script
 {
     public class Parser
     {
+        private int _index = 0;
+
+        public string TemplateName => $"temp_{++_index}";
+
         public LambdaExpression ParseProgram(string content, GlobalScope globalScope, IEnumerable<KeyValuePair<string, Type>> args)
         {
             using var reader = new StringReader(content);
@@ -38,8 +42,8 @@ namespace ZoDream.Shared.Script
 
         private void ParseBlock(GlobalScope globalScope, Lexer reader)
         {
-            var res = ParseBlock(globalScope, globalScope.LookupExpression(GlobalScope.InstanceName)!, reader);
-            globalScope.AddExpression(Expression.Return(globalScope.ReturnLabel, res));
+            var res = ParseBlock(globalScope, GetEntryInstance(globalScope), reader);
+            globalScope.AddExpression(res);//Expression.Return(globalScope.ReturnLabel, res));
         }
 
         private Expression ParseBlock(Scope scope, Expression instance, Lexer reader)
@@ -61,7 +65,7 @@ namespace ZoDream.Shared.Script
                         reader.NextToken();
                         break;
                     case TokenType.DotDot:
-                        res = Expression.Field(res, res.Type.GetField("Parent"));
+                        res = ParseParent(res);
                         reader.NextToken();
                         break;
                     case TokenType.Bracket:
@@ -99,12 +103,12 @@ namespace ZoDream.Shared.Script
                                 res,
                                 name
                             );
-                        } 
-                        else 
+                        }
+                        else
                         {
                             reader.NextToken();
-                            res = name.Equals("map", StringComparison.CurrentCultureIgnoreCase) ? 
-                                ParseConvertMap(scope, res, reader) 
+                            res = name.Equals("map", StringComparison.CurrentCultureIgnoreCase) ?
+                                ParseConvertMap(scope, res, reader)
                                 : ParseCall(scope, res, name, reader);
                             if (reader.CurrentToken.Value == ")")
                             {
@@ -118,6 +122,141 @@ namespace ZoDream.Shared.Script
                 }
             }
             return res;
+        }
+
+        
+
+        
+        private Expression ParseParameter(Scope scope, Expression instance, Lexer reader)
+        {
+            var current = reader.CurrentToken!;
+            if (current.Value is "," or ")")
+            {
+                return Expression.Empty();
+            }
+            reader.NextToken();
+            switch (current.Type)
+            {
+                case TokenType.String:
+                    return Expression.Constant(current.Value);
+                case TokenType.Number:
+                    return Expression.Constant(Convert.ToInt32(current.Value));
+                case TokenType.Comma:
+                    break;
+                case TokenType.Regex:
+                    return Expression.New(typeof(Regex).GetConstructor([typeof(string)]), Expression.Constant(current.Value));
+                case TokenType.Identifier:
+                    if (current.Value is "true" or "false")
+                    {
+                        return Expression.Constant(
+                            current.Value is "true"
+                        );
+                    }
+                    if (reader.CurrentToken!.Type == TokenType.Colon)
+                    {
+                        reader.NextToken();
+                        if (reader.CurrentToken.Type 
+                            == TokenType.Dot)
+                        {
+                            reader.NextToken();
+                            return ParseBlock(scope, ParseClone(scope, instance, current.Value), reader);
+                        } else if (reader.CurrentToken.Type
+                            == TokenType.DotDot)
+                        {
+                            reader.NextToken();
+                            return ParseBlock(scope, ParseClone(scope, ParseParent(instance), current.Value), reader);
+                        }
+                        return ParseBlock(scope, ParseClone(scope, GetEntryInstance(scope), current.Value), reader);
+                    }
+                    break;
+                case TokenType.Bracket:
+                    if (current.Value == ")")
+                    {
+                        break;
+                    }
+                    if (current.Value is "{")
+                    {
+                        return ParseMap(scope, instance, reader);
+                    }
+                    break;
+                case TokenType.Dot:
+                case TokenType.DotDot:
+                    {
+                        return ParseBlock(scope, ParseClone(scope, instance), reader);
+                    }
+                default:
+                    break;
+            }
+            return Expression.Empty();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        private Expression ParseConvertMap(Scope scope, Expression instance, Lexer reader)
+        {
+            var source = ParseVariable(scope, instance);
+            var fn = ParseConvertMapFunc(scope, instance, reader);
+            var res = Expression.Variable(typeof(IArrayObject), TemplateName);
+            scope.RegisterVariable(res);
+            scope.AddExpression(Expression.IfThenElse(Expression.TypeIs(source, typeof(IArrayObject)),
+                    Expression.Assign(res,
+                        Expression.Call(source, source.Type.GetMethod("Map", [fn.Type]),
+                            fn
+                        )
+                    )
+                    ,
+                    Expression.Assign(res, 
+                        Expression.Convert(
+                            Expression.Call(
+                        fn,
+                        fn.Type.GetMethod("Invoke", [typeof(IBaseObject)])
+                        , source
+                        ),
+                            res.Type
+                            )
+                    )
+                ));
+            return res;
+        }
+
+        private LambdaExpression ParseConvertMapFunc(Scope scope, Expression instance, Lexer reader)
+        {
+            var fnParameter = Expression.Parameter(typeof(IBaseObject));
+            var block = new Scope(scope);
+            var core = GetEntryInstance(scope);
+            var host = Expression.Variable(typeof(IArrayObject), TemplateName);
+            block.RegisterVariable(host);
+            block.AddExpression(Expression.Assign(host, Expression.Call(
+                    core,
+                    core?.Type.GetMethod("Array", [typeof(IBaseObject)]),
+                    fnParameter)));
+            var func = host.Type.GetMethod("Add", [typeof(IBaseObject)]);
+            while (reader.CurrentToken!.Value != ")" && reader.CurrentToken.Type != TokenType.Eof)
+            {
+                var next = ParseParameter(block, fnParameter, reader);
+                if (next is DefaultExpression)
+                {
+                    continue;
+                }
+                block.AddExpression(Expression.Call(host, func, next));
+            }
+            var res = ParseClone(block, fnParameter);
+            if (reader.CurrentToken.Type == TokenType.Eof)
+            {
+                block.AddExpression(Expression.Call(host, func, res));
+            }
+            else
+            {
+                reader.NextToken();
+                block.AddExpression(Expression.Call(host, func, ParseBlock(block, res, reader)));
+            }
+            block.AddExpression(host);
+            // block.AddExpression(Expression.Return(Expression.Label(), host, typeof(IBaseObject)));
+            return Expression.Lambda<Func<IBaseObject, IBaseObject>>(block.ExpressionBlock, fnParameter);
         }
 
         private Expression ParseCall(Scope scope,
@@ -146,8 +285,8 @@ namespace ZoDream.Shared.Script
                     [.. items]);
         }
 
-        private Expression ParseCall(Scope scope, Expression instance, 
-            string name, 
+        private Expression ParseCall(Scope scope, Expression instance,
+            string name,
             params Expression[] parameters)
         {
             var func = instance.Type.GetMethod(GlobalScope.Studly(name), parameters.Select(i => i.Type).ToArray());
@@ -158,12 +297,12 @@ namespace ZoDream.Shared.Script
                     func,
                     parameters);
             }
-            if (parameters.Length == 0 && !name.Equals("attr", StringComparison.CurrentCultureIgnoreCase) 
+            if (parameters.Length == 0 && !name.Equals("attr", StringComparison.CurrentCultureIgnoreCase)
                 && !name.Equals("null", StringComparison.CurrentCultureIgnoreCase))
             {
                 return ParseCall(scope, Expression.Convert(instance, typeof(IQueryableObject)), "attr", Expression.Constant(name));
             }
-            var core = scope.LookupExpression(GlobalScope.InstanceName);
+            var core = GetEntryInstance(scope);
             return Expression.Call(
                     core,
                     core?.Type.GetMethod("Null", [typeof(IBaseObject)]),
@@ -209,131 +348,20 @@ namespace ZoDream.Shared.Script
                     continue;
                 }
                 scope.AddExpression(Expression.Call(
-                    data, 
-                    func, 
+                    data,
+                    func,
                         Expression.Constant(key),
                         ParseParameter(scope, instance, reader)
                     ));
             }
-            
+
             return data;
         }
 
-        private Expression ParseParameter(Scope scope, Expression instance, Lexer reader)
-        {
-            var current = reader.CurrentToken!;
-            if (current.Value is "," or ")")
-            {
-                return Expression.Empty();
-            }
-            reader.NextToken();
-            switch (current.Type)
-            {
-                case TokenType.String:
-                    return Expression.Constant(current.Value);
-                case TokenType.Number:
-                    return Expression.Constant(Convert.ToInt32(current.Value));
-                case TokenType.Comma:
-                    break;
-                case TokenType.Regex:
-                    return Expression.New(typeof(Regex).GetConstructor([typeof(string)]), Expression.Constant(current.Value));
-                case TokenType.Identifier:
-                    if (current.Value is "true" or "false")
-                    {
-                        return Expression.Constant(
-                            current.Value is "true"
-                        );
-                    }
-                    if (reader.CurrentToken!.Type == TokenType.Colon)
-                    {
-                        return ParseBlock(scope, ParseClone(scope, instance, current.Value), reader);
-                    }
-                    break;
-                case TokenType.Bracket:
-                    if (current.Value == ")")
-                    {
-                        break;
-                    }
-                    if (current.Value is "{")
-                    {
-                        return ParseMap(scope, instance, reader);
-                    }
-                    break;
-                case TokenType.Dot:
-                case TokenType.DotDot:
-                    {
-                        return ParseBlock(scope, ParseClone(scope, instance), reader);
-                    }
-                default:
-                    break;
-            }
-            return Expression.Empty();
-        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="scope"></param>
-        /// <param name="instance"></param>
-        /// <returns></returns>
-        private Expression ParseConvertMap(Scope scope, Expression instance, Lexer reader)
+        private static Expression GetEntryInstance(Scope scope)
         {
-            var source = ParseVariable(scope, instance);
-            var fn = ParseConvertMapFunc(scope, instance, reader);
-            var res = Expression.Variable(typeof(IArrayObject));
-            scope.AddExpression(res);
-            scope.AddExpression(Expression.IfThenElse(Expression.TypeIs(source, typeof(IArrayObject)),
-                    Expression.Assign(res,
-                        Expression.Call(source, source.Type.GetMethod("Map", [fn.Type]),
-                            fn
-                        )
-                    )
-                    ,
-                    Expression.Assign(res, 
-                        Expression.Convert(
-                            Expression.Call(
-                        fn,
-                        fn.Type.GetMethod("Invoke", [typeof(IBaseObject)])
-                        , source
-                        ),
-                            res.Type
-                            )
-                    )
-                ));
-            return res;
-        }
-
-        private LambdaExpression ParseConvertMapFunc(Scope scope, Expression instance, Lexer reader)
-        {
-            var fnParameter = Expression.Parameter(typeof(IBaseObject));
-            var block = new Scope(scope);
-            var core = scope.LookupExpression(GlobalScope.InstanceName);
-            var host = Expression.Variable(typeof(IArrayObject));
-            block.AddExpression(Expression.Assign(host, Expression.Call(
-                    core,
-                    core?.Type.GetMethod("Array", [typeof(IBaseObject)]),
-                    fnParameter)));
-            var func = host.Type.GetMethod("Add", [typeof(IBaseObject)]);
-            while (reader.CurrentToken!.Value != ")" && reader.CurrentToken.Type != TokenType.Eof)
-            {
-                var next = ParseParameter(block, fnParameter, reader);
-                if (next is DefaultExpression)
-                {
-                    continue;
-                }
-                block.AddExpression(Expression.Call(host, func, next));
-            }
-            var res = ParseClone(block, fnParameter);
-            if (reader.CurrentToken.Type == TokenType.Eof)
-            {
-                block.AddExpression(Expression.Call(host, func, res));
-            } else
-            {
-                reader.NextToken();
-                block.AddExpression(Expression.Call(host, func, ParseBlock(block, res, reader)));
-            }
-            block.AddExpression(Expression.Return(Expression.Label(), host, typeof(IBaseObject)));
-            return Expression.Lambda<Func<IBaseObject, IBaseObject>>(block.ExpressionBlock, fnParameter);
+            return scope.LookupExpression(GlobalScope.InstanceName)!;
         }
 
         private Expression ParseClone(Scope scope, Expression instance)
@@ -355,14 +383,19 @@ namespace ZoDream.Shared.Script
             return ParseVariable(scope, Expression.TypeAs(next, instance.Type));
         }
 
+        private static MemberExpression ParseParent(Expression res)
+        {
+            return Expression.Field(res, res.Type.GetField("Parent"));
+        }
+
         private Expression ParseVariable(Scope scope, Expression instance)
         {
             if (instance is ParameterExpression)
             {
                 return instance;
             }
-            var res = Expression.Variable(instance.Type);
-            // scope.RegisterVariable(res);
+            var res = Expression.Variable(instance.Type, TemplateName);
+            scope.RegisterVariable(res);
             scope.AddExpression(Expression.Assign(res, instance));
             return res;
         }

@@ -34,7 +34,12 @@ namespace ZoDream.Shared.Plugins.Net
 
         public IArrayObject Map(Func<IBaseObject, IBaseObject> func)
         {
-            return _factory.Array(this);
+            var items = new SpiderArray(_factory);
+            foreach (var item in this)
+            {
+                items.Add(func.Invoke(item.Clone()));
+            }
+            return items;
         }
 
         public IQueryableObject Query(string selector)
