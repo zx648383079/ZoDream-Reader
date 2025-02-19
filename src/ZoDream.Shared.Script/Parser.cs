@@ -13,7 +13,7 @@ namespace ZoDream.Shared.Script
     {
         private int _index = 0;
 
-        public string TemplateName => $"temp_{++_index}";
+        public string TemporaryName => $"temp_{++_index}";
 
         public LambdaExpression ParseProgram(string content, GlobalScope globalScope, IEnumerable<KeyValuePair<string, Type>> args)
         {
@@ -200,7 +200,7 @@ namespace ZoDream.Shared.Script
         {
             var source = ParseVariable(scope, instance);
             var fn = ParseConvertMapFunc(scope, instance, reader);
-            var res = Expression.Variable(typeof(IArrayObject), TemplateName);
+            var res = Expression.Variable(typeof(IArrayObject), TemporaryName);
             scope.RegisterVariable(res);
             scope.AddExpression(Expression.IfThenElse(Expression.TypeIs(source, typeof(IArrayObject)),
                     Expression.Assign(res,
@@ -228,7 +228,7 @@ namespace ZoDream.Shared.Script
             var fnParameter = Expression.Parameter(typeof(IBaseObject));
             var block = new Scope(scope);
             var core = GetEntryInstance(scope);
-            var host = Expression.Variable(typeof(IArrayObject), TemplateName);
+            var host = Expression.Variable(typeof(IArrayObject), TemporaryName);
             block.RegisterVariable(host);
             block.AddExpression(Expression.Assign(host, Expression.Call(
                     core,
@@ -394,7 +394,7 @@ namespace ZoDream.Shared.Script
             {
                 return instance;
             }
-            var res = Expression.Variable(instance.Type, TemplateName);
+            var res = Expression.Variable(instance.Type, TemporaryName);
             scope.RegisterVariable(res);
             scope.AddExpression(Expression.Assign(res, instance));
             return res;
