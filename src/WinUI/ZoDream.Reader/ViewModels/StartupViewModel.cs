@@ -47,8 +47,9 @@ namespace ZoDream.Reader.ViewModels
         private async void TapOpen()
         {
             var picker = new FolderPicker();
-            App.GetService<AppViewModel>().InitializePicker(picker);
+            picker.FileTypeFilter.Add("*");
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            App.GetService<AppViewModel>().InitializePicker(picker);
             var folder = await picker.PickSingleFolderAsync();
             if (folder is null)
             {
@@ -68,8 +69,9 @@ namespace ZoDream.Reader.ViewModels
         private async void TapCreate()
         {
             var picker = new FolderPicker();
-            App.GetService<AppViewModel>().InitializePicker(picker);
+            picker.FileTypeFilter.Add("*");
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            App.GetService<AppViewModel>().InitializePicker(picker);
             var folder = await picker.PickSingleFolderAsync();
             if (folder is null)
             {

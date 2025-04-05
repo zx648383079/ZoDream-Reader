@@ -4,79 +4,94 @@
     xmlns:ctl="using:ZoDream.Reader.Controls">
 
     <Style x:Key="ColorRect" TargetType="Rectangle">
-        <Setter Property="Width" Value="32"/>
-        <Setter Property="Height" Value="32"/>
-        <Setter Property="RadiusX" Value="4"/>
-        <Setter Property="RadiusY" Value="4"/>
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="RadiusX" Value="4" />
+        <Setter Property="RadiusY" Value="4" />
     </Style>
-    
+
     <Style TargetType="ctl:ColorInput">
-        <Setter Property="BorderBrush" Value="Black"/>
-        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ctl:ColorInput">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="{TemplateBinding Header}" 
-                                   VerticalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Header}" />
 
-                        <SplitButton Grid.Column="1" 
-                                     HorizontalAlignment="Right" 
-                                     VerticalAlignment="Stretch" Padding="0">
-                            <Rectangle 
-                                Fill="{TemplateBinding ColorBrush}"
-                                VerticalAlignment="Stretch"
+                        <SplitButton
+                            Grid.Column="1"
+                            Padding="0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Stretch">
+                            <Rectangle
+                                Width="40"
                                 MinHeight="30"
-                                Width="40"/>
+                                VerticalAlignment="Stretch"
+                                Fill="{TemplateBinding ColorBrush}" />
                             <SplitButton.Flyout>
                                 <Flyout x:Name="PART_Flyout">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition/>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition/>
-                                            <RowDefinition Height="auto"/>
-                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
                                         </Grid.RowDefinitions>
-                                        <ColorPicker x:Name="PART_ColorPicker" 
-                                                     IsColorChannelTextInputVisible="False" 
-                                                     Grid.RowSpan="2" Grid.ColumnSpan="2"  Visibility="Collapsed" />
-                                        <GridView x:Name="PART_MainPanel" 
-                                                  ItemsSource="{TemplateBinding ItemsSource}"
-                                                  Grid.ColumnSpan="2">
+                                        <ColorPicker
+                                            x:Name="PART_ColorPicker"
+                                            Grid.RowSpan="2"
+                                            Grid.ColumnSpan="2"
+                                            IsColorChannelTextInputVisible="False"
+                                            Visibility="Collapsed" />
+                                        <GridView
+                                            x:Name="PART_MainPanel"
+                                            Grid.ColumnSpan="2"
+                                            ItemsSource="{TemplateBinding ItemsSource}">
                                             <GridView.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <ItemsWrapGrid MaximumRowsOrColumns="6" Orientation="Horizontal"/>
+                                                    <ItemsWrapGrid MaximumRowsOrColumns="6" Orientation="Horizontal" />
                                                 </ItemsPanelTemplate>
                                             </GridView.ItemsPanel>
                                             <GridView.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Rectangle Fill="{Binding}" Style="{StaticResource ColorRect}"/>
+                                                    <Rectangle Fill="{Binding}" Style="{StaticResource ColorRect}" />
                                                 </DataTemplate>
                                             </GridView.ItemTemplate>
                                         </GridView>
-                                        <GridView x:Name="PART_SecondaryPanel" Grid.Row="1" Grid.ColumnSpan="2">
+                                        <GridView
+                                            x:Name="PART_SecondaryPanel"
+                                            Grid.Row="1"
+                                            Grid.ColumnSpan="2">
                                             <GridView.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <StackPanel Orientation="Horizontal"/>
+                                                    <StackPanel Orientation="Horizontal" />
                                                 </ItemsPanelTemplate>
                                             </GridView.ItemsPanel>
                                             <GridView.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Rectangle Fill="{Binding}" Style="{StaticResource ColorRect}"/>
+                                                    <Rectangle Fill="{Binding}" Style="{StaticResource ColorRect}" />
                                                 </DataTemplate>
                                             </GridView.ItemTemplate>
                                         </GridView>
-                                        <HyperlinkButton x:Name="PART_ToggleBtn" Content="自定义颜色"  Grid.Row="2"/>
-                                        <Button x:Name="PART_ConfirmBtn" Content="确认" 
-                                                HorizontalAlignment="Right"  Grid.Row="2" Grid.Column="1"/>
+                                        <HyperlinkButton
+                                            x:Name="PART_ToggleBtn"
+                                            Grid.Row="2"
+                                            Content="自定义颜色" />
+                                        <Button
+                                            x:Name="PART_ConfirmBtn"
+                                            Grid.Row="2"
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Right"
+                                            Content="确认" />
                                     </Grid>
                                 </Flyout>
                             </SplitButton.Flyout>

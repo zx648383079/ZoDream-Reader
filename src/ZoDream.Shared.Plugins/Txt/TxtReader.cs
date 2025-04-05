@@ -129,7 +129,7 @@ namespace ZoDream.Shared.Plugins.Txt
             }
             return (new BookEntity()
             {
-                Charset = encoding.EncodingName,
+                Charset = encoding.WebName,
             }, [..items]);
         }
 

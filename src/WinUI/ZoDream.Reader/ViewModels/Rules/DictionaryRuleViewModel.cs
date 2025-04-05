@@ -10,6 +10,7 @@ using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Dialogs;
 using ZoDream.Shared.Interfaces.Entities;
+using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Repositories.Extensions;
 using ZoDream.Shared.Repositories.Models;
 
@@ -28,6 +29,7 @@ namespace ZoDream.Reader.ViewModels
             SortCommand = new RelayCommand<DictionaryRuleModel>(TapSort);
             SortBottomCommand = new RelayCommand<DictionaryRuleModel>(TapSortBottom);
             SortTopCommand = new RelayCommand<DictionaryRuleModel>(TapSortTop);
+            CustomDictCommand = new RelayCommand(TapCustomDict);
             LoadAsync();
         }
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
@@ -50,6 +52,14 @@ namespace ZoDream.Reader.ViewModels
         public ICommand SortCommand { get; private set; }
         public ICommand SortBottomCommand { get; private set; }
         public ICommand SortTopCommand { get; private set; }
+
+        public ICommand CustomDictCommand {  get; private set; }
+
+        private void TapCustomDict()
+        {
+            var router = App.GetService<IRouter>();
+            router.GoToAsync("rule/dictionary_create");
+        }
 
         private void TapSort(DictionaryRuleModel? arg)
         {

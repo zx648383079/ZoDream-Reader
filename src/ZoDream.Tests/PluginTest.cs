@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using ZoDream.Shared.Storage;
 
 namespace ZoDream.Tests
 {
@@ -21,5 +22,6 @@ namespace ZoDream.Tests
             var node = reader.Element(cnsNamespace + "container");
             Assert.IsNotNull(node);
         }
+
     }
 }

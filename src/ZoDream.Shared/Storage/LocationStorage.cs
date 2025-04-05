@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,12 +13,12 @@ namespace ZoDream.Shared.Storage
         /// <returns></returns>
         public static async Task<string> ReadAsync(string file)
         {
-            if (!System.IO.File.Exists(file))
+            if (!File.Exists(file))
             {
                 return string.Empty;
             }
             var fs = new FileStream(file, FileMode.Open);
-            using var reader = new StreamReader(fs, TxtEncoder.GetEncoding(fs));
+            using var reader = new StreamReader(fs, TxtEncoder.GetEncoding(fs, Encoding.GetEncoding("gb2312")));
             var content = await reader.ReadToEndAsync();
             return content;
         }
@@ -28,7 +26,7 @@ namespace ZoDream.Shared.Storage
         public static StreamReader Reader(string file)
         {
             var fs = new FileStream(file, FileMode.Open);
-            return new StreamReader(fs, TxtEncoder.GetEncoding(fs));
+            return new StreamReader(fs, TxtEncoder.GetEncoding(fs, Encoding.GetEncoding("gb2312")));
         }
 
         /// <summary>

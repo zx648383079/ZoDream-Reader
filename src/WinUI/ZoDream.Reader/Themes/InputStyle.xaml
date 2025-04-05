@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cvt="using:ZoDream.Reader.Converters">
+    <cvt:ToggleConverter x:Key="ToggleCvt" />
+
+    <Thickness x:Key="TextBoxTopHeaderMargin">0,12,0,2</Thickness>
+    <Thickness x:Key="ComboBoxTopHeaderMargin">0,12,0,2</Thickness>
+    <Thickness x:Key="PasswordBoxTopHeaderMargin">0,12,0,2</Thickness>
+
+    <Style x:Name="HeaderIcon" TargetType="FontIcon">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Name="HeaderStamp" TargetType="FontIcon">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="8" />
+        <Setter Property="FontSize" Value="{StaticResource MetaFontSize}" />
+        <Setter Property="Foreground" Value="{ThemeResource SecondaryTextBrush}" />
+    </Style>
+    <Style x:Name="MetaTb" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="FontSize" Value="{StaticResource MetaFontSize}" />
+        <Setter Property="Foreground" Value="{ThemeResource SecondaryTextBrush}" />
+    </Style>
+    <Style x:Name="HeaderTb" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="FontWeight" Value="Black" />
+        <Setter Property="Foreground" Value="{ThemeResource BodyTextBrush}" />
+    </Style>
+    <Style x:Name="InlineHeaderTb" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{ThemeResource BodyTextBrush}" />
+    </Style>
+    <Style x:Name="LineHeaderTb" TargetType="TextBlock">
+        <Setter Property="Margin" Value="{StaticResource TextBoxTopHeaderMargin}" />
+        <Setter Property="Foreground" Value="{ThemeResource BodyTextBrush}" />
+    </Style>
+    <Style x:Name="InlineTextTb" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{ThemeResource BodyTextBrush}" />
+    </Style>
+
+    <Style x:Name="IconBtn" TargetType="ButtonBase">
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="FontFamily" Value="{ThemeResource SymbolThemeFontFamily}" />
+    </Style>
+
+    <Style
+        x:Name="LargeIconBtn"
+        BasedOn="{StaticResource IconBtn}"
+        TargetType="ButtonBase">
+        <Setter Property="Width" Value="{StaticResource LargeToolSize}" />
+        <Setter Property="Height" Value="{StaticResource LargeToolSize}" />
+        <!--<Setter Property="Background" Value="Transparent" />-->
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style
+        x:Name="ToolIconBtn"
+        BasedOn="{StaticResource IconBtn}"
+        TargetType="ButtonBase">
+        <Setter Property="Width" Value="{StaticResource ToolSize}" />
+        <Setter Property="Height" Value="{StaticResource ToolSize}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+</ResourceDictionary>

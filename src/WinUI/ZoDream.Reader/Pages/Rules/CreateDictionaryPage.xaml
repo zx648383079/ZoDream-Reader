@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="ZoDream.Reader.Pages.Rules.CreateDictionaryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:ZoDream.Reader.Pages.Rules"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    mc:Ignorable="d">
+
+    <Page.DataContext>
+        <vm:CreateDictionaryViewModel />
+    </Page.DataContext>
+
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="ListBoxItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            </Style>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal">
+            <Button
+                Command="{Binding OpenCommand}"
+                Content="&#xE8DA;"
+                Style="{StaticResource LargeIconBtn}" />
+            <Button
+                Command="{Binding SaveCommand}"
+                Content="&#xE74E;"
+                Style="{StaticResource LargeIconBtn}" />
+            <Button
+                Command="{Binding FindCommand}"
+                Content="&#xE721;"
+                Style="{StaticResource LargeIconBtn}" />
+            <Button
+                Command="{Binding ExtractCommand}"
+                Content="&#xE8FE;"
+                Style="{StaticResource LargeIconBtn}" />
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <RichEditBox x:Name="Editor" />
+            <Border Style="{StaticResource ModalStyle}" Visibility="{Binding FindVisible, Converter={StaticResource ToggleCvt}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox VerticalContentAlignment="Center" Text="{Binding FindText, Mode=TwoWay}" />
+                    <Button
+                        Grid.Column="1"
+                        Command="{Binding FindNextCommand}"
+                        Content="&#xE72A;"
+                        Style="{StaticResource ToolIconBtn}" />
+                    <Button
+                        Grid.Column="2"
+                        Command="{Binding FindCommand}"
+                        Content="&#xE8BB;"
+                        Style="{StaticResource ToolIconBtn}" />
+                </Grid>
+            </Border>
+        </Grid>
+        <ListBox
+            Grid.Row="1"
+            Grid.Column="1"
+            HorizontalContentAlignment="Stretch"
+            Background="Transparent"
+            ItemsSource="{Binding WordItems}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Word}" />
+                        <Border Grid.Column="1">
+                            <TextBlock Style="{StaticResource MetaTb}" Text="{Binding Count}" />
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Page>

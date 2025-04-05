@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Buffers;
 using System.IO;
 using System.Text;
 
@@ -35,10 +35,8 @@ namespace ZoDream.Shared.Storage
         /// <returns></returns>   
         public static Encoding GetEncoding(string fileName, Encoding defaultEncoding)
         {
-            var fs = new FileStream(fileName, FileMode.Open);
-            var targetEncoding = GetEncoding(fs, defaultEncoding);
-            fs.Close();
-            return targetEncoding;
+            using var fs = File.OpenRead(fileName);
+            return GetEncoding(fs, defaultEncoding);
         }
 
         /// <summary>   
@@ -47,72 +45,117 @@ namespace ZoDream.Shared.Storage
         /// <param name="stream">文本文件流。</param>   
         /// <param name="defaultEncoding">默认编码方式。当该方法无法从文件的头部取得有效的前导符时，将返回该编码方式。</param>   
         /// <returns></returns>   
-        public static Encoding GetEncoding(Stream stream, Encoding defaultEncoding)
+        public static Encoding GetEncoding(Stream input, Encoding defaultEncoding)
         {
             var targetEncoding = defaultEncoding;
-            if (stream == null || stream.Length < 2) return targetEncoding;
-            //保存文件流的前4个字节   
-            byte byte3 = 0;
-            //保存当前Seek位置   
-            var origPos = stream.Seek(0, SeekOrigin.Begin);
-            stream.Seek(0, SeekOrigin.Begin);
-
-            var nByte = stream.ReadByte();
-            var byte1 = Convert.ToByte(nByte);
-            var byte2 = Convert.ToByte(stream.ReadByte());
-            if (stream.Length >= 3)
+            if (input == null || input.Length < 2)
             {
-                byte3 = Convert.ToByte(stream.ReadByte());
+                return targetEncoding;
             }
-            //根据文件流的前4个字节判断Encoding   
-            //Unicode {0xFF, 0xFE};   
-            //BE-Unicode {0xFE, 0xFF};   
-            //UTF8 = {0xEF, 0xBB, 0xBF};   
-            if (byte1 == 0xFE && byte2 == 0xFF)//UnicodeBe   
+            var beginPos = input.Position;
+            var maxLength = 1024; // 判断范围可以设大一点
+            var buffer = ArrayPool<byte>.Shared.Rent(maxLength);
+            try
             {
-                targetEncoding = Encoding.BigEndianUnicode;
-            }
-            else if (byte1 == 0xFF && byte2 == 0xFE && byte3 != 0xFF)//Unicode   
-            {
-                targetEncoding = Encoding.Unicode;
-            }
-            else if (byte1 == 0xEF && byte2 == 0xBB && byte3 == 0xBF) //UTF8   
-            {
-                targetEncoding = Encoding.UTF8;
-            }
-            else
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                int read;
-                while ((read = stream.ReadByte()) != -1)
+                var readLength = input.Read(buffer, 0, 3);
+                //根据文件流的前4个字节判断Encoding   
+                //Unicode {0xFF, 0xFE};   
+                //BE-Unicode {0xFE, 0xFF};   
+                //UTF8 = {0xEF, 0xBB, 0xBF};   
+                if (buffer[0] == 0xFE && buffer[1] == 0xFF && readLength >= 2)//UnicodeBe   
                 {
-                    if (read >= 0xF0)
-                        break;
-                    if (0x80 <= read && read <= 0xBF)
-                        break;
-                    if (0xC0 <= read && read <= 0xDF)
+                    return Encoding.BigEndianUnicode;
+                }
+                else if (buffer[0] == 0xFF && buffer[1] == 0xFE && buffer[2] != 0xFF && readLength >= 3)//Unicode   
+                {
+                    return Encoding.Unicode;
+                }
+                else if (buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF && readLength >= 3) //UTF8   
+                {
+                    return Encoding.UTF8;
+                }
+                readLength += input.Read(buffer, readLength, maxLength - readLength);
+                var isUtf8 = false;
+                for (var i = 0; i < readLength - 3; i++)
+                {
+                    if (buffer[i] < 0x80)
                     {
-                        read = stream.ReadByte();
-                        if (0x80 <= read && read <= 0xBF)
-                            continue;
-                        break;
+                        continue;
                     }
-                    if (0xE0 > read || read > 0xEF) continue;
-                    read = stream.ReadByte();
-                    if (0x80 <= read && read <= 0xBF)
+                    #region UTF8
+                    if ((IsInRange(buffer[i], 0xC2, 0xDF) && IsInRange(buffer[i + 1], 0x80, 0xBF))
+                        )
                     {
-                        read = stream.ReadByte();
-                        if (0x80 <= read && read <= 0xBF)
-                        {
-                            targetEncoding = Encoding.UTF8;
-                        }
+                        i++;
+                        isUtf8 = true;
+                        continue;
                     }
-                    break;
+                    if ((buffer[i] == 0xE0 && IsInRange(buffer[i + 1], 0xA0, 0xBF) && IsInRange(buffer[i + 2], 0x80, 0xBF))
+                        || (IsInRange(buffer[i], 0xE1, 0xEC) && IsInRange(buffer[i + 1], 0x80, 0xBF) && IsInRange(buffer[i + 2], 0x80, 0xBF))
+                        || (buffer[i] == 0xED && IsInRange(buffer[i + 1], 0x80, 0x9F) && IsInRange(buffer[i + 2], 0x80, 0xBF))
+                        || (IsInRange(buffer[i], 0xEE, 0xEF) && IsInRange(buffer[i + 1], 0x80, 0xBF) && IsInRange(buffer[i + 2], 0x80, 0xBF))
+                        )
+                    {
+                        i += 2;
+                        isUtf8 = true;
+                        continue;
+                    }
+                    if ((buffer[i] == 0xF0 && IsInRange(buffer[i + 1], 0x90, 0xBF) && IsInRange(buffer[i + 2], 0x80, 0xBF) && IsInRange(buffer[i + 3], 0x80, 0xBF))
+                        || (IsInRange(buffer[i], 0xF1, 0xF3) && IsInRange(buffer[i + 1], 0x80, 0xBF) && IsInRange(buffer[i + 2], 0x80, 0xBF) && IsInRange(buffer[i + 3], 0x80, 0xBF))
+                        || (buffer[i] == 0xF4 && IsInRange(buffer[i + 1], 0x80, 0x9F) && IsInRange(buffer[i + 2], 0x80, 0xBF) && IsInRange(buffer[i + 3], 0x80, 0xBF))
+                        )
+                    {
+                        i += 3;
+                        isUtf8 = true;
+                        continue;
+                    }
+                    #endregion
+
+                    #region GBK
+                    if ((IsInRange(buffer[i], 0x81, 0xA0) && IsInRange(buffer[i + 1], 0x40, 0xFE, 0x7F))
+                        || (IsInRange(buffer[i], 0xA8, 0xA9) && IsInRange(buffer[i + 1], 0x40, 0xA0, 0x7F))
+                        || (IsInRange(buffer[i], 0xAA, 0xFE) && IsInRange(buffer[i + 1], 0x40, 0xA0, 0x7F))
+                        )
+                    {
+                        i++;
+                        return Encoding.GetEncoding("gbk");
+                    }
+                    #endregion
+                    #region GB2312
+                    if ((IsInRange(buffer[i], 0xA1, 0xA9) && IsInRange(buffer[i + 1], 0xA1, 0xFE))
+                        || (IsInRange(buffer[i], 0xB0, 0xF7) && IsInRange(buffer[i + 1], 0xA1, 0xFE)))
+                    {
+                        i++;
+                        // gb18030 > gbk > gb2312
+                        return Encoding.GetEncoding("gbk"); // Encoding.GetEncoding("gb2312");
+                    }
+                    #endregion
+                    return defaultEncoding;
+                }
+                if (isUtf8)
+                {
+                    return Encoding.UTF8;
                 }
             }
-            //恢复Seek位置         
-            stream.Seek(origPos, SeekOrigin.Begin);
+            finally
+            {
+                input.Seek(beginPos, SeekOrigin.Begin);
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
             return targetEncoding;
+        }
+
+        private static bool IsInRange(byte val, byte min, byte max)
+        {
+            return val >= min && val <= max;
+        }
+        private static bool IsInRange(byte val, byte min, byte max, byte exclude)
+        {
+            if (val == exclude)
+            {
+                return false;
+            }
+            return val >= min && val <= max;
         }
     }
 }
