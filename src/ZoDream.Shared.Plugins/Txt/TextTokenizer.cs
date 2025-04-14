@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Interfaces.Tokenizers;
@@ -17,7 +16,7 @@ namespace ZoDream.Shared.Plugins.Txt
                 return [];
             }
             var theme = new CanvasTheme(setting, control, true);
-            var maxH = theme.PageInnerHeight;
+            var maxH = theme.BodySize.Y;
             var lines = ParseBlock(target.Title, theme);
             if (!string.IsNullOrWhiteSpace(target.Content))
             {
@@ -28,20 +27,20 @@ namespace ZoDream.Shared.Plugins.Txt
             }
             var items = new List<INovelPage>();
             var page = new NovelPage();
-            var y = .0;
+            var y = .0f;
             foreach (var item in lines)
             {
-                var h = item.ActualHeight;
+                var h = item.Size.Y;
                 if (y + h <= maxH)
                 {
-                    item.Y = y;
+                    item.Position = new(item.Position.X, y);
                     page.Add(item);
                     y += h;
                     continue;
                 }
                 items.Add(page);
                 page = [];
-                y = .0;
+                y = .0f;
             }
             items.Add(page);
             return items;
@@ -70,8 +69,8 @@ namespace ZoDream.Shared.Plugins.Txt
                 return null;
             }
             var line = new NovelPageLine(theme);
-            var maxW = theme.PageInnerWidth;
-            var x = .0;
+            var maxW = theme.BodySize.X;
+            var x = .0f;
             while (index < content.Length)
             {
                 var code = content[index];
@@ -85,26 +84,25 @@ namespace ZoDream.Shared.Plugins.Txt
                     index++;
                     break;
                 }
-                var (fontW, fontH) = theme.FontBound(code);
-                if (x + fontW > maxW)
+                var font = theme.FontBound(code);
+                if (x + font.X > maxW)
                 {
                     break;
                 }
                 line.Add(new NovelPageChar(code.ToString())
                 {
-                    X = x,
-                    Width = fontW,
-                    Height = fontH,
+                    Position = new(x, 0),
+                    Size = font
                 });
-                x += fontW;
+                x += font.X;
                 index++;
             }
-            line.X = theme.TextAlign switch
+            line.Position = new(theme.TextAlign switch
             {
-                1 => (theme.Width - x) / 2,
-                2 => theme.Width - x - theme.PaddingRight,
-                _ => theme.PaddingLeft,
-            };
+                1 => (theme.Size.X - x) / 2,
+                2 => theme.Size.X - x - theme.Padding.Z,
+                _ => theme.Padding.X,
+            }, 0);
             return line;
         }
     }

@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System.Collections.Generic;
+using System.Numerics;
 using Windows.System;
 using ZoDream.Shared.Events;
 using ZoDream.Shared.Interfaces;
@@ -22,7 +23,7 @@ namespace ZoDream.Reader.Controls
 
         public event PageChangedEventHandler? PageChanged;
         public event CanvasReadyEventHandler? OnReady;
-
+        public Vector2 Size => new((float)ActualWidth, (float)ActualHeight);
 
         public ICanvasSource Source {
             get { return (ICanvasSource)GetValue(SourceProperty); }
@@ -77,47 +78,47 @@ namespace ZoDream.Reader.Controls
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Source.ReadyAsync(this);
-            Source.Animator.Resize(ActualWidth, ActualHeight);
+            Source.Animator.Resize(Size);
         }
 
         private void UserControl_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
-            Source.Animator.OnTouchStart(e.Position.X, e.Position.Y);
+            Source.Animator.OnTouchStart(new((float)e.Position.X, (float)e.Position.Y));
         }
 
         private void UserControl_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
-            Source.Animator.OnTouchMove(e.Position.X, e.Position.Y);
+            Source.Animator.OnTouchMove(new((float)e.Position.X, (float)e.Position.Y));
         }
 
         private void UserControl_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
-            Source.Animator.OnTouchFinish(e.Position.X, e.Position.Y);
+            Source.Animator.OnTouchFinish(new((float)e.Position.X, (float)e.Position.Y));
         }
 
         private void UserControl_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             var point = e.GetCurrentPoint(this).Position;
-            Source.Animator.OnTouchStart(point.X, point.Y);
+            Source.Animator.OnTouchStart(new((float)point.X, (float)point.Y));
         }
 
         private void UserControl_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             var point = e.GetCurrentPoint(this).Position;
-            Source.Animator.OnTouchFinish(point.X, point.Y);
+            Source.Animator.OnTouchFinish(new((float)point.X, (float)point.Y));
         }
 
         private void UserControl_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
             var point = e.GetCurrentPoint(this).Position;
-            Source.Animator.OnTouchMove(point.X, point.Y);
+            Source.Animator.OnTouchMove(new((float)point.X, (float)point.Y));
         }
 
 
-        public ICanvasLayer CreateLayer(double width, double height)
+        public ICanvasLayer CreateLayer(Vector2 size)
         {
             var layer = new PageLayer(this);
-            layer.Resize(0, 0, width, height);
+            layer.Resize(new Vector4(0, 0, size.X, size.Y));
             return layer;
         }
 

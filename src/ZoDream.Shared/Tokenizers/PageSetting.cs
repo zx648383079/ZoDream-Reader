@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ZoDream.Shared.Tokenizers
+﻿namespace ZoDream.Shared.Tokenizers
 {
     public class PageSetting
     {

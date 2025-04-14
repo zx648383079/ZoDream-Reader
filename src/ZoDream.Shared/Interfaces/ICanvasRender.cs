@@ -1,4 +1,5 @@
-﻿using ZoDream.Shared.Events;
+﻿using System.Numerics;
+using ZoDream.Shared.Events;
 
 namespace ZoDream.Shared.Interfaces
 {
@@ -6,8 +7,7 @@ namespace ZoDream.Shared.Interfaces
     {
         public ICanvasSource? Source {  get; set; }
 
-        public double ActualWidth { get; }
-        public double ActualHeight { get; }
+        public Vector2 Size { get; }
 
         /// <summary>
         /// 翻页完成事件
@@ -19,7 +19,7 @@ namespace ZoDream.Shared.Interfaces
         /// </summary>
         public event CanvasReadyEventHandler? OnReady;
 
-        public ICanvasLayer CreateLayer(double width, double height);
+        public ICanvasLayer CreateLayer(Vector2 size);
         /// <summary>
         /// 刷新重绘画板内容
         /// </summary>
@@ -29,29 +29,5 @@ namespace ZoDream.Shared.Interfaces
         /// </summary>
         /// <param name="layer"></param>
         public void DrawLayer(ICanvasLayer layer);
-
-        //public void SwapTo(IList<PageItem> pages, int page);
-        ///// <summary>
-        ///// 使用过渡动画切换到新的页面，下一页
-        ///// </summary>
-        ///// <param name="page"></param>
-        ///// <returns></returns>
-        //public Task SwapToAsync(int page);
-
-        //public void SwapFrom(IList<PageItem> pages, int page);
-        ///// <summary>
-        ///// 使用过渡动画切换回新的页面，上一页
-        ///// </summary>
-        ///// <param name="page"></param>
-        //public Task SwapFromAsync(int page);
-
-        //public Task SwapNextAsync();
-
-        //public Task SwapPreviousAsync();
-
-        ///// <summary>
-        ///// 清空页面内容
-        ///// </summary>
-        //public void Flush();
     }
 }

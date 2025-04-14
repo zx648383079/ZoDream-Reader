@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.Interfaces.Tokenizers;
 
 namespace ZoDream.Shared.Interfaces
 {

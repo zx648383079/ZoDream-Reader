@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -49,14 +50,11 @@ namespace ZoDream.Reader.ViewModels
                 _novel.CurrentChapterOffset = (int)(value * 10000);
             }
         }
-        public double Width { get; private set; }
-
-        public double Height { get; private set; }
+        public Vector2 Size { get; private set; }
 
         public Task ReadyAsync(ICanvasRender render)
         {
-            Width = render.ActualWidth;
-            Height = render.ActualHeight;
+            Size = render.Size;
             Animator.Ready(render);
             return Task.CompletedTask;
         }

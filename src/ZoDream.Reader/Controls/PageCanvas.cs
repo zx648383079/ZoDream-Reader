@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -70,6 +71,8 @@ namespace ZoDream.Reader.Controls
             DependencyProperty.Register("Source", typeof(ICanvasSource), typeof(PageCanvas), new PropertyMetadata(null));
 
 
+        public Vector2 Size => new((float)ActualWidth, (float)ActualHeight);
+
         public event PageChangedEventHandler? PageChanged;
         public event CanvasReadyEventHandler? OnReady;
 
@@ -87,7 +90,7 @@ namespace ZoDream.Reader.Controls
             Source!.ReadyAsync(this);
             foreach (var item in LayerItems)
             {
-                item.Resize(0, 0, ActualWidth, ActualHeight);
+                item.Resize(new Vector4(0, 0, (float)ActualWidth, (float)ActualHeight));
             }
         }
 
@@ -153,7 +156,7 @@ namespace ZoDream.Reader.Controls
         {
             base.OnMouseDown(e);
             var p = e.GetPosition(this);
-            Source.Animator.OnTouchStart(p.X, p.Y);
+            Source.Animator.OnTouchStart(new((float)p.X, (float)p.Y));
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -164,14 +167,14 @@ namespace ZoDream.Reader.Controls
                 return;
             }
             var p = e.GetPosition(this);
-            Source.Animator.OnTouchMove(p.X, p.Y);
+            Source.Animator.OnTouchMove(new((float)p.X, (float)p.Y));
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             base.OnMouseUp(e);
             var p = e.GetPosition(this);
-            Source.Animator.OnTouchFinish(p.X, p.Y);
+            Source.Animator.OnTouchFinish(new((float)p.X, (float)p.Y));
         }
 
 
@@ -216,12 +219,12 @@ namespace ZoDream.Reader.Controls
         }
 
 
-        public ICanvasLayer CreateLayer(double width, double height)
+        public ICanvasLayer CreateLayer(Vector2 size)
         {
             return new PageLayer
             {
-                Width = width,
-                Height = height
+                Width = size.X,
+                Height = size.Y
             };
         }
 

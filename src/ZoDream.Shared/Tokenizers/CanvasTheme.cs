@@ -1,62 +1,54 @@
-﻿using ZoDream.Shared.Interfaces;
+﻿using System.Numerics;
+using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 
 namespace ZoDream.Shared.Tokenizers
 {
     public class CanvasTheme: ICanvasTheme
     {
-        public double Width { get; }
-        public double Height { get; }
         /// <summary>
         /// 对齐，0 居左 1 居中 3 隐藏
         /// </summary>
-        public int TextAlign { get; }
+        public byte TextAlign { get; }
 
         public string FontFamily { get; } = string.Empty;
-        public int FontSize { get; }
+        public byte FontSize { get; }
         /// <summary>
         /// 字体加粗，500 正常
         /// </summary>
-        public int FontWeight { get; }
+        public ushort FontWeight { get; }
         public bool FontItalic { get; }
         public bool Underline { get; }
-        public int PaddingTop { get; }
-        public int PaddingLeft { get; }
-        public int PaddingRight { get; }
-        public int PaddingBottom { get; }
 
-        public int LineSpacing { get; }
-        public int LetterSpacing { get; }
+        public Vector4 Padding { get; private set; }
+
+        public Vector2 Spacing { get; private set; }
+
+        
+
+        public Vector2 Size { get; private set; }
 
         public int ColumnCount { get; } = 1;
 
         public int Gap { get; }
 
-        public double PageInnerWidth {
-            get {
-                return (Width - PaddingLeft - PaddingRight - 
-                    (ColumnCount - 1) * Gap) / ColumnCount;
-            }
-        }
-
-        public double PageInnerHeight {
-            get {
-                return Height - PaddingTop - PaddingBottom;
-            }
-        }
+        public Vector2 BodySize => new(
+            (Size.X - Padding.X - Padding.Z - (ColumnCount - 1) * Gap) / ColumnCount, 
+            Size.Y - Padding.Y - Padding.W
+            );
 
         public double PageX(int column)
         {
-            return PaddingLeft + column * (PageInnerWidth + Gap);
+            return Padding.X + column * (BodySize.X + Gap);
         }
 
         public double PageY(int column)
         {
-            return PaddingTop;
+            return Padding.Y;
         }
         public double LineY(int index)
         {
-            return PaddingTop + index * (FontSize + LineSpacing);
+            return Padding.Y + index * (FontSize + Spacing.Y);
         }
 
         public double FontX(int column, int index)
@@ -66,64 +58,61 @@ namespace ZoDream.Shared.Tokenizers
 
         public double FontX(double pageX, int index)
         {
-            return pageX + index * (FontSize + LetterSpacing);
+            return pageX + index * (FontSize + Spacing.X);
         }
-        public double FontWidth(double count)
+        public float FontWidth(float count)
         {
-            return count * (FontSize + LetterSpacing);
+            return count * (FontSize + Spacing.X);
         }
-        public double FontHeight()
+        public float FontHeight()
         {
-            return FontSize + LineSpacing;
+            return FontSize + Spacing.Y;
         }
 
-        public (double, double) FontBound(char? code)
+        public Vector2 FontBound(char? code)
         {
             var height = FontHeight();
             if (code == null)
             {
-                return (0, height);
+                return new(0, height);
             }
             if (code == '\t')
             {
-                return (FontWidth(2), height);
+                return new(FontWidth(2), height);
             }
             if ((code >= 48 && code <= 57)
                 || (code >= 64 && code <= 90))
             {
-                return (FontWidth(.8), height);
+                return new(FontWidth(.8f), height);
             }
             if (code == 46 ||
                 (code >= 97 && code <= 122))
             {
-                return (FontWidth(.6), height);
+                return new(FontWidth(.6f), height);
             }
-            return (FontWidth(1), height);
+            return new(FontWidth(1), height);
         }
 
         public CanvasTheme(IReadTheme theme, ICanvasControl control, bool isTitle = false)
         {
-            Width = control.Width;
-            Height = control.Height;
+            Size = control.Size;
 
             FontFamily = theme.FontFamily;
+            var lineSpacing = 0;
             if (isTitle)
             {
-                FontSize = theme.TitleFontSize;
-                TextAlign = theme.TitleAlign;
-                LineSpacing = theme.TitleSpacing;
+                FontSize = (byte)theme.TitleFontSize;
+                TextAlign = (byte)theme.TitleAlign;
+                lineSpacing = theme.TitleSpacing;
             } else
             {
-                FontSize = theme.FontSize;
-                LineSpacing = theme.LineSpacing;
+                FontSize = (byte)theme.FontSize;
+                lineSpacing = theme.LineSpacing;
             }
-            FontWeight = theme.FontWeight;
+            FontWeight = (byte)theme.FontWeight;
             Underline = theme.Underline;
-            PaddingTop = theme.PaddingTop;
-            PaddingLeft = theme.PaddingLeft;
-            PaddingRight = theme.PaddingRight;
-            PaddingBottom = theme.PaddingBottom;
-            LetterSpacing = theme.LetterSpacing;
+            Padding = new(theme.PaddingLeft, theme.PaddingTop, theme.PaddingRight, theme.PaddingBottom);
+            Spacing = new(theme.LetterSpacing, lineSpacing);
         }
     }
 }

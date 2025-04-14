@@ -1,24 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using ZoDream.Shared.Database;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Tokenizers;
-using ZoDream.Shared.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZoDream.Reader.Controls
 {
@@ -58,11 +46,11 @@ namespace ZoDream.Reader.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PageLayer), new FrameworkPropertyMetadata(typeof(PageLayer)));
         }
 
-        public double Left => Canvas.GetLeft(this);
-        public double Top => Canvas.GetTop(this);
-
-
         public int Page { get; set; }
+
+        public Vector2 Position => new((float)Canvas.GetLeft(this), (float)Canvas.GetTop(this));
+
+        public Vector2 Size => new((float)ActualWidth, (float)ActualHeight);
 
         private INovelPage? _data;
 
@@ -94,13 +82,15 @@ namespace ZoDream.Reader.Controls
                     {
                         formatted = new FormattedText(c.Text, CultureInfo.CurrentCulture,
                         FlowDirection.LeftToRight, font, fontSize, Foreground, 1.25);
-                        drawingContext.DrawText(formatted, new Point(page.X + item.X, page.Y + item.Y));
+                        drawingContext.DrawText(formatted, new Point(page.Position.X + item.Position.X, 
+                            page.Position.Y + item.Position.Y));
                     }
                     if (item is INovelPageImage i)
                     {
                         drawingContext.DrawImage(
                             new BitmapImage(new Uri(i.Source, UriKind.Absolute))
-                            , new Rect(page.X + item.X, page.Y + item.Y, item.Width, item.Height));
+                            , new Rect(page.Position.X + item.Position.X, 
+                            page.Position.Y + item.Position.Y, item.Size.X, item.Size.Y));
                     }
                 }
             }
@@ -136,8 +126,8 @@ namespace ZoDream.Reader.Controls
 
         public void DrawText(INovelPage data)
         {
-            Canvas.SetLeft(this, data.X);
-            Canvas.SetTop(this, data.Y);
+            Canvas.SetLeft(this, data.Position.X);
+            Canvas.SetTop(this, data.Position.Y);
             _data = data;
             InvalidateVisual();
         }
@@ -145,6 +135,16 @@ namespace ZoDream.Reader.Controls
         public void Dispose()
         {
             
+        }
+
+        public void Move(Vector2 point)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Resize(Vector4 bound)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Numerics;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Tokenizers;
 
@@ -20,27 +20,29 @@ namespace ZoDream.Shared.Tokenizers
             FontItalic = theme.FontItalic;
         }
 
-        public double X { get; set; }
-        public double Y { get; set; }
+        public Vector2 Position { get; set; }
 
-        public int FontSize { get; }
+
+
+        public byte FontSize { get; }
         public string FontFamily { get; } = string.Empty;
 
-        public int FontWeight { get; }
+        public ushort FontWeight { get; }
         public bool FontItalic { get; }
 
-        public double ActualHeight {
+        public Vector2 Size 
+        {
             get {
-                var max = .0;
+                var maxX = .0f;
+                var maxY = .0f;
                 foreach (var item in this)
                 {
-                    if (item.Height > max)
-                    {
-                        max = item.Height;
-                    }
+                    maxX = Math.Max(maxX, item.Size.X);
+                    maxY = Math.Max(maxY, item.Size.Y);
                 }
-                return max;
+                return new(maxX, maxY);
             }
         }
+
     }
 }

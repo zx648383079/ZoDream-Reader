@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using ZoDream.Shared.Animations;
 using ZoDream.Shared.Interfaces;
@@ -43,14 +44,11 @@ namespace ZoDream.Reader.ViewModels
 
         public string NovelId => _novel.Id;
 
-        public double Width { get; private set; }
-
-        public double Height { get; private set; }
+        public Vector2 Size { get; private set; }
 
         public Task ReadyAsync(ICanvasRender render)
         {
-            Width = render.ActualWidth;
-            Height = render.ActualHeight - 20;
+            Size = new(render.Size.X, render.Size.Y - 20);
             Animator.Ready(render);
             return Task.CompletedTask;
         }

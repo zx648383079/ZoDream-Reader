@@ -1,25 +1,21 @@
-﻿using Microsoft.Graphics.Canvas.Effects;
-using Microsoft.Graphics.Canvas;
-using System;
-using ZoDream.Shared.Interfaces;
-using ZoDream.Shared.Interfaces.Tokenizers;
+﻿using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.UI;
-using Windows.UI;
-using Windows.Foundation;
+using Microsoft.UI.Xaml.Documents;
+using System;
 using System.Numerics;
+using Windows.Foundation;
+using Windows.UI;
+using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Interfaces.Tokenizers;
 
 namespace ZoDream.Reader.Controls
 {
     public class PageLayer(TextContainer container) : ICanvasLayer
     {
-        public double Left { get; set; }
-
-        public double Top { get; set; }
-
-        public double ActualWidth { get; set; }
-
-        public double ActualHeight { get; set; }
+        public Vector2 Position { get; set; }
+        public Vector2 Size { get; set; }
 
         public int Page { get; set; }
 
@@ -48,14 +44,14 @@ namespace ZoDream.Reader.Controls
         {
             if (_cacheEffect != null)
             {
-                target.DrawImage(_cacheEffect, (float)Left, (float)Top);
+                target.DrawImage(_cacheEffect, Position.X, Position.Y);
                 // return;
             }
             if (_cacheBitmap == null)
             {
                 return;
             }
-            target.DrawImage(_cacheBitmap, (float)Left, (float)Top);
+            target.DrawImage(_cacheBitmap, Position.X, Position.Y);
         }
 
 
@@ -63,15 +59,16 @@ namespace ZoDream.Reader.Controls
         {
             if (_cacheBitmap == null)
             {
-                _cacheBitmap = new CanvasRenderTarget(container.Canvas, (float)ActualWidth,
-                   (float)ActualHeight, 96);
+                _cacheBitmap = new CanvasRenderTarget(container.Canvas, Size.X,
+                   Size.Y, 96);
             }
             using var ds = _cacheBitmap.CreateDrawingSession();
             ds.Clear(Background);
             var backgroundImage = container.BackgroundImage;
             if (backgroundImage != null)
             {
-                ds.DrawImage(backgroundImage, 0, 0, new Rect(0, 0, ActualWidth, ActualHeight));
+                ds.DrawImage(backgroundImage, 0, 0, new Rect(0, 0, Size.X,
+                   Size.Y));
             }
             foreach (var page in data)
             {
@@ -85,30 +82,34 @@ namespace ZoDream.Reader.Controls
                     if (item is INovelPageChar c)
                     {
                         ds.DrawText(c.Text,
-                            new Vector2((float)(item.X + page.X), (float)(item.Y + page.Y)),
+                            item.Position + page.Position,
                             Foreground, font);
                     }
                     if (item is INovelPageImage i)
                     {
                         var image = CanvasBitmap.LoadAsync(container.Canvas, i.Source).GetAwaiter().GetResult();
-                        ds.DrawImage(image, new Rect(page.X + item.X, page.Y + item.Y, item.Width, item.Height));
+                        ds.DrawImage(image, new Rect((item.Position + page.Position).ToPoint(), item.Size.ToSize()));
                     }
 
                 }
             }
         }
 
-        public void Move(double x, double y)
+        public void Move(Vector2 point)
         {
-            Left = x;
-            Top = y;
+            Position = point;
         }
 
-        public void Resize(double x, double y, double width, double height)
+        public void Resize(Vector4 bound)
         {
-            Move(x, y);
-            ActualWidth = width;
-            ActualHeight = height;
+            Move(new(bound.X, bound.Y));
+            Size = new(bound.Z, bound.W);
+        }
+
+        public void Resize(Vector2 point, Vector2 size)
+        {
+            Move(point);
+            Size = size;
         }
 
         public void Toggle(bool visible)

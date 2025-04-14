@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using ZoDream.Shared.Interfaces.Tokenizers;
 
 namespace ZoDream.Shared.Interfaces
@@ -6,10 +7,8 @@ namespace ZoDream.Shared.Interfaces
     public interface ICanvasLayer: IDisposable
     {
 
-        public double Left { get; }
-        public double Top { get; }
-        public double ActualWidth { get; }
-        public double ActualHeight { get; }
+        public Vector2 Position { get; }
+        public Vector2 Size { get; }
 
         public int Page { get; set; }
 
@@ -17,9 +16,10 @@ namespace ZoDream.Shared.Interfaces
 
         public void Clear();
 
-        public void Move(double x, double y);
+        public void Move(Vector2 point);
 
-        public void Resize(double x, double y, double width, double height);
+        public void Resize(Vector4 bound);
+        public void Resize(Vector2 point, Vector2 size);
 
         public void Toggle(bool visible);
 

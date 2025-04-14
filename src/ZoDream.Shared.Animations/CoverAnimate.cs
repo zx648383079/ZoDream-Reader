@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using ZoDream.Shared.Interfaces;
 
@@ -16,17 +17,17 @@ namespace ZoDream.Shared.Animations
             
         }
 
-        public override void OnTouchFinish(double x, double y)
+        public override void OnTouchFinish(Vector2 point)
         {
             
         }
 
-        public override void OnTouchMove(double x, double y)
+        public override void OnTouchMove(Vector2 point)
         {
             
         }
 
-        public override void OnTouchStart(double x, double y)
+        public override void OnTouchStart(Vector2 point)
         {
             
         }

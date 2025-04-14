@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Numerics;
 
 namespace ZoDream.Shared.Interfaces.Tokenizers
 {
     public interface INovelPageLinePart
     {
-        public double X { get; }
-        public double Y { get; }
-        public double Height { get; }
-        public double Width { get; }
+        public Vector2 Position { get; }
+        public Vector2 Size { get; }
     }
 }

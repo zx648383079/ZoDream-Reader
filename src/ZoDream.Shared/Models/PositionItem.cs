@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ZoDream.Shared.Models
+﻿namespace ZoDream.Shared.Models
 {
     public class PositionItem
     {
@@ -23,18 +19,22 @@ namespace ZoDream.Shared.Models
             Offset = offset;
         }
 
-        public override bool Equals(object target)
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object? target)
         {
             if (target == null)
             {
                 return false;
             }
-            if (target is not PositionItem)
+            if (target is not PositionItem t)
             {
                 return false;
             }
-            var t = target as PositionItem;
-            return Position == t.Position && Offset == t.Offset;
+            return Position == t?.Position && Offset == t?.Offset;
         }
 
 

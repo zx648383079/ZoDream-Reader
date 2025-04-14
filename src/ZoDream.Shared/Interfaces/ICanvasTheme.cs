@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Numerics;
 
 namespace ZoDream.Shared.Interfaces
 {
@@ -9,27 +7,29 @@ namespace ZoDream.Shared.Interfaces
         /// <summary>
         /// 对齐，0 居左 1 居中 3 居右
         /// </summary>
-        public int TextAlign { get; }
-
+        public byte TextAlign { get; }
         public string FontFamily { get; }
-        public int FontSize { get; }
+        public byte FontSize { get; }
         /// <summary>
         /// 字体加粗，500 正常
         /// </summary>
-        public int FontWeight { get; }
+        public ushort FontWeight { get; }
         public bool FontItalic { get; }
         public bool Underline { get; }
-        public int PaddingTop { get; }
-        public int PaddingLeft { get; }
-        public int PaddingRight { get; }
-        public int PaddingBottom { get; }
+        /// <summary>
+        /// x 左 y 上 z 右 w 下 
+        /// </summary>
+        public Vector4 Padding { get; }
 
-        public int LineSpacing { get; }
-        public int LetterSpacing { get; }
+        /// <summary>
+        /// x 字间距 y 行间距
+        /// </summary>
+        public Vector2 Spacing { get; }
+        /// <summary>
+        /// 内容有效区域
+        /// </summary>
+        public Vector2 BodySize { get; }
 
-        public double PageInnerWidth { get; }
-        public double PageInnerHeight { get; }
-
-        public (double, double) FontBound(char? code);
+        public Vector2 FontBound(char? code);
     }
 }

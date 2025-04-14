@@ -1,36 +1,32 @@
-﻿using ZoDream.Shared.Interfaces;
+﻿using System.Numerics;
+using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Shared.Animations
 {
     public abstract class BaseCanvasAnimate : ICanvasAnimate
     {
         protected ICanvasRender? Canvas;
-        protected double Width;
-        protected double Height;
+        protected Vector2 _size;
 
-        protected double LastX;
-        protected double LastY;
-        protected double BeginY;
-        protected double BeginX;
+        protected Vector2 _lastPoint;
+        protected Vector2 _beginPoint;
         protected bool? DirectNext;
         protected bool IsMoving;
 
         public virtual void Ready(ICanvasRender canvas)
         {
-            Width = 0;
-            Height = 0;
+            _size = Vector2.Zero;
             Canvas = canvas;
-            Resize(canvas.ActualWidth, canvas.ActualHeight);
+            Resize(canvas.Size);
         }
 
-        public virtual void Resize(double width, double height)
+        public virtual void Resize(Vector2 size)
         {
-            if (Width == width &&  Height == height)
+            if (_size == size)
             {
                 return;
             }
-            Width = width;
-            Height = height;
+            _size = size;
             OnResize();
         }
 
@@ -46,24 +42,21 @@ namespace ZoDream.Shared.Animations
                 Ready(canvas);
             }
         }
-        public virtual void OnTouchFinish(double x, double y)
+        public virtual void OnTouchFinish(Vector2 point)
         {
-            LastX = x;
-            LastY = y;
+            _lastPoint = point;
             IsMoving = false;
         }
 
-        public virtual void OnTouchMove(double x, double y)
+        public virtual void OnTouchMove(Vector2 point)
         {
-            LastX = x;
-            LastY = y;
+            _lastPoint = point;
             IsMoving = true;
         }
 
-        public virtual void OnTouchStart(double x, double y)
+        public virtual void OnTouchStart(Vector2 point)
         {
-            LastX = BeginX = x;
-            LastY = BeginY = y;
+            _lastPoint = _beginPoint = point;
             DirectNext = null;
             IsMoving = false;
         }

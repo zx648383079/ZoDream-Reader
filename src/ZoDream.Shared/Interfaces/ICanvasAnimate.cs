@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Numerics;
 
 namespace ZoDream.Shared.Interfaces
 {
     public interface ICanvasAnimate: IDisposable
     {
         public void Ready(ICanvasRender canvas);
-        public void Resize(double width, double height);
+        public void Resize(Vector2 size);
 
-        public void OnTouchStart(double x, double y);
-        public void OnTouchMove(double x, double y);
-        public void OnTouchFinish(double x, double y);
+        public void OnTouchStart(Vector2 point);
+        public void OnTouchMove(Vector2 point);
+        public void OnTouchFinish(Vector2 point);
 
         public void TurnPrevious();
         public void TurnNext();

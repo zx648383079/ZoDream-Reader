@@ -1,4 +1,5 @@
-﻿using ZoDream.Shared.Interfaces;
+﻿using System.Numerics;
+using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Shared.Animations
 {
@@ -14,7 +15,7 @@ namespace ZoDream.Shared.Animations
             {
                 return;
             }
-            _layer = Canvas?.CreateLayer(Width, Height);
+            _layer = Canvas?.CreateLayer(_size);
             _layer?.DrawText(page);
         }
 
@@ -24,16 +25,16 @@ namespace ZoDream.Shared.Animations
             canvas.DrawLayer(_layer!);
         }
 
-        public override void OnTouchFinish(double x, double y)
+        public override void OnTouchFinish(Vector2 point)
         {
-            base.OnTouchFinish(x, y);
+            base.OnTouchFinish(point);
             if (!IsMoving)
             {
-                if (x < Width / 3)
+                if (point.X < _size.X / 3)
                 {
                     TurnPrevious();
                 }
-                else if (x > Width * .7)
+                else if (point.X < _size.X * .7)
                 {
                     TurnNext();
                 }
@@ -41,15 +42,15 @@ namespace ZoDream.Shared.Animations
             }
         }
 
-        public override void OnTouchMove(double x, double y)
+        public override void OnTouchMove(Vector2 point)
         {
-            DirectNext = x > LastX;
-            base.OnTouchMove(x, y);
+            DirectNext = point.X > _lastPoint.X;
+            base.OnTouchMove(point);
         }
 
-        public override void OnTouchStart(double x, double y)
+        public override void OnTouchStart(Vector2 point)
         {
-            base.OnTouchStart(x, y);
+            base.OnTouchStart(point);
         }
 
         public override void TurnNext()

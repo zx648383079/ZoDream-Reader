@@ -82,7 +82,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            Editor.LoadFromFile(file);
+            Editor.LoadFromFile(file.Path);
         }
 
         private void TapSave()

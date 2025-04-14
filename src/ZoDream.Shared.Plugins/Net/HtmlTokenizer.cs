@@ -63,30 +63,29 @@ namespace ZoDream.Shared.Plugins.Net
                 return null;
             }
             var line = new NovelPageLine();
-            var maxW = theme.PageInnerWidth;
-            var x = .0;
+            var maxW = theme.BodySize.X;
+            var x = .0f;
             while (index < content.Length)
             {
-                var (fontW, fontH) = theme.FontBound(content[index]);
-                if (x + fontW > maxW)
+                var font = theme.FontBound(content[index]);
+                if (x + font.X > maxW)
                 {
                     break;
                 }
                 line.Add(new NovelPageChar(content[index].ToString())
                 {
-                    X = x,
-                    Width = fontW,
-                    Height = fontH,
+                    Position = new(x, 0),
+                    Size = font
                 });
-                x += fontW;
+                x += font.X;
                 index++;
             }
-            line.X = theme.TextAlign switch
+            line.Position = new(theme.TextAlign switch
             {
-                1 => (theme.Width - x) / 2,
-                2 => theme.Width - x - theme.PaddingRight,
-                _ => theme.PaddingLeft,
-            };
+                1 => (theme.Size.X - x) / 2,
+                2 => theme.Size.X - x - theme.Padding.Z,
+                _ => theme.Padding.X,
+            }, 0);
             return line;
         }
 
