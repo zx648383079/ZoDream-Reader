@@ -52,6 +52,16 @@
                 Command="{Binding ExtractCommand}"
                 Content="&#xE8FE;"
                 Style="{StaticResource LargeIconBtn}" />
+            <Button
+                Command="{Binding BackCommand}"
+                Content="&#xE72B;"
+                IsEnabled="{Binding BackEnabled}"
+                Style="{StaticResource LargeIconBtn}" />
+            <Button
+                Command="{Binding ForwardCommand}"
+                Content="&#xE72A;"
+                IsEnabled="{Binding ForwardEnabled}"
+                Style="{StaticResource LargeIconBtn}" />
         </StackPanel>
         <Grid Grid.Row="1">
             <ctl:TextEditor x:Name="Editor" />

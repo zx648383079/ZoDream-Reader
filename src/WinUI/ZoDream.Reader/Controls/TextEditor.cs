@@ -16,87 +16,48 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.System;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Storage;
+using ZoDream.Shared.Tokenizers;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace ZoDream.Reader.Controls
 {
-    [TemplatePart(Name = TextRender.CanvasElementName, Type = typeof(CanvasControl))]
+    [TemplatePart(Name = TextRender.CanvasElementName, Type = typeof(TextBox))]
     public sealed class TextEditor : Control, ITextEditor
     {
         public TextEditor()
         {
             this.DefaultStyleKey = typeof(TextEditor);
-            // 初始化光标闪烁定时器
-            _cursorTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(500)
-            };
-            _cursorTimer.Tick += CursorTimer_Tick;
-            _cursorTimer.Start();
         }
 
 
-        private CanvasTextLayout _textLayout;
-        private CanvasControl? _canvas;
-        private int _cursorPosition;
-        private Vector2 _cursorPositionPixels;
-        private bool _cursorVisible = true;
-        private DispatcherTimer _cursorTimer;
-        private float _scrollOffset;
+        private TextBox? _canvas;
+        private int _cursor;
+        private int _cursorNext;
         private string _source = string.Empty;
+        private readonly List<int> _histories = [0];
+
+        public bool CanBack => _cursor > 0;
+        public bool CanForward => _cursorNext < Text.Length;
 
         public string Text { 
             get => _source; 
             set {
                 _source = value;
-                if (_textLayout is not null)
-                {
-                    Render();
-                }
+                _cursor = 0;
+                Render();
             }
         }
+
+
+
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _canvas = GetTemplateChild(TextRender.CanvasElementName) as CanvasControl;
-            if (_canvas is not null)
-            {
-                _canvas.Draw += Canvas_Draw;
-                _canvas.CreateResources += Canvas_CreateResources;
-            }
+            _canvas = GetTemplateChild(TextRender.CanvasElementName) as TextBox;
         }
 
-        private void Canvas_CreateResources(CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
-        {
-            Render();
-        }
-
-        private void Canvas_Draw(CanvasControl sender, CanvasDrawEventArgs args)
-        {
-            if (_textLayout is null)
-            {
-                return;
-            }
-            // 绘制文本
-            args.DrawingSession.DrawTextLayout(_textLayout, 0, _scrollOffset, Colors.Black);
-
-            // 绘制光标
-            if (_cursorVisible)// && sender.FocusState != FocusState.Unfocused)
-            {
-                var cursorPosition = _textLayout.GetCaretPosition(_cursorPosition, false, out var cursorRegion);
-                _cursorPositionPixels = new Vector2(cursorPosition.X, cursorPosition.Y + _scrollOffset);
-
-                args.DrawingSession.DrawLine(
-                    _cursorPositionPixels,
-                    new Vector2(_cursorPositionPixels.X,
-                    _cursorPositionPixels.Y + (float)cursorRegion.LayoutBounds.Height
-                    ),
-                    Colors.Black,
-                    2);
-            }
-        }
 
         private void Render()
         {
@@ -104,133 +65,30 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
-            // 创建或更新文本布局
-            var format = new CanvasTextFormat()
+            if (_cursor == 0)
             {
-                FontSize = (float)FontSize,
-                WordWrapping = CanvasWordWrapping.Wrap
-            };
-            _textLayout = new CanvasTextLayout(_canvas, Text, format,
-                (float)_canvas.ActualWidth, (float)_canvas.ActualHeight);
-        }
-
-        protected override void OnKeyDown(KeyRoutedEventArgs e)
-        {
-            base.OnKeyDown(e);
-            var textChanged = false;
-
-            switch (e.Key)
-            {
-                case VirtualKey.Back:
-                    if (_cursorPosition > 0 && Text.Length > 0)
-                    {
-                        Text = Text.Remove(_cursorPosition - 1, 1);
-                        _cursorPosition--;
-                        textChanged = true;
-                    }
-                    break;
-
-                case VirtualKey.Delete:
-                    if (_cursorPosition < Text.Length)
-                    {
-                        Text = Text.Remove(_cursorPosition, 1);
-                        textChanged = true;
-                    }
-                    break;
-
-                case VirtualKey.Left:
-                    if (_cursorPosition > 0)
-                    {
-                        _cursorPosition--;
-                        textChanged = true;
-                    }
-                    break;
-
-                case VirtualKey.Right:
-                    if (_cursorPosition < Text.Length)
-                    {
-                        _cursorPosition++;
-                        textChanged = true;
-                    }
-                    break;
-
-                case VirtualKey.Up:
-                    // 简化版 - 实际应计算上一行的位置
-                    _cursorPosition = Math.Max(0, _cursorPosition - 20);
-                    textChanged = true;
-                    break;
-
-                case VirtualKey.Down:
-                    // 简化版 - 实际应计算下一行的位置
-                    _cursorPosition = Math.Min(Text.Length, _cursorPosition + 20);
-                    textChanged = true;
-                    break;
-
-                case VirtualKey.Home:
-                    _cursorPosition = 0;
-                    textChanged = true;
-                    break;
-
-                case VirtualKey.End:
-                    _cursorPosition = Text.Length;
-                    textChanged = true;
-                    break;
-
-                case VirtualKey.Enter:
-                    Text = Text.Insert(_cursorPosition, "\n");
-                    _cursorPosition++;
-                    textChanged = true;
-                    break;
+                _histories.Clear();
             }
-
-            // 处理常规文本输入
-            if (!e.Key.ToString().StartsWith("VirtualKey") && e.Key != VirtualKey.Space)
+            var start = _cursor;
+            var fontWidth = _canvas.FontSize * 2;
+            var maxColumn = Math.Floor(_canvas.ActualWidth / fontWidth);
+            var maxRow = (int)Math.Floor(_canvas.ActualHeight / fontWidth * .8);
+            var row = 0;
+            while (true)
             {
-                var ch = GetCharFromKey(e.Key);
-                if (ch != '\0')
+                var line = TextFormatter.LineText(_source, start, out _cursorNext);
+                start = _cursorNext;
+                if (line is null)
                 {
-                    Text = Text.Insert(_cursorPosition, ch.ToString());
-                    _cursorPosition++;
-                    textChanged = true;
+                    break;
+                }
+                row += (int)Math.Min(1, Math.Ceiling(line.Length / maxColumn));
+                if (row >= maxRow)
+                {
+                    break;
                 }
             }
-            else if (e.Key == VirtualKey.Space)
-            {
-                Text = Text.Insert(_cursorPosition, " ");
-                _cursorPosition++;
-                textChanged = true;
-            }
-
-            if (textChanged)
-            {
-                _cursorVisible = true;
-                _cursorTimer.Stop();
-                _cursorTimer.Start();
-                _canvas?.Invalidate();
-            }
-        }
-
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-        {
-            base.OnPointerPressed(e);
-            _canvas?.Focus(FocusState.Programmatic);
-
-            // 获取点击位置并设置光标位置
-            var point = e.GetCurrentPoint(_canvas);
-            if (_textLayout.HitTest(
-                new Vector2((float)point.Position.X, (float)point.Position.Y - _scrollOffset),
-                out var rect))
-            {
-                _cursorPosition = rect.CharacterIndex;
-                _cursorVisible = true;
-                _canvas?.Invalidate();
-            }
-        }
-
-        protected override void OnPointerMoved(PointerRoutedEventArgs e)
-        {
-            base.OnPointerMoved(e);
-
+            _canvas.Text = _source[_cursor .. _cursorNext];
         }
 
         public void LoadFromFile(string fileName)
@@ -262,25 +120,50 @@ namespace ZoDream.Reader.Controls
         {
         }
 
-        private void CursorTimer_Tick(object? sender, object e)
+        public void GoForward()
         {
-            _cursorVisible = !_cursorVisible;
-            _canvas?.Invalidate();
+            if (!_histories.Contains(_cursor))
+            {
+                _histories.Add(_cursor);
+            }
+            _cursor = _cursorNext;
+            Render();
         }
 
-        private static char GetCharFromKey(VirtualKey key)
+        public void GoBack()
         {
-            // 简化版 - 实际应用中应考虑Shift键状态等
-            if (key >= VirtualKey.A && key <= VirtualKey.Z)
+            if (_cursor == 0)
             {
-                return (char)('a' + (key - VirtualKey.A));
+                return;
             }
-            else if (key >= VirtualKey.Number0 && key <= VirtualKey.Number9)
+            var i = _histories.IndexOf(_cursor);
+            if (i > 0)
             {
-                return (char)('0' + (key - VirtualKey.Number0));
+                _histories.RemoveRange(i, _histories.Count - i);
+            } else
+            {
+                i = _histories.Count;
             }
+            _cursor = _histories[i - 1];
+            Render();
+        }
 
-            return '\0';
+        public IDictionary<char, int> Count()
+        {
+            var data = new Dictionary<char, int>();
+            foreach (var item in _source)
+            {
+                if (item is '\t' or ' ' or '\n' or '\r')
+                {
+                    continue;
+                }
+                if (data.TryAdd(item, 1))
+                {
+                    continue;
+                }
+                data[item]++;
+            }
+            return data;
         }
     }
 }

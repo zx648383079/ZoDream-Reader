@@ -20,6 +20,8 @@ namespace ZoDream.Reader.ViewModels
             FindCommand = new RelayCommand(TapFind);
             FindNextCommand = new RelayCommand(TapFindNext);
             ExtractCommand = new RelayCommand(TapExtract);
+            BackCommand = new RelayCommand(TapBack);
+            ForwardCommand = new RelayCommand(TapForward);
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
@@ -47,21 +49,75 @@ namespace ZoDream.Reader.ViewModels
         }
 
 
+        private bool _backEnabled;
+
+        public bool BackEnabled {
+            get => _backEnabled;
+            set => SetProperty(ref _backEnabled, value);
+        }
+
+        private bool _forwardEnabled;
+
+        public bool ForwardEnabled {
+            get => _forwardEnabled;
+            set => SetProperty(ref _forwardEnabled, value);
+        }
+
+
 
         public ICommand OpenCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
         public ICommand FindCommand { get; private set; }
         public ICommand FindNextCommand { get; private set; }
         public ICommand ExtractCommand { get; private set; }
+        public ICommand BackCommand { get; private set; }
+        public ICommand ForwardCommand { get; private set; }
+
+        private void TapBack()
+        {
+            if (Editor is null)
+            {
+                return;
+            }
+            Editor.GoBack();
+            SyncState();
+        }
+        private void TapForward()
+        {
+            if (Editor is null)
+            {
+                return;
+            }
+            Editor.GoForward();
+            SyncState();
+        }
+
+        private void SyncState()
+        {
+            if (Editor is null)
+            {
+                return;
+            }
+            BackEnabled = Editor.CanBack;
+            ForwardEnabled = Editor.CanForward;
+        }
 
         private void TapFind()
         {
+            if (Editor is null)
+            {
+                return;
+            }
             FindVisible = !FindVisible;
             Editor.Unselect();
         }
 
         private async void TapFindNext()
         {
+            if (Editor is null)
+            {
+                return;
+            }
             if (string.IsNullOrWhiteSpace(FindText))
             {
                 return;
@@ -75,6 +131,10 @@ namespace ZoDream.Reader.ViewModels
 
         private async void TapOpen()
         {
+            if (Editor is null)
+            {
+                return;
+            }
             var picker = new FileOpenPicker();
             picker.FileTypeFilter.Add(".txt");
             _app.InitializePicker(picker);
@@ -84,6 +144,7 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             Editor.LoadFromFile(file.Path);
+            SyncState();
         }
 
         private void TapSave()
@@ -93,20 +154,11 @@ namespace ZoDream.Reader.ViewModels
 
         private void TapExtract()
         {
-            var text = Editor.Text;
-            var data = new Dictionary<char, int>();
-            foreach (var item in text)
+            if (Editor is null)
             {
-                if (item is '\t' or ' ' or '\n' or '\r')
-                {
-                    continue;
-                }
-                if (data.TryAdd(item, 1))
-                {
-                    continue;
-                }
-                data[item]++;
+                return;
             }
+            var data = Editor.Count();
             WordItems.Clear();
             foreach (var item in data.Order(this))
             {

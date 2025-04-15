@@ -179,5 +179,49 @@ namespace ZoDream.Shared.Tokenizers
         {
             return (int)Math.Ceiling((float)ComputeLine(input) / PerPageLineCount);
         }
+
+        public static string? LineText(string text, out int next)
+        {
+            return LineText(text, 0, out next);
+        }
+        /// <summary>
+        /// 获取一行
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="index"></param>
+        /// <param name="next">下一行的开始位置，最后一行时，next = 0</param>
+        /// <returns></returns>
+        public static string? LineText(string text, int index, out int next)
+        {
+            if (index >= text.Length)
+            {
+                next = 0;
+                return null;
+            }
+            var i = index;
+            var end = text.Length;
+            while (i < text.Length)
+            {
+                var code = text[i++];
+                if (code == '\r')
+                {
+                    end = i - 1;
+                    if (text.Length > i && text[i] == '\n')
+                    {
+                        i++;
+                    }
+                    next = i;
+                    return text.Substring(index, end - index);
+                }
+                if (code == '\n')
+                {
+                    end = i - 1;
+                    next = i;
+                    return text.Substring(index, end - index);
+                }
+            }
+            next = 0;
+            return text.Substring(index, end - index);
+        }
     }
 }
