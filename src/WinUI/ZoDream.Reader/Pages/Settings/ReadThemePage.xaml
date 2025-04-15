@@ -2,27 +2,27 @@
     x:Class="ZoDream.Reader.Pages.Settings.ReadThemePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ZoDream.Reader.Pages.Settings"
+    xmlns:bhv="using:ZoDream.Reader.Behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ity="using:Microsoft.Xaml.Interactivity"
+    xmlns:local="using:ZoDream.Reader.Pages.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
-    xmlns:bhv="using:ZoDream.Reader.Behaviors"
-     xmlns:ity="using:Microsoft.Xaml.Interactivity"
-     x:Name="root"
+    x:Name="root"
     mc:Ignorable="d">
 
     <Page.DataContext>
-        <vm:ReadThemeViewModel/>
+        <vm:ReadThemeViewModel />
     </Page.DataContext>
 
     <Page.Resources>
-        <ResourceDictionary Source="ms-appx:///Themes/RuleStyle.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Themes/RuleStyle.xaml" />
     </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <ListBox ItemsSource="{Binding ThemeItems}">
@@ -30,38 +30,63 @@
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="200" />
                         </Grid.ColumnDefinitions>
-                        <CheckBox IsChecked="{Binding IsChecked,Mode=TwoWay}"/>
-                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Grid.Column="1"/>
-                        <ToggleSwitch IsOn="{Binding IsEnabled,Mode=TwoWay}" 
-                                  Style="{StaticResource InlineSwitchStyle}"
-                                  Grid.Column="2" Grid.RowSpan="2">
+                        <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="{Binding Name}" />
+                        <ToggleSwitch
+                            Grid.RowSpan="2"
+                            Grid.Column="2"
+                            IsOn="{Binding IsEnabled, Mode=TwoWay}"
+                            Style="{StaticResource InlineSwitchStyle}">
                             <ity:Interaction.Behaviors>
-                                <bhv:ToggleSwitchBehavior ToggleCommand="{Binding ElementName=root,Path=DataContext.ToggleCommand}"      
-                                    CommandParameter="{Binding}"/>
+                                <bhv:ToggleSwitchBehavior CommandParameter="{Binding}" ToggleCommand="{Binding ElementName=root, Path=DataContext.ToggleCommand}" />
                             </ity:Interaction.Behaviors>
                         </ToggleSwitch>
                         <CommandBar Grid.Column="3">
-                            <AppBarButton Icon="Edit" Label="编辑" Command="{Binding ElementName=root,Path=DataContext.EditCommand}"      
-                                    CommandParameter="{Binding}"/>
-                            <AppBarButton Icon="Delete" Label="删除" Command="{Binding ElementName=root,Path=DataContext.DeleteCommand}"      
-                                    CommandParameter="{Binding}"/>
+                            <AppBarButton
+                                Command="{Binding ElementName=root, Path=DataContext.EditCommand}"
+                                CommandParameter="{Binding}"
+                                Icon="Edit"
+                                Label="编辑" />
+                            <AppBarButton
+                                Command="{Binding ElementName=root, Path=DataContext.DeleteCommand}"
+                                CommandParameter="{Binding}"
+                                Icon="Delete"
+                                Label="删除" />
                         </CommandBar>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         <CommandBar Grid.Row="1">
-            <AppBarButton Icon="List" Label="切换选择" Command="{Binding ToggleCheckCommand}"/>
-            <AppBarButton Icon="Edit" Label="编辑" Command="{Binding EditCommand}"/>
-            <AppBarButton Icon="Delete" Label="删除" Command="{Binding DeleteCommand}"/>
-            <AppBarButton Icon="Add" Label="添加" Command="{Binding AddCommand}"/>
+            <AppBarButton
+                Command="{Binding ToggleCheckCommand}"
+                Icon="List"
+                Label="切换选择" />
+            <AppBarButton
+                Command="{Binding EditCommand}"
+                Icon="Edit"
+                Label="编辑" />
+            <AppBarButton
+                Command="{Binding DeleteCommand}"
+                Icon="Delete"
+                Label="删除" />
+            <AppBarButton
+                Command="{Binding AddCommand}"
+                Icon="Add"
+                Label="添加" />
             <CommandBar.SecondaryCommands>
-                <AppBarButton Icon="Import" Label="导入" Command="{Binding ImportCommand}"/>
+                <AppBarButton
+                    Command="{Binding ImportCommand}"
+                    Icon="Import"
+                    Label="导入" />
             </CommandBar.SecondaryCommands>
         </CommandBar>
     </Grid>

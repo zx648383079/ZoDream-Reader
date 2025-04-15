@@ -1,48 +1,54 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Page
     x:Class="ZoDream.Reader.Pages.NovelPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ZoDream.Reader.Pages"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ctl="using:ZoDream.Reader.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:ZoDream.Reader.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     mc:Ignorable="d">
 
     <Page.DataContext>
-        <vm:NovelViewModel/>
+        <vm:NovelViewModel />
     </Page.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="200"/>
-            <RowDefinition/>
+            <RowDefinition Height="200" />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Image Source="{Binding Cover,Converter={StaticResource ImageCvt}}"/>
+            <Image Source="{Binding Cover, Converter={StaticResource ImageCvt}}" />
             <StackPanel Grid.Column="1">
-                <TextBlock Text="{Binding Name}"/>
-                <ctl:IconLabel Icon="&#xE77B;" Text="{Binding Author}"/>
-                <ctl:IconLabel Icon="&#xE81C;" Text="最新章节"/>
-                <ctl:IconLabel Icon="&#xE74C;" Text="更新时间"/>
+                <TextBlock Text="{Binding Name}" />
+                <ctl:IconLabel Icon="&#xE77B;" Text="{Binding Author}" />
+                <ctl:IconLabel Icon="&#xE81C;" Text="最新章节" />
+                <ctl:IconLabel Icon="&#xE74C;" Text="更新时间" />
 
                 <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Button Content="立即阅读" Command="{Binding ReadCommand}"/>
-                    <Button Content="{Binding SecondaryText}" Command="{Binding SecondaryCommand}" Grid.Column="1"/>
+                    <Button Command="{Binding ReadCommand}" Content="立即阅读" />
+                    <Button
+                        Grid.Column="1"
+                        Command="{Binding SecondaryCommand}"
+                        Content="{Binding SecondaryText}" />
                 </Grid>
             </StackPanel>
         </Grid>
-        <TextBlock Grid.Row="1" Text="{Binding Description}" TextWrapping="Wrap"/>
+        <TextBlock
+            Grid.Row="1"
+            Text="{Binding Description}"
+            TextWrapping="Wrap" />
 
-        
+
     </Grid>
 </Page>

@@ -9,6 +9,8 @@ namespace ZoDream.Shared.Interfaces
 
         public long Position { get; }
 
+        public long Seek(long position);
+        public string? ReadLine();
         public Task SeekAsync(long position);
 
         public Task<string?> ReadLineAsync();

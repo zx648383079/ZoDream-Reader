@@ -1,41 +1,55 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Page
     x:Class="ZoDream.Reader.Pages.StartupPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ZoDream.Reader.Pages"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ctl="using:ZoDream.Reader.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:ZoDream.Reader.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     mc:Ignorable="d">
 
     <Page.DataContext>
-        <vm:StartupViewModel/>
+        <vm:StartupViewModel />
     </Page.DataContext>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <StackPanel Width="200" VerticalAlignment="Center" Grid.RowSpan="2">
-            <Image Source="/Assets/StoreLogo.png"/>
-            <TextBlock Text="{Binding Version}" HorizontalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}"/>
+        <StackPanel
+            Grid.RowSpan="2"
+            Width="200"
+            VerticalAlignment="Center">
+            <Image Source="/Assets/StoreLogo.png" />
+            <TextBlock
+                HorizontalAlignment="Center"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Text="{Binding Version}" />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <TextBlock Text="欢迎使用" Style="{StaticResource TitleTextBlockStyle}"/>
-            <TextBlock Text="介绍" Style="{StaticResource CaptionTextBlockStyle}"/>
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="欢迎使用" />
+            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="介绍" />
 
             <!--<InfoBar IsOpen="True" Severity="Error" Title="{Binding Tip}" Message="h"/>-->
 
-            <ctl:LargeIconButton Icon="&#xE838;" Header="打开文件夹" Meta="选择一个已存在" 
-                                 Command="{Binding OpenCommand}" Margin="0,40,0,0"/>
-            <ctl:LargeIconButton Icon="&#xE710;" Header="创建新" Meta="创建新的" Command="{Binding CreateCommand}"/>
+            <ctl:LargeIconButton
+                Margin="0,40,0,0"
+                Command="{Binding OpenCommand}"
+                Header="打开文件夹"
+                Icon="&#xE838;"
+                Meta="选择一个已存在" />
+            <ctl:LargeIconButton
+                Command="{Binding CreateCommand}"
+                Header="创建新"
+                Icon="&#xE710;"
+                Meta="创建新的" />
         </StackPanel>
         <!--<InfoBar BorderThickness="0" Severity="Informational" Title="h" Message="应用当前支持.txt" IsOpen="True" IsClosable="False" Grid.Column="1" Grid.Row="1"/>-->
     </Grid>

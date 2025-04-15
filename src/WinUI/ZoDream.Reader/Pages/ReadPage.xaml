@@ -20,7 +20,7 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <ctl:TextContainer Source="{Binding SourceService}" />
+        <ctl:TextRender Source="{Binding SourceService}" />
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

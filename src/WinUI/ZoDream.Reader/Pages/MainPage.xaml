@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Page
     x:Class="ZoDream.Reader.Pages.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -7,16 +7,31 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <NavigationView x:Name="MenuBar" ItemInvoked="NavigationView_ItemInvoked"
-                    IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False">
+    <NavigationView
+        x:Name="MenuBar"
+        IsBackButtonVisible="Collapsed"
+        IsPaneToggleButtonVisible="False"
+        ItemInvoked="NavigationView_ItemInvoked">
         <NavigationView.MenuItems>
-            <NavigationViewItem Icon="Bookmarks" Content="我的书架" Tag="home" />
-            <NavigationViewItem Icon="Globe" Content="探索发现" Tag="explore" />
-            <NavigationViewItem Icon="World" Content="书源管理" Tag="rule/source" />
+            <NavigationViewItem
+                Content="我的书架"
+                Icon="Bookmarks"
+                Tag="home" />
+            <NavigationViewItem
+                Content="探索发现"
+                Icon="Globe"
+                Tag="explore" />
+            <NavigationViewItem
+                Content="书源管理"
+                Icon="World"
+                Tag="rule/source" />
         </NavigationView.MenuItems>
         <NavigationView.FooterMenuItems>
-            <NavigationViewItem Icon="Help"  Content="帮助支持" Tag="help"/>
+            <NavigationViewItem
+                Content="帮助支持"
+                Icon="Help"
+                Tag="help" />
         </NavigationView.FooterMenuItems>
-        <Frame x:Name="ContentFrame"/>
+        <Frame x:Name="ContentFrame" />
     </NavigationView>
 </Page>

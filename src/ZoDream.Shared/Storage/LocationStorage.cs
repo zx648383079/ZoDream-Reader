@@ -17,16 +17,20 @@ namespace ZoDream.Shared.Storage
             {
                 return string.Empty;
             }
-            var fs = new FileStream(file, FileMode.Open);
-            using var reader = new StreamReader(fs, TxtEncoder.GetEncoding(fs, Encoding.GetEncoding("gb2312")));
+            using var reader = Reader(file);
             var content = await reader.ReadToEndAsync();
             return content;
         }
 
         public static StreamReader Reader(string file)
         {
-            var fs = new FileStream(file, FileMode.Open);
-            return new StreamReader(fs, TxtEncoder.GetEncoding(fs, Encoding.GetEncoding("gb2312")));
+            var fs = File.OpenRead(file);
+            return Reader(fs);
+        }
+
+        public static StreamReader Reader(Stream input)
+        {
+            return new StreamReader(input, TxtEncoder.GetEncoding(input, Encoding.GetEncoding("gb2312")));
         }
 
         /// <summary>

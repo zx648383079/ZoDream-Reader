@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Color x:Key="PrimaryColor">#000</Color>
     <Color x:Key="PrimaryTextColor">#fff</Color>
@@ -11,10 +9,10 @@
     <Color x:Key="SecondaryTextColor">#767676</Color>
 
 
-    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
-    <SolidColorBrush x:Key="PrimaryTextBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="{StaticResource PrimaryTextColor}" />
 
-    <SolidColorBrush x:Key="BodyBrush" Color="{StaticResource BodyColor}"/>
-    <SolidColorBrush x:Key="BodyTextBrush" Color="{StaticResource BodyTextColor}"/>
-    <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource SecondaryTextColor}"/>
+    <SolidColorBrush x:Key="BodyBrush" Color="{StaticResource BodyColor}" />
+    <SolidColorBrush x:Key="BodyTextBrush" Color="{StaticResource BodyTextColor}" />
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource SecondaryTextColor}" />
 </ResourceDictionary>

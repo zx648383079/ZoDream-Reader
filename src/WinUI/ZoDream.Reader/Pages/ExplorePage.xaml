@@ -1,33 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Page
     x:Class="ZoDream.Reader.Pages.ExplorePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     mc:Ignorable="d">
 
     <Page.DataContext>
-        <vm:ExploreViewModel/>
+        <vm:ExploreViewModel />
     </Page.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="auto" />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <TabView TabItemsSource="{Binding ChannelItems}">
             <TabView.TabStripHeader>
-                <ComboBox ItemsSource="{Binding SiteItems}" DisplayMemberPath="Name"/>
+                <ComboBox DisplayMemberPath="Name" ItemsSource="{Binding SiteItems}" />
             </TabView.TabStripHeader>
             <TabView.TabItemTemplate>
                 <DataTemplate>
-                    <TabViewItem Header="{Binding Name}" IsClosable="False" HorizontalAlignment="Center"/>
+                    <TabViewItem
+                        HorizontalAlignment="Center"
+                        Header="{Binding Name}"
+                        IsClosable="False" />
                 </DataTemplate>
             </TabView.TabItemTemplate>
         </TabView>
-        
+
     </Grid>
 </Page>

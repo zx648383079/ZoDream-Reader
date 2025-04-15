@@ -4,30 +4,30 @@
     xmlns:ctl="using:ZoDream.Reader.Controls">
 
     <Style TargetType="ctl:ContentPanel">
-        <Setter Property="Visibility" Value="Collapsed"/>
-        <Setter Property="Background" Value="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"/>
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="Background" Value="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ctl:ContentPanel">
                     <Grid>
-                        <Border 
+                        <Border
                             x:Name="PART_Mark"
                             Background="{ThemeResource ContentDialogBackgroundThemeBrush}"
-                            Opacity=".3">
-
-                        </Border>
-                        <Border Background="{TemplateBinding Background}" 
+                            Opacity=".3" />
+                        <Border
                             Width="{TemplateBinding PanelWidth}"
-                            HorizontalAlignment="{TemplateBinding Placement}">
+                            HorizontalAlignment="{TemplateBinding Placement}"
+                            Background="{TemplateBinding Background}">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition/>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="{TemplateBinding Header}"
-                                           Margin="10,0"
-                                           Style="{StaticResource TitleTextBlockStyle}"/>
-                                <ContentPresenter Grid.Row="1"/>
+                                <TextBlock
+                                    Margin="10,0"
+                                    Style="{StaticResource TitleTextBlockStyle}"
+                                    Text="{TemplateBinding Header}" />
+                                <ContentPresenter Grid.Row="1" />
                             </Grid>
                         </Border>
                     </Grid>

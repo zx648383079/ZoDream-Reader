@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Controls;
+using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -22,7 +23,7 @@ namespace ZoDream.Reader.ViewModels
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
-        public TextEditor Editor { get; private set; } = new();
+        public ITextEditor? Editor { get; internal set; }
 
         private string _findText = string.Empty;
 

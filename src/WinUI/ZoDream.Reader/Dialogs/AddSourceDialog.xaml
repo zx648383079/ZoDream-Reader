@@ -1,48 +1,51 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentDialog
     x:Class="ZoDream.Reader.Dialogs.AddSourceDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ZoDream.Reader.Dialogs"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:ZoDream.Reader.Dialogs"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Shared.Repositories.Models"
-    mc:Ignorable="d"
     Title="编辑书源"
-    PrimaryButtonText="取消"
-    SecondaryButtonText="下一步"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+    PrimaryButtonText="取消"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    SecondaryButtonText="下一步"
+    mc:Ignorable="d">
 
     <ContentDialog.DataContext>
-        <vm:SourceRuleModel/>
+        <vm:SourceRuleModel />
     </ContentDialog.DataContext>
 
     <Grid>
         <ScrollViewer x:Name="FirstPanel">
             <StackPanel>
-                <TextBlock Text="书源名" Style="{StaticResource InputHeaderStyle}"/>
-                <TextBox Text="{Binding Name,Mode=TwoWay}" Style="{StaticResource InputEntryStyle}"/>
+                <TextBlock Style="{StaticResource InputHeaderStyle}" Text="书源名" />
+                <TextBox Style="{StaticResource InputEntryStyle}" Text="{Binding Name, Mode=TwoWay}" />
 
-                <TextBlock Text="网址" Style="{StaticResource InputHeaderStyle}"/>
-                <TextBox Text="{Binding BaseUri,Mode=TwoWay}" Style="{StaticResource InputEntryStyle}"/>
+                <TextBlock Style="{StaticResource InputHeaderStyle}" Text="网址" />
+                <TextBox Style="{StaticResource InputEntryStyle}" Text="{Binding BaseUri, Mode=TwoWay}" />
 
-                <CheckBox IsChecked="{Binding EnabledExplore,Mode=TwoWay}" Content="支持发现模块"/>
-                <CheckBox IsChecked="{Binding EnabledSearch,Mode=TwoWay}" Content="支持搜索模块"/>
+                <CheckBox Content="支持发现模块" IsChecked="{Binding EnabledExplore, Mode=TwoWay}" />
+                <CheckBox Content="支持搜索模块" IsChecked="{Binding EnabledSearch, Mode=TwoWay}" />
             </StackPanel>
         </ScrollViewer>
         <Grid x:Name="SecondPanel" Visibility="Collapsed">
             <Grid.RowDefinitions>
-                <RowDefinition Height="32"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="32"/>
-                <RowDefinition/>
+                <RowDefinition Height="32" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="32" />
+                <RowDefinition />
             </Grid.RowDefinitions>
-            <TextBlock Text="网址" Style="{StaticResource InputHeaderStyle}"/>
-            <TextBox Style="{StaticResource InputEntryStyle}" Grid.Row="1"/>
+            <TextBlock Style="{StaticResource InputHeaderStyle}" Text="网址" />
+            <TextBox Grid.Row="1" Style="{StaticResource InputEntryStyle}" />
 
-            <TextBlock Text="规则" Style="{StaticResource InputHeaderStyle}" Grid.Row="2"/>
-            <RichEditBox Grid.Row="3"/>
+            <TextBlock
+                Grid.Row="2"
+                Style="{StaticResource InputHeaderStyle}"
+                Text="规则" />
+            <RichEditBox Grid.Row="3" />
         </Grid>
     </Grid>
 </ContentDialog>

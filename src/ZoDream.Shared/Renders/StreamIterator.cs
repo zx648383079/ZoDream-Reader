@@ -36,12 +36,12 @@ namespace ZoDream.Shared.Renders
             }
         }
 
-        internal void Seek(long position)
+        public long Seek(long position)
         {
-           _reader.Seek(position, SeekOrigin.Begin);
+           return _reader.Seek(position, SeekOrigin.Begin);
         }
 
-        internal string? ReadLine()
+        public string? ReadLine()
         {
             return ReadLine(out _);
         }
@@ -81,7 +81,7 @@ namespace ZoDream.Shared.Renders
                     Seek(p);
                     break;
                 }
-                bytes.Add(Convert.ToByte(bInt));
+                bytes.Add((byte)bInt);
             }
             nextPosition = Position;
             _isLoading = false;
@@ -140,5 +140,6 @@ namespace ZoDream.Shared.Renders
                 return new ReadLineItem(str, nextPos);
             });
         }
+
     }
 }

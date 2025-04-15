@@ -12,7 +12,7 @@ using ZoDream.Shared.Interfaces.Tokenizers;
 
 namespace ZoDream.Reader.Controls
 {
-    public class PageLayer(TextContainer container) : ICanvasLayer
+    public class TextPageLayer(TextRender container) : ICanvasLayer
     {
         public Vector2 Position { get; set; }
         public Vector2 Size { get; set; }
@@ -64,12 +64,12 @@ namespace ZoDream.Reader.Controls
             }
             using var ds = _cacheBitmap.CreateDrawingSession();
             ds.Clear(Background);
-            var backgroundImage = container.BackgroundImage;
-            if (backgroundImage != null)
-            {
-                ds.DrawImage(backgroundImage, 0, 0, new Rect(0, 0, Size.X,
-                   Size.Y));
-            }
+            //var backgroundImage = container.BackgroundImage;
+            //if (backgroundImage != null)
+            //{
+            //    ds.DrawImage(backgroundImage, 0, 0, new Rect(0, 0, Size.X,
+            //       Size.Y));
+            //}
             foreach (var page in data)
             {
                 using var font = new CanvasTextFormat()

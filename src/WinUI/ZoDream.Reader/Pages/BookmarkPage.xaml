@@ -2,38 +2,41 @@
     x:Class="ZoDream.Reader.Pages.BookmarkPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     mc:Ignorable="d">
 
     <Page.DataContext>
-        <vm:BookmarkViewModel/>
+        <vm:BookmarkViewModel />
     </Page.DataContext>
 
     <Page.Resources>
-        <ResourceDictionary Source="ms-appx:///Themes/RuleStyle.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Themes/RuleStyle.xaml" />
     </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <ListView ItemsSource="{Binding Items}">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <ItemsStackPanel AreStickyGroupHeadersEnabled="True"/>
+                    <ItemsStackPanel AreStickyGroupHeadersEnabled="True" />
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
             <ListView.GroupStyle>
-                <GroupStyle >
+                <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
                             <Border AutomationProperties.AccessibilityView="Raw">
-                                <TextBlock Text="{Binding BookName}" Style="{ThemeResource TitleTextBlockStyle}" AutomationProperties.AccessibilityView="Raw"/>
+                                <TextBlock
+                                    AutomationProperties.AccessibilityView="Raw"
+                                    Style="{ThemeResource TitleTextBlockStyle}"
+                                    Text="{Binding BookName}" />
                             </Border>
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>
@@ -43,28 +46,37 @@
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <CheckBox Grid.RowSpan="3"/>
-                        <TextBlock Text="{Binding Title}" Grid.Column="1"/>
-                        <TextBlock Text="{Binding Description}" Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="{Binding Remark}" Grid.Row="2" Grid.Column="1"/>
+                        <CheckBox Grid.RowSpan="3" />
+                        <TextBlock Grid.Column="1" Text="{Binding Title}" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Text="{Binding Description}" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Text="{Binding Remark}" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
         <CommandBar Grid.Row="1">
-            <AppBarButton Icon="List" Label="切换选择"/>
-            <AppBarButton Icon="Edit" Label="编辑"/>
-            <AppBarButton Icon="Delete" Label="删除"/>
+            <AppBarButton Icon="List" Label="切换选择" />
+            <AppBarButton Icon="Edit" Label="编辑" />
+            <AppBarButton Icon="Delete" Label="删除" />
             <CommandBar.SecondaryCommands>
-                <AppBarButton Icon="Download" Label="导出" Command="{Binding ExportCommand}"/>
+                <AppBarButton
+                    Command="{Binding ExportCommand}"
+                    Icon="Download"
+                    Label="导出" />
             </CommandBar.SecondaryCommands>
         </CommandBar>
     </Grid>

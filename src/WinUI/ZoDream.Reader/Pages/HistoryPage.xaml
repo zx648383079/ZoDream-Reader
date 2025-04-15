@@ -2,24 +2,24 @@
     x:Class="ZoDream.Reader.Pages.HistoryPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     mc:Ignorable="d">
 
     <Page.DataContext>
-        <vm:HistoryViewModel/>
+        <vm:HistoryViewModel />
     </Page.DataContext>
 
     <Page.Resources>
-        <ResourceDictionary Source="ms-appx:///Themes/RuleStyle.xaml"/>
+        <ResourceDictionary Source="ms-appx:///Themes/RuleStyle.xaml" />
     </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <ListBox ItemsSource="{Binding Items}">
@@ -27,28 +27,40 @@
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <CheckBox Grid.RowSpan="3"/>
-                        <TextBlock Text="{Binding Name}" Grid.Column="1"/>
-                        <TextBlock Text="阅读时长：" Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="{Binding ReadTime}" Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="最后阅读时间：" Grid.Row="2" Grid.Column="1"/>
-                        <TextBlock Text="{Binding LastReadAt}" Grid.Row="2" Grid.Column="1"/>
+                        <CheckBox Grid.RowSpan="3" />
+                        <TextBlock Grid.Column="1" Text="{Binding Name}" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Text="阅读时长：" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Text="{Binding ReadTime}" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Text="最后阅读时间：" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Text="{Binding LastReadAt}" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         <CommandBar Grid.Row="1">
-            <AppBarButton Icon="List" Label="切换选择"/>
-            <AppBarButton Icon="Edit" Label="编辑"/>
-            <AppBarButton Icon="Delete" Label="删除"/>
+            <AppBarButton Icon="List" Label="切换选择" />
+            <AppBarButton Icon="Edit" Label="编辑" />
+            <AppBarButton Icon="Delete" Label="删除" />
         </CommandBar>
     </Grid>
 </Page>

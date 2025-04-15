@@ -27,7 +27,7 @@ namespace ZoDream.Reader.Pages.Rules
         public CreateDictionaryPage()
         {
             this.InitializeComponent();
-            ViewModel.Editor.Instance = Editor;
+            ViewModel.Editor = Editor;
         }
 
         public CreateDictionaryViewModel ViewModel => (CreateDictionaryViewModel)DataContext;

@@ -17,7 +17,6 @@
 	  <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Controls\TextContainer.xaml" />
     <None Remove="Dialogs\AddAppThemeDialog.xaml" />
     <None Remove="Dialogs\AddChapterRuleDialog.xaml" />
     <None Remove="Dialogs\AddDictionaryDialog.xaml" />
@@ -63,6 +62,7 @@
     <None Remove="Themes\Novel.xaml" />
     <None Remove="Themes\Panel.xaml" />
     <None Remove="Themes\RuleStyle.xaml" />
+    <None Remove="Themes\Text.xaml" />
     <None Remove="Themes\TitleBar.xaml" />
   </ItemGroup>
 
@@ -114,11 +114,6 @@
     <ProjectReference Include="..\..\ZoDream.Shared.Repositories\ZoDream.Shared.Repositories.csproj" />
     <ProjectReference Include="..\..\ZoDream.Shared.Script\ZoDream.Shared.Script.csproj" />
     <ProjectReference Include="..\..\ZoDream.Shared\ZoDream.Shared.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Controls\TextContainer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Dialogs\AddGroupDialog.xaml">
@@ -358,6 +353,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\Dialogs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Themes\Text.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Themes\InputStyle.xaml">

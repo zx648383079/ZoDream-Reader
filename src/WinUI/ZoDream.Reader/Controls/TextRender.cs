@@ -1,8 +1,16 @@
+﻿using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
 using Windows.System;
 using ZoDream.Shared.Events;
 using ZoDream.Shared.Interfaces;
@@ -12,17 +20,21 @@ using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Reader.Controls
 {
-    public sealed partial class TextContainer : UserControl, ICanvasRender
+    [TemplatePart(Name = CanvasElementName, Type = typeof(CanvasControl))]
+    public sealed class TextRender : Control, ICanvasRender
     {
-        public TextContainer()
+        internal const string CanvasElementName = "PART_Canvas";
+        public TextRender()
         {
-            this.InitializeComponent();
+            this.DefaultStyleKey = typeof(TextRender);
         }
 
-        private List<ICanvasLayer> LayerItems = [];
+        private CanvasControl? _canvas;
+        private readonly List<ICanvasLayer> LayerItems = [];
 
         public event PageChangedEventHandler? PageChanged;
         public event CanvasReadyEventHandler? OnReady;
+        public CanvasControl Canvas => _canvas;
         public Vector2 Size => new((float)ActualWidth, (float)ActualHeight);
 
         public ICanvasSource Source {
@@ -32,27 +44,39 @@ namespace ZoDream.Reader.Controls
 
         // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(ICanvasSource), typeof(TextContainer), new PropertyMetadata(null));
+            DependencyProperty.Register("Source", typeof(ICanvasSource), typeof(TextRender), new PropertyMetadata(null));
 
-        private void PaintCanvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
+
+        protected override void OnApplyTemplate()
         {
-            LayerItems.Clear();
-            Source.Animator.OnDraw(this);
-            foreach (PageLayer item in LayerItems)
+            base.OnApplyTemplate();
+            _canvas = GetTemplateChild(CanvasElementName) as CanvasControl;
+            if (_canvas is not null)
             {
-                item.Draw(args.DrawingSession);
+                _canvas.Draw += Canvas_Draw;
+                _canvas.CreateResources += Canvas_CreateResources;
             }
-            
         }
 
-        private void PaintCanvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
+        private void Canvas_CreateResources(CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
         {
             OnReady?.Invoke(this);
             Source?.ReadyAsync(this);
         }
 
-        private void UserControl_KeyUp(object sender, KeyRoutedEventArgs e)
+        private void Canvas_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
+            LayerItems.Clear();
+            Source.Animator.OnDraw(this);
+            foreach (TextPageLayer item in LayerItems)
+            {
+                item.Draw(args.DrawingSession);
+            }
+        }
+
+        protected override void OnKeyUp(KeyRoutedEventArgs e)
+        {
+            base.OnKeyUp(e);
             if (e.Key == VirtualKey.Right || e.Key == VirtualKey.PageDown)
             {
                 Source.Animator.TurnNext();
@@ -65,59 +89,55 @@ namespace ZoDream.Reader.Controls
             }
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        protected override Size MeasureOverride(Size availableSize)
         {
             Source.ReadyAsync(this);
             Source.Animator.Resize(Size);
+            return base.MeasureOverride(availableSize);
         }
 
-        private void UserControl_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
+        protected override void OnManipulationStarted(ManipulationStartedRoutedEventArgs e)
         {
+            base.OnManipulationStarted(e);
             Source.Animator.OnTouchStart(new((float)e.Position.X, (float)e.Position.Y));
         }
 
-        private void UserControl_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
+        protected override void OnManipulationDelta(ManipulationDeltaRoutedEventArgs e)
         {
+            base.OnManipulationDelta(e);
             Source.Animator.OnTouchMove(new((float)e.Position.X, (float)e.Position.Y));
         }
 
-        private void UserControl_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
+        protected override void OnManipulationCompleted(ManipulationCompletedRoutedEventArgs e)
         {
+            base.OnManipulationCompleted(e);
             Source.Animator.OnTouchFinish(new((float)e.Position.X, (float)e.Position.Y));
         }
 
-        private void UserControl_PointerPressed(object sender, PointerRoutedEventArgs e)
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
         {
+            base.OnPointerPressed(e);
             var point = e.GetCurrentPoint(this).Position;
             Source.Animator.OnTouchStart(new((float)point.X, (float)point.Y));
         }
 
-        private void UserControl_PointerReleased(object sender, PointerRoutedEventArgs e)
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
         {
+            base.OnPointerReleased(e);
             var point = e.GetCurrentPoint(this).Position;
             Source.Animator.OnTouchFinish(new((float)point.X, (float)point.Y));
         }
 
-        private void UserControl_PointerMoved(object sender, PointerRoutedEventArgs e)
+        protected override void OnPointerMoved(PointerRoutedEventArgs e)
         {
+            base.OnPointerMoved(e);
             var point = e.GetCurrentPoint(this).Position;
             Source.Animator.OnTouchMove(new((float)point.X, (float)point.Y));
         }
 
-
         public ICanvasLayer CreateLayer(Vector2 size)
         {
-            var layer = new PageLayer(this);
+            var layer = new TextPageLayer(this);
             layer.Resize(new Vector4(0, 0, size.X, size.Y));
             return layer;
         }
@@ -125,7 +145,7 @@ namespace ZoDream.Reader.Controls
         public void Invalidate()
         {
             // Animate.Invalidate();
-            PaintCanvas.Invalidate();
+            _canvas?.Invalidate();
         }
 
         public void DrawLayer(ICanvasLayer layer)
@@ -134,7 +154,7 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
-            LayerItems.Add(layer); 
+            LayerItems.Add(layer);
         }
     }
 }
