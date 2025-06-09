@@ -1,12 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
-using ZoDream.Reader.Controls;
 using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Reader.ViewModels
@@ -22,6 +22,10 @@ namespace ZoDream.Reader.ViewModels
             ExtractCommand = new RelayCommand(TapExtract);
             BackCommand = new RelayCommand(TapBack);
             ForwardCommand = new RelayCommand(TapForward);
+
+            SaveDictCommand = new RelayCommand(TapSaveDict);
+            OrderCommand = new RelayCommand(TapOrder);
+            FindLetterCommand = new RelayCommand<WordItemViewModel>(TapFindLetter);
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
@@ -63,7 +67,35 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _forwardEnabled, value);
         }
 
+        private Visibility _dictVisible = Visibility.Collapsed;
 
+        public Visibility DictVisible {
+            get => _dictVisible;
+            set => SetProperty(ref _dictVisible, value);
+        }
+
+        private bool _isDictFilter;
+
+        public bool IsDictFilter {
+            get => _isDictFilter;
+            set {
+                SetProperty(ref _isDictFilter, value);
+                OnPropertyChanged(nameof(FilterIcon));
+            }
+        }
+
+        public string FilterIcon => IsDictFilter ? "\uED1A" : "\uE890";
+        private bool _isDictOrder = true;
+
+        public bool IsDictOrder {
+            get => _isDictOrder;
+            set {
+                SetProperty(ref _isDictOrder, value);
+                OnPropertyChanged(nameof(OrderIcon));
+            }
+        }
+
+        public string OrderIcon => IsDictOrder ? "\uE74B" : "\uE74A";
 
         public ICommand OpenCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
@@ -72,6 +104,33 @@ namespace ZoDream.Reader.ViewModels
         public ICommand ExtractCommand { get; private set; }
         public ICommand BackCommand { get; private set; }
         public ICommand ForwardCommand { get; private set; }
+
+
+        public ICommand SaveDictCommand { get; private set; }
+        public ICommand OrderCommand { get; private set; }
+
+        public ICommand FindLetterCommand { get; private set; }
+
+        private void TapFindLetter(WordItemViewModel word)
+        {
+            if (Editor is null)
+            {
+                return;
+            }
+            FindVisible = true;
+            FindText = word.Word;
+            TapFindNext();
+        }
+
+        private void TapSaveDict()
+        {
+
+        }
+
+        private void TapOrder()
+        {
+            IsDictOrder = !IsDictOrder;
+        }
 
         private void TapBack()
         {
@@ -167,6 +226,7 @@ namespace ZoDream.Reader.ViewModels
                     Count = item.Value
                 });
             }
+            DictVisible = Visibility.Visible;
         }
 
         public int Compare(KeyValuePair<char, int> x, KeyValuePair<char, int> y)

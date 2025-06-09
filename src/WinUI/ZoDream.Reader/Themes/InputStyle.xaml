@@ -58,6 +58,12 @@
         <Setter Property="BorderThickness" Value="0" />
     </Style>
 
+    <Style x:Name="LargeLabel" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="MinWidth" Value="{StaticResource LargeToolSize}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
     <Style
         x:Name="ToolIconBtn"
         BasedOn="{StaticResource IconBtn}"

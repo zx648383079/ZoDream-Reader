@@ -3,8 +3,10 @@
     x:Class="ZoDream.Reader.Pages.Rules.CreateDictionaryPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:bhv="using:ZoDream.Reader.Behaviors"
     xmlns:ctl="using:ZoDream.Reader.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ivy="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:ZoDream.Reader.Pages.Rules"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
@@ -26,86 +28,123 @@
         </ResourceDictionary>
     </Page.Resources>
 
+
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="48" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="auto" MaxWidth="200" />
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal">
-            <Button
-                Command="{Binding OpenCommand}"
-                Content="&#xE8DA;"
-                Style="{StaticResource LargeIconBtn}" />
-            <Button
-                Command="{Binding SaveCommand}"
-                Content="&#xE74E;"
-                Style="{StaticResource LargeIconBtn}" />
-            <Button
-                Command="{Binding FindCommand}"
-                Content="&#xE721;"
-                Style="{StaticResource LargeIconBtn}" />
-            <Button
-                Command="{Binding ExtractCommand}"
-                Content="&#xE8FE;"
-                Style="{StaticResource LargeIconBtn}" />
-            <Button
-                Command="{Binding BackCommand}"
-                Content="&#xE72B;"
-                IsEnabled="{Binding BackEnabled}"
-                Style="{StaticResource LargeIconBtn}" />
-            <Button
-                Command="{Binding ForwardCommand}"
-                Content="&#xE72A;"
-                IsEnabled="{Binding ForwardEnabled}"
-                Style="{StaticResource LargeIconBtn}" />
-        </StackPanel>
-        <Grid Grid.Row="1">
-            <ctl:TextEditor x:Name="Editor" />
-            <Border Style="{StaticResource ModalStyle}" Visibility="{Binding FindVisible, Converter={StaticResource ToggleCvt}}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox VerticalContentAlignment="Center" Text="{Binding FindText, Mode=TwoWay}" />
-                    <Button
-                        Grid.Column="1"
-                        Command="{Binding FindNextCommand}"
-                        Content="&#xE72A;"
-                        Style="{StaticResource ToolIconBtn}" />
-                    <Button
-                        Grid.Column="2"
-                        Command="{Binding FindCommand}"
-                        Content="&#xE8BB;"
-                        Style="{StaticResource ToolIconBtn}" />
-                </Grid>
-            </Border>
-        </Grid>
-        <ListBox
-            Grid.Row="1"
-            Grid.Column="1"
-            HorizontalContentAlignment="Stretch"
-            Background="Transparent"
-            ItemsSource="{Binding WordItems}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <Button
+                    Command="{Binding OpenCommand}"
+                    Content="&#xE8DA;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="选择文件" />
+                <Button
+                    Command="{Binding SaveCommand}"
+                    Content="&#xE74E;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="保存文件" />
+                <Button
+                    Command="{Binding FindCommand}"
+                    Content="&#xE721;"
+                    Style="{StaticResource LargeIconBtn}" />
+                <Button
+                    Command="{Binding ExtractCommand}"
+                    Content="&#xE8FE;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="提取词频" />
+                <Button
+                    Command="{Binding BackCommand}"
+                    Content="&#xE72B;"
+                    IsEnabled="{Binding BackEnabled}"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="后退" />
+                <TextBlock Style="{StaticResource LargeLabel}" Text="0/100" />
+                <Button
+                    Command="{Binding ForwardCommand}"
+                    Content="&#xE72A;"
+                    IsEnabled="{Binding ForwardEnabled}"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="前进" />
+            </StackPanel>
+            <Grid Grid.Row="1">
+                <ctl:TextEditor x:Name="Editor" />
+                <Border Style="{StaticResource ModalStyle}" Visibility="{Binding FindVisible, Converter={StaticResource ToggleCvt}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Word}" />
-                        <Border Grid.Column="1">
-                            <TextBlock Style="{StaticResource MetaTb}" Text="{Binding Count}" />
-                        </Border>
+                        <TextBox VerticalContentAlignment="Center" Text="{Binding FindText, Mode=TwoWay}" />
+                        <Button
+                            Grid.Column="1"
+                            Command="{Binding FindNextCommand}"
+                            Content="&#xE72A;"
+                            Style="{StaticResource ToolIconBtn}" />
+                        <Button
+                            Grid.Column="2"
+                            Command="{Binding FindCommand}"
+                            Content="&#xE8BB;"
+                            Style="{StaticResource ToolIconBtn}" />
                     </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                </Border>
+            </Grid>
+        </Grid>
+        <Grid
+            Grid.Column="1"
+            Width="200"
+            Visibility="{Binding DictVisible}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <Button
+                    Command="{Binding SaveDictCommand}"
+                    Content="&#xE74E;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="保存字典" />
+                <ToggleButton
+                    Content="{Binding FilterIcon}"
+                    IsChecked="{Binding IsDictFilter, Mode=TwoWay}"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="显示/隐藏ASCII" />
+                <Button
+                    Command="{Binding OrderCommand}"
+                    Content="{Binding OrderIcon}"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="排序" />
+            </StackPanel>
+            <ListBox
+                Grid.Row="1"
+                HorizontalContentAlignment="Stretch"
+                Background="Transparent"
+                ItemsSource="{Binding WordItems}">
+                <ivy:Interaction.Behaviors>
+                    <bhv:ListItemDoubleClickBehavior Command="{Binding FindLetterCommand}" />
+                </ivy:Interaction.Behaviors>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Word}" />
+                            <Border Grid.Column="1">
+                                <TextBlock Style="{StaticResource MetaTb}" Text="{Binding Count}" />
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
     </Grid>
 </Page>

@@ -1,20 +1,11 @@
-﻿using Microsoft.Graphics.Canvas.Text;
-using Microsoft.Graphics.Canvas.UI.Xaml;
-using Microsoft.UI;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Documents;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.System;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Plugins.Own;
 using ZoDream.Shared.Storage;
 using ZoDream.Shared.Tokenizers;
 
@@ -32,6 +23,7 @@ namespace ZoDream.Reader.Controls
         }
 
 
+        private readonly OwnDictionary _dict = new();
         private TextBox? _canvas;
         private int _cursor;
         private int _cursorNext;
@@ -69,10 +61,28 @@ namespace ZoDream.Reader.Controls
             {
                 _histories.Clear();
             }
+            var (maxColumn, maxRow) = GetLetterRange();
+            ReadNext(maxColumn, maxRow);
+            _canvas.Text = Current;
+        }
+        public string Current => _source[_cursor.._cursorNext];
+
+        private int SelectionEnd => _canvas is not null ? _canvas.SelectionStart + _canvas.SelectionLength : 0;
+
+        private (int, int) GetLetterRange()
+        {
+            if (_canvas is null)
+            {
+                return (0, 0);
+            }
+            var fontWidth = _canvas.FontSize * 1.4;
+            var maxColumn = (int)Math.Floor(_canvas.ActualWidth / fontWidth);
+            var maxRow = (int)Math.Floor(_canvas.ActualHeight / fontWidth);
+            return (maxColumn, maxRow);
+        }
+        private void ReadNext(int maxColumn, int maxRow)
+        {
             var start = _cursor;
-            var fontWidth = _canvas.FontSize * 2;
-            var maxColumn = Math.Floor(_canvas.ActualWidth / fontWidth);
-            var maxRow = (int)Math.Floor(_canvas.ActualHeight / fontWidth * .8);
             var row = 0;
             while (true)
             {
@@ -82,13 +92,12 @@ namespace ZoDream.Reader.Controls
                 {
                     break;
                 }
-                row += (int)Math.Min(1, Math.Ceiling(line.Length / maxColumn));
+                row += (int)Math.Max(1, Math.Ceiling((double)line.Length / maxColumn));
                 if (row >= maxRow)
                 {
                     break;
                 }
             }
-            _canvas.Text = _source[_cursor .. _cursorNext];
         }
 
         public void LoadFromFile(string fileName)
@@ -105,19 +114,85 @@ namespace ZoDream.Reader.Controls
 
         public bool FindNext(string text)
         {
-            return false;
+            if (_canvas is null)
+            {
+                return false;
+            }
+            var lastIndex = _cursor;
+            var selectionEnd = SelectionEnd;
+            lastIndex += selectionEnd;
+            var i = _source.IndexOf(text, lastIndex);
+            if (i < 0)
+            {
+                return false;
+            }
+            var (maxColumn, maxRow) = GetLetterRange();
+            while (i >= _cursorNext)
+            {
+                selectionEnd = 0;
+                if (!_histories.Contains(_cursor))
+                {
+                    _histories.Add(_cursor);
+                }
+                _cursor = _cursorNext;
+                ReadNext(maxColumn, maxRow);
+            }
+            _canvas.Text = Current;
+            _canvas.Focus(FocusState.Pointer);
+            _canvas.Select(_canvas.Text.IndexOf(text, selectionEnd), text.Length);
+            return true;
         }
 
         public void Select(int start, int count)
         {
+            if (_canvas is null)
+            {
+                return;
+            }
+            _canvas.Focus(FocusState.Pointer);
+            _canvas.Select(start - _cursor, count);
         }
 
         public void ScrollTo(int position)
         {
+            if (_canvas is null)
+            {
+                return;
+            }
+            if (position < _cursor)
+            {
+                for (var i = _histories.Count - 1; i >= 0; i--)
+                {
+                    var item = _histories[i];
+                    if (position > item)
+                    {
+                        _cursor = item;
+                        break;
+                    }
+                    _cursorNext = item;
+                    _histories.RemoveAt(i);
+                }
+
+            } 
+            else
+            {
+                var (maxColumn, maxRow) = GetLetterRange();
+                while (position >= _cursorNext)
+                {
+                    if (!_histories.Contains(_cursor))
+                    {
+                        _histories.Add(_cursor);
+                    }
+                    _cursor = _cursorNext;
+                    ReadNext(maxColumn, maxRow);
+                }
+            }
+            _canvas.Text = Current;
         }
 
         public void Unselect()
         {
+            _canvas?.Select(0, 0);
         }
 
         public void GoForward()
@@ -153,15 +228,17 @@ namespace ZoDream.Reader.Controls
             var data = new Dictionary<char, int>();
             foreach (var item in _source)
             {
-                if (item is '\t' or ' ' or '\n' or '\r')
+                
+                var formatted = _dict.Serialize(item);
+                if (formatted is '\t' or ' ' or '\n' or '\r')
                 {
                     continue;
                 }
-                if (data.TryAdd(item, 1))
+                if (data.TryAdd(formatted, 1))
                 {
                     continue;
                 }
-                data[item]++;
+                data[formatted]++;
             }
             return data;
         }
