@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Plugins.Own;
 using ZoDream.Shared.Storage;
@@ -34,9 +33,12 @@ namespace ZoDream.Reader.Controls
         public bool CanForward => _cursorNext < Text.Length;
 
         public string Text { 
-            get => _source; 
+            get {
+                TrySave();
+                return _source;
+            } 
             set {
-                _source = value;
+                _source = value.Replace("\r\n", "\n").Replace('\r', '\n');
                 _cursor = 0;
                 Render();
             }
@@ -80,14 +82,42 @@ namespace ZoDream.Reader.Controls
             var maxRow = (int)Math.Floor(_canvas.ActualHeight / fontWidth);
             return (maxColumn, maxRow);
         }
+
+        private void TrySave()
+        {
+            if (_canvas is null)
+            {
+                return;
+            }
+            var begin = _cursor;
+            var end = _cursorNext;
+            var source = _source[begin..end];
+            var text = _canvas.Text;
+            if (text[^1] != '\n' && end < _source.Length)
+            {
+                text += '\n';
+            }
+            if (text == source)
+            {
+                return;
+            }
+            _source = _source[..begin] + text + _source[end..];
+            _cursorNext = begin + text.Length;
+        }
+
         private void ReadNext(int maxColumn, int maxRow)
         {
-            var start = _cursor;
+            _cursorNext = ReadNext(maxColumn, maxRow, _cursor);
+        }
+        private int ReadNext(int maxColumn, int maxRow, int index)
+        {
+            var start = index;
+            int next;
             var row = 0;
             while (true)
             {
-                var line = TextFormatter.LineText(_source, start, out _cursorNext);
-                start = _cursorNext;
+                var line = TextFormatter.LineText(_source, start, out next);
+                start = next;
                 if (line is null)
                 {
                     break;
@@ -98,6 +128,7 @@ namespace ZoDream.Reader.Controls
                     break;
                 }
             }
+            return next;
         }
 
         public void LoadFromFile(string fileName)
@@ -118,6 +149,7 @@ namespace ZoDream.Reader.Controls
             {
                 return false;
             }
+            TrySave();
             var lastIndex = _cursor;
             var selectionEnd = SelectionEnd;
             lastIndex += selectionEnd;
@@ -149,6 +181,7 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
+            TrySave();
             _canvas.Focus(FocusState.Pointer);
             _canvas.Select(start - _cursor, count);
         }
@@ -159,6 +192,7 @@ namespace ZoDream.Reader.Controls
             {
                 return;
             }
+            TrySave();
             if (position < _cursor)
             {
                 for (var i = _histories.Count - 1; i >= 0; i--)
@@ -192,11 +226,13 @@ namespace ZoDream.Reader.Controls
 
         public void Unselect()
         {
+            TrySave();
             _canvas?.Select(0, 0);
         }
 
         public void GoForward()
         {
+            TrySave();
             if (!_histories.Contains(_cursor))
             {
                 _histories.Add(_cursor);
@@ -207,6 +243,7 @@ namespace ZoDream.Reader.Controls
 
         public void GoBack()
         {
+            TrySave();
             if (_cursor == 0)
             {
                 return;
@@ -225,6 +262,7 @@ namespace ZoDream.Reader.Controls
 
         public IDictionary<char, int> Count()
         {
+            TrySave();
             var data = new Dictionary<char, int>();
             foreach (var item in _source)
             {

@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ZoDream.Shared.Plugins.Txt;
@@ -14,8 +15,9 @@ public class PageTest
     [TestMethod]
     public void TestPages()
     {
+        var text = "【科幻】《书名》作者：明";
         var novel = new BookEntity();
-        new TxtReader().Decode("【科幻】《书名》作者：明", novel);
+        new TxtReader().Decode(text, novel);
 
         Assert.AreEqual(novel.Name, "书名");
     }
