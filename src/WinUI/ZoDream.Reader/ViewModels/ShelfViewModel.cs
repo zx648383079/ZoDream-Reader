@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Dialogs;
+using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Repositories.Entities;
 
 namespace ZoDream.Reader.ViewModels
@@ -18,6 +19,7 @@ namespace ZoDream.Reader.ViewModels
         public ShelfViewModel()
         {
             AddCommand = new RelayCommand(TapAdd);
+            CreateCommand = new RelayCommand(TapCreate);
             LoadAsync();
         }
 
@@ -33,6 +35,13 @@ namespace ZoDream.Reader.ViewModels
 
 
         public ICommand AddCommand { get; private set; }
+        public ICommand CreateCommand { get; private set; }
+
+        private void TapCreate()
+        {
+            var router = App.GetService<IRouter>();
+            router.GoToAsync("creator/novel");
+        }
 
         private async void TapAdd()
         {

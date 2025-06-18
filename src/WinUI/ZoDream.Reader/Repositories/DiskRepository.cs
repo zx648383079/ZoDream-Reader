@@ -15,7 +15,6 @@ using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Repositories.Entities;
 using Windows.Graphics.Imaging;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Newtonsoft.Json.Linq;
 using Windows.Storage.Streams;
 using System.Runtime.InteropServices.WindowsRuntime;
 using ZoDream.Shared.Plugins.EPub;

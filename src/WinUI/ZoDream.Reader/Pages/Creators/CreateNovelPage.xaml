@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="ZoDream.Reader.Pages.Creators.CreateNovelPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:bhv="using:ZoDream.Reader.Behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ivy="using:Microsoft.Xaml.Interactivity"
+    xmlns:local="using:ZoDream.Reader.Pages.Creators"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ZoDream.Reader.ViewModels"
+    mc:Ignorable="d">
+    <Page.DataContext>
+        <vm:CreateNovelViewModel />
+    </Page.DataContext>
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="100" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+            <TextBox Header="Name" />
+            <TextBox Grid.Row="1" Header="Author" />
+
+            <Image Grid.RowSpan="3" Grid.Column="1" />
+
+            <TextBox
+                Grid.Row="3"
+                Grid.ColumnSpan="2"
+                MinHeight="200"
+                AcceptsReturn="True"
+                Header="Brief" />
+        </Grid>
+        <Grid Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBox Header="Title" />
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <Button
+                        Command="{Binding AddImageCommand}"
+                        Content="&#xEE71;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="插入图片" />
+                </StackPanel>
+                <RichEditBox Grid.Row="2" />
+            </Grid>
+            <ListView
+                Grid.Row="1"
+                HorizontalContentAlignment="Stretch"
+                Background="Transparent"
+                DisplayMemberPath="Title"
+                Header="Catalog"
+                ItemsSource="{Binding WordItems}">
+                <ivy:Interaction.Behaviors>
+                    <bhv:ListItemDoubleClickBehavior Command="{Binding FindLetterCommand}" />
+                </ivy:Interaction.Behaviors>
+            </ListView>
+        </Grid>
+    </Grid>
+</Page>

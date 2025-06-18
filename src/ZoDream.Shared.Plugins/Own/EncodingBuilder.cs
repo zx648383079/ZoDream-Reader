@@ -6,18 +6,17 @@ namespace ZoDream.Shared.Plugins.Own
 {
     public class EncodingBuilder
     {
-        private readonly OwnDictionary _dict = new();
         public Dictionary<char, int> Items = [];
 
         public int Count => Items.Count;
         /// <summary>
         /// 排序后的所有字符
         /// </summary>
-        public IEnumerable<char> Values => Items.OrderByDescending(i => i.Value).Select(i => i.Key);
+        public IEnumerable<char> Values => Items.OrderByDescending(i => i.Value).ThenBy(i => i.Key).Select(i => i.Key);
         /// <summary>
         /// 过滤标点后的字符
         /// </summary>
-        public IEnumerable<char> FilteredValues => Values.Where(i => !_dict.IsExclude(i));
+        public IEnumerable<char> FilteredValues => Values.Where(i => !IsExclude(i));
         /// <summary>
         /// 追加字符串
         /// </summary>
@@ -35,7 +34,7 @@ namespace ZoDream.Shared.Plugins.Own
         /// <param name="code"></param>
         public void Append(char code)
         {
-            var formatted = _dict.Serialize(code);
+            var formatted = Serialize(code);
             if (formatted is '\t' or ' ' or '\n' or '\r')
             {
                 return;
@@ -77,5 +76,119 @@ namespace ZoDream.Shared.Plugins.Own
                 writer.WriteLine(item);
             }
         }
+
+        public static bool IsExclude(char value)
+        {
+            return value < 0x7f || Serialize(value) < 0x7F;
+        }
+
+        /// <summary>
+        /// 转化一些特殊符号
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static char Serialize(char value)
+        {
+            if (value >= 0xFF01 && value <= 0xFF5E)
+            {
+                value = (char)(value - 0xFF00 + 0x20);
+            }
+            if (value >= 'a' && value <= 'z')
+            {
+                // 字母全大写 0x15 - 0x46
+                return (char)(value - 'a' + 'A');
+            }
+            return value switch
+            {
+                // 移除字符
+                '"' => '“',
+                //全角转半角
+                '　' => ' ',
+                '？' => '?',
+                '！' => '!',
+                '，' => ',',
+                '）' => ')',
+                '（' => '(',
+                '；' => ';',
+                '＊' or '※' => '*',
+                '：' or '∶' => ':',
+                '【' => '[',
+                '】' => ']',
+                '．' => '.',
+                '～' => '~',
+                '―' or '─' or '－' or '—' => '-',
+
+                // 一下是替换
+                '“' => (char)0xB,
+                '”' => (char)0xC,
+                '‘' => (char)0xD,
+                '’' => (char)0xE,
+                '、' or '﹑' => (char)0xF,
+                '「' or '『' => (char)0x10,
+                '」' or '』' => (char)0x11,
+                '《' => (char)0x12,
+                '》' => (char)0x13,
+                '。' => (char)0x14,
+                '…' or '┅' => (char)0x22,
+                '°' => (char)0x60,
+
+                '一' => (char)0x15,
+                '二' => (char)0x16,
+                '三' => (char)0x17,
+                '四' => (char)0x18,
+                '五' => (char)0x19,
+                '六' => (char)0x1A,
+                '七' => (char)0x1B,
+                '八' => (char)0x1C,
+                '九' => (char)0x1D,
+                '十' => (char)0x1E,
+                '百' => (char)0x1F,
+                //'千' => (char)0x7F,
+                //'万' => (char)0x80,
+                //'忆' => (char)0x81,
+
+                '·' => (char)0x7F,
+
+                _ => value,
+            };
+        }
+
+        public static char Deserialize(char value)
+        {
+            return value switch 
+            {
+                (char)0xB => '“',
+                (char)0xC => '”',
+                (char)0xD => '‘',
+                (char)0xE => '’',
+                (char)0xF => '、',
+                (char)0x10 => '「',
+                (char)0x11 => '」',
+                (char)0x12 => '《',
+                (char)0x13 => '》',
+                (char)0x14 => '。',
+                (char)0x22 => '…',
+                (char)0x60 => '°',
+
+                (char)0x15 => '一',
+                (char)0x16 => '二',
+                (char)0x17 => '三',
+                (char)0x18 => '四',
+                (char)0x19 => '五',
+                (char)0x1A => '六',
+                (char)0x1B => '七',
+                (char)0x1C => '八',
+                (char)0x1D => '九',
+                (char)0x1E => '十',
+                (char)0x1F => '百',
+                // (char)0x7F => '千',
+                // (char)0x80 => '万',
+                // (char)0x81 => '忆',
+
+                (char)0x7F => '·',
+                _ => value
+            };
+        }
+
     }
 }

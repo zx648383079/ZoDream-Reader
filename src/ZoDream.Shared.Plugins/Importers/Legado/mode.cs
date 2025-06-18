@@ -1,330 +1,330 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace ZoDream.Shared.Plugins.Importers
 {
     internal class TxtTocRule
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public long Id { get; set; }
 
-        [JsonProperty("enable")]
+        [JsonPropertyName("enable")]
         public bool Enable { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("rule")]
+        [JsonPropertyName("rule")]
         public string Rule { get; set; }
 
-        [JsonProperty("example")]
+        [JsonPropertyName("example")]
         public string Example { get; set; }
 
-        [JsonProperty("serialNumber")]
+        [JsonPropertyName("serialNumber")]
         public long SerialNumber { get; set; }
     }
 
     internal class ThemeConfig
     {
-        [JsonProperty("themeName")]
+        [JsonPropertyName("themeName")]
         public string ThemeName { get; set; }
 
-        [JsonProperty("isNightTheme")]
+        [JsonPropertyName("isNightTheme")]
         public bool IsNightTheme { get; set; }
 
-        [JsonProperty("primaryColor")]
+        [JsonPropertyName("primaryColor")]
         public string PrimaryColor { get; set; }
 
-        [JsonProperty("accentColor")]
+        [JsonPropertyName("accentColor")]
         public string AccentColor { get; set; }
 
-        [JsonProperty("backgroundColor")]
+        [JsonPropertyName("backgroundColor")]
         public string BackgroundColor { get; set; }
 
-        [JsonProperty("bottomBackground")]
+        [JsonPropertyName("bottomBackground")]
         public string BottomBackground { get; set; }
     }
 
     internal class RssSource
     {
-        [JsonProperty("customOrder")]
+        [JsonPropertyName("customOrder")]
         public long CustomOrder { get; set; }
 
-        [JsonProperty("enableJs")]
+        [JsonPropertyName("enableJs")]
         public bool EnableJs { get; set; }
 
-        [JsonProperty("enabled")]
+        [JsonPropertyName("enabled")]
         public bool Enabled { get; set; }
 
-        [JsonProperty("singleUrl")]
+        [JsonPropertyName("singleUrl")]
         public bool SingleUrl { get; set; }
 
-        [JsonProperty("sourceGroup")]
+        [JsonPropertyName("sourceGroup")]
         public string SourceGroup { get; set; }
 
-        [JsonProperty("sourceIcon")]
+        [JsonPropertyName("sourceIcon")]
         public string SourceIcon { get; set; }
 
-        [JsonProperty("sourceName")]
+        [JsonPropertyName("sourceName")]
         public string SourceName { get; set; }
 
-        [JsonProperty("sourceUrl")]
+        [JsonPropertyName("sourceUrl")]
         public string SourceUrl { get; set; }
     }
     internal class ReadConfig
     {
-        [JsonProperty("bgStr")]
+        [JsonPropertyName("bgStr")]
         public string BgStr { get; set; }
 
-        [JsonProperty("bgStrEInk", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("bgStrEInk")]
         public string BgStrEInk { get; set; }
 
-        [JsonProperty("bgStrNight")]
+        [JsonPropertyName("bgStrNight")]
         public string BgStrNight { get; set; }
 
-        [JsonProperty("bgType")]
+        [JsonPropertyName("bgType")]
         public long BgType { get; set; }
 
-        [JsonProperty("bgTypeEInk", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("bgTypeEInk")]
         public long? BgTypeEInk { get; set; }
 
-        [JsonProperty("bgTypeNight")]
+        [JsonPropertyName("bgTypeNight")]
         public long BgTypeNight { get; set; }
 
-        [JsonProperty("darkStatusIcon")]
+        [JsonPropertyName("darkStatusIcon")]
         public bool DarkStatusIcon { get; set; }
 
-        [JsonProperty("darkStatusIconEInk", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("darkStatusIconEInk")]
         public bool? DarkStatusIconEInk { get; set; }
 
-        [JsonProperty("darkStatusIconNight")]
+        [JsonPropertyName("darkStatusIconNight")]
         public bool DarkStatusIconNight { get; set; }
 
-        [JsonProperty("footerMode", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("footerMode")]
         public long? FooterMode { get; set; }
 
-        [JsonProperty("footerPaddingBottom", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("footerPaddingBottom")]
         public long? FooterPaddingBottom { get; set; }
 
-        [JsonProperty("footerPaddingLeft", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("footerPaddingLeft")]
         public long? FooterPaddingLeft { get; set; }
 
-        [JsonProperty("footerPaddingRight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("footerPaddingRight")]
         public long? FooterPaddingRight { get; set; }
 
-        [JsonProperty("footerPaddingTop", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("footerPaddingTop")]
         public long? FooterPaddingTop { get; set; }
 
-        [JsonProperty("headerMode", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("headerMode")]
         public long? HeaderMode { get; set; }
 
-        [JsonProperty("headerPaddingBottom", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("headerPaddingBottom")]
         public long? HeaderPaddingBottom { get; set; }
 
-        [JsonProperty("headerPaddingLeft", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("headerPaddingLeft")]
         public long? HeaderPaddingLeft { get; set; }
 
-        [JsonProperty("headerPaddingRight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("headerPaddingRight")]
         public int HeaderPaddingRight { get; set; }
 
-        [JsonProperty("headerPaddingTop", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("headerPaddingTop")]
         public int HeaderPaddingTop { get; set; }
 
-        [JsonProperty("letterSpacing", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("letterSpacing")]
         public int LetterSpacing { get; set; }
 
-        [JsonProperty("lineSpacingExtra", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("lineSpacingExtra")]
         public int LineSpacingExtra { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("paddingBottom", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("paddingBottom")]
         public int? PaddingBottom { get; set; }
 
-        [JsonProperty("paddingLeft", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("paddingLeft")]
         public int? PaddingLeft { get; set; }
 
-        [JsonProperty("paddingRight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("paddingRight")]
         public int? PaddingRight { get; set; }
 
-        [JsonProperty("paddingTop", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("paddingTop")]
         public int? PaddingTop { get; set; }
 
-        [JsonProperty("paragraphIndent", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("paragraphIndent")]
         public string ParagraphIndent { get; set; }
 
-        [JsonProperty("paragraphSpacing", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("paragraphSpacing")]
         public int? ParagraphSpacing { get; set; }
 
-        [JsonProperty("showFooterLine", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("showFooterLine")]
         public bool? ShowFooterLine { get; set; }
 
-        [JsonProperty("showHeaderLine", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("showHeaderLine")]
         public bool? ShowHeaderLine { get; set; }
 
-        [JsonProperty("textBold", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("textBold")]
         public long? TextBold { get; set; }
 
-        [JsonProperty("textColor")]
+        [JsonPropertyName("textColor")]
         public string TextColor { get; set; }
 
-        [JsonProperty("textColorEInk", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("textColorEInk")]
         public string TextColorEInk { get; set; }
 
-        [JsonProperty("textColorNight")]
+        [JsonPropertyName("textColorNight")]
         public string TextColorNight { get; set; }
 
-        [JsonProperty("textSize", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("textSize")]
         public int? TextSize { get; set; }
 
-        [JsonProperty("tipColor", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("tipColor")]
         public long? TipColor { get; set; }
 
-        [JsonProperty("tipFooterLeft", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("tipFooterLeft")]
         public long? TipFooterLeft { get; set; }
 
-        [JsonProperty("tipFooterMiddle", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("tipFooterMiddle")]
         public long? TipFooterMiddle { get; set; }
 
-        [JsonProperty("tipFooterRight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("tipFooterRight")]
         public long? TipFooterRight { get; set; }
 
-        [JsonProperty("tipHeaderLeft", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("tipHeaderLeft")]
         public long? TipHeaderLeft { get; set; }
 
-        [JsonProperty("tipHeaderMiddle", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("tipHeaderMiddle")]
         public long? TipHeaderMiddle { get; set; }
 
-        [JsonProperty("tipHeaderRight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("tipHeaderRight")]
         public long? TipHeaderRight { get; set; }
 
-        [JsonProperty("titleBottomSpacing", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("titleBottomSpacing")]
         public int? TitleBottomSpacing { get; set; }
 
-        [JsonProperty("titleMode", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("titleMode")]
         public long? TitleMode { get; set; }
 
-        [JsonProperty("titleSize", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("titleSize")]
         public int? TitleSize { get; set; }
 
-        [JsonProperty("titleTopSpacing", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("titleTopSpacing")]
         public long? TitleTopSpacing { get; set; }
     }
 
     internal class TtsSource
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public long Id { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public string Url { get; set; }
 
-        [JsonProperty("contentType")]
+        [JsonPropertyName("contentType")]
         public string ContentType { get; set; }
 
-        [JsonProperty("loginUrl", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("loginUrl")]
         public string LoginUrl { get; set; }
 
-        [JsonProperty("loginUi", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("loginUi")]
         public Input[] LoginUi { get; set; }
 
-        [JsonProperty("loginCheckJs", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("loginCheckJs")]
         public string LoginCheckJs { get; set; }
     }
 
     internal class Input
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
     }
 
     internal class DictRule
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("urlRule")]
+        [JsonPropertyName("urlRule")]
         public string UrlRule { get; set; }
 
-        [JsonProperty("showRule")]
+        [JsonPropertyName("showRule")]
         public string ShowRule { get; set; }
 
-        [JsonProperty("enabled")]
+        [JsonPropertyName("enabled")]
         public bool Enabled { get; set; }
 
-        [JsonProperty("sortNumber")]
+        [JsonPropertyName("sortNumber")]
         public long SortNumber { get; set; }
     }
 
     internal class BookSource
     {
-        [JsonProperty("bookSourceComment")]
+        [JsonPropertyName("bookSourceComment")]
         public string BookSourceComment { get; set; }
 
-        [JsonProperty("bookSourceGroup")]
+        [JsonPropertyName("bookSourceGroup")]
         public string BookSourceGroup { get; set; }
 
-        [JsonProperty("bookSourceName")]
+        [JsonPropertyName("bookSourceName")]
         public string BookSourceName { get; set; }
 
-        [JsonProperty("bookSourceType")]
+        [JsonPropertyName("bookSourceType")]
         public long BookSourceType { get; set; }
 
-        [JsonProperty("bookSourceUrl")]
+        [JsonPropertyName("bookSourceUrl")]
         public string BookSourceUrl { get; set; }
 
-        [JsonProperty("customOrder")]
+        [JsonPropertyName("customOrder")]
         public long CustomOrder { get; set; }
 
-        [JsonProperty("enabled")]
+        [JsonPropertyName("enabled")]
         public bool Enabled { get; set; }
 
-        [JsonProperty("enabledExplore")]
+        [JsonPropertyName("enabledExplore")]
         public bool EnabledExplore { get; set; }
 
-        [JsonProperty("exploreUrl")]
+        [JsonPropertyName("exploreUrl")]
         public string ExploreUrl { get; set; }
 
-        [JsonProperty("searchUrl")]
+        [JsonPropertyName("searchUrl")]
         public string SearchUrl { get; set; }
 
-        [JsonProperty("lastUpdateTime")]
+        [JsonPropertyName("lastUpdateTime")]
         public long LastUpdateTime { get; set; }
 
-        [JsonProperty("loginCheckJs")]
+        [JsonPropertyName("loginCheckJs")]
         public string LoginCheckJs { get; set; }
 
-        [JsonProperty("loginUi")]
+        [JsonPropertyName("loginUi")]
         public string LoginUi { get; set; }
 
-        [JsonProperty("loginUrl")]
+        [JsonPropertyName("loginUrl")]
         public string LoginUrl { get; set; }
 
-        [JsonProperty("respondTime")]
+        [JsonPropertyName("respondTime")]
         public long RespondTime { get; set; }
 
-        [JsonProperty("ruleBookInfo")]
+        [JsonPropertyName("ruleBookInfo")]
         public RuleBookInfo RuleBookInfo { get; set; }
 
-        [JsonProperty("ruleContent")]
+        [JsonPropertyName("ruleContent")]
         public RuleContent RuleContent { get; set; }
 
-        [JsonProperty("ruleExplore")]
+        [JsonPropertyName("ruleExplore")]
         public Rule RuleExplore { get; set; }
 
-        [JsonProperty("ruleSearch")]
+        [JsonPropertyName("ruleSearch")]
         public Rule RuleSearch { get; set; }
 
-        [JsonProperty("ruleToc")]
+        [JsonPropertyName("ruleToc")]
         public RuleToc RuleToc { get; set; }
 
-        [JsonProperty("weight")]
+        [JsonPropertyName("weight")]
         public long Weight { get; set; }
     }
 
@@ -346,46 +346,46 @@ namespace ZoDream.Shared.Plugins.Importers
 
     internal class RuleContent
     {
-        [JsonProperty("content")]
+        [JsonPropertyName("content")]
         public string Content { get; set; }
 
-        [JsonProperty("payAction")]
+        [JsonPropertyName("payAction")]
         public string PayAction { get; set; }
     }
 
     internal class Rule
     {
-        [JsonProperty("author")]
+        [JsonPropertyName("author")]
         public string Author { get; set; }
 
-        [JsonProperty("bookList")]
+        [JsonPropertyName("bookList")]
         public string BookList { get; set; }
 
-        [JsonProperty("bookUrl")]
+        [JsonPropertyName("bookUrl")]
         public string BookUrl { get; set; }
 
-        [JsonProperty("coverUrl")]
+        [JsonPropertyName("coverUrl")]
         public string CoverUrl { get; set; }
 
-        [JsonProperty("intro")]
+        [JsonPropertyName("intro")]
         public string Intro { get; set; }
 
-        [JsonProperty("lastChapter")]
+        [JsonPropertyName("lastChapter")]
         public string LastChapter { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
     }
 
     internal class RuleToc
     {
-        [JsonProperty("chapterList")]
+        [JsonPropertyName("chapterList")]
         public string ChapterList { get; set; }
 
-        [JsonProperty("chapterName")]
+        [JsonPropertyName("chapterName")]
         public string ChapterName { get; set; }
 
-        [JsonProperty("chapterUrl")]
+        [JsonPropertyName("chapterUrl")]
         public string ChapterUrl { get; set; }
     }
 

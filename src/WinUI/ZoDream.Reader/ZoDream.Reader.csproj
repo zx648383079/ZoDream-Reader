@@ -32,6 +32,7 @@
     <None Remove="Dialogs\SearchNovelDialog.xaml" />
     <None Remove="Dialogs\SearchSourceDialog.xaml" />
     <None Remove="Pages\BookmarkPage.xaml" />
+    <None Remove="Pages\Creators\CreateNovelPage.xaml" />
     <None Remove="Pages\ExplorePage.xaml" />
     <None Remove="Pages\HelpPage.xaml" />
     <None Remove="Pages\HistoryPage.xaml" />
@@ -353,6 +354,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\Dialogs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\Creators\CreateNovelPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Themes\Text.xaml">

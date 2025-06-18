@@ -58,7 +58,7 @@ namespace ZoDream.Reader.ViewModels
         private void TapCustomDict()
         {
             var router = App.GetService<IRouter>();
-            router.GoToAsync("rule/dictionary_create");
+            router.GoToAsync("creator/dictionary");
         }
 
         private void TapSort(DictionaryRuleModel? arg)

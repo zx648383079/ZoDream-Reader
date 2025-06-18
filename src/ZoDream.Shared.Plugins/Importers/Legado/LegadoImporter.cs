@@ -1,12 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.Repositories.Entities;
 using ZoDream.Shared.Storage;
 
 namespace ZoDream.Shared.Plugins.Importers
@@ -196,7 +192,7 @@ namespace ZoDream.Shared.Plugins.Importers
         public async Task<T?> ReadAsync<T>(string fileName)
         {
             var content = await LocationStorage.ReadAsync(fileName);
-            return JsonConvert.DeserializeObject<T>(content);
+            return JsonSerializer.Deserialize<T>(content);
         }
     }
 }

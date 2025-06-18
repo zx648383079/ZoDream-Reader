@@ -40,6 +40,10 @@
             <CommandBar.SecondaryCommands>
                 <AppBarButton Icon="Library" Label="分组" />
                 <AppBarButton Icon="Sync" Label="同步" />
+                <AppBarButton
+                    Command="{Binding CreateCommand}"
+                    Icon="NewFolder"
+                    Label="创建" />
             </CommandBar.SecondaryCommands>
         </CommandBar>
     </Grid>

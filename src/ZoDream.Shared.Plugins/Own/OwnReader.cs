@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Interfaces.Entities;
 using ZoDream.Shared.Tokenizers;
@@ -19,7 +21,12 @@ namespace ZoDream.Shared.Plugins.Own
 
         public Task<INovelChapter[]> GetChaptersAsync(INovelSource source)
         {
-            throw new System.NotImplementedException();
+            return Task.Factory.StartNew(() => {
+                using var fs = File.OpenRead(((FileSource)source).FileName);
+                var items = new List<INovelChapter>();
+
+                return items.ToArray();
+            });
         }
 
         public Task<(INovel?, INovelChapter[])> LoadAsync(INovelSource source)

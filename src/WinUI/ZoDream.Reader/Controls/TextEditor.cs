@@ -21,8 +21,6 @@ namespace ZoDream.Reader.Controls
             this.DefaultStyleKey = typeof(TextEditor);
         }
 
-
-        private readonly OwnDictionary _dict = new();
         private TextBox? _canvas;
         private int _cursor;
         private int _cursorNext;
@@ -266,8 +264,7 @@ namespace ZoDream.Reader.Controls
             var data = new Dictionary<char, int>();
             foreach (var item in _source)
             {
-                
-                var formatted = _dict.Serialize(item);
+                var formatted = EncodingBuilder.Deserialize(EncodingBuilder.Serialize(item));
                 if (formatted is '\t' or ' ' or '\n' or '\r')
                 {
                     continue;

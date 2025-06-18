@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using System.Text;
 using ZoDream.Reader.Pages;
+using ZoDream.Reader.Pages.Creators;
 using ZoDream.Reader.Pages.Rules;
 using ZoDream.Reader.Pages.Settings;
 using ZoDream.Reader.Repositories;
@@ -79,7 +80,8 @@ namespace ZoDream.Reader
             router.RegisterRoute("rule/chapter", typeof(ChapterRulePage), true);
             router.RegisterRoute("rule/replace", typeof(ReplaceRulePage), true);
             router.RegisterRoute("rule/dictionary", typeof(DictionaryRulePage), true);
-            router.RegisterRoute("rule/dictionary_create", typeof(CreateDictionaryPage), true);
+            router.RegisterRoute("creator/dictionary", typeof(CreateDictionaryPage), true);
+            router.RegisterRoute("creator/novel", typeof(CreateNovelPage), true);
 
             router.RegisterRoute("read", typeof(ReadPage), RouteType.Single);
             services.AddSingleton<IRouter>(router);

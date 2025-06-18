@@ -6,6 +6,19 @@ namespace ZoDream.Shared.Plugins.Own
 {
     public class OwnWriter(Stream output, Encoding encoding)
     {
+        /**
+         0x5 [长度]  图标
+         书名 0xA
+         作者 0xA
+         简介 
+        0x1 章节名
+        0x2 正文
+        0x5 [长度] 图片
+        0x2 正文
+        0x1 章节名
+        0x2 正文
+         */
+
         public void WriteTitle(string title)
         {
             output.WriteByte(01);
