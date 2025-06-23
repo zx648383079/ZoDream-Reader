@@ -1,22 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
+using System.Collections.Generic;
 using System.Linq;
 using ZoDream.Shared.Storage;
 
 namespace ZoDream.Shared.Text
 {
-    public class EncodingBuilder
+    public class EncodingBuilder : Dictionary<char, int>
     {
-        public Dictionary<char, int> Items = [];
-
-        public int Count => Items.Count;
         /// <summary>
         /// 排序后的所有字符
         /// </summary>
-        public IEnumerable<char> Values => Items.OrderByDescending(i => i.Value).ThenBy(i => i.Key).Select(i => i.Key);
+        public IEnumerable<char> SortedValues => this.OrderByDescending(i => i.Value).ThenBy(i => i.Key).Select(i => i.Key);
         /// <summary>
         /// 过滤标点后的字符
         /// </summary>
-        public IEnumerable<char> FilteredValues => Values.Where(i => !IsExclude(i));
+        public IEnumerable<char> FilteredValues => SortedValues.Where(i => !IsExclude(i));
+
+        public IEnumerable<KeyValuePair<char, char>> TraditionalItems => Keys.Select(i => new KeyValuePair<char, char>(i, ToSimplified(i))).Where(i => i.Key != i.Value);
         /// <summary>
         /// 追加字符串
         /// </summary>
@@ -29,21 +29,21 @@ namespace ZoDream.Shared.Text
             }
         }
         /// <summary>
-        /// 追加字符
+        /// 追加字符，并处理一些字符
         /// </summary>
         /// <param name="code"></param>
         public void Append(char code)
         {
-            var formatted = Serialize(code);
+            var formatted = Deserialize(Serialize(code));
             if (formatted is '\t' or ' ' or '\n' or '\r')
             {
                 return;
             }
-            if (Items.TryAdd(formatted, 1))
+            if (TryAdd(formatted, 1))
             {
                 return;
             }
-            Items[formatted]++;
+            this[formatted]++;
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace ZoDream.Shared.Text
 
         public static bool IsExclude(char value)
         {
-            return value < 0x7f || Serialize(value) < 0x7F;
+            return value <= 0x7f || Serialize(value) <= 0x7F;
         }
 
         /// <summary>
@@ -190,5 +190,65 @@ namespace ZoDream.Shared.Text
             };
         }
 
+        /// <summary>
+        /// 载入字典
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static EncodingBuilder OpenFile(string fileName)
+        {
+            using var reader = LocationStorage.Reader(fileName);
+            var res = new EncodingBuilder();
+            while (true)
+            {
+                var line = reader.ReadLine();
+                if (line == null)
+                {
+                    break;
+                }
+                foreach (var item in line)
+                {
+                    if (item <= 0x7F)
+                    {
+                        continue;
+                    }
+                    res.TryAdd(item, 0);
+                }
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// 一些特别
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static bool IsExcludeSimplified(char code)
+        {
+            return code is '著' or '瞭' or '捍' or '徬' or '胄' or '妳';
+        }
+        /// <summary>
+        /// 转换成简体
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static char ToSimplified(char code)
+        {
+            if (IsExcludeSimplified(code))
+            {
+                return code;
+            }
+            var res = ChineseConverter.Convert(code.ToString(), ChineseConversionDirection.TraditionalToSimplified);
+            return res.Length == 1 ? res[0] : code;
+        }
+        /// <summary>
+        /// 判断字符是是简体
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static bool IsSimplified(char code)
+        {
+            return code < 0xFF || ToSimplified(code) == code;
+        }
     }
 }

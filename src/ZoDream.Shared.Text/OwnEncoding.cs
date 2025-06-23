@@ -30,7 +30,7 @@ namespace ZoDream.Shared.Text
             {
                 if (!dict.TrySerialize(chars[charIndex + i], out var code))
                 {
-                    bytes[byteIndex + j++] = 0x7F;
+                    // bytes[byteIndex + j++] = 0x7F;
                     continue;
                 }
                 if (code <= 210)

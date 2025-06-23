@@ -261,20 +261,8 @@ namespace ZoDream.Reader.Controls
         public IDictionary<char, int> Count()
         {
             TrySave();
-            var data = new Dictionary<char, int>();
-            foreach (var item in _source)
-            {
-                var formatted = EncodingBuilder.Deserialize(EncodingBuilder.Serialize(item));
-                if (formatted is '\t' or ' ' or '\n' or '\r')
-                {
-                    continue;
-                }
-                if (data.TryAdd(formatted, 1))
-                {
-                    continue;
-                }
-                data[formatted]++;
-            }
+            var data = new EncodingBuilder();
+            data.Append(_source);
             return data;
         }
     }
