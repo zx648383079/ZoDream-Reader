@@ -22,59 +22,125 @@
         </ResourceDictionary>
     </Page.Resources>
     <Grid>
-        <Grid>
+        <Grid Visibility="{Binding BasicVisible}">
             <Grid.RowDefinitions>
+                <RowDefinition Height="40" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="100" />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="200" />
             </Grid.ColumnDefinitions>
-            <TextBox Header="Name" />
-            <TextBox Grid.Row="1" Header="Author" />
+            <StackPanel Orientation="Horizontal">
+                <Button
+                    Command="{Binding OpenCommand}"
+                    Content="&#xE8E5;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="打开书籍" />
+                <Button
+                    Command="{Binding SaveCommand}"
+                    Content="&#xE74E;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="保存" />
+                <Button
+                    Command="{Binding CatalogCommand}"
+                    Content="&#xE8A4;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="目录" />
+            </StackPanel>
+            <TextBox
+                Grid.Row="1"
+                Header="Name"
+                Text="{Binding Name, Mode=TwoWay}" />
+            <TextBox
+                Grid.Row="2"
+                Header="Author"
+                Text="{Binding Author, Mode=TwoWay}" />
 
-            <Image Grid.RowSpan="3" Grid.Column="1" />
+
+            <Border
+                Grid.RowSpan="3"
+                Grid.Column="1"
+                BorderBrush="LightGray"
+                BorderThickness="1">
+                <Image Source="{Binding Cover}" />
+            </Border>
 
             <TextBox
                 Grid.Row="3"
                 Grid.ColumnSpan="2"
                 MinHeight="200"
                 AcceptsReturn="True"
-                Header="Brief" />
+                Header="Brief"
+                Text="{Binding Brief, Mode=TwoWay}" />
         </Grid>
-        <Grid Visibility="Collapsed">
+        <Grid Visibility="{Binding CatalogVisible}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="200" />
             </Grid.ColumnDefinitions>
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
+                    <RowDefinition Height="auto" />
                     <RowDefinition Height="40" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBox Header="Title" />
+                <TextBox Header="Title" Text="{Binding Title, Mode=TwoWay}" />
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <Button
+                        Command="{Binding SaveCommand}"
+                        Content="&#xE74E;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="保存" />
+                    <Button
+                        Command="{Binding BasicCommand}"
+                        Content="&#xE946;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="返回编辑基本信息" />
+                    <Button
+                        Command="{Binding PreviousCommand}"
+                        Content="&#xE72B;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="上一章" />
+                    <Button
+                        Command="{Binding NextCommand}"
+                        Content="&#xE72A;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="下一章" />
+
+                    <AppBarSeparator />
                     <Button
                         Command="{Binding AddImageCommand}"
                         Content="&#xEE71;"
                         Style="{StaticResource LargeIconBtn}"
                         ToolTipService.ToolTip="插入图片" />
+                    <Button
+                        Command="{Binding UndoCommand}"
+                        Content="&#xE7A7;"
+                        IsEnabled="{Binding UndoEnabled}"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="Undo" />
+                    <Button
+                        Command="{Binding RedoCommand}"
+                        Content="&#xE7A6;"
+                        IsEnabled="{Binding RedoEnabled}"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="Redo" />
                 </StackPanel>
-                <RichEditBox Grid.Row="2" />
+                <RichEditBox x:Name="Editor" Grid.Row="2" />
             </Grid>
             <ListView
                 Grid.Row="1"
+                Grid.Column="1"
                 HorizontalContentAlignment="Stretch"
                 Background="Transparent"
                 DisplayMemberPath="Title"
                 Header="Catalog"
-                ItemsSource="{Binding WordItems}">
+                ItemsSource="{Binding Items}">
                 <ivy:Interaction.Behaviors>
-                    <bhv:ListItemDoubleClickBehavior Command="{Binding FindLetterCommand}" />
+                    <bhv:ListItemDoubleClickBehavior Command="{Binding EditCommand}" />
                 </ivy:Interaction.Behaviors>
             </ListView>
         </Grid>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ZoDream.Shared.Storage;
 
-namespace ZoDream.Shared.Plugins.Own
+namespace ZoDream.Shared.Text
 {
     public class OwnDictionary(char[] extendItems)
     {

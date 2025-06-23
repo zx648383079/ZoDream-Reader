@@ -2,43 +2,90 @@
 
 namespace ZoDream.Shared.Text
 {
-    public class OwnEncoding : Encoding
+    public class OwnEncoding(OwnDictionary dict) : Encoding
     {
         /// <summary>
         /// 保留 ascii 前 10 个字符 0x20 - 0x7E
         /// </summary>
-        private readonly byte _system = 0xA;
+        const byte SystemMax = 0xA;
+        const byte CodeBegin = 0xB;
+        const byte CodeCount = 0xFF - CodeBegin;
 
-        
+
 
         public override int GetByteCount(char[] chars, int index, int count)
         {
-            throw new System.NotImplementedException();
+            var res = 0;
+            for (int i = 0; i < count; i++)
+            {
+                res += dict.TrySerialize(chars[index + i], out var code) && code > 210 ? 2 : 1;
+            }
+            return res;
         }
 
         public override int GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex)
         {
-            throw new System.NotImplementedException();
+            var j = 0;
+            for (int i = 0; i < charCount; i++)
+            {
+                if (!dict.TrySerialize(chars[charIndex + i], out var code))
+                {
+                    bytes[byteIndex + j++] = 0x7F;
+                    continue;
+                }
+                if (code <= 210)
+                {
+                    bytes[byteIndex + j++] = (byte)code;
+                    continue;
+                }
+                bytes[byteIndex + j++] = (byte)(code / CodeCount + 210);
+                bytes[byteIndex + j++] = (byte)(code % CodeCount + CodeBegin);
+            }
+            return j;
         }
 
         public override int GetCharCount(byte[] bytes, int index, int count)
         {
-            throw new System.NotImplementedException();
+            var res = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (bytes[index + i] > 210)
+                {
+                    i++;
+                }
+                res ++;
+            }
+            return res;
         }
 
         public override int GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex)
         {
-            throw new System.NotImplementedException();
+            var j = 0;
+            int n;
+            for (int i = 0; i < byteCount; i++)
+            {
+                n = byteIndex + i;
+                var code = (char)bytes[n];
+                if (bytes[n] > 210)
+                {
+                    i++;
+                    n++;
+                    var next = bytes.Length > n ? (bytes[n] - CodeBegin) : 0;
+                    code = (char)((code - 210) * CodeCount + next);
+                }
+                chars[charIndex + j++] = dict.Deserialize(code);
+            }
+            return j;
         }
 
         public override int GetMaxByteCount(int charCount)
         {
-            throw new System.NotImplementedException();
+            return charCount * 2;
         }
 
         public override int GetMaxCharCount(int byteCount)
         {
-            throw new System.NotImplementedException();
+            return byteCount;
         }
     }
 }

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using ZoDream.Shared.Interfaces;
-using ZoDream.Shared.Plugins.Own;
+using ZoDream.Shared.Text;
 using ZoDream.Shared.Storage;
 using ZoDream.Shared.Tokenizers;
 

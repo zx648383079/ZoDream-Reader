@@ -1,10 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Storage.Streams;
 
 namespace ZoDream.Reader.Utils
@@ -38,6 +35,13 @@ namespace ZoDream.Reader.Utils
                 imageUrl = string.Concat("ms-appx:///", imageUrl);
             }
             return new BitmapImage(new Uri(imageUrl, UriKind.Absolute));
+        }
+
+        public static BitmapImage ToImg(Stream value)
+        {
+            var bi = new BitmapImage();
+            bi.SetSourceAsync(value.AsRandomAccessStream()).GetAwaiter().GetResult();
+            return bi;
         }
 
         public static string RandomCover()
