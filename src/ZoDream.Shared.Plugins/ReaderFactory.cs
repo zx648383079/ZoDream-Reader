@@ -24,7 +24,7 @@ namespace ZoDream.Shared.Plugins
             };
         }
 
-        public static INovelReader GetReader(INovelSourceEntity entity)
+        public static INovelSerializer GetReader(INovelSourceEntity entity)
         {
             return entity.Type switch
             {
@@ -34,7 +34,7 @@ namespace ZoDream.Shared.Plugins
             };
         }
 
-        public static IPageTokenizer GetTokenizer(INovelDocument document)
+        public static IPageTokenizer GetTokenizer(ISectionSource document)
         {
             if (document is HtmlDocument)
             {

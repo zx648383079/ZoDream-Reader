@@ -18,13 +18,13 @@ namespace ZoDream.Shared.Interfaces
 
         public Task ReadyAsync(ICanvasRender render);
 
-        public Task<INovelReader> GetReaderAsync();
+        public Task<INovelSerializer> GetReaderAsync();
 
-        public Task<IPageTokenizer> GetTokenizerAsync(INovelDocument document);
-        public Task<IList<INovelPage>> PageParseAsync(INovelDocument document);
+        public Task<IPageTokenizer> GetTokenizerAsync(ISectionSource document);
+        public Task<IList<INovelPage>> PageParseAsync(ISectionSource document);
         public Task<INovelChapter[]> LoadChaptersAsync();
 
-        public Task<INovelDocument> GetChapterAsync(int chapterId);
+        public Task<ISectionSource> GetChapterAsync(int chapterId);
 
         public Task<IReadTheme> GetReadThemeAsync();
     }

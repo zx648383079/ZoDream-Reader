@@ -8,7 +8,7 @@ namespace ZoDream.Shared.Plugins.Txt
 {
     public class TextTokenizer: IPageTokenizer
     {
-        public IList<INovelPage> Parse(INovelDocument content, 
+        public IList<INovelPage> Parse(ISectionSource content, 
             IReadTheme setting, ICanvasControl control)
         {
             if (content is not TextDocument target)

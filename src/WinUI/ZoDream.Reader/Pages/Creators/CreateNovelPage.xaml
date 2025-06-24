@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:bhv="using:ZoDream.Reader.Behaviors"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ivy="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:ZoDream.Reader.Pages.Creators"
@@ -19,6 +20,27 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate x:Key="SectionTemplate">
+                <Grid>
+                    <TextBlock Text="{Binding Title}" />
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="VolumeTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Glyph="&#xE838;" />
+                    <TextBlock Grid.Column="1" Text="{Binding Title}" />
+                </Grid>
+            </DataTemplate>
+
+            <ctl:SectionItemTemplateSelector
+                x:Key="SectionTemplateSelector"
+                DefaultTemplate="{StaticResource SectionTemplate}"
+                VolumeTemplate="{StaticResource VolumeTemplate}" />
         </ResourceDictionary>
     </Page.Resources>
     <Grid>
@@ -43,7 +65,7 @@
                     Command="{Binding SaveCommand}"
                     Content="&#xE74E;"
                     Style="{StaticResource LargeIconBtn}"
-                    ToolTipService.ToolTip="保存" />
+                    ToolTipService.ToolTip="保存为书籍" />
                 <Button
                     Command="{Binding CatalogCommand}"
                     Content="&#xE8A4;"
@@ -93,7 +115,7 @@
                         Command="{Binding SaveCommand}"
                         Content="&#xE74E;"
                         Style="{StaticResource LargeIconBtn}"
-                        ToolTipService.ToolTip="保存" />
+                        ToolTipService.ToolTip="保存为书籍" />
                     <Button
                         Command="{Binding BasicCommand}"
                         Content="&#xE946;"
@@ -111,11 +133,11 @@
                         ToolTipService.ToolTip="下一章" />
 
                     <AppBarSeparator />
-                    <Button
+                    <!--<Button
                         Command="{Binding AddImageCommand}"
                         Content="&#xEE71;"
                         Style="{StaticResource LargeIconBtn}"
-                        ToolTipService.ToolTip="插入图片" />
+                        ToolTipService.ToolTip="插入图片" />-->
                     <Button
                         Command="{Binding UndoCommand}"
                         Content="&#xE7A7;"
@@ -129,7 +151,10 @@
                         Style="{StaticResource LargeIconBtn}"
                         ToolTipService.ToolTip="Redo" />
                 </StackPanel>
-                <RichEditBox x:Name="Editor" Grid.Row="2" />
+                <TextBox
+                    Grid.Row="2"
+                    AcceptsReturn="True"
+                    Text="{Binding Content, Mode=TwoWay}" />
             </Grid>
             <ListView
                 Grid.Row="1"
@@ -138,6 +163,7 @@
                 Background="Transparent"
                 DisplayMemberPath="Title"
                 Header="Catalog"
+                ItemTemplateSelector="{StaticResource SectionTemplateSelector}"
                 ItemsSource="{Binding Items}">
                 <ivy:Interaction.Behaviors>
                     <bhv:ListItemDoubleClickBehavior Command="{Binding EditCommand}" />

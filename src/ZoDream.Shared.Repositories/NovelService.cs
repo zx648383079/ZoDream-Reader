@@ -11,7 +11,7 @@ namespace ZoDream.Shared.Repositories
         INovelEnvironment environment) : INovelService, ICanvasSource
     {
         private IList<INovelChapter>? _chapterRecordItems;
-        private IList<INovelDocument> _cacheChapters = [];
+        private IList<ISectionSource> _cacheChapters = [];
         private IList<INovelPage> _cachePages = [];
         private string _novelId = string.Empty;
         private int _recordIndex = -1;
@@ -128,7 +128,7 @@ namespace ZoDream.Shared.Repositories
             {
                 _recordIndex = environment.ChapterIndex;
             }
-            var items = new INovelDocument[_cacheCount];
+            var items = new ISectionSource[_cacheCount];
             var begin = Math.Max(0, _recordIndex - _cacheCount / 3);
             if (begin == _cacheRecordIndex)
             {

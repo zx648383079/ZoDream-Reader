@@ -9,7 +9,7 @@ using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Pdf
 {
-    public class PdfReader : INovelReader
+    public class PdfReader : INovelSerializer
     {
         public void Dispose()
         {
@@ -21,7 +21,7 @@ namespace ZoDream.Shared.Plugins.Pdf
             return new FileSource(entry);
         }
 
-        public Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter)
+        public Task<ISectionSource> GetChapterAsync(INovelSource source, INovelChapter chapter)
         {
             throw new NotImplementedException();
         }

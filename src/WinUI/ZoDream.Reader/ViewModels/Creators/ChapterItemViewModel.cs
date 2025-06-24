@@ -1,10 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
-using ZoDream.Shared.Tokenizers;
+using ZoDream.Shared.Interfaces;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ChapterItemViewModel : ObservableObject
+    public interface IEditableSection
+    {
+        public string Title { get; }
+    }
+
+    public class ChapterItemViewModel : ObservableObject, INovelSection, IEditableSection
     {
 
 
@@ -15,6 +20,19 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _title, value);
         }
 
-        public IList<INodeLine> Nodes { get; private set; } = [];
+        public IList<INovelBlock> Items { get; private set; } = [];
+    }
+
+    public class VolumeItemViewModel : ObservableObject, IEditableSection
+    {
+
+
+        private string _title = string.Empty;
+
+        public string Title {
+            get => _title;
+            set => SetProperty(ref _title, value);
+        }
+
     }
 }

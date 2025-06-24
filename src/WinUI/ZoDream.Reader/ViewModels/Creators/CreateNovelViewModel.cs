@@ -32,7 +32,8 @@ namespace ZoDream.Reader.ViewModels
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
-        public RichEditTextDocument? Document { get; internal set; }
+        private ChapterItemViewModel? _current;
+        //public RichEditTextDocument? Document { get; internal set; }
 
         private string _name = string.Empty;
 
@@ -76,9 +77,9 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _content, value);
         }
 
-        private ObservableCollection<ChapterItemViewModel> _items = [];
+        private ObservableCollection<IEditableSection> _items = [];
 
-        public ObservableCollection<ChapterItemViewModel> Items {
+        public ObservableCollection<IEditableSection> Items {
             get => _items;
             set => SetProperty(ref _items, value);
         }
@@ -129,6 +130,9 @@ namespace ZoDream.Reader.ViewModels
         {
             var picker = new FileOpenPicker();
             picker.FileTypeFilter.Add(".npk");
+            picker.FileTypeFilter.Add(".txt");
+            picker.FileTypeFilter.Add(".epub");
+            picker.FileTypeFilter.Add(".umd");
             _app.InitializePicker(picker);
             var file = await picker.PickSingleFileAsync();
             if (file is null)
@@ -137,13 +141,12 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private void TapSave()
+        private async void TapSave()
         {
-            if (Document is null)
-            {
-                return;
-            }
-            Document.GetText(TextGetOptions.FormatRtf, out var text);
+            var picker = new FileSavePicker();
+            picker.FileTypeChoices.Add("书籍", [".npk"]);
+            var file = await picker.PickSaveFileAsync();
+
         }
         private void TapBasic()
         {
@@ -171,35 +174,35 @@ namespace ZoDream.Reader.ViewModels
 
         public void TapRedo()
         {
-            Document?.Redo();
+            //Document?.Redo();
         }
 
         public void TapUndo()
         {
-            Document?.Undo();
+            //Document?.Undo();
         }
 
-        private async void TapAddImage()
+        private void TapAddImage()
         {
-            if (Document is null)
-            {
-                return;
-            }
-            var picker = new FileOpenPicker();
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            picker.FileTypeFilter.Add(".png");
-            _app.InitializePicker(picker);
-            var file = await picker.PickSingleFileAsync();
-            if (file is null)
-            {
-                return;
-            }
-            var input = await file.OpenReadAsync();
-            Document.Selection.TypeText("\n");
-            Document.Selection.InsertImage(0, 0, 0, VerticalCharacterAlignment.Baseline, file.DisplayName, input);
-            Document.Selection.Move(TextRangeUnit.Paragraph, 1);
-            Document.Selection.TypeText("\n");
+            //if (Document is null)
+            //{
+            //    return;
+            //}
+            //var picker = new FileOpenPicker();
+            //picker.FileTypeFilter.Add(".jpg");
+            //picker.FileTypeFilter.Add(".jpeg");
+            //picker.FileTypeFilter.Add(".png");
+            //_app.InitializePicker(picker);
+            //var file = await picker.PickSingleFileAsync();
+            //if (file is null)
+            //{
+            //    return;
+            //}
+            //var input = await file.OpenReadAsync();
+            //Document.Selection.TypeText("\n");
+            //Document.Selection.InsertImage(0, 0, 0, VerticalCharacterAlignment.Baseline, file.DisplayName, input);
+            //Document.Selection.Move(TextRangeUnit.Paragraph, 1);
+            //Document.Selection.TypeText("\n");
         }
 
     }

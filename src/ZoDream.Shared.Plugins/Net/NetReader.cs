@@ -7,7 +7,7 @@ using ZoDream.Shared.Script;
 
 namespace ZoDream.Shared.Plugins.Net
 {
-    public class NetReader : INovelReader
+    public class NetReader : INovelSerializer
     {
 
         public void Dispose()
@@ -21,10 +21,10 @@ namespace ZoDream.Shared.Plugins.Net
         }
         
 
-        public async Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter)
+        public async Task<ISectionSource> GetChapterAsync(INovelSource source, INovelChapter chapter)
         {
             var inter = new Interpreter();
-            return await Task.FromResult(inter.Execute<INovelDocument>("", new NetSpider()));
+            return await Task.FromResult(inter.Execute<ISectionSource>("", new NetSpider()));
         }
 
         public Task<(INovel?, INovelChapter[])> LoadAsync(INovelSource source)

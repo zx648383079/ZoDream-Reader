@@ -9,7 +9,7 @@ namespace ZoDream.Shared.Plugins.Net
     public class HtmlTokenizer: IPageTokenizer
     {
 
-        public IList<INovelPage> Parse(INovelDocument content,
+        public IList<INovelPage> Parse(ISectionSource content,
             IReadTheme setting, ICanvasControl control)
         {
             if (content is not HtmlDocument res)

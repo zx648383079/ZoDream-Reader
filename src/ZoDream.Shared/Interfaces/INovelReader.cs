@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Threading.Tasks;
-using ZoDream.Shared.Interfaces.Entities;
+using System.IO;
 
 namespace ZoDream.Shared.Interfaces
 {
-    public interface INovelReader: IDisposable
+    public interface INovelReader : IDisposable
     {
 
-        public INovelSource CreateSource(INovelSourceEntity entry);
-        public Task<(INovel?, INovelChapter[])> LoadAsync(INovelSource source);
-        public Task<INovelChapter[]> GetChaptersAsync(INovelSource source);
+        public INovelDocument Read();
+    }
 
-        public Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter);
+    public interface INovelWriter : IDisposable
+    {
 
-        public string Serialize(INovelChapter chapter);
-        public INovelChapter UnSerialize(string data);
+        public void Write(Stream output);
     }
 }

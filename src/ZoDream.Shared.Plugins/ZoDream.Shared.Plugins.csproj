@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\shared\ZoDream.Shared.Http\ZoDream.Shared.Http.csproj" />
     <ProjectReference Include="..\ZoDream.Shared.Repositories\ZoDream.Shared.Repositories.csproj" />
     <ProjectReference Include="..\ZoDream.Shared.Script\ZoDream.Shared.Script.csproj" />
+    <ProjectReference Include="..\ZoDream.Shared.Text\ZoDream.Shared.Text.csproj" />
     <ProjectReference Include="..\ZoDream.Shared\ZoDream.Shared.csproj" />
   </ItemGroup>
 

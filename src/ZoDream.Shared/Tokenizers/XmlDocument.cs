@@ -2,7 +2,7 @@
 
 namespace ZoDream.Shared.Tokenizers
 {
-    public class XmlDocument(string title, string content) : TextDocument(title, content), INovelDocument
+    public class XmlDocument(string title, string content) : TextDocument(title, content), ISectionSource
     {
     }
 }

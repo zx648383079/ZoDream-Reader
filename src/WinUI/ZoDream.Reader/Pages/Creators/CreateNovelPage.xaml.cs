@@ -14,7 +14,6 @@ namespace ZoDream.Reader.Pages.Creators
         public CreateNovelPage()
         {
             InitializeComponent();
-            ViewModel.Document = Editor.Document;
         }
 
         public CreateNovelViewModel ViewModel => (CreateNovelViewModel)DataContext;

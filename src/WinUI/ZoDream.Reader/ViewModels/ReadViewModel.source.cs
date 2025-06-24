@@ -27,7 +27,7 @@ namespace ZoDream.Reader.ViewModels
 
         private BookEntity _novel;
         private INovelSource? _source;
-        private INovelReader? _reader;
+        private INovelSerializer? _reader;
         public ICanvasAnimate Animator { get; private set; } = new NoneAnimate();
 
         public string NovelId => _novel.Id;
@@ -59,17 +59,17 @@ namespace ZoDream.Reader.ViewModels
             return Task.CompletedTask;
         }
 
-        public Task<INovelReader> GetReaderAsync()
+        public Task<INovelSerializer> GetReaderAsync()
         {
             return Task.FromResult(_reader ??= ReaderFactory.GetReader(_novel));
         }
 
-        public Task<IPageTokenizer> GetTokenizerAsync(INovelDocument document)
+        public Task<IPageTokenizer> GetTokenizerAsync(ISectionSource document)
         {
             return Task.FromResult(ReaderFactory.GetTokenizer(document));
         }
 
-        public async Task<IList<INovelPage>> PageParseAsync(INovelDocument document)
+        public async Task<IList<INovelPage>> PageParseAsync(ISectionSource document)
         {
             var tokenizer = await GetTokenizerAsync(document);
             return tokenizer.Parse(document, _app.ReadTheme, this);
@@ -80,7 +80,7 @@ namespace ZoDream.Reader.ViewModels
             return Task.FromResult(ChapterItems.Select(i => (INovelChapter)i).ToArray());
         }
 
-        public async Task<INovelDocument> GetChapterAsync(int chapterId)
+        public async Task<ISectionSource> GetChapterAsync(int chapterId)
         {
 
             var reader = await GetReaderAsync();

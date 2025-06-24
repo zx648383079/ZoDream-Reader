@@ -12,7 +12,7 @@ using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.EPub
 {
-    public class EPubReader : INovelReader
+    public class EPubReader : INovelSerializer
     {
         const string EPUB_CONTAINER_FILE_PATH = "META-INF/container.xml";
         public void Dispose()
@@ -24,7 +24,7 @@ namespace ZoDream.Shared.Plugins.EPub
             return new FileSource(entry);
         }
 
-        public Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter)
+        public Task<ISectionSource> GetChapterAsync(INovelSource source, INovelChapter chapter)
         {
             return Task.Factory.StartNew(() => {
                 using var fs = File.OpenRead(((FileSource)source).FileName);
@@ -111,7 +111,7 @@ namespace ZoDream.Shared.Plugins.EPub
             return (novel, [..items]);
         }
 
-        public INovelDocument GetChapter(Stream input, INovelChapter chapter)
+        public ISectionSource GetChapter(Stream input, INovelChapter chapter)
         {
             using var archive = new ZipArchive(input, ZipArchiveMode.Read);
             var doc = Read(archive, chapter.Url);

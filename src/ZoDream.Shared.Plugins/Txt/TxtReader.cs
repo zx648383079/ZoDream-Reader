@@ -12,7 +12,7 @@ using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Txt
 {
-    public class TxtReader : INovelReader
+    public class TxtReader : INovelSerializer
     {
         public TxtReader()
         {
@@ -44,7 +44,7 @@ namespace ZoDream.Shared.Plugins.Txt
             });
         }
 
-        public async Task<INovelDocument> GetChapterAsync(INovelSource source, INovelChapter chapter)
+        public async Task<ISectionSource> GetChapterAsync(INovelSource source, INovelChapter chapter)
         {
             if (source is not TxtSource t)
             {

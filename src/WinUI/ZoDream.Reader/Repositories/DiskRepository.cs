@@ -175,7 +175,7 @@ namespace ZoDream.Reader.Repositories
             return novel;
         }
 
-        public async Task<INovelReader> GetReaderAsync(string fileName, bool init = false)
+        public async Task<INovelSerializer> GetReaderAsync(string fileName, bool init = false)
         {
             return Path.GetExtension(fileName)[1..].ToLower() switch
             {

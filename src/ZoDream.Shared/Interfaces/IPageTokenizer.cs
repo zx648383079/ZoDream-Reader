@@ -6,7 +6,7 @@ namespace ZoDream.Shared.Interfaces
 {
     public interface IPageTokenizer
     {
-        public IList<INovelPage> Parse(INovelDocument content,
+        public IList<INovelPage> Parse(ISectionSource content,
             IReadTheme setting, ICanvasControl control);
     }
 }

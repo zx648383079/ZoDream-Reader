@@ -550,7 +550,7 @@ namespace ZoDream.Reader.Repositories
             await App.GetService<AppViewModel>().Storage.AddImageAsync(key, value);
         }
 
-        public async Task<INovelReader> GetReaderAsync(INovelSourceEntity novel)
+        public async Task<INovelSerializer> GetReaderAsync(INovelSourceEntity novel)
         {
             var type = (NovelSourceType)novel.Type;
             if (type == NovelSourceType.Network)
