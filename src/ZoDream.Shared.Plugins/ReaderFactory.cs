@@ -30,7 +30,7 @@ namespace ZoDream.Shared.Plugins
             {
                 2 => new NetReader(),
                 1 => new EPubReader(),
-                _ => new TxtReader(),
+                _ => new TxtSerializer(),
             };
         }
 

@@ -562,7 +562,7 @@ namespace ZoDream.Reader.Repositories
                 "epub" => new EPubReader(),
                 "umd" => new UmdReader(),
                 "pdf" => new PdfReader(),
-                _ => new TxtReader()
+                _ => new TxtSerializer()
             };
         }
 
