@@ -25,6 +25,7 @@
     <None Remove="Dialogs\AddReadThemeDialog.xaml" />
     <None Remove="Dialogs\AddReplaceDialog.xaml" />
     <None Remove="Dialogs\AddSourceDialog.xaml" />
+    <None Remove="Dialogs\ChapterMatchDialog.xaml" />
     <None Remove="Dialogs\ConfirmDialog.xaml" />
     <None Remove="Dialogs\FormDialog.xaml" />
     <None Remove="Dialogs\GroupDialog.xaml" />
@@ -354,7 +355,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ViewModels\Dialogs\" />
+    <Page Update="Dialogs\ChapterMatchDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Pages\Creators\CreateNovelPage.xaml">

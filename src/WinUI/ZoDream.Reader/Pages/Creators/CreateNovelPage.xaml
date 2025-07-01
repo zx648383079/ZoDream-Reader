@@ -43,7 +43,7 @@
                 VolumeTemplate="{StaticResource VolumeTemplate}" />
         </ResourceDictionary>
     </Page.Resources>
-    <Grid>
+    <Grid Padding="8">
         <Grid Visibility="{Binding BasicVisible}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
@@ -96,7 +96,10 @@
                 MinHeight="200"
                 AcceptsReturn="True"
                 Header="Brief"
-                Text="{Binding Brief, Mode=TwoWay}" />
+                IsSpellCheckEnabled="False"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                Text="{Binding Brief, Mode=TwoWay}"
+                TextWrapping="Wrap" />
         </Grid>
         <Grid Visibility="{Binding CatalogVisible}">
             <Grid.ColumnDefinitions>
@@ -154,7 +157,10 @@
                 <TextBox
                     Grid.Row="2"
                     AcceptsReturn="True"
-                    Text="{Binding Content, Mode=TwoWay}" />
+                    IsSpellCheckEnabled="False"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    Text="{Binding Content, Mode=TwoWay}"
+                    TextWrapping="Wrap" />
             </Grid>
             <ListView
                 Grid.Row="1"
@@ -168,6 +174,18 @@
                 <ivy:Interaction.Behaviors>
                     <bhv:ListItemDoubleClickBehavior Command="{Binding EditCommand}" />
                 </ivy:Interaction.Behaviors>
+                <ListView.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="编辑" />
+                        <MenuFlyoutSubItem Text="排序">
+                            <MenuFlyoutItem Text="置顶" />
+                            <MenuFlyoutItem Text="上移" />
+                            <MenuFlyoutItem Text="下移" />
+                            <MenuFlyoutItem Text="置底" />
+                        </MenuFlyoutSubItem>
+                        <MenuFlyoutItem Text="删除" />
+                    </MenuFlyout>
+                </ListView.ContextFlyout>
             </ListView>
         </Grid>
     </Grid>

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using ZoDream.Shared.Interfaces;
@@ -180,7 +178,7 @@ namespace ZoDream.Reader.Repositories
             return Path.GetExtension(fileName)[1..].ToLower() switch
             {
                 "epub" => new EPubReader(),
-                "umd" => new UmdReader(),
+                "umd" => new UmdSerializer(),
                 "pdf" => new PdfReader(),
                 _ => init ? new TxtSerializer(await App.GetService<AppViewModel>().Database.GetEnabledChapterRuleAsync()) : new TxtSerializer()
             };

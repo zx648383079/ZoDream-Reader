@@ -1,13 +1,18 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Storage;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Txt
 {
-    public partial class TxtReader(Stream input, string fileName, Regex splitRule) : INovelReader
+    public partial class TxtReader(Stream input, 
+        Encoding encoding,
+        string fileName, 
+        Regex splitRule) : INovelReader
     {
         const int MaxLengthWithRule = 102400;
         const int MaxLengthWithoutRule = 10 * 1024;
@@ -23,12 +28,20 @@ namespace ZoDream.Shared.Plugins.Txt
             
         }
 
+        public TxtReader(Stream input, string fileName, Regex splitRule)
+            : this (input, GetEncoding(input), fileName, splitRule)
+        {
+            
+        }
+
+        public Encoding Encoding => encoding;
+
         public INovelDocument Read()
         {
             var res = new RichDocument(Parse(fileName, out var author, out _));
             res.Author = author;
             input.Seek(0, SeekOrigin.Begin);
-            var reader = LocationStorage.Reader(input);
+            var reader = new StreamReader(input, encoding);
             var isMatchRule = true;
             var bodyLength = 0L;
             INovelSection last = new NovelSection(string.Empty);
@@ -76,10 +89,42 @@ namespace ZoDream.Shared.Plugins.Txt
             return res;
         }
 
+        /// <summary>
+        /// 读取章节
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public async Task ReadAsync(IAsyncObservableCollection<string> data)
+        {
+            data.Start();
+            input.Seek(0, SeekOrigin.Begin);
+            var reader = new StreamReader(input, encoding);
+            while (!data.IsPaused)
+            {
+                var line = await reader.ReadLineAsync();
+                if (line == null)
+                {
+                    break;
+                }
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+                if (splitRule.IsMatch(line))
+                {
+                    data.Add(line.Trim());
+                    continue;
+                }
+            }
+            data.Stop();
+        }
+
         public void Dispose()
         {
             input.Dispose();
         }
+
+        
 
         #region 编解码书籍文件名信息
         public static string Format(string name, string author, string category)
@@ -172,7 +217,10 @@ namespace ZoDream.Shared.Plugins.Txt
         }
         #endregion
 
-
+        private static Encoding GetEncoding(Stream input)
+        {
+            return TxtEncoder.GetEncoding(input, Encoding.GetEncoding("gb2312"));
+        }
 
 
         [GeneratedRegex(@"^(正文)?[\s]{0,6}第?[\s]*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?[\s\S]{0,20}$")]

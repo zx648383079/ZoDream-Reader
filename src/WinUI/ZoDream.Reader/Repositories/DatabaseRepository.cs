@@ -560,7 +560,7 @@ namespace ZoDream.Reader.Repositories
             return Path.GetExtension(novel.FileName)[1..].ToLower() switch
             {
                 "epub" => new EPubReader(),
-                "umd" => new UmdReader(),
+                "umd" => new UmdSerializer(),
                 "pdf" => new PdfReader(),
                 _ => new TxtSerializer()
             };

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
+using ZoDream.Reader.Dialogs;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -139,6 +140,8 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
+            var dialog = new ChapterMatchDialog();
+            await _app.OpenDialogAsync(dialog);
         }
 
         private async void TapSave()
