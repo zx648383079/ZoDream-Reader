@@ -141,6 +141,7 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             var dialog = new ChapterMatchDialog();
+            _ = dialog.ViewModel.LoadAsync(file.Path);
             await _app.OpenDialogAsync(dialog);
         }
 

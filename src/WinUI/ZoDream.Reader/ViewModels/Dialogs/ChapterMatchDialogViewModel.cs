@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ZoDream.Shared.Plugins.Txt;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -31,23 +33,34 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _items, value);
         }
 
+        private string _okText = "确定";
+
+        public string OkText {
+            get => _okText;
+            set => SetProperty(ref _okText, value);
+        }
+
 
         public ICommand MatchCommand { get; private set; }
 
         private async void TapMatch(string? text)
         {
+            Items.Clear();
             await LoadAsync(_fileName, text!);
         }
 
         public Task LoadAsync(string fileName)
         {
             _fileName = fileName;
-            return LoadAsync(fileName, RuleText = @"^(正文)?[\\s]{0,6}第?[\\s]*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?[\\s\\S]{0,20}$");
+            return LoadAsync(fileName, RuleText = @"^第\s*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?.{0,20}$");
         }
 
-        public Task LoadAsync(string fileName, string ruleText)
+        public async Task LoadAsync(string fileName, string ruleText)
         {
-
+            using var fs = File.OpenRead(fileName);
+            using var reader = new TxtReader(fs, fileName, ruleText);
+            await reader.ReadAsync(Items);
+            OkText = $"确认(共{Items.Count}章)";
         }
 
 

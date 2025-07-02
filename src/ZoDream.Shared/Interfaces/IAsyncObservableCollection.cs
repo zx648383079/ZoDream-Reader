@@ -13,6 +13,8 @@ namespace ZoDream.Shared.Interfaces
 
         public void Add(T item);
 
+        public void Clear();
+
         public void Start();
 
         public void Stop();

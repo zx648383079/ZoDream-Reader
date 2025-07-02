@@ -9,7 +9,8 @@
     xmlns:local="using:ZoDream.Reader.Dialogs"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
-    PrimaryButtonText="确定"
+    IsPrimaryButtonEnabled="{Binding Items.IsPaused}"
+    PrimaryButtonText="{Binding OkText}"
     SecondaryButtonText="取消"
     mc:Ignorable="d">
 
@@ -33,11 +34,14 @@
         </AutoSuggestBox>
         <ProgressBar
             Grid.Row="1"
+            Height="5"
             IsIndeterminate="{Binding Items.InProgress}"
             ShowError="False"
-            ShowPaused="False" />
+            ShowPaused="False"
+            Visibility="{Binding Items.InProgress, Converter={StaticResource ToggleCvt}}" />
         <ListBox
             Grid.Row="2"
+            MinHeight="160"
             ItemsSource="{Binding Items}"
             Style="{StaticResource CustomListBox}" />
     </Grid>
