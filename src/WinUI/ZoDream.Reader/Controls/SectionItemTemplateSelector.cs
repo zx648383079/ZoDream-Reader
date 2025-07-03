@@ -15,9 +15,9 @@ namespace ZoDream.Reader.Controls
             {
                 return VolumeTemplate;
             }
-            if (item is ChapterItemViewModel)
+            if (item is ChapterItemViewModel o)
             {
-                return DefaultTemplate;
+                return o.Items.Count == 0 ? VolumeTemplate : DefaultTemplate;
             }
             return base.SelectTemplateCore(item, container);
         }

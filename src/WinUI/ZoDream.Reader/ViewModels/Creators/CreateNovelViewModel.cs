@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Behaviors;
@@ -11,9 +12,11 @@ using ZoDream.Reader.Dialogs;
 using ZoDream.Shared.Extensions;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Plugins.EPub;
+using ZoDream.Shared.Plugins.Own;
 using ZoDream.Shared.Plugins.Txt;
 using ZoDream.Shared.Plugins.Umd;
 using ZoDream.Shared.Text;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -197,6 +200,13 @@ namespace ZoDream.Reader.ViewModels
             else if (extension == ".epub")
             {
                 reader = new EPubReader(await file.OpenStreamForReadAsync());
+            } else if (extension == ".npk")
+            {
+                if (!await LoadDictionaryAsync())
+                {
+                    return;
+                }
+                reader = new OwnReader(await file.OpenStreamForReadAsync(), new OwnEncoding(_dict!));
             }
             var doc = reader?.Read();
             reader?.Dispose();
@@ -204,37 +214,27 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            Name = doc.Name;
-            Author = doc.Author;
-            Brief = doc.Brief;
-            Cover = doc.Cover?.ToBase64String();
-            Items.Clear();
-            foreach (var item in doc.Items)
-            {
-                if (!string.IsNullOrWhiteSpace(item.Name))
-                {
-                    Items.Add(new VolumeItemViewModel(this)
-                    {
-                        Title = item.Name,
-                    });
-                }
-                foreach (var it in item)
-                {
-                    Items.Add(new ChapterItemViewModel(this)
-                    {
-                        Title = it.Title,
-                        Items = it.Items
-                    });
-                }
-            }
+            Deserialize(doc);
         }
 
+        
         private async void TapSave()
         {
             var picker = new FileSavePicker();
             picker.FileTypeChoices.Add("书籍", [".npk"]);
+            _app.InitializePicker(picker);
             var file = await picker.PickSaveFileAsync();
-
+            if (file is null)
+            {
+                return;
+            }
+            if (!await LoadDictionaryAsync())
+            {
+                return;
+            }
+            using var fs = await file.OpenStreamForWriteAsync();
+            new OwnWriter(Serialize(), new OwnEncoding(_dict!)).Write(fs);
+            await _app.ConfirmAsync("保存成功");
         }
         private void TapBasic()
         {
@@ -287,30 +287,37 @@ namespace ZoDream.Reader.ViewModels
             _isUpdated = false;
         }
 
+        private async Task<bool> LoadDictionaryAsync()
+        {
+            if (_dict is not null)
+            {
+                return true;
+            }
+            var picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".bin");
+            _app.InitializePicker(picker);
+            var file = await picker.PickSingleFileAsync();
+            if (file is null)
+            {
+                return false;
+            }
+            _dict = OwnDictionary.OpenFile(await file.OpenStreamForReadAsync());
+            return true;
+        }
+
         private async void TapCheck()
         {
             if (Document is null)
             {
                 return;
             }
-            if (_dict is null)
+            if (!await LoadDictionaryAsync())
             {
-                var picker = new FileOpenPicker();
-                picker.FileTypeFilter.Add(".npk");
-                picker.FileTypeFilter.Add(".txt");
-                picker.FileTypeFilter.Add(".epub");
-                picker.FileTypeFilter.Add(".umd");
-                _app.InitializePicker(picker);
-                var file = await picker.PickSingleFileAsync();
-                if (file is null)
-                {
-                    return;
-                }
-                _dict = OwnDictionary.OpenFile(await file.OpenStreamForReadAsync());
+                return;
             }
             foreach (var item in Document.Text)
             {
-                if (_dict.TrySerialize(item, out _))
+                if (_dict!.TrySerialize(item, out _))
                 {
                     continue;
                 }
@@ -390,7 +397,25 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            Items.Remove(arg);
+            var i = Items.IndexOf(arg);
+            if (Items.Count <= 1)
+            {
+                _current!.Title = Title = string.Empty;
+                Content = string.Empty;
+                return;
+            }
+            Items.RemoveAt(i);
+            if (_current != arg)
+            {
+                return;
+            }
+            if (Items.Count > i)
+            {
+                EditSection(Items[i]);
+            } else
+            {
+                EditSection(Items[i - 1]);
+            }
         }
 
         public void TapPrevious()
@@ -444,6 +469,60 @@ namespace ZoDream.Reader.ViewModels
             //Document.Selection.InsertImage(0, 0, 0, VerticalCharacterAlignment.Baseline, file.DisplayName, input);
             //Document.Selection.Move(TextRangeUnit.Paragraph, 1);
             //Document.Selection.TypeText("\n");
+        }
+
+        private void Deserialize(INovelDocument doc)
+        {
+            Name = doc.Name;
+            Author = doc.Author;
+            Brief = doc.Brief;
+            Cover = doc.Cover?.ToBase64String();
+            Items.Clear();
+            foreach (var item in doc.Items)
+            {
+                if (!string.IsNullOrWhiteSpace(item.Name))
+                {
+                    Items.Add(new VolumeItemViewModel(this)
+                    {
+                        Title = item.Name,
+                    });
+                }
+                foreach (var it in item)
+                {
+                    Items.Add(new ChapterItemViewModel(this)
+                    {
+                        Title = it.Title,
+                        Items = it.Items
+                    });
+                }
+            }
+        }
+
+        private INovelDocument Serialize()
+        {
+            var res = new RichDocument(Name)
+            {
+                Author = Author,
+                Brief = Brief
+            };
+            foreach (var item in Items)
+            {
+                if (item is VolumeItemViewModel v)
+                {
+                    res.Add(new NovelVolume(v.Title));
+                    continue;
+                }
+                if (item is ChapterItemViewModel c)
+                {
+                    if (res.Items.Count == 0)
+                    {
+                        res.Add(new NovelVolume(c.Title));
+                        continue;
+                    }
+                    res.Add(new NovelSection(c.Title, c.Items));
+                }
+            }
+            return res;
         }
 
     }

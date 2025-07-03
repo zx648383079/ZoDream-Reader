@@ -21,13 +21,54 @@
                 <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <MenuFlyout x:Key="ItemContextMenu">
+                <MenuFlyoutItem
+                    Command="{Binding EditCommand}"
+                    CommandParameter="{Binding}"
+                    Icon="Edit"
+                    Text="编辑" />
+                <MenuFlyoutSubItem Text="排序">
+                    <MenuFlyoutItem
+                        Command="{Binding MoveTopCommand}"
+                        CommandParameter="{Binding}"
+                        Icon="Upload"
+                        Text="置顶" />
+                    <MenuFlyoutItem
+                        Command="{Binding MoveUpCommand}"
+                        CommandParameter="{Binding}"
+                        Icon="Up"
+                        Text="上移" />
+                    <MenuFlyoutItem
+                        Command="{Binding MoveDownCommand}"
+                        CommandParameter="{Binding}"
+                        Text="下移">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon Glyph="&#xE74B;" />
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                    <MenuFlyoutItem
+                        Command="{Binding MoveBottomCommand}"
+                        CommandParameter="{Binding}"
+                        Text="置底">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon Glyph="&#xE896;" />
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                </MenuFlyoutSubItem>
+                <MenuFlyoutItem
+                    Command="{Binding DeleteCommand}"
+                    CommandParameter="{Binding}"
+                    Icon="Delete"
+                    Text="删除" />
+            </MenuFlyout>
+
             <DataTemplate x:Key="SectionTemplate">
-                <Grid>
+                <Grid ContextFlyout="{StaticResource ItemContextMenu}">
                     <TextBlock Text="{Binding Title}" />
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="VolumeTemplate">
-                <Grid>
+                <Grid ContextFlyout="{StaticResource ItemContextMenu}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition />
@@ -191,38 +232,6 @@
                     <bhv:ListItemDoubleClickBehavior Command="{Binding EditCommand}" />
                     <bhv:DragSortBehavior DragCommand="{Binding SortCommand}" />
                 </ivy:Interaction.Behaviors>
-                <ListView.ContextFlyout>
-                    <MenuFlyout>
-                        <MenuFlyoutItem
-                            Command="{Binding EditCommand}"
-                            Icon="Edit"
-                            Text="编辑" />
-                        <MenuFlyoutSubItem Text="排序">
-                            <MenuFlyoutItem
-                                Command="{Binding MoveTopCommand}"
-                                Icon="Upload"
-                                Text="置顶" />
-                            <MenuFlyoutItem
-                                Command="{Binding MoveUpCommand}"
-                                Icon="Up"
-                                Text="上移" />
-                            <MenuFlyoutItem Command="{Binding MoveDownCommand}" Text="下移">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon Glyph="&#xE74B;" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutItem Command="{Binding MoveBottomCommand}" Text="置底">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon Glyph="&#xE896;" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuFlyoutSubItem>
-                        <MenuFlyoutItem
-                            Command="{Binding DeleteCommand}"
-                            Icon="Delete"
-                            Text="删除" />
-                    </MenuFlyout>
-                </ListView.ContextFlyout>
             </ListView>
         </Grid>
     </Grid>
