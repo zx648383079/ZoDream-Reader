@@ -29,7 +29,7 @@ namespace ZoDream.Shared.Plugins
             return entity.Type switch
             {
                 2 => new NetReader(),
-                1 => new EPubReader(),
+                1 => new EPubSerializer(),
                 _ => new TxtSerializer(),
             };
         }

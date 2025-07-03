@@ -162,7 +162,7 @@ namespace ZoDream.Reader.Repositories
             novel.FileName = fileId;
             if (string.IsNullOrWhiteSpace(novel.Name))
             {
-                new TxtSerializer().Decode(name, novel);
+                TxtSerializer.Decode(name, novel);
             }
             var service = App.GetService<AppViewModel>().Database;
             await service.SaveBookAsync(novel);
@@ -177,7 +177,7 @@ namespace ZoDream.Reader.Repositories
         {
             return Path.GetExtension(fileName)[1..].ToLower() switch
             {
-                "epub" => new EPubReader(),
+                "epub" => new EPubSerializer(),
                 "umd" => new UmdSerializer(),
                 "pdf" => new PdfReader(),
                 _ => init ? new TxtSerializer(await App.GetService<AppViewModel>().Database.GetEnabledChapterRuleAsync()) : new TxtSerializer()

@@ -87,7 +87,7 @@
                 Grid.Column="1"
                 BorderBrush="LightGray"
                 BorderThickness="1">
-                <Image Source="{Binding Cover}" />
+                <Image MaxHeight="48" Source="{Binding Cover, Converter={StaticResource ImageCvt}}" />
             </Border>
 
             <TextBox
@@ -166,24 +166,28 @@
                 Grid.Row="1"
                 Grid.Column="1"
                 HorizontalContentAlignment="Stretch"
+                AllowDrop="True"
                 Background="Transparent"
-                DisplayMemberPath="Title"
+                CanDragItems="True"
                 Header="Catalog"
                 ItemTemplateSelector="{StaticResource SectionTemplateSelector}"
-                ItemsSource="{Binding Items}">
+                ItemsSource="{Binding Items}"
+                SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                SelectionMode="Single">
                 <ivy:Interaction.Behaviors>
                     <bhv:ListItemDoubleClickBehavior Command="{Binding EditCommand}" />
+                    <bhv:DragSortBehavior DragCommand="{Binding SortCommand}" />
                 </ivy:Interaction.Behaviors>
                 <ListView.ContextFlyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="编辑" />
+                        <MenuFlyoutItem Command="{Binding EditCommand}" Text="编辑" />
                         <MenuFlyoutSubItem Text="排序">
-                            <MenuFlyoutItem Text="置顶" />
-                            <MenuFlyoutItem Text="上移" />
-                            <MenuFlyoutItem Text="下移" />
-                            <MenuFlyoutItem Text="置底" />
+                            <MenuFlyoutItem Command="{Binding MoveTopCommand}" Text="置顶" />
+                            <MenuFlyoutItem Command="{Binding MoveUpCommand}" Text="上移" />
+                            <MenuFlyoutItem Command="{Binding MoveDownCommand}" Text="下移" />
+                            <MenuFlyoutItem Command="{Binding MoveBottomCommand}" Text="置底" />
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutItem Text="删除" />
+                        <MenuFlyoutItem Command="{Binding DeleteCommand}" Text="删除" />
                     </MenuFlyout>
                 </ListView.ContextFlyout>
             </ListView>

@@ -213,7 +213,7 @@ namespace ZoDream.Shared.Plugins.Txt
         #region 编解码书籍文件名信息
 
 
-        public void Decode(string text, INovel novel)
+        public static void Decode(string text, INovel novel)
         {
             novel.Name = TxtReader.Parse(text, out var author, out var category);
             if (!string.IsNullOrEmpty(author))

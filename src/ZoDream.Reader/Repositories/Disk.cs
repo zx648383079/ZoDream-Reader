@@ -256,7 +256,7 @@ namespace ZoDream.Reader.Repositories
         {
             return Path.GetExtension(fileName)[1..].ToLower() switch
             {
-                "epub" => new EPubReader(),
+                "epub" => new EPubSerializer(),
                 "umd" => new UmdReader(),
                 "pdf" => new PdfReader(),
                 _ => init ? new TxtSerializer(await App.GetService<AppViewModel>().Database.GetEnabledChapterRuleAsync()) : new TxtSerializer()

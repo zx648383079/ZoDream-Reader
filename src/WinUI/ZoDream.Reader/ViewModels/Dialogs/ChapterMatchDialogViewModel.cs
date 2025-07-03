@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ZoDream.Shared.Plugins.Txt;
@@ -9,12 +10,15 @@ namespace ZoDream.Reader.ViewModels
 {
     public class ChapterMatchDialogViewModel : ObservableObject
     {
+        const string DefaultRule = @"^第\s*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?.{0,20}$";
+
         public ChapterMatchDialogViewModel()
         {
             MatchCommand = new RelayCommand<string>(TapMatch);
+            _ = InitializeAsync();
         }
 
-
+        
         private string _fileName = string.Empty;
 
 
@@ -23,6 +27,13 @@ namespace ZoDream.Reader.ViewModels
         public string RuleText {
             get => _ruleText;
             set => SetProperty(ref _ruleText, value);
+        }
+
+        private string[] _ruleItems = [];
+
+        public string[] RuleItems {
+            get => _ruleItems;
+            set => SetProperty(ref _ruleItems, value);
         }
 
 
@@ -52,7 +63,7 @@ namespace ZoDream.Reader.ViewModels
         public Task LoadAsync(string fileName)
         {
             _fileName = fileName;
-            return LoadAsync(fileName, RuleText = @"^第\s*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?.{0,20}$");
+            return LoadAsync(fileName, RuleText = DefaultRule);
         }
 
         public async Task LoadAsync(string fileName, string ruleText)
@@ -63,6 +74,11 @@ namespace ZoDream.Reader.ViewModels
             OkText = $"确认(共{Items.Count}章)";
         }
 
-
+        private async Task InitializeAsync()
+        {
+            var items = await App.GetService<AppViewModel>().Database
+                .GetEnabledChapterRuleAsync();
+            RuleItems = [DefaultRule, ..items];
+        }
     }
 }

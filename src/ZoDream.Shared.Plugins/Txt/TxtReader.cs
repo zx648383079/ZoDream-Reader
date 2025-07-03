@@ -34,6 +34,10 @@ namespace ZoDream.Shared.Plugins.Txt
             
         }
 
+        /// <summary>
+        /// 是否添加限制最大字数
+        /// </summary>
+        public bool IsMaxLimit { get; set; } = false;
         public Encoding Encoding => encoding;
 
         public INovelDocument Read()
@@ -70,7 +74,7 @@ namespace ZoDream.Shared.Plugins.Txt
                     continue;
                 }
                 bodyLength += line.Length;
-                if (bodyLength > (isMatchRule ? MaxLengthWithRule : MaxLengthWithoutRule)
+                if (IsMaxLimit && bodyLength > (isMatchRule ? MaxLengthWithRule : MaxLengthWithoutRule)
                     && line.Length < 30)
                 {
                     if (!string.IsNullOrWhiteSpace(last.Title) || last.Items.Count > 0)

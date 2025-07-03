@@ -1,68 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Compression;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
-using ZoDream.Shared.Interfaces;
-using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.Repositories.Entities;
+using System.IO.Compression;
 using System.Xml;
 using System.Xml.Linq;
+using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.EPub
 {
-    public class EPubReader : INovelSerializer
+    public class EPubReader(Stream input) : INovelReader
     {
-        const string EPUB_CONTAINER_FILE_PATH = "META-INF/container.xml";
-        public void Dispose()
-        {
-        }
+        internal const string EPUB_CONTAINER_FILE_PATH = "META-INF/container.xml";
+        const string NcxPrefixNamespace = "http://www.daisy.org/z3986/2005/ncx/";
+        const string OpfPrefixNamespace = "http://www.idpf.org/2007/opf";
+        const string XHtmlPrefixNamespace = "http://www.w3.org/1999/xhtml";
 
-        public INovelSource CreateSource(INovelSourceEntity entry)
-        {
-            return new FileSource(entry);
-        }
+        internal static XNamespace Ncx => NcxPrefixNamespace;
+        internal static XNamespace Opf => OpfPrefixNamespace;
+        internal static XNamespace XHtml => XHtmlPrefixNamespace;
 
-        public Task<ISectionSource> GetChapterAsync(INovelSource source, INovelChapter chapter)
-        {
-            return Task.Factory.StartNew(() => {
-                using var fs = File.OpenRead(((FileSource)source).FileName);
-                return GetChapter(fs, chapter);
-            });
-        }
-
-        public Task<INovelChapter[]> GetChaptersAsync(INovelSource source)
-        {
-            return Task.Factory.StartNew(() => {
-                using var fs = File.OpenRead(((FileSource)source).FileName);
-                var (_, items) = GetChapters(fs);
-                return items;
-            });
-        }
-
-        public Task<(INovel?, INovelChapter[])> LoadAsync(INovelSource source)
-        {
-            return Task.Factory.StartNew(() => {
-                using var fs = File.OpenRead(((FileSource)source).FileName);
-                return GetChapters(fs);
-            });
-        }
-
-        public (INovel?, INovelChapter[]) GetChapters(Stream input)
+        public INovelDocument Read()
         {
             using var archive = new ZipArchive(input, ZipArchiveMode.Read);
             var rootFile = GetRootFileName(archive);
-            if (rootFile == null)
+            if (rootFile is null)
             {
-                return (null, []);
+                return null;
             }
             var doc = Read(archive, rootFile);
-            XNamespace opfNamespace = "http://www.idpf.org/2007/opf";
+            var opfNamespace = Opf;
             var root = doc.Element(opfNamespace + "package");
             if (root is null)
             {
-                return (null, []);
+                return null;
             }
             var maps = new Dictionary<string, string>();
             var folder = Path.GetDirectoryName(rootFile);
@@ -70,7 +40,7 @@ namespace ZoDream.Shared.Plugins.EPub
             {
                 maps.Add(item.Attribute("id").Value, folder + "/" + item.Attribute("href").Value);
             }
-            var novel = new BookEntity();
+            var novel = new RichDocument();
             foreach (var item in root.Element(opfNamespace + "metadata").Elements())
             {
                 switch (item.Name.LocalName.ToLowerInvariant())
@@ -79,7 +49,7 @@ namespace ZoDream.Shared.Plugins.EPub
                         novel.Name = item.Value;
                         break;
                     case "description":
-                        novel.Description = item.Value;
+                        novel.Brief = item.Value;
                         break;
                     case "creator":
                         novel.Author = item.Value;
@@ -96,40 +66,58 @@ namespace ZoDream.Shared.Plugins.EPub
             }
             var spine = root.Element(opfNamespace + "spine");
             var ncx = maps[spine.Attribute("toc").Value];
-            XNamespace ncxNamespace = "http://www.daisy.org/z3986/2005/ncx/";
+            var ncxNamespace = Ncx;
             var ncxDoc = Read(archive, ncx);
-            var items = new List<INovelChapter>();
+            var pointName = ncxNamespace + "navPoint";
             foreach (var item in ncxDoc.Element(ncxNamespace + "ncx")
-                .Element(ncxNamespace + "navMap").Elements())
+                .Element(ncxNamespace + "navMap").Elements(pointName))
             {
-                items.Add(new ChapterEntity()
+                if (item.Element(pointName) is null)
                 {
-                    Title = item.Element(ncxNamespace + "navLabel").Element(ncxNamespace + "text").Value,
-                    Url = folder + "/" + item.Element(ncxNamespace + "content").Attribute("src").Value
-                });
+                    novel.Add(ReadDocument(archive, 
+                        folder + "/" + item.Element(ncxNamespace + "content").Attribute("src").Value,
+                        item.Element(ncxNamespace + "navLabel").Element(ncxNamespace + "text").Value));
+                    continue;
+                }
+                var volume = new NovelVolume(item.Element(ncxNamespace + "navLabel").Element(ncxNamespace + "text").Value);
+                novel.Add(volume);
+                foreach (var it in item.Elements(pointName))
+                {
+                    volume.Add(ReadDocument(archive,
+                        folder + "/" + it.Element(ncxNamespace + "content").Attribute("src").Value,
+                        it.Element(ncxNamespace + "navLabel").Element(ncxNamespace + "text").Value));
+                    
+                }
             }
-            return (novel, [..items]);
+            return novel;
         }
 
-        public ISectionSource GetChapter(Stream input, INovelChapter chapter)
+        private static INovelSection ReadDocument(ZipArchive archive, 
+            string fileName, string title)
         {
-            using var archive = new ZipArchive(input, ZipArchiveMode.Read);
-            var doc = Read(archive, chapter.Url);
-            return new HtmlDocument(chapter.Title, doc.Root.ToString());
+            var doc = Read(archive, fileName);
+            var xHtmlNamespace = XHtml;
+            var root = doc.Root;
+            var res = new NovelSection(root?.Element(xHtmlNamespace + "head")
+                ?.Element(xHtmlNamespace + "title")?.Value ?? title);
+            foreach (var item in root.Element(xHtmlNamespace + "body").Elements())
+            {
+                var text = item.Value;
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    continue;
+                }
+                res.Items.Add(new NovelTextBlock(text));
+            }
+            return res;
         }
 
-
-        public string Serialize(INovelChapter chapter)
+        public void Dispose()
         {
-            throw new NotImplementedException();
+            input.Dispose();
         }
 
-        public INovelChapter UnSerialize(string data)
-        {
-            throw new NotImplementedException();
-        }
-
-        private string? GetRootFileName(ZipArchive archive)
+        internal static string? GetRootFileName(ZipArchive archive)
         {
             var reader = Read(archive, EPUB_CONTAINER_FILE_PATH);
             XNamespace cnsNamespace = "urn:oasis:names:tc:opendocument:xmlns:container";
@@ -137,15 +125,7 @@ namespace ZoDream.Shared.Plugins.EPub
                 Attribute("full-path").Value;
         }
 
-        private string GetImageResource(ZipArchive archive, string fileName)
-        {
-            var entry = archive.GetEntry(fileName);
-            using var ms = new MemoryStream();
-            entry.Open().CopyTo(ms);
-            return Convert.ToBase64String(ms.ToArray());
-        }
-
-        private XDocument Read(ZipArchiveEntry entry)
+        private static XDocument Read(ZipArchiveEntry entry)
         {
             var xmlReader = XmlReader.Create(entry.Open(), new XmlReaderSettings
             {
@@ -155,11 +135,17 @@ namespace ZoDream.Shared.Plugins.EPub
             return XDocument.Load(xmlReader);
         }
 
-        private XDocument Read(ZipArchive archive, string fileName)
+        internal static XDocument Read(ZipArchive archive, string fileName)
         {
             return Read(archive.GetEntry(fileName));
         }
 
-        
+        internal static Stream GetImageResource(ZipArchive archive, string fileName)
+        {
+            var entry = archive.GetEntry(fileName);
+            var ms = new MemoryStream();
+            entry.Open().CopyTo(ms);
+            return ms;
+        }
     }
 }

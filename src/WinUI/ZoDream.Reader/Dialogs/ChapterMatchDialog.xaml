@@ -27,7 +27,10 @@
             <RowDefinition Height="auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <AutoSuggestBox IsEnabled="{Binding Items.IsPaused}" Text="{Binding RuleText, Mode=TwoWay}">
+        <AutoSuggestBox
+            IsEnabled="{Binding Items.IsPaused}"
+            ItemsSource="{Binding RuleItems}"
+            Text="{Binding RuleText, Mode=TwoWay}">
             <ivy:Interaction.Behaviors>
                 <bhv:SearchTextBehavior Command="{Binding MatchCommand}" />
             </ivy:Interaction.Behaviors>

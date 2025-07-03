@@ -45,6 +45,11 @@ namespace ZoDream.Shared.Tokenizers
             }
             Items.Last().Add(section);
         }
+
+        public void Add(INovelVolume volume)
+        {
+            Items.Add(volume);
+        }
     }
 
     public class NovelVolume(string name): List<INovelSection>, INovelVolume
@@ -66,11 +71,17 @@ namespace ZoDream.Shared.Tokenizers
         public string Title => title;
 
         public IList<INovelBlock> Items { get; private set; } = [];
+
     }
 
     public class NovelTextBlock(string text) : INovelTextBlock
     {
         public string Text => text;
+
+        public override string ToString()
+        {
+            return Text;
+        }
     }
 
     public class NovelImageBlock(Stream source) : INovelImageBlock
