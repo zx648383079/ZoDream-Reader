@@ -1,15 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Behaviors;
@@ -19,10 +13,11 @@ using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Plugins.EPub;
 using ZoDream.Shared.Plugins.Txt;
 using ZoDream.Shared.Plugins.Umd;
+using ZoDream.Shared.Text;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class CreateNovelViewModel : ObservableObject
+    public class CreateNovelViewModel : ObservableObject, IEditableSectionCommand
     {
 
         public CreateNovelViewModel()
@@ -35,21 +30,23 @@ namespace ZoDream.Reader.ViewModels
             EditCommand = new RelayCommand<IEditableSection>(TapEdit);
 
             SortCommand = new RelayCommand<DragItemsResult>(TapSort);
-            MoveBottomCommand = new RelayCommand(TapMoveBottom);
-            MoveDownCommand = new RelayCommand(TapMoveDown);
-            MoveUpCommand = new RelayCommand(TapMoveUp);
-            MoveTopCommand = new RelayCommand(TapMoveTop);
-            DeleteCommand = new RelayCommand(TapDelete);
+            MoveBottomCommand = new RelayCommand<IEditableSection>(TapMoveBottom);
+            MoveDownCommand = new RelayCommand<IEditableSection>(TapMoveDown);
+            MoveUpCommand = new RelayCommand<IEditableSection>(TapMoveUp);
+            MoveTopCommand = new RelayCommand<IEditableSection>(TapMoveTop);
+            DeleteCommand = new RelayCommand<IEditableSection>(TapDelete);
 
             PreviousCommand = new RelayCommand(TapPrevious);
             NextCommand = new RelayCommand(TapNext);
             UndoCommand = new RelayCommand(TapUndo);
             RedoCommand = new RelayCommand(TapRedo);
+            CheckCommand = new RelayCommand(TapCheck);
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
+        private OwnDictionary? _dict;
         private IEditableSection? _current;
-        //public RichEditTextDocument? Document { get; internal set; }
+        public ITextEditor? Document { get; internal set; }
 
         private string _name = string.Empty;
 
@@ -144,6 +141,8 @@ namespace ZoDream.Reader.ViewModels
         public ICommand AddImageCommand { get; private set; }
 
         public ICommand EditCommand { get; private set; }
+
+        public ICommand CheckCommand { get; private set; }
         public ICommand PreviousCommand { get; private set; }
         public ICommand NextCommand { get; private set; }
         public ICommand RedoCommand { get; private set; }
@@ -206,14 +205,14 @@ namespace ZoDream.Reader.ViewModels
             {
                 if (!string.IsNullOrWhiteSpace(item.Name))
                 {
-                    Items.Add(new VolumeItemViewModel()
+                    Items.Add(new VolumeItemViewModel(this)
                     {
                         Title = item.Name,
                     });
                 }
                 foreach (var it in item)
                 {
-                    Items.Add(new ChapterItemViewModel()
+                    Items.Add(new ChapterItemViewModel(this)
                     {
                         Title = it.Title,
                         Items = it.Items
@@ -245,9 +244,46 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
+            EditSection(model);
+        }
+
+        private void EditSection(IEditableSection model)
+        {
             _current = model;
             Title = _current.Title;
             Content = _current is ChapterItemViewModel o ? o.Text : string.Empty;
+        }
+
+        private async void TapCheck()
+        {
+            if (Document is null)
+            {
+                return;
+            }
+            if (_dict is null)
+            {
+                var picker = new FileOpenPicker();
+                picker.FileTypeFilter.Add(".npk");
+                picker.FileTypeFilter.Add(".txt");
+                picker.FileTypeFilter.Add(".epub");
+                picker.FileTypeFilter.Add(".umd");
+                _app.InitializePicker(picker);
+                var file = await picker.PickSingleFileAsync();
+                if (file is null)
+                {
+                    return;
+                }
+                _dict = OwnDictionary.OpenFile(await file.OpenStreamForReadAsync());
+            }
+            foreach (var item in Document.Text)
+            {
+                if (_dict.TrySerialize(item, out _))
+                {
+                    continue;
+                }
+                Document.FindNext(item.ToString());
+                break;
+            }
         }
 
         private void TapSort(DragItemsResult? data)
@@ -259,9 +295,9 @@ namespace ZoDream.Reader.ViewModels
             Items.Move(data.ItemsIndex[0], data.TargetIndex);
         }
 
-        private void TapMoveTop()
+        private void TapMoveTop(IEditableSection? arg)
         {
-            var arg = SelectedItem;
+            arg ??= SelectedItem;
             if (arg is null)
             {
                 return;
@@ -269,9 +305,9 @@ namespace ZoDream.Reader.ViewModels
             Items.MoveToFirst(Items.IndexOf(arg));
         }
 
-        private void TapMoveBottom()
+        private void TapMoveBottom(IEditableSection? arg)
         {
-            var arg = SelectedItem;
+            arg ??= SelectedItem;
             if (arg is null)
             {
                 return;
@@ -279,18 +315,18 @@ namespace ZoDream.Reader.ViewModels
             Items.MoveToLast(Items.IndexOf(arg));
         }
 
-        private void TapMoveUp()
+        private void TapMoveUp(IEditableSection? arg)
         {
-            var arg = SelectedItem;
+            arg ??= SelectedItem;
             if (arg is null)
             {
                 return;
             }
             Items.MoveUp(Items.IndexOf(arg));
         }
-        private void TapMoveDown()
+        private void TapMoveDown(IEditableSection? arg)
         {
-            var arg = SelectedItem;
+            arg ??= SelectedItem;
             if (arg is null)
             {
                 return;
@@ -298,9 +334,9 @@ namespace ZoDream.Reader.ViewModels
             Items.MoveDown(Items.IndexOf(arg));
         }
 
-        private void TapDelete()
+        private void TapDelete(IEditableSection? arg)
         {
-            var arg = SelectedItem;
+            arg ??= SelectedItem;
             if (arg is null)
             {
                 return;
@@ -310,22 +346,32 @@ namespace ZoDream.Reader.ViewModels
 
         public void TapPrevious()
         {
-
+            var i = _current is null ? Items.Count : Items.IndexOf(_current);
+            if (i <= 0)
+            {
+                return;
+            }
+            EditSection(SelectedItem = Items[i - 1]);
         }
 
         public void TapNext()
         {
-
+            var i = _current is null ? Items.Count : Items.IndexOf(_current);
+            if (i < Items.Count - 2)
+            {
+                return;
+            }
+            EditSection(SelectedItem = Items[i + 1]);
         }
 
         public void TapRedo()
         {
-            //Document?.Redo();
+            Document?.Redo();
         }
 
         public void TapUndo()
         {
-            //Document?.Undo();
+            Document?.Undo();
         }
 
         private void TapAddImage()

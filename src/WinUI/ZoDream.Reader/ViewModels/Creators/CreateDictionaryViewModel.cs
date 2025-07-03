@@ -4,10 +4,12 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Text;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -111,9 +113,9 @@ namespace ZoDream.Reader.ViewModels
 
         public ICommand FindLetterCommand { get; private set; }
 
-        private void TapFindLetter(WordItemViewModel word)
+        private void TapFindLetter(WordItemViewModel? word)
         {
-            if (Editor is null)
+            if (Editor is null || word is null)
             {
                 return;
             }
@@ -206,9 +208,19 @@ namespace ZoDream.Reader.ViewModels
             SyncState();
         }
 
-        private void TapSave()
+        private async void TapSave()
         {
-
+            var picker = new FileSavePicker();
+            picker.FileTypeChoices.Add("字典文件", [".bin"]);
+            picker.SuggestedFileName = "dict.bin";
+            _app.InitializePicker(picker);
+            var file = await picker.PickSaveFileAsync();
+            if (file is null)
+            {
+                return;
+            }
+            OwnDictionary.WriteFile(await file.OpenStreamForWriteAsync(), 
+                WordItems.Select(i => i.Word[0]));
         }
 
         private void TapExtract()

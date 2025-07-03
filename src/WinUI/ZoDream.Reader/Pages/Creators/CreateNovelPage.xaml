@@ -124,6 +124,17 @@
                         Content="&#xE946;"
                         Style="{StaticResource LargeIconBtn}"
                         ToolTipService.ToolTip="返回编辑基本信息" />
+
+                    <AppBarSeparator />
+
+                    <Button
+                        Command="{Binding CheckCommand}"
+                        Content="&#xE8FE;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="字典字词检测" />
+
+                    <AppBarSeparator />
+
                     <Button
                         Command="{Binding PreviousCommand}"
                         Content="&#xE72B;"
@@ -155,8 +166,10 @@
                         ToolTipService.ToolTip="Redo" />
                 </StackPanel>
                 <TextBox
+                    x:Name="PART_TextBox"
                     Grid.Row="2"
                     AcceptsReturn="True"
+                    FontSize="25"
                     IsSpellCheckEnabled="False"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     Text="{Binding Content, Mode=TwoWay}"
@@ -180,14 +193,34 @@
                 </ivy:Interaction.Behaviors>
                 <ListView.ContextFlyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Command="{Binding EditCommand}" Text="编辑" />
+                        <MenuFlyoutItem
+                            Command="{Binding EditCommand}"
+                            Icon="Edit"
+                            Text="编辑" />
                         <MenuFlyoutSubItem Text="排序">
-                            <MenuFlyoutItem Command="{Binding MoveTopCommand}" Text="置顶" />
-                            <MenuFlyoutItem Command="{Binding MoveUpCommand}" Text="上移" />
-                            <MenuFlyoutItem Command="{Binding MoveDownCommand}" Text="下移" />
-                            <MenuFlyoutItem Command="{Binding MoveBottomCommand}" Text="置底" />
+                            <MenuFlyoutItem
+                                Command="{Binding MoveTopCommand}"
+                                Icon="Upload"
+                                Text="置顶" />
+                            <MenuFlyoutItem
+                                Command="{Binding MoveUpCommand}"
+                                Icon="Up"
+                                Text="上移" />
+                            <MenuFlyoutItem Command="{Binding MoveDownCommand}" Text="下移">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE74B;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem Command="{Binding MoveBottomCommand}" Text="置底">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE896;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutItem Command="{Binding DeleteCommand}" Text="删除" />
+                        <MenuFlyoutItem
+                            Command="{Binding DeleteCommand}"
+                            Icon="Delete"
+                            Text="删除" />
                     </MenuFlyout>
                 </ListView.ContextFlyout>
             </ListView>

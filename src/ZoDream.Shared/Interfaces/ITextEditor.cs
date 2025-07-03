@@ -9,6 +9,11 @@ namespace ZoDream.Shared.Interfaces
 
         public bool CanBack { get; }
         public bool CanForward { get; }
+        public bool CanUndo { get; }
+        public bool CanRedo { get; }
+
+        public void Undo();
+        public void Redo();
 
         public void LoadFromFile(string fileName);
         public void Load(Stream input);

@@ -70,11 +70,7 @@ namespace ZoDream.Shared.Text
         /// <param name="fileName"></param>
         public void SaveAs(string fileName)
         {
-            using var writer = LocationStorage.Writer(fileName);
-            foreach (var item in FilteredValues)
-            {
-                writer.WriteLine(item);
-            }
+            OwnDictionary.WriteFile(fileName, FilteredValues);
         }
 
         public static bool IsExclude(char value)

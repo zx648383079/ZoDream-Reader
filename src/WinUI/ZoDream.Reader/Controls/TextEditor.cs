@@ -30,6 +30,11 @@ namespace ZoDream.Reader.Controls
         public bool CanBack => _cursor > 0;
         public bool CanForward => _cursorNext < Text.Length;
 
+
+        public bool CanUndo => _canvas?.CanUndo == true;
+
+        public bool CanRedo => _canvas?.CanRedo == true;
+
         public string Text { 
             get {
                 TrySave();
@@ -68,6 +73,7 @@ namespace ZoDream.Reader.Controls
         public string Current => _source[_cursor.._cursorNext];
 
         private int SelectionEnd => _canvas is not null ? _canvas.SelectionStart + _canvas.SelectionLength : 0;
+
 
         private (int, int) GetLetterRange()
         {
@@ -258,6 +264,16 @@ namespace ZoDream.Reader.Controls
             Render();
         }
 
+        public void Undo()
+        {
+            _canvas?.Undo();
+        }
+
+        public void Redo()
+        {
+            _canvas?.Redo();
+        }
+
         public IDictionary<char, int> Count()
         {
             TrySave();
@@ -265,5 +281,7 @@ namespace ZoDream.Reader.Controls
             data.Append(_source);
             return data;
         }
+
+
     }
 }

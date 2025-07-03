@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using ZoDream.Shared.Storage;
 
 namespace ZoDream.Shared.Text
@@ -56,7 +58,11 @@ namespace ZoDream.Shared.Text
 
         public static OwnDictionary OpenFile(string fileName)
         {
-            using var reader = LocationStorage.Reader(fileName);
+            return OpenFile(File.OpenRead(fileName));
+        }
+        public static OwnDictionary OpenFile(Stream input)
+        {
+            using var reader = LocationStorage.Reader(input);
             var items = new HashSet<char>();
             while (true)
             {
@@ -75,6 +81,25 @@ namespace ZoDream.Shared.Text
                 }
             }
             return new OwnDictionary(items.ToArray());
+        }
+
+
+        public static void WriteFile(string fileName, IEnumerable<char> items)
+        {
+            WriteFile(File.Create(fileName), items);
+        }
+
+        public static void WriteFile(Stream output, IEnumerable<char> items)
+        {
+            using var writer = new StreamWriter(output, Encoding.UTF8);
+            foreach (var item in items)
+            {
+                if (EncodingBuilder.IsExclude(item))
+                {
+                    continue;
+                }
+                writer.WriteLine(item);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using ZoDream.Reader.Controls;
 using ZoDream.Reader.ViewModels;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -14,6 +15,7 @@ namespace ZoDream.Reader.Pages.Creators
         public CreateNovelPage()
         {
             InitializeComponent();
+            ViewModel.Document = new TextBoxEditor(PART_TextBox);
         }
 
         public CreateNovelViewModel ViewModel => (CreateNovelViewModel)DataContext;
