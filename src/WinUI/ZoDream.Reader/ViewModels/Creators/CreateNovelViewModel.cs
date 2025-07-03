@@ -28,7 +28,7 @@ namespace ZoDream.Reader.ViewModels
             CatalogCommand = new RelayCommand(TapCatalog);
             AddImageCommand = new RelayCommand(TapAddImage);
             EditCommand = new RelayCommand<IEditableSection>(TapEdit);
-
+            AddNewCommand = new RelayCommand<IEditableSection>(TapAddNew);
             SortCommand = new RelayCommand<DragItemsResult>(TapSort);
             MoveBottomCommand = new RelayCommand<IEditableSection>(TapMoveBottom);
             MoveDownCommand = new RelayCommand<IEditableSection>(TapMoveDown);
@@ -46,6 +46,8 @@ namespace ZoDream.Reader.ViewModels
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
         private OwnDictionary? _dict;
         private IEditableSection? _current;
+        private bool _isUpdated = false;
+
         public ITextEditor? Document { get; internal set; }
 
         private string _name = string.Empty;
@@ -80,14 +82,20 @@ namespace ZoDream.Reader.ViewModels
 
         public string Title {
             get => _title;
-            set => SetProperty(ref _title, value);
+            set {
+                SetProperty(ref _title, value);
+                _isUpdated = true;
+            }
         }
 
         private string _content = string.Empty;
 
         public string Content {
             get => _content;
-            set => SetProperty(ref _content, value);
+            set {
+                SetProperty(ref _content, value);
+                _isUpdated = true;
+            }
         }
 
         private ObservableCollection<IEditableSection> _items = [];
@@ -141,7 +149,7 @@ namespace ZoDream.Reader.ViewModels
         public ICommand AddImageCommand { get; private set; }
 
         public ICommand EditCommand { get; private set; }
-
+        public ICommand AddNewCommand { get; private set; }
         public ICommand CheckCommand { get; private set; }
         public ICommand PreviousCommand { get; private set; }
         public ICommand NextCommand { get; private set; }
@@ -235,6 +243,15 @@ namespace ZoDream.Reader.ViewModels
         private void TapCatalog()
         {
             IsBasic = false;
+            if (_current is not null)
+            {
+                return;
+            }
+            if (Items.Count == 0)
+            {
+                Items.Add(new ChapterItemViewModel(this));
+            }
+            EditSection(Items[0]);
         }
 
         private void TapEdit(IEditableSection? model)
@@ -247,11 +264,27 @@ namespace ZoDream.Reader.ViewModels
             EditSection(model);
         }
 
+        private void SaveSection(IEditableSection? section)
+        {
+            if (!_isUpdated || section is null)
+            {
+                return;
+            }
+            section.Title = Title;
+            if (section is ChapterItemViewModel o)
+            {
+                o.Text = Content;
+            }
+            _isUpdated = false;
+        }
+
         private void EditSection(IEditableSection model)
         {
+            SaveSection(_current);
             _current = model;
             Title = _current.Title;
             Content = _current is ChapterItemViewModel o ? o.Text : string.Empty;
+            _isUpdated = false;
         }
 
         private async void TapCheck()
@@ -293,6 +326,22 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             Items.Move(data.ItemsIndex[0], data.TargetIndex);
+        }
+
+        private void TapAddNew(IEditableSection? arg)
+        {
+            var i = 0;
+            if (arg is null)
+            {
+                Items.Add(new ChapterItemViewModel(this));
+                i = Items.Count - 1;
+            }
+            else
+            {
+                i = Items.IndexOf(arg);
+                Items.Insert(i, new ChapterItemViewModel(this));
+            }
+            EditSection(Items[i]);
         }
 
         private void TapMoveTop(IEditableSection? arg)

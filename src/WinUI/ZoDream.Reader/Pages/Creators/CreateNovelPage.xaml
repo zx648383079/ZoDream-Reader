@@ -155,13 +155,13 @@
                     <Button
                         Command="{Binding UndoCommand}"
                         Content="&#xE7A7;"
-                        IsEnabled="{Binding UndoEnabled}"
+                        IsEnabled="{Binding ElementName=PART_TextBox, Path=CanUndo}"
                         Style="{StaticResource LargeIconBtn}"
                         ToolTipService.ToolTip="Undo" />
                     <Button
                         Command="{Binding RedoCommand}"
                         Content="&#xE7A6;"
-                        IsEnabled="{Binding RedoEnabled}"
+                        IsEnabled="{Binding ElementName=PART_TextBox, Path=CanRedo}"
                         Style="{StaticResource LargeIconBtn}"
                         ToolTipService.ToolTip="Redo" />
                 </StackPanel>
