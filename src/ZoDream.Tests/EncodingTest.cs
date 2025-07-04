@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
@@ -13,17 +14,21 @@ namespace ZoDream.Tests
     [TestClass]
     public class EncodingTest
     {
+        const string BaseFolder = "D:\\zodream";
+        const string TxtFolder = BaseFolder + "\\txt";
 
-        //[TestMethod]
+        [TestMethod]
         public void TestBuilder()
         {
-            var fileName = "dict.bin";
+            var fileName = Path.Combine(BaseFolder, "dict.bin");
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            var builder = EncodingBuilder.OpenFile(fileName);
-            var items = builder.TraditionalItems.ToArray();
-            builder.AppendFile("1.txt");
-            builder.AppendFile("2.txt");
-            builder.AppendFile("3.txt");
+            var builder = new EncodingBuilder();
+            foreach (var item in Directory.GetFiles(TxtFolder, "*.txt"))
+            {
+                builder.Append(Path.GetFileNameWithoutExtension(item));
+                builder.AppendFile(item);
+            }
+            builder.Replace(builder.TraditionalItems.ToArray());
             builder.SaveAs(fileName);
             Assert.AreEqual(builder.Count, 5035);
         }

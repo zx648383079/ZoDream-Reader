@@ -1,4 +1,5 @@
 ﻿using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ZoDream.Shared.Storage;
@@ -97,22 +98,26 @@ namespace ZoDream.Shared.Text
             return value switch
             {
                 // 移除字符
-                '"' => (char)0xB, // '“',
+                '"' or '〃' => (char)0xB, // '“',
                 //全角转半角
-                '　' => ' ',
+                '′' => '\'',
+                '﹢' => '+',
+                '丨' => '|',
+                '﹩' or '￥' => '$',
+                '　' or ' ' or ' ' => ' ',
                 '？' => '?',
                 '！' => '!',
                 '，' => ',',
                 '）' => ')',
                 '（' => '(',
-                '；' => ';',
+                '；' or '﹔' => ';',
                 '＊' or '※' => '*',
-                '：' or '∶' => ':',
-                '【' => '[',
-                '】' => ']',
+                '：' or '∶' or '︰' or '﹕' => ':',
+                '【' or '〖' => '[',
+                '】' or '〗' => ']',
                 '．' => '.',
                 '～' => '~',
-                '―' or '─' or '－' or '—' => '-',
+                '―' or '─' or '－' or '—' or 'ー' => '-',
 
                 // 一下是替换
                 '“' => (char)0xB,
@@ -125,7 +130,7 @@ namespace ZoDream.Shared.Text
                 '《' => (char)0x12,
                 '》' => (char)0x13,
                 '。' => (char)0x14,
-                '…' or '┅' => (char)0x22,
+                '…' or '┅' or '┈' => (char)0x22,
                 '°' => (char)0x60,
 
                 '一' => (char)0x15,
@@ -144,7 +149,7 @@ namespace ZoDream.Shared.Text
                 //'忆' => (char)0x81,
 
                 '·' => (char)0x7F,
-
+                '艹' => '草',
                 _ => value,
             };
         }
@@ -246,6 +251,36 @@ namespace ZoDream.Shared.Text
         public static bool IsSimplified(char code)
         {
             return code < 0xFF || ToSimplified(code) == code;
+        }
+
+        /// <summary>
+        /// 批量替换字符
+        /// </summary>
+        /// <param name="items">旧字符,新字符</param>
+        public void Replace(IEnumerable<KeyValuePair<char, char>> items)
+        {
+            foreach (var item in items)
+            {
+                Replace(item.Key, item.Value);
+            }
+        }
+        /// <summary>
+        /// 替换字符
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="replace"></param>
+        public void Replace(char search, char replace)
+        {
+            if (!TryGetValue(search, out var count))
+            {
+                return;
+            }
+            Remove(search);
+            if (TryAdd(replace, count))
+            {
+                return;
+            }
+            this[replace] += count;
         }
 
         public static explicit operator OwnDictionary(EncodingBuilder data)
