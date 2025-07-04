@@ -151,7 +151,7 @@ namespace ZoDream.Shared.Text
 
         public static char Deserialize(char value)
         {
-            return value switch 
+            return value switch
             {
                 // 替换
                 (char)0xB => '“',
@@ -246,6 +246,20 @@ namespace ZoDream.Shared.Text
         public static bool IsSimplified(char code)
         {
             return code < 0xFF || ToSimplified(code) == code;
+        }
+
+        public static explicit operator OwnDictionary(EncodingBuilder data)
+        {
+            return new([..data.FilteredValues]);
+        }
+
+        public static char[] operator -(EncodingBuilder main, EncodingBuilder diff) 
+        {
+            return [.. main.FilteredValues.Where(i => !diff.ContainsKey(i))];
+        }
+        public static char[] operator -(EncodingBuilder main, OwnDictionary diff)
+        {
+            return [.. main.Keys.Where(i => !diff.Contains(i))];
         }
     }
 }

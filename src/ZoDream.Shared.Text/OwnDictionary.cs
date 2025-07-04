@@ -9,6 +9,20 @@ namespace ZoDream.Shared.Text
 {
     public class OwnDictionary(char[] extendItems)
     {
+        /// <summary>
+        /// 是否包含字符
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool Contains(char value)
+        {
+            var result = EncodingBuilder.Serialize(value);
+            if (result <= 0x7F)
+            {
+                return true;
+            }
+            return extendItems.Contains(value);
+        }
 
         public bool TrySerialize(char value, out char result)
         {
