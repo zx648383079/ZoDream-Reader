@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
@@ -30,6 +31,9 @@ namespace ZoDream.Reader.ViewModels
             BasicCommand = new RelayCommand(TapBasic);
             CatalogCommand = new RelayCommand(TapCatalog);
             AddImageCommand = new RelayCommand(TapAddImage);
+
+            CheckAllCommand = new RelayCommand(TapCheckAll);
+
             EditCommand = new RelayCommand<IEditableSection>(TapEdit);
             AddNewCommand = new RelayCommand<IEditableSection>(TapAddNew);
             SortCommand = new RelayCommand<DragItemsResult>(TapSort);
@@ -151,6 +155,8 @@ namespace ZoDream.Reader.ViewModels
         public ICommand BasicCommand { get; private set; }
         public ICommand AddImageCommand { get; private set; }
 
+        public ICommand CheckAllCommand { get; private set; }
+
         public ICommand EditCommand { get; private set; }
         public ICommand AddNewCommand { get; private set; }
         public ICommand CheckCommand { get; private set; }
@@ -271,6 +277,7 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             section.Title = Title;
+            section.IsWrong = false;
             if (section is ChapterItemViewModel o)
             {
                 o.Text = Content;
@@ -302,6 +309,64 @@ namespace ZoDream.Reader.ViewModels
                 return false;
             }
             _dict = OwnDictionary.OpenFile(await file.OpenStreamForReadAsync());
+            return true;
+        }
+
+
+        private async void TapCheckAll()
+        {
+            if (!await LoadDictionaryAsync())
+            {
+                return;
+            }
+            if (!await CheckTextAsync(Name))
+            {
+                return;
+            }
+            if (!await CheckTextAsync(Author))
+            {
+                return;
+            }
+            if (!await CheckTextAsync(Brief))
+            {
+                return;
+            }
+            foreach (var item in Items)
+            {
+                item.IsWrong = !CheckText(item.Title);
+                if (item.IsWrong)
+                {
+                    continue;
+                }
+                if (item is ChapterItemViewModel o)
+                {
+                    foreach (var it in o.Items)
+                    {
+                        if (it is INovelTextBlock t)
+                        {
+                            item.IsWrong = !CheckText(t.Text);
+                            if (item.IsWrong)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            await _app.ConfirmAsync("检测完成");
+        }
+        private bool CheckText(string text)
+        {
+            return !text.Where(i => !_dict!.TrySerialize(i, out _)).Any();
+        }
+        private async Task<bool> CheckTextAsync(string text)
+        {
+            var res = text.Where(i => !_dict!.TrySerialize(i, out _)).Distinct().ToArray();
+            if (res.Length > 0)
+            {
+                await _app.ConfirmAsync(new string(res), "以下字词不支持");
+                return false;
+            }
             return true;
         }
 
@@ -514,7 +579,7 @@ namespace ZoDream.Reader.ViewModels
                 }
                 if (item is ChapterItemViewModel c)
                 {
-                    if (res.Items.Count == 0)
+                    if (c.Items.Count == 0)
                     {
                         res.Add(new NovelVolume(c.Title));
                         continue;

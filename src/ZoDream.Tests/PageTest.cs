@@ -3,10 +3,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using ZoDream.Shared.Plugins.EPub;
 using ZoDream.Shared.Plugins.Txt;
-using ZoDream.Shared.Renders;
-using ZoDream.Shared.Repositories.Entities;
-using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Tests;
 [TestClass]
@@ -38,5 +37,15 @@ public class PageTest
         Assert.AreEqual(res, "书名");
         Assert.AreEqual(a, "明");
         Assert.AreEqual(c, "科幻");
+    }
+
+    //[TestMethod]
+    public void TestXml()
+    {
+        var fileName = "1.xhtml";
+        var doc = XDocument.Load(fileName);
+        var res = doc.Root;
+        var text = res.Element((XNamespace)"http://www.w3.org/1999/xhtml" + "body")?.Value;
+        Assert.IsTrue(res != null);
     }
 }

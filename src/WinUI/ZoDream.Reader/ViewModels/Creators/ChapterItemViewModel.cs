@@ -11,6 +11,7 @@ namespace ZoDream.Reader.ViewModels
     public interface IEditableSection
     {
         public string Title { get; set; }
+        public bool IsWrong { get; set; }
     }
 
     public interface IEditableSectionCommand
@@ -46,6 +47,14 @@ namespace ZoDream.Reader.ViewModels
         public string Title {
             get => _title;
             set => SetProperty(ref _title, value);
+        }
+
+
+        private bool _isWrong;
+
+        public bool IsWrong {
+            get => _isWrong;
+            set => SetProperty(ref _isWrong, value);
         }
 
 

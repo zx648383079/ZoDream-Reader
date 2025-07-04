@@ -10,7 +10,7 @@ namespace ZoDream.Shared.Plugins.Own
 {
     public class OwnReader(Stream input, OwnEncoding encoding) : INovelReader
     {
-        private readonly byte[] _buffer = new byte[1024];
+        private readonly byte[] _buffer = new byte[1024 * 5];
         private int _last = -1;
         public INovelDocument Read()
         {

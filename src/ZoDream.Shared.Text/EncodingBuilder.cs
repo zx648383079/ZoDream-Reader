@@ -97,7 +97,7 @@ namespace ZoDream.Shared.Text
             return value switch
             {
                 // 移除字符
-                '"' => '“',
+                '"' => (char)0xB, // '“',
                 //全角转半角
                 '　' => ' ',
                 '？' => '?',
@@ -153,6 +153,7 @@ namespace ZoDream.Shared.Text
         {
             return value switch 
             {
+                // 替换
                 (char)0xB => '“',
                 (char)0xC => '”',
                 (char)0xD => '‘',

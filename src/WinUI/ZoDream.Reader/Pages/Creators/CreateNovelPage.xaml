@@ -64,17 +64,31 @@
 
             <DataTemplate x:Key="SectionTemplate">
                 <Grid ContextFlyout="{StaticResource ItemContextMenu}">
-                    <TextBlock Text="{Binding Title}" />
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon
+                        Foreground="Red"
+                        Glyph="&#xE7BA;"
+                        Visibility="{Binding IsWrong, Converter={StaticResource ToggleCvt}}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Title}" />
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="VolumeTemplate">
                 <Grid ContextFlyout="{StaticResource ItemContextMenu}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <FontIcon Glyph="&#xE838;" />
-                    <TextBlock Grid.Column="1" Text="{Binding Title}" />
+                    <FontIcon
+                        Grid.Column="1"
+                        Foreground="Red"
+                        Glyph="&#xE7BA;"
+                        Visibility="{Binding IsWrong, Converter={StaticResource ToggleCvt}}" />
+                    <TextBlock Grid.Column="2" Text="{Binding Title}" />
                 </Grid>
             </DataTemplate>
 
@@ -112,6 +126,11 @@
                     Content="&#xE8A4;"
                     Style="{StaticResource LargeIconBtn}"
                     ToolTipService.ToolTip="目录" />
+                <Button
+                    Command="{Binding CheckAllCommand}"
+                    Content="&#xE8FE;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="字典字词检测全部内容" />
             </StackPanel>
             <TextBox
                 Grid.Row="1"

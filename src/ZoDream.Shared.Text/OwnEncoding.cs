@@ -10,6 +10,7 @@ namespace ZoDream.Shared.Text
         const byte SystemMax = 0xA;
         const byte CodeBegin = 0xB;
         const byte CodeCount = 0xFF - CodeBegin;
+        const byte DoubleSplitTag = 210;
 
 
 
@@ -18,7 +19,7 @@ namespace ZoDream.Shared.Text
             var res = 0;
             for (int i = 0; i < count; i++)
             {
-                res += dict.TrySerialize(chars[index + i], out var code) && code > 210 ? 2 : 1;
+                res += dict.TrySerialize(chars[index + i], out var code) && code > DoubleSplitTag ? 2 : 1;
             }
             return res;
         }
@@ -33,12 +34,12 @@ namespace ZoDream.Shared.Text
                     // bytes[byteIndex + j++] = 0x7F;
                     continue;
                 }
-                if (code <= 210)
+                if (code <= DoubleSplitTag)
                 {
                     bytes[byteIndex + j++] = (byte)code;
                     continue;
                 }
-                bytes[byteIndex + j++] = (byte)(code / CodeCount + 210);
+                bytes[byteIndex + j++] = (byte)(code / CodeCount + DoubleSplitTag);
                 bytes[byteIndex + j++] = (byte)(code % CodeCount + CodeBegin);
             }
             return j;
@@ -49,7 +50,7 @@ namespace ZoDream.Shared.Text
             var res = 0;
             for (int i = 0; i < count; i++)
             {
-                if (bytes[index + i] > 210)
+                if (bytes[index + i] >= DoubleSplitTag)
                 {
                     i++;
                 }
@@ -66,12 +67,12 @@ namespace ZoDream.Shared.Text
             {
                 n = byteIndex + i;
                 var code = (char)bytes[n];
-                if (bytes[n] > 210)
+                if (bytes[n] >= DoubleSplitTag)
                 {
                     i++;
                     n++;
                     var next = bytes.Length > n ? (bytes[n] - CodeBegin) : 0;
-                    code = (char)((code - 210) * CodeCount + next);
+                    code = (char)((code - DoubleSplitTag) * CodeCount + next);
                 }
                 chars[charIndex + j++] = dict.Deserialize(code);
             }
