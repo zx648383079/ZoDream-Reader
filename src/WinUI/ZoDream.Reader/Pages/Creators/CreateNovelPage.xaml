@@ -235,23 +235,32 @@
                     Text="{Binding Content, Mode=TwoWay}"
                     TextWrapping="Wrap" />
             </Grid>
-            <ListView
-                Grid.Row="1"
-                Grid.Column="1"
-                HorizontalContentAlignment="Stretch"
-                AllowDrop="True"
-                Background="Transparent"
-                CanDragItems="True"
-                Header="Catalog"
-                ItemTemplateSelector="{StaticResource SectionTemplateSelector}"
-                ItemsSource="{Binding Items}"
-                SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-                SelectionMode="Single">
-                <ivy:Interaction.Behaviors>
-                    <bhv:ListItemDoubleClickBehavior Command="{Binding EditCommand}" />
-                    <bhv:DragSortBehavior DragCommand="{Binding SortCommand}" />
-                </ivy:Interaction.Behaviors>
-            </ListView>
+            <Pivot Grid.Row="1" Grid.Column="1">
+                <PivotItem Header="Catalog">
+                    <ListView
+                        HorizontalContentAlignment="Stretch"
+                        AllowDrop="True"
+                        Background="Transparent"
+                        CanDragItems="True"
+                        ItemTemplateSelector="{StaticResource SectionTemplateSelector}"
+                        ItemsSource="{Binding Items}"
+                        SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                        SelectionMode="Single">
+                        <ivy:Interaction.Behaviors>
+                            <bhv:ListItemDoubleClickBehavior Command="{Binding EditCommand}" />
+                            <bhv:DragSortBehavior DragCommand="{Binding SortCommand}" />
+                        </ivy:Interaction.Behaviors>
+                    </ListView>
+                </PivotItem>
+                <PivotItem Header="Wrongs">
+                    <ListBox Background="Transparent" ItemsSource="{Binding WrongItems}">
+                        <ivy:Interaction.Behaviors>
+                            <bhv:ListItemDoubleClickBehavior Command="{Binding JumpToCommand}" />
+                        </ivy:Interaction.Behaviors>
+                    </ListBox>
+                </PivotItem>
+            </Pivot>
+
         </Grid>
     </Grid>
 </Page>

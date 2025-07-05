@@ -48,6 +48,7 @@ namespace ZoDream.Reader.ViewModels
             UndoCommand = new RelayCommand(TapUndo);
             RedoCommand = new RelayCommand(TapRedo);
             CheckCommand = new RelayCommand(TapCheck);
+            JumpToCommand = new RelayCommand<string>(TapJumpTo);
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
@@ -119,6 +120,14 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _selectedItem, value);
         }
 
+        private ObservableCollection<string> _wrongItems = [];
+
+        public ObservableCollection<string> WrongItems {
+            get => _wrongItems;
+            set => SetProperty(ref _wrongItems, value);
+        }
+
+
 
         public Visibility BasicVisible => IsBasic ? Visibility.Visible : Visibility.Collapsed;
         public Visibility CatalogVisible => !IsBasic ? Visibility.Visible : Visibility.Collapsed;
@@ -172,6 +181,7 @@ namespace ZoDream.Reader.ViewModels
         public ICommand MoveDownCommand { get; private set; }
 
         public ICommand DeleteCommand { get; private set; }
+        public ICommand JumpToCommand { get; private set; }
 
 
         private async void TapOpen()
@@ -291,6 +301,7 @@ namespace ZoDream.Reader.ViewModels
             _current = model;
             Title = _current.Title;
             Content = _current is ChapterItemViewModel o ? o.Text : string.Empty;
+            WrongItems.Clear();
             _isUpdated = false;
         }
 
@@ -370,6 +381,15 @@ namespace ZoDream.Reader.ViewModels
             return true;
         }
 
+        private void TapJumpTo(string? arg)
+        {
+            if (string.IsNullOrWhiteSpace(arg) || Document is null)
+            {
+                return;
+            }
+            Document.FindNext(arg);
+        }
+
         private async void TapCheck()
         {
             if (Document is null)
@@ -380,14 +400,26 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
+            WrongItems.Clear();
+            foreach (var item in Title)
+            {
+                if (_dict!.TrySerialize(item, out _))
+                {
+                    continue;
+                }
+                WrongItems.Add(item.ToString());
+            }
             foreach (var item in Document.Text)
             {
                 if (_dict!.TrySerialize(item, out _))
                 {
                     continue;
                 }
-                Document.FindNext(item.ToString());
-                break;
+                WrongItems.Add(item.ToString());
+            }
+            if (WrongItems.Count > 0)
+            {
+                TapJumpTo(WrongItems[0]);
             }
         }
 
