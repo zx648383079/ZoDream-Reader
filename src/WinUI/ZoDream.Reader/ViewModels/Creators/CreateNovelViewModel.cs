@@ -65,6 +65,14 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _name, value);
         }
 
+        private int _rating;
+
+        public int Rating {
+            get => _rating;
+            set => SetProperty(ref _rating, value);
+        }
+
+
         private string _author = string.Empty;
 
         public string Author {
@@ -573,6 +581,7 @@ namespace ZoDream.Reader.ViewModels
             Name = doc.Name;
             Author = doc.Author;
             Brief = doc.Brief;
+            Rating = doc.Rating / 2;
             Cover = doc.Cover?.ToBase64String();
             Items.Clear();
             foreach (var item in doc.Items)
@@ -600,6 +609,7 @@ namespace ZoDream.Reader.ViewModels
             var res = new RichDocument(Name)
             {
                 Author = Author,
+                Rating = (byte)Math.Min(Rating * 2, 10),
                 Brief = Brief
             };
             foreach (var item in Items)

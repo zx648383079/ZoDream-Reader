@@ -16,6 +16,7 @@ namespace ZoDream.Shared.Tokenizers
             Name = name;
         }
         public string Name { get; set; } = string.Empty;
+        public byte Rating { get; set; }
 
         public string Author { get; set; } = string.Empty;
 

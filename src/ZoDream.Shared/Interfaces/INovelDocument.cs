@@ -6,6 +6,10 @@ namespace ZoDream.Shared.Interfaces
     public interface INovelDocument
     {
         public string Name { get; }
+        /// <summary>
+        /// 评分 0 - 10
+        /// </summary>
+        public byte Rating { get; }
         public string Author { get; }
         public Stream? Cover { get; }
         public string Brief { get; }

@@ -25,6 +25,7 @@ namespace ZoDream.Shared.Plugins.Own
                 input.Seek(-1, SeekOrigin.Current);
             }
             res.Name = ReadString();
+            res.Rating = (byte)_last;
             res.Author = ReadString();
             res.Brief = ReadString();
             while (_last == 0x1)

@@ -104,6 +104,7 @@
                 <RowDefinition Height="40" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -140,10 +141,15 @@
                 Grid.Row="2"
                 Header="Author"
                 Text="{Binding Author, Mode=TwoWay}" />
-
-
+            <RatingControl
+                Grid.Row="3"
+                AutomationProperties.Name="Simple RatingControl"
+                Caption="Your rating"
+                IsClearEnabled="False"
+                IsReadOnly="False"
+                Value="{Binding Rating, Mode=TwoWay}" />
             <Border
-                Grid.RowSpan="3"
+                Grid.RowSpan="4"
                 Grid.Column="1"
                 BorderBrush="LightGray"
                 BorderThickness="1">
@@ -151,7 +157,7 @@
             </Border>
 
             <TextBox
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.ColumnSpan="2"
                 MinHeight="200"
                 AcceptsReturn="True"

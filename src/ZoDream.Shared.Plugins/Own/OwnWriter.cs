@@ -10,7 +10,8 @@ namespace ZoDream.Shared.Plugins.Own
     {
         /**
          0x5 [长度]  图标
-         书名 0xA
+         书名 
+         评分 0-0xA
          作者 0xA
          简介 
         0x1 章节名
@@ -28,7 +29,7 @@ namespace ZoDream.Shared.Plugins.Own
                 WriteImage(output, 0, 0, data.Cover);
             }
             output.Write(encoding.GetBytes(data.Name));
-            output.WriteByte(0xA);
+            output.WriteByte(data.Rating);
             output.Write(encoding.GetBytes(data.Author));
             output.WriteByte(0xA);
             output.Write(encoding.GetBytes(data.Brief));
