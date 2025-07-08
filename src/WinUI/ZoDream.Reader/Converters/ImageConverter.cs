@@ -7,7 +7,7 @@ namespace ZoDream.Reader.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return Utils.Converter.ToImg((string)value);
+            return ConverterHelper.ToImg((string)value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

@@ -23,11 +23,80 @@
                 <ComboBox DisplayMemberPath="Name" ItemsSource="{Binding SiteItems}" />
             </TabView.TabStripHeader>
             <TabView.TabItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="vm:OnlineChannelViewModel">
                     <TabViewItem
                         HorizontalAlignment="Center"
-                        Header="{Binding Name}"
-                        IsClosable="False" />
+                        Header="{x:Bind Name}"
+                        IsClosable="False">
+                        <ItemsView ItemsSource="{x:Bind Items}" SelectionMode="None">
+                            <ItemsView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:OnlineNovelItemViewModel">
+                                    <Border>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="20" />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="20" />
+                                                <RowDefinition Height="20" />
+                                                <RowDefinition Height="20" />
+                                            </Grid.RowDefinitions>
+                                            <Image
+                                                Grid.RowSpan="4"
+                                                Margin="0,0,10,0"
+                                                Source="{x:Bind Cover}"
+                                                Stretch="UniformToFill" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Grid.ColumnSpan="2"
+                                                VerticalAlignment="Center"
+                                                FontWeight="Bold"
+                                                Text="{x:Bind Name}" />
+                                            <Border
+                                                Grid.Column="2"
+                                                Padding="5"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Top"
+                                                Background="LightGray"
+                                                CornerRadius="8">
+                                                <TextBlock Text="{x:Bind Count}" />
+                                            </Border>
+                                            <FontIcon
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                Glyph="&#xE77B;" />
+                                            <TextBlock
+                                                Grid.Row="1"
+                                                Grid.Column="2"
+                                                VerticalAlignment="Center"
+                                                Text="{x:Bind Author}" />
+
+                                            <ItemsRepeater
+                                                Grid.Row="2"
+                                                Grid.Column="1"
+                                                Grid.ColumnSpan="2"
+                                                ItemsSource="{x:Bind TagItems}" />
+
+                                            <FontIcon
+                                                Grid.Row="3"
+                                                Grid.Column="1"
+                                                Margin="0,5,0,0"
+                                                VerticalAlignment="Top"
+                                                Glyph="&#xE74C;" />
+                                            <TextBlock
+                                                Grid.Row="3"
+                                                Grid.Column="2"
+                                                Text="{x:Bind Brief}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsView.ItemTemplate>
+                        </ItemsView>
+                    </TabViewItem>
                 </DataTemplate>
             </TabView.TabItemTemplate>
         </TabView>

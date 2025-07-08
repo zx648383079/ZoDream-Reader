@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
+using ZoDream.Reader.Converters;
 using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Database;
 using ZoDream.Shared.Interfaces;
@@ -76,7 +77,7 @@ namespace ZoDream.Reader.Repositories
         {
             if (string.IsNullOrEmpty(item.Cover))
             {
-                item.Cover = Utils.Converter.RandomCover();
+                item.Cover = ConverterHelper.RandomCover();
             }
             var data = item is BookEntity o ? o :
                  item.Clone<BookEntity>();

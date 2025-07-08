@@ -25,9 +25,9 @@ namespace ZoDream.Reader.ViewModels
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
-        private ObservableCollection<BookEntity> novelItems = [];
+        private ObservableCollection<NovelItemViewModel> novelItems = [];
 
-        public ObservableCollection<BookEntity> NovelItems {
+        public ObservableCollection<NovelItemViewModel> NovelItems {
             get => novelItems;
             set => SetProperty(ref novelItems, value);
         }
@@ -87,7 +87,7 @@ namespace ZoDream.Reader.ViewModels
             var items = await _app.Database.GetBookAsync<BookEntity>();
             foreach (var item in items)
             {
-                NovelItems.Add(item);
+                NovelItems.Add(new NovelItemViewModel(item));
             }
         }
 

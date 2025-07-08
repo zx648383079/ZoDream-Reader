@@ -21,7 +21,19 @@
         <ListBox ItemsSource="{Binding GroupItems}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <ctl:GroupListItem />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox />
+                        <TextBlock Grid.Column="1" />
+                        <CommandBar Grid.Column="2">
+                            <AppBarButton Icon="Edit" Label="编辑" />
+                            <AppBarButton Icon="Delete" Label="删除" />
+                        </CommandBar>
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

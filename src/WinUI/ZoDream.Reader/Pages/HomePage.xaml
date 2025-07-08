@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ctl="using:ZoDream.Reader.Controls"
+    xmlns:cvt="using:ZoDream.Reader.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:ZoDream.Reader.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -19,16 +20,87 @@
             <RowDefinition />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <GridView
-            Background="Transparent"
-            ItemsSource="{Binding NovelItems}"
-            SelectionMode="None">
-            <GridView.ItemTemplate>
-                <DataTemplate>
-                    <ctl:NovelListItem Source="{Binding}" />
+        <ItemsView ItemsSource="{Binding NovelItems}" SelectionMode="None">
+            <ItemsView.Layout>
+                <UniformGridLayout
+                    ItemsStretch="Fill"
+                    MaximumRowsOrColumns="2"
+                    MinColumnSpacing="8"
+                    MinItemHeight="120"
+                    MinItemWidth="360"
+                    MinRowSpacing="8" />
+            </ItemsView.Layout>
+
+            <ItemsView.ItemTemplate>
+                <DataTemplate x:DataType="vm:NovelItemViewModel">
+                    <ItemContainer AutomationProperties.Name="{x:Bind Name}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90" />
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="20" />
+                            </Grid.RowDefinitions>
+                            <Image
+                                Grid.RowSpan="4"
+                                Margin="0,0,10,0"
+                                Source="{x:Bind cvt:ConverterHelper.ToImg(Cover)}"
+                                Stretch="UniformToFill" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Grid.ColumnSpan="2"
+                                VerticalAlignment="Center"
+                                FontWeight="Bold"
+                                Text="{x:Bind Name}" />
+                            <Border
+                                Grid.Column="2"
+                                Padding="5"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Background="LightGray"
+                                CornerRadius="8">
+                                <TextBlock Text="{x:Bind Remaining}" />
+                            </Border>
+                            <FontIcon
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Glyph="&#xE77B;" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind Author}" />
+                            <FontIcon
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Glyph="&#xE81C;" />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind CurrentChapterTitle}" />
+                            <FontIcon
+                                Grid.Row="3"
+                                Grid.Column="1"
+                                Margin="0,5,0,0"
+                                VerticalAlignment="Top"
+                                Glyph="&#xE74C;" />
+                            <TextBlock
+                                Grid.Row="3"
+                                Grid.Column="2"
+                                Text="{x:Bind LatestChapterTitle}" />
+                        </Grid>
+                    </ItemContainer>
                 </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
+            </ItemsView.ItemTemplate>
+        </ItemsView>
         <CommandBar Grid.Row="1">
             <AppBarButton Icon="List" Label="切换选择" />
             <AppBarButton Icon="Edit" Label="编辑" />

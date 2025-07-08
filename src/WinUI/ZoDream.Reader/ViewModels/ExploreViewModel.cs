@@ -19,9 +19,9 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref siteItems, value);
         }
 
-        private ObservableCollection<SourceChannelEntity> channelItems = [];
+        private ObservableCollection<OnlineChannelViewModel> channelItems = [];
 
-        public ObservableCollection<SourceChannelEntity> ChannelItems {
+        public ObservableCollection<OnlineChannelViewModel> ChannelItems {
             get => channelItems;
             set => SetProperty(ref channelItems, value);
         }
