@@ -1,6 +1,6 @@
 ﻿using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
-using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using ZoDream.Shared.Storage;
 
@@ -35,16 +35,29 @@ namespace ZoDream.Shared.Text
         /// <param name="code"></param>
         public void Append(char code)
         {
+            Append(code, 1);
+        }
+
+        public void Append(char code, int count)
+        {
             var formatted = Deserialize(Serialize(code));
             if (formatted is '\t' or ' ' or '\n' or '\r')
             {
                 return;
             }
-            if (TryAdd(formatted, 1))
+            if (TryAdd(formatted, count))
             {
                 return;
             }
-            this[formatted]++;
+            this[formatted] += count;
+        }
+
+        public void Append(IDictionary<char, int> items)
+        {
+            foreach (var item in items)
+            {
+                Append(item.Key, item.Value);
+            }
         }
 
         /// <summary>
@@ -72,6 +85,11 @@ namespace ZoDream.Shared.Text
         public void SaveAs(string fileName)
         {
             OwnDictionary.WriteFile(fileName, FilteredValues);
+        }
+
+        public void SaveAs(Stream output)
+        {
+            OwnDictionary.WriteFile(output, FilteredValues);
         }
 
         public static bool IsExclude(char value)

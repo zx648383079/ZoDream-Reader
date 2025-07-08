@@ -31,6 +31,7 @@ namespace ZoDream.Reader.ViewModels
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
+        private readonly EncodingBuilder _source = [];
         public ITextEditor? Editor { get; internal set; }
 
         private string _findText = string.Empty;
@@ -83,6 +84,7 @@ namespace ZoDream.Reader.ViewModels
             set {
                 SetProperty(ref _isDictFilter, value);
                 OnPropertyChanged(nameof(FilterIcon));
+                SyncWord();
             }
         }
 
@@ -124,14 +126,25 @@ namespace ZoDream.Reader.ViewModels
             TapFindNext();
         }
 
-        private void TapSaveDict()
+        private async void TapSaveDict()
         {
-
+            var picker = new FileSavePicker();
+            picker.FileTypeChoices.Add("字典", [".bin"]);
+            _app.InitializePicker(picker);
+            var file = await picker.PickSaveFileAsync();
+            if (file is null)
+            {
+                return;
+            }
+            using var fs = await file.OpenStreamForWriteAsync();
+            _source.SaveAs(fs);
+            await _app.ConfirmAsync("保存成功");
         }
 
         private void TapOrder()
         {
             IsDictOrder = !IsDictOrder;
+            SyncWord();
         }
 
         private void TapBack()
@@ -206,6 +219,12 @@ namespace ZoDream.Reader.ViewModels
             }
             Editor.LoadFromFile(file.Path);
             SyncState();
+            if (WordItems.Count == 0)
+            {
+                return;
+            }
+            var res = await _app.ConfirmAsync("是否合并词频，否则替换？");
+            ExtractWord(res);
         }
 
         private async void TapSave()
@@ -229,16 +248,36 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            var data = Editor.Count();
-            WordItems.Clear();
-            foreach (var item in data.Order(this))
+            ExtractWord(false);
+        }
+
+        private void ExtractWord(bool isMerge = true)
+        {
+            var data = Editor!.Count();
+            if (!isMerge)
             {
+                _source.Clear();
+            }
+            _source.Append(data);
+            SyncWord();
+            DictVisible = Visibility.Visible;
+        }
+
+        private void SyncWord()
+        {
+            WordItems.Clear();
+            var data = IsDictOrder ? _source.Order(this) : _source.OrderDescending(this);
+            foreach (var item in data)
+            {
+                if (IsDictFilter && EncodingBuilder.Serialize(item.Key) <= 0x7F)
+                {
+                    continue;
+                }
                 WordItems.Add(new(item.Key)
                 {
                     Count = item.Value
                 });
             }
-            DictVisible = Visibility.Visible;
         }
 
         public int Compare(KeyValuePair<char, int> x, KeyValuePair<char, int> y)
