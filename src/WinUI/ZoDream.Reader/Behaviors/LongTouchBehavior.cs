@@ -54,12 +54,12 @@ namespace ZoDream.Reader.Behaviors
             OnTouchStart();
         }
 
-        private void AssociatedObject_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        private void AssociatedObject_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             OnTouchEnd();
         }
 
-        private void AssociatedObject_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        private void AssociatedObject_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             OnTouchStart();
         }

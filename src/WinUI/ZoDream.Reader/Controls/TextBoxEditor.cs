@@ -20,6 +20,8 @@ namespace ZoDream.Reader.Controls
 
         public bool CanRedo => control.CanUndo;
 
+        public int SelectionStart => control.SelectionStart;
+
         private int SelectionEnd => control.SelectionStart + control.SelectionLength;
 
 

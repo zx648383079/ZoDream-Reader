@@ -35,6 +35,8 @@ namespace ZoDream.Reader.Controls
 
         public bool CanRedo => _canvas?.CanRedo == true;
 
+        public int SelectionStart => _canvas?.SelectionStart ?? 0;
+
         public string Text { 
             get {
                 TrySave();

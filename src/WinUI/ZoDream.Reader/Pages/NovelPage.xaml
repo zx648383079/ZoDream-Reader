@@ -25,7 +25,7 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Image Source="{Binding Cover, Converter={StaticResource ImageCvt}}" />
-            <StackPanel Grid.Column="1">
+            <StackPanel Grid.Column="1" VerticalAlignment="Bottom">
                 <TextBlock Text="{Binding Name}" />
                 <ctl:IconLabel Icon="&#xE77B;" Text="{Binding Author}" />
                 <ctl:IconLabel Icon="&#xE81C;" Text="最新章节" />

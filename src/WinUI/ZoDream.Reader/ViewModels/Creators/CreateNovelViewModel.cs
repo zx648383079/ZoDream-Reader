@@ -48,6 +48,7 @@ namespace ZoDream.Reader.ViewModels
             UndoCommand = new RelayCommand(TapUndo);
             RedoCommand = new RelayCommand(TapRedo);
             CheckCommand = new RelayCommand(TapCheck);
+            SplitCommand = new RelayCommand(TapSplit);
             JumpToCommand = new RelayCommand<string>(TapJumpTo);
         }
 
@@ -191,6 +192,9 @@ namespace ZoDream.Reader.ViewModels
         public ICommand DeleteCommand { get; private set; }
         public ICommand JumpToCommand { get; private set; }
 
+        public ICommand SplitCommand { get; private set; }
+
+
 
         private async void TapOpen()
         {
@@ -286,6 +290,34 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             EditSection(model);
+        }
+
+        private async void TapSplit()
+        {
+            if (Document is null || _current is null)
+            {
+                return;
+            }
+            if (!await _app.ConfirmAsync("是否从选中位置进行拆分章节？"))
+            {
+                return;
+            }
+            var index = Document.SelectionStart;
+            var text = Document.Text;
+            Document.Text = text[..index];
+            var chapter = new ChapterItemViewModel(this)
+            {
+                RawText = text[index..]
+            };
+            SaveSection(_current);
+            var i = Items.IndexOf(_current);
+            if (i < 0 || i >= Items.Count - 1)
+            {
+                Items.Add(chapter);
+            } else
+            {
+                Items.Insert(i + 1, chapter);
+            }
         }
 
         private void SaveSection(IEditableSection? section)

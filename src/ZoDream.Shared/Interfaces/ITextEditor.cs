@@ -11,6 +11,7 @@ namespace ZoDream.Shared.Interfaces
         public bool CanForward { get; }
         public bool CanUndo { get; }
         public bool CanRedo { get; }
+        public int SelectionStart { get; }
 
         public void Undo();
         public void Redo();

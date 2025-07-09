@@ -228,6 +228,12 @@
                         Style="{StaticResource LargeIconBtn}"
                         ToolTipService.ToolTip="插入图片" />-->
                     <Button
+                        Command="{Binding SplitCommand}"
+                        Content="&#xE736;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="在当前位置进行拆分" />
+                    <AppBarSeparator />
+                    <Button
                         Command="{Binding UndoCommand}"
                         Content="&#xE7A7;"
                         IsEnabled="{Binding ElementName=PART_TextBox, Path=CanUndo}"

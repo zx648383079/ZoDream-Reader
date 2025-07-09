@@ -124,9 +124,46 @@ namespace ZoDream.Reader.ViewModels
             }
             set {
                 Items.Clear();
-                foreach (var item in value.Split('\n'))
+                foreach (var item in value.Split(['\n', '\r']))
                 {
                     if (!string.IsNullOrWhiteSpace(item))
+                    {
+                        Items.Add(new NovelTextBlock(item.Trim()));
+                    }
+                }
+            }
+        }
+
+        public string RawText 
+        {
+            get {
+                var sb = new StringBuilder();
+                sb.Append(Title).Append('\n').Append('\n');
+                foreach (var item in Items)
+                {
+                    if (item is INovelTextBlock o)
+                    {
+                        sb.Append("    ");
+                        sb.Append(o.Text);
+                        sb.Append('\n');
+                    }
+                }
+                return sb.ToString();
+            }
+            set {
+                Title = string.Empty;
+                Items.Clear();
+                foreach (var item in value.Split(['\n', '\r']))
+                {
+                    if (string.IsNullOrWhiteSpace(item))
+                    {
+                        continue;
+                    }
+                    if (string.IsNullOrEmpty(Title))
+                    {
+                        Title = item.Trim();
+                    }
+                    else
                     {
                         Items.Add(new NovelTextBlock(item.Trim()));
                     }

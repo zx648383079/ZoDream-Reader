@@ -4,10 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
+using ZoDream.Reader.Controls;
 using ZoDream.Reader.Dialogs;
 using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Repositories.Entities;
@@ -18,24 +17,114 @@ namespace ZoDream.Reader.ViewModels
     {
         public ShelfViewModel()
         {
-            AddCommand = new RelayCommand(TapAdd);
-            CreateCommand = new RelayCommand(TapCreate);
+            AddCommand = UICommand.Add(TapAdd);
+            CreateCommand = UICommand.Create(TapCreate);
+            LayoutCommand = new RelayCommand(TapLayout);
+            EditCommand = new RelayCommand<NovelItemViewModel>(TapEdit);
+            DeleteCommand = new RelayCommand<NovelItemViewModel>(TapDelete);
+            DetailCommand = new RelayCommand<NovelItemViewModel>(TapDetail);
+            ReadCommand = new RelayCommand<NovelItemViewModel>(TapRead);
+            MultipleCommand = UICommand.MultipleSelect(TapMultiple);
+            SelectAllCommand = UICommand.SelectAll(TapSelectAll);
             LoadAsync();
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
-        private ObservableCollection<NovelItemViewModel> novelItems = [];
+        private ObservableCollection<NovelItemViewModel> _items = [];
 
-        public ObservableCollection<NovelItemViewModel> NovelItems {
-            get => novelItems;
-            set => SetProperty(ref novelItems, value);
+        public ObservableCollection<NovelItemViewModel> Items {
+            get => _items;
+            set => SetProperty(ref _items, value);
         }
 
+        private bool _layoutMode;
+
+        public bool LayoutMode {
+            get => _layoutMode;
+            set {
+                SetProperty(ref _layoutMode, value);
+                OnPropertyChanged(nameof(LayoutIcon));
+                OnPropertyChanged(nameof(LayoutColumnCount));
+            }
+        }
+
+        private bool _isMultipleSelect;
+
+        public bool IsMultipleSelect {
+            get => _isMultipleSelect;
+            set => SetProperty(ref _isMultipleSelect, value);
+        }
+
+        public int LayoutColumnCount => LayoutMode ? 1 : 2;
+        public string LayoutIcon => LayoutMode ? "\uF0E2" : "\uE8FD";
 
 
         public ICommand AddCommand { get; private set; }
         public ICommand CreateCommand { get; private set; }
+        public ICommand LayoutCommand { get; private set; }
+        public ICommand MultipleCommand { get; private set; }
+        public ICommand SelectAllCommand { get; private set; }
+        public ICommand EditCommand { get; private set; }
+        public ICommand DeleteCommand { get; private set; }
+        public ICommand DetailCommand { get; private set; }
+        public ICommand ReadCommand { get; private set; }
+
+
+        private void TapSelectAll()
+        {
+            var isChecked = Items.Where(i => !i.IsChecked).Any();
+            foreach (var item in Items)
+            {
+                item.IsChecked = isChecked;
+            }
+        }
+
+        private void TapDetail(NovelItemViewModel? arg)
+        {
+            if (arg is null)
+            {
+                return;
+            }
+            App.GetService<IRouter>().GoToAsync("novel", new Dictionary<string, object>
+            {
+                {"novel", arg.Source},
+                {"id", arg.Source.Id},
+            });
+        }
+
+        private void TapRead(NovelItemViewModel? arg)
+        {
+            if (arg is null)
+            {
+                return;
+            }
+            App.GetService<IRouter>().GoToAsync("read", new Dictionary<string, object>
+            {
+                {"novel", arg.Source},
+                {"id", arg.Source.Id},
+            });
+        }
+
+        private void TapMultiple()
+        {
+            IsMultipleSelect = !IsMultipleSelect;
+        }
+
+        private void TapEdit(NovelItemViewModel? arg)
+        {
+            
+        }
+
+        private void TapDelete(NovelItemViewModel? arg)
+        {
+
+        }
+
+        private void TapLayout()
+        {
+            LayoutMode = !LayoutMode;
+        }
 
         private void TapCreate()
         {
@@ -83,11 +172,11 @@ namespace ZoDream.Reader.ViewModels
 
         public async void LoadAsync()
         {
-            NovelItems.Clear();
+            Items.Clear();
             var items = await _app.Database.GetBookAsync<BookEntity>();
             foreach (var item in items)
             {
-                NovelItems.Add(new NovelItemViewModel(item));
+                Items.Add(new NovelItemViewModel(this, item));
             }
         }
 
