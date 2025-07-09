@@ -21,6 +21,15 @@
                 <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Style x:Key="EditorStyle" TargetType="TextBox">
+                <Setter Property="AcceptsReturn" Value="True" />
+                <Setter Property="FontSize" Value="25" />
+                <Setter Property="IsSpellCheckEnabled" Value="False" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                <Setter Property="CharacterSpacing" Value="30" />
+            </Style>
+
             <MenuFlyout x:Key="ItemContextMenu">
                 <MenuFlyoutItem
                     Command="{Binding EditCommand}"
@@ -234,12 +243,8 @@
                 <TextBox
                     x:Name="PART_TextBox"
                     Grid.Row="2"
-                    AcceptsReturn="True"
-                    FontSize="25"
-                    IsSpellCheckEnabled="False"
-                    ScrollViewer.VerticalScrollBarVisibility="Auto"
-                    Text="{Binding Content, Mode=TwoWay}"
-                    TextWrapping="Wrap" />
+                    Style="{StaticResource EditorStyle}"
+                    Text="{Binding Content, Mode=TwoWay}" />
             </Grid>
             <Pivot Grid.Row="1" Grid.Column="1">
                 <PivotItem Header="Catalog">

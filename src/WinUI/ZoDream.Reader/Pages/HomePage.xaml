@@ -15,6 +15,20 @@
         <vm:ShelfViewModel />
     </Page.DataContext>
 
+    <Page.Resources>
+        <ResourceDictionary>
+            <Style x:Key="IconStyle" TargetType="FontIcon">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+            <Style x:Key="MetaStyle" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+        </ResourceDictionary>
+    </Page.Resources>
+
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -37,66 +51,69 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="90" />
-                                <ColumnDefinition Width="20" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30" />
-                                <RowDefinition Height="20" />
-                                <RowDefinition Height="20" />
-                                <RowDefinition Height="20" />
-                            </Grid.RowDefinitions>
                             <Image
                                 Grid.RowSpan="4"
                                 Margin="0,0,10,0"
                                 Source="{x:Bind cvt:ConverterHelper.ToImg(Cover)}"
                                 Stretch="UniformToFill" />
-                            <TextBlock
-                                Grid.Column="1"
-                                Grid.ColumnSpan="2"
-                                VerticalAlignment="Center"
-                                FontWeight="Bold"
-                                Text="{x:Bind Name}" />
-                            <Border
-                                Grid.Column="2"
-                                Padding="5"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Top"
-                                Background="LightGray"
-                                CornerRadius="8">
-                                <TextBlock Text="{x:Bind Remaining}" />
-                            </Border>
-                            <FontIcon
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                VerticalAlignment="Center"
-                                Glyph="&#xE77B;" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="2"
-                                VerticalAlignment="Center"
-                                Text="{x:Bind Author}" />
-                            <FontIcon
-                                Grid.Row="2"
-                                Grid.Column="1"
-                                VerticalAlignment="Center"
-                                Glyph="&#xE81C;" />
-                            <TextBlock
-                                Grid.Row="2"
-                                Grid.Column="2"
-                                VerticalAlignment="Center"
-                                Text="{x:Bind CurrentChapterTitle}" />
-                            <FontIcon
-                                Grid.Row="3"
-                                Grid.Column="1"
-                                Margin="0,5,0,0"
-                                VerticalAlignment="Top"
-                                Glyph="&#xE74C;" />
-                            <TextBlock
-                                Grid.Row="3"
-                                Grid.Column="2"
-                                Text="{x:Bind LatestChapterTitle}" />
+                            <Grid Grid.Column="1" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="20" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Grid.ColumnSpan="2"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Bold"
+                                    Text="{x:Bind Name}" />
+                                <Border
+                                    Grid.Column="1"
+                                    Padding="5,2"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Background="LightGray"
+                                    CornerRadius="5">
+                                    <TextBlock Text="{x:Bind Remaining}" />
+                                </Border>
+                                <FontIcon
+                                    Grid.Row="1"
+                                    Glyph="&#xE77B;"
+                                    Style="{StaticResource IconStyle}" />
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Style="{StaticResource MetaStyle}"
+                                    Text="{x:Bind Author}" />
+                                <FontIcon
+                                    Grid.Row="2"
+                                    Glyph="&#xE81C;"
+                                    Style="{StaticResource IconStyle}" />
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Style="{StaticResource MetaStyle}"
+                                    Text="{x:Bind CurrentChapterTitle}" />
+                                <FontIcon
+                                    Grid.Row="3"
+                                    Glyph="&#xE74C;"
+                                    Style="{StaticResource IconStyle}" />
+                                <TextBlock
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    Style="{StaticResource MetaStyle}"
+                                    Text="{x:Bind LatestChapterTitle}" />
+                            </Grid>
                         </Grid>
+
                     </ItemContainer>
                 </DataTemplate>
             </ItemsView.ItemTemplate>

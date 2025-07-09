@@ -27,7 +27,15 @@ namespace ZoDream.Shared.Plugins.Own
             res.Name = ReadString();
             res.Rating = (byte)_last;
             res.Author = ReadString();
-            res.Brief = ReadString();
+            while (_last == 0xA)
+            {
+                res.Brief += ReadString();
+                if (_last == 0xA)
+                {
+                    res.Brief += '\n';
+                }
+            }
+            
             while (_last == 0x1)
             {
                 var title = ReadString();

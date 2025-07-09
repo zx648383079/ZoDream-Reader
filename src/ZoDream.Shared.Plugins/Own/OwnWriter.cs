@@ -31,8 +31,16 @@ namespace ZoDream.Shared.Plugins.Own
             output.Write(encoding.GetBytes(data.Name));
             output.WriteByte(data.Rating);
             output.Write(encoding.GetBytes(data.Author));
-            output.WriteByte(0xA);
-            output.Write(encoding.GetBytes(data.Brief));
+            
+            foreach (var item in data.Brief.Split(['\n', '\r']))
+            {
+                if (string.IsNullOrWhiteSpace(item))
+                {
+                    continue;
+                }
+                output.WriteByte(0xA);
+                output.Write(encoding.GetBytes(item.Trim()));
+            }
             foreach (var item in data.Items)
             {
                 Write(output, item);

@@ -305,12 +305,20 @@ namespace ZoDream.Reader.ViewModels
 
         private void EditSection(IEditableSection model)
         {
+            if (_current == model)
+            {
+                return;
+            }
             SaveSection(_current);
             _current = model;
             Title = _current.Title;
             Content = _current is ChapterItemViewModel o ? o.Text : string.Empty;
             WrongItems.Clear();
             _isUpdated = false;
+            if (model.IsWrong)
+            {
+                TapCheck();
+            }
         }
 
         private async Task<bool> LoadDictionaryAsync()
@@ -389,13 +397,23 @@ namespace ZoDream.Reader.ViewModels
             return true;
         }
 
-        private void TapJumpTo(string? arg)
+        private async void TapJumpTo(string? arg)
         {
             if (string.IsNullOrWhiteSpace(arg) || Document is null)
             {
                 return;
             }
-            Document.FindNext(arg);
+            await Task.Delay(100);
+            if (Document.FindNext(arg))
+            {
+                return;
+            }
+            var res = await _app.ConfirmAsync($"找不到下一个[{arg}]，是否从头开始找？");
+            if (res)
+            {
+                Document.Unselect();
+                Document.FindNext(arg);
+            }
         }
 
         private async void TapCheck()

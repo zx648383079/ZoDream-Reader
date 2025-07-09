@@ -38,7 +38,7 @@ namespace ZoDream.Reader.Controls
             {
                 return false;
             }
-            control.Select(i, text.Length);
+            Select(i, text.Length);
             return true;
         }
 
@@ -74,7 +74,7 @@ namespace ZoDream.Reader.Controls
 
         public void Select(int start, int count)
         {
-            control.Focus(FocusState.Pointer);
+            control.Focus(FocusState.Programmatic);
             control.Select(start, count);
         }
 
