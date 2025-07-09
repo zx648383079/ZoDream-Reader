@@ -304,7 +304,7 @@ namespace ZoDream.Reader.ViewModels
             }
             var index = Document.SelectionStart;
             var text = Document.Text;
-            Document.Text = text[..index];
+            Content = text[..index];
             var chapter = new ChapterItemViewModel(this)
             {
                 RawText = text[index..]
