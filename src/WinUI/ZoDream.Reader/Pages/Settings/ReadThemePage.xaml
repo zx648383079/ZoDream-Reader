@@ -25,7 +25,7 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <ListBox ItemsSource="{Binding ThemeItems}">
+        <ListBox ItemsSource="{Binding ThemeItems}" Style="{StaticResource CustomListBox}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>

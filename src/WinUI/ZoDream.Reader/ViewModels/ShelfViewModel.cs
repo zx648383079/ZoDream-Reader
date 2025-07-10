@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Controls;
@@ -18,6 +19,8 @@ namespace ZoDream.Reader.ViewModels
         public ShelfViewModel()
         {
             AddCommand = UICommand.Add(TapAdd);
+            GroupCommand = UICommand.Group(TapGroup);
+            SyncCommand = UICommand.Sync(TapSync);
             CreateCommand = UICommand.Create(TapCreate);
             LayoutCommand = new RelayCommand(TapLayout);
             EditCommand = new RelayCommand<NovelItemViewModel>(TapEdit);
@@ -61,6 +64,8 @@ namespace ZoDream.Reader.ViewModels
 
 
         public ICommand AddCommand { get; private set; }
+        public ICommand GroupCommand { get; private set; }
+        public ICommand SyncCommand { get; private set; }
         public ICommand CreateCommand { get; private set; }
         public ICommand LayoutCommand { get; private set; }
         public ICommand MultipleCommand { get; private set; }
@@ -70,6 +75,16 @@ namespace ZoDream.Reader.ViewModels
         public ICommand DetailCommand { get; private set; }
         public ICommand ReadCommand { get; private set; }
 
+
+        private void TapGroup()
+        {
+
+        }
+
+        private void TapSync()
+        {
+
+        }
 
         private void TapSelectAll()
         {
@@ -116,9 +131,29 @@ namespace ZoDream.Reader.ViewModels
             
         }
 
-        private void TapDelete(NovelItemViewModel? arg)
+        private async void TapDelete(NovelItemViewModel? arg)
         {
-
+            NovelItemViewModel[] items;
+            if (arg is null)
+            {
+                items = Items.Where(i => i.IsChecked).ToArray();
+            } else
+            {
+                items = [arg];
+            }
+            if (items.Length == 0)
+            {
+                return;
+            }
+            if (!await _app.ConfirmAsync($"确定删除 {items.Length} 项?"))
+            {
+                return;
+            }
+            foreach (var item in items)
+            {
+                Items.Remove(item);
+            }
+            await _app.Database.DeleteBookAsync(items.Select(i => i.Source.Id).ToArray());
         }
 
         private void TapLayout()

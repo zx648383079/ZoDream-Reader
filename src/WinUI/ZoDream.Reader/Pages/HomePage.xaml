@@ -141,42 +141,15 @@
                     <FontIcon Glyph="{Binding LayoutIcon}" />
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton Command="{Binding MultipleCommand}" Label="管理">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xE762;" />
-                </AppBarButton.Icon>
-            </AppBarButton>
-            <AppBarButton
-                Command="{Binding SelectAllCommand}"
-                Icon="SelectAll"
-                Label="全选/撤销"
-                Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
-            <AppBarButton
-                Command="{Binding EditCommand}"
-                Icon="Edit"
-                Label="编辑"
-                Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
-            <AppBarButton
-                Command="{Binding DeleteCommand}"
-                Icon="Delete"
-                Label="删除"
-                Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
-            <AppBarButton
-                Command="{Binding AddCommand}"
-                Icon="Add"
-                Label="添加"
-                Visibility="{x:Bind cvt:ConverterHelper.CollapsedIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
+            <AppBarButton Command="{Binding MultipleCommand}" />
+            <AppBarButton Command="{Binding SelectAllCommand}" Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
+            <AppBarButton Command="{Binding EditCommand}" Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
+            <AppBarButton Command="{Binding DeleteCommand}" Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
+            <AppBarButton Command="{Binding AddCommand}" Visibility="{x:Bind cvt:ConverterHelper.CollapsedIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
             <CommandBar.SecondaryCommands>
-                <AppBarButton
-                    Icon="Library"
-                    Label="分组"
-                    Visibility="{x:Bind cvt:ConverterHelper.CollapsedIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
-                <AppBarButton Icon="Sync" Label="同步" />
-                <AppBarButton
-                    Command="{Binding CreateCommand}"
-                    Icon="NewFolder"
-                    Label="创建"
-                    Visibility="{x:Bind cvt:ConverterHelper.CollapsedIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
+                <AppBarButton Command="{Binding GroupCommand}" Visibility="{x:Bind cvt:ConverterHelper.CollapsedIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
+                <AppBarButton Command="{Binding SyncCommand}" />
+                <AppBarButton Command="{Binding CreateCommand}" Visibility="{x:Bind cvt:ConverterHelper.CollapsedIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
             </CommandBar.SecondaryCommands>
         </CommandBar>
     </Grid>
