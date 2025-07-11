@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Xml;
 using System.Xml.Linq;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Models;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.EPub
@@ -18,6 +19,14 @@ namespace ZoDream.Shared.Plugins.EPub
         internal static XNamespace Ncx => NcxPrefixNamespace;
         internal static XNamespace Opf => OpfPrefixNamespace;
         internal static XNamespace XHtml => XHtmlPrefixNamespace;
+
+        public INovelBasic ReadBasic()
+        {
+            var data = new NovelBasic();
+            using var archive = new ZipArchive(input, ZipArchiveMode.Read);
+            Read(archive, data);
+            return data;
+        }
 
         public INovelDocument Read()
         {
@@ -90,6 +99,51 @@ namespace ZoDream.Shared.Plugins.EPub
                 }
             }
             return novel;
+        }
+
+        private void Read(ZipArchive archive, NovelBasic novel)
+        {
+            var rootFile = GetRootFileName(archive);
+            if (rootFile is null)
+            {
+                return;
+            }
+            var doc = Read(archive, rootFile);
+            var opfNamespace = Opf;
+            var root = doc.Element(opfNamespace + "package");
+            if (root is null)
+            {
+                return;
+            }
+            var maps = new Dictionary<string, string>();
+            var folder = Path.GetDirectoryName(rootFile);
+            foreach (var item in root.Element(opfNamespace + "manifest").Elements())
+            {
+                maps.Add(item.Attribute("id").Value, folder + "/" + item.Attribute("href").Value);
+            }
+            foreach (var item in root.Element(opfNamespace + "metadata").Elements())
+            {
+                switch (item.Name.LocalName.ToLowerInvariant())
+                {
+                    case "title":
+                        novel.Name = item.Value;
+                        break;
+                    case "description":
+                        novel.Brief = item.Value;
+                        break;
+                    case "creator":
+                        novel.Author = item.Value;
+                        break;
+                    case "meta":
+                        if (item.Attribute("name").Value == "cover")
+                        {
+                            novel.Cover = GetImageResource(archive, maps[item.Attribute("content").Value]);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         private static INovelSection ReadDocument(ZipArchive archive, 

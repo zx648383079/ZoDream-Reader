@@ -2,27 +2,20 @@
 using System.IO;
 using System.Linq;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Models;
 
 namespace ZoDream.Shared.Tokenizers
 {
-    public class RichDocument : INovelDocument
+    public class RichDocument : NovelBasic, INovelDocument
     {
         public RichDocument()
         {
             
         }
         public RichDocument(string name)
+            : base(name)
         {
-            Name = name;
         }
-        public string Name { get; set; } = string.Empty;
-        public byte Rating { get; set; }
-
-        public string Author { get; set; } = string.Empty;
-
-        public Stream? Cover { get; set; }
-
-        public string Brief { get; set; } = string.Empty;
 
         public IList<INovelVolume> Items { get; private set; } = [];
 

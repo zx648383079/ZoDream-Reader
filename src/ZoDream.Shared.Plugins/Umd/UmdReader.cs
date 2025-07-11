@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.IO;
+using ZoDream.Shared.Models;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Umd
@@ -13,6 +14,23 @@ namespace ZoDream.Shared.Plugins.Umd
     {
         internal const uint Magic = 0xde9a9b89;
         private readonly Encoding _encoding = Encoding.Unicode;
+
+        public INovelBasic ReadBasic()
+        {
+            var data = new NovelBasic();
+            input.Seek(0, SeekOrigin.Begin);
+            var reader = new BinaryReader(input);
+            if (reader.ReadUInt32() != 0xde9a9b89)
+            {
+                // TODO 文件错误
+                return data;
+            }
+            reader.BaseStream.Seek(5, SeekOrigin.Current);
+            var fileType = input.ReadByte(); // 1 text 2 图片
+            reader.BaseStream.Seek(2, SeekOrigin.Current);
+            ReadNovel(reader, data);
+            return data;
+        }
 
         public INovelDocument Read()
         {
@@ -26,7 +44,8 @@ namespace ZoDream.Shared.Plugins.Umd
             reader.BaseStream.Seek(5, SeekOrigin.Current);
             var fileType = input.ReadByte(); // 1 text 2 图片
             reader.BaseStream.Seek(2, SeekOrigin.Current);
-            var novel = ReadNovel(reader);
+            var novel = new RichDocument();
+            ReadNovel(reader, novel);
             var type = ReadHeaderType(reader);
             if (type != 0x83)
             {
@@ -77,15 +96,13 @@ namespace ZoDream.Shared.Plugins.Umd
         }
 
 
-        private RichDocument ReadNovel(BinaryReader reader)
+        private void ReadNovel(BinaryReader reader, NovelBasic data)
         {
-            var novel = new RichDocument();
-            var properties = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0b };
             while (true)
             {
                 //两个字节，表示类别
                 var type = ReadHeaderType(reader);
-                if (!properties.Any(i => i == type))
+                if (type is 0x0 or 0xA or >= 0xC)
                 {
                     reader.BaseStream.Seek(-3, SeekOrigin.Current);
                     break;
@@ -96,12 +113,12 @@ namespace ZoDream.Shared.Plugins.Umd
                 switch (type)
                 {
                     case 0x01:
-                        return novel;
+                        return;
                     case 0x02:
-                        novel.Name = _encoding.GetString(buffer);
+                        data.Name = _encoding.GetString(buffer);
                         break;
                     case 0x03:
-                        novel.Author = _encoding.GetString(buffer);
+                        data.Author = _encoding.GetString(buffer);
                         break;
                     case 0x04:
                     case 0x05:
@@ -112,10 +129,10 @@ namespace ZoDream.Shared.Plugins.Umd
                     case 0x0b: // contentLength
                         break;
                     default:
-                        return novel;
+                        return;
                 }
             }
-            return novel;
+            return;
         }
 
         private int ReadHeaderType(BinaryReader reader)

@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Models;
 using ZoDream.Shared.Storage;
 using ZoDream.Shared.Tokenizers;
 
@@ -39,6 +40,14 @@ namespace ZoDream.Shared.Plugins.Txt
         /// </summary>
         public bool IsMaxLimit { get; set; } = false;
         public Encoding Encoding => encoding;
+
+        public INovelBasic ReadBasic()
+        {
+            return new NovelBasic(Parse(Path.GetFileNameWithoutExtension(fileName), out var author, out _))
+            {
+                Author = author
+            };
+        }
 
         public INovelDocument Read()
         {

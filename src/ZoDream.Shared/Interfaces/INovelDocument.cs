@@ -3,7 +3,8 @@ using System.IO;
 
 namespace ZoDream.Shared.Interfaces
 {
-    public interface INovelDocument
+
+    public interface INovelBasic
     {
         public string Name { get; }
         /// <summary>
@@ -13,7 +14,10 @@ namespace ZoDream.Shared.Interfaces
         public string Author { get; }
         public Stream? Cover { get; }
         public string Brief { get; }
+    }
 
+    public interface INovelDocument : INovelBasic
+    {
         public IList<INovelVolume> Items { get; }
     }
 

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.IO;
+using ZoDream.Shared.Models;
 using ZoDream.Shared.Text;
 using ZoDream.Shared.Tokenizers;
 
@@ -12,30 +13,17 @@ namespace ZoDream.Shared.Plugins.Own
     {
         private readonly byte[] _buffer = new byte[1024 * 5];
         private int _last = -1;
+
+        public INovelBasic ReadBasic()
+        {
+            var res = new NovelBasic();
+            Read(res);
+            return res;
+        }
         public INovelDocument Read()
         {
-            input.Seek(0, SeekOrigin.Begin);
-            var code = input.ReadByte();
             var res = new RichDocument();
-            if (code == 0x5)
-            {
-                res.Cover = ReadImage();
-            } else
-            {
-                input.Seek(-1, SeekOrigin.Current);
-            }
-            res.Name = ReadString();
-            res.Rating = (byte)_last;
-            res.Author = ReadString();
-            while (_last == 0xA)
-            {
-                res.Brief += ReadString();
-                if (_last == 0xA)
-                {
-                    res.Brief += '\n';
-                }
-            }
-            
+            Read(res);
             while (_last == 0x1)
             {
                 var title = ReadString();
@@ -71,6 +59,32 @@ namespace ZoDream.Shared.Plugins.Own
             }
 
             return res;
+        }
+
+        private void Read(NovelBasic novel)
+        {
+            input.Seek(0, SeekOrigin.Begin);
+            var code = input.ReadByte();
+            
+            if (code == 0x5)
+            {
+                novel.Cover = ReadImage();
+            }
+            else
+            {
+                input.Seek(-1, SeekOrigin.Current);
+            }
+            novel.Name = ReadString();
+            novel.Rating = (byte)_last;
+            novel.Author = ReadString();
+            while (_last == 0xA)
+            {
+                novel.Brief += ReadString();
+                if (_last == 0xA)
+                {
+                    novel.Brief += '\n';
+                }
+            }
         }
 
         private string ReadString()

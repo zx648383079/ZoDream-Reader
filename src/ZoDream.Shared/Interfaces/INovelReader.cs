@@ -5,7 +5,7 @@ namespace ZoDream.Shared.Interfaces
 {
     public interface INovelReader : IDisposable
     {
-
+        public INovelBasic ReadBasic();
         public INovelDocument Read();
     }
 
