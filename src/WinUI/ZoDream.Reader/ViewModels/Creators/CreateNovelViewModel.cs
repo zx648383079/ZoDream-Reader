@@ -250,18 +250,38 @@ namespace ZoDream.Reader.ViewModels
         {
             var picker = new FileSavePicker();
             picker.FileTypeChoices.Add("书籍", [".npk"]);
+            picker.FileTypeChoices.Add("TXT书籍", [".txt"]);
+            picker.FileTypeChoices.Add("EPUB书籍", [".epub"]);
             _app.InitializePicker(picker);
             var file = await picker.PickSaveFileAsync();
             if (file is null)
             {
                 return;
             }
-            if (!await LoadDictionaryAsync())
+            INovelWriter? writer = null;
+            var extension = Path.GetExtension(file.Path);
+            if (extension == ".txt")
+            {
+                writer = new TxtWriter(Serialize());
+            }
+            else if (extension == ".epub")
+            {
+                writer = new EPubWriter(Serialize());
+            }
+            else if (extension == ".npk")
+            {
+                if (!await LoadDictionaryAsync())
+                {
+                    return;
+                }
+                writer = new OwnWriter(Serialize(), new OwnEncoding(_dict!));
+            }
+            if (writer is null)
             {
                 return;
             }
             using var fs = await file.OpenStreamForWriteAsync();
-            new OwnWriter(Serialize(), new OwnEncoding(_dict!)).Write(fs);
+            writer.Write(fs);
             await _app.ConfirmAsync("保存成功");
         }
         private void TapBasic()
