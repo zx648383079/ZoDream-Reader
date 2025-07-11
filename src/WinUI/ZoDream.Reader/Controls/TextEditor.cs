@@ -97,6 +97,10 @@ namespace ZoDream.Reader.Controls
             }
             var begin = _cursor;
             var end = _cursorNext;
+            if (begin == end)
+            {
+                return;
+            }
             var source = _source[begin..end];
             var text = _canvas.Text;
             if (text[^1] != '\n' && end < _source.Length)

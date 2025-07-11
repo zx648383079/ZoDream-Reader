@@ -88,4 +88,12 @@
         <Setter Property="BorderBrush" Value="{StaticResource ControlElevationBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
     </Style>
+
+    <Style x:Key="CustomListBoxItem" TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+    <Style x:Key="CustomListBox" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource CustomListBoxItem}" />
+    </Style>
 </ResourceDictionary>

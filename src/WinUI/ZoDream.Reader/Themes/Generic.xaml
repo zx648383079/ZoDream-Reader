@@ -10,4 +10,6 @@
         <ResourceDictionary Source="ms-appx:///Themes/Input.xaml" />
         <ResourceDictionary Source="ms-appx:///Themes/Text.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+
 </ResourceDictionary>

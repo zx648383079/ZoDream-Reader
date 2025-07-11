@@ -18,14 +18,7 @@
 
 
     <Page.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="ListBoxItem">
-                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            </Style>
-        </ResourceDictionary>
+        <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
     </Page.Resources>
 
 
@@ -75,26 +68,10 @@
             </StackPanel>
             <Grid Grid.Row="1">
                 <ctl:TextEditor x:Name="Editor" />
-                <Border Style="{StaticResource ModalStyle}" Visibility="{Binding FindVisible, Converter={StaticResource ToggleCvt}}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBox VerticalContentAlignment="Center" Text="{Binding FindText, Mode=TwoWay}" />
-                        <Button
-                            Grid.Column="1"
-                            Command="{Binding FindNextCommand}"
-                            Content="&#xE72A;"
-                            Style="{StaticResource ToolIconBtn}" />
-                        <Button
-                            Grid.Column="2"
-                            Command="{Binding FindCommand}"
-                            Content="&#xE8BB;"
-                            Style="{StaticResource ToolIconBtn}" />
-                    </Grid>
-                </Border>
+                <ctl:FindPanel
+                    FindCommand="{Binding FindNextCommand}"
+                    IsOpen="{Binding FindVisible, Mode=TwoWay}"
+                    SearchText="{Binding FindText, Mode=TwoWay}" />
             </Grid>
         </Grid>
         <Grid
@@ -125,8 +102,8 @@
             <ListBox
                 Grid.Row="1"
                 HorizontalContentAlignment="Stretch"
-                Background="Transparent"
-                ItemsSource="{Binding WordItems}">
+                ItemsSource="{Binding WordItems}"
+                Style="{StaticResource CustomListBox}">
                 <ivy:Interaction.Behaviors>
                     <bhv:ListItemDoubleClickBehavior Command="{Binding FindLetterCommand}" />
                 </ivy:Interaction.Behaviors>
