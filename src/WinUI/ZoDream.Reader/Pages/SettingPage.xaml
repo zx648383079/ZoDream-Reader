@@ -89,7 +89,10 @@
                     Command="{Binding HistoryCommand}"
                     Header="阅读记录"
                     IsClickEnabled="True" />
-                <lbs:SettingsCard Header="文件管理" IsClickEnabled="True" />
+                <lbs:SettingsCard
+                    Command="{Binding FileCommand}"
+                    Header="文件管理"
+                    IsClickEnabled="True" />
                 <lbs:SettingsCard
                     Command="{Binding AboutCommand}"
                     Header="关于"

@@ -96,4 +96,14 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource CustomListBoxItem}" />
     </Style>
+
+    <Style x:Name="HeaderIcon" TargetType="FontIcon">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Name="HeaderLabelStyle" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="FontWeight" Value="Black" />
+    </Style>
 </ResourceDictionary>

@@ -82,6 +82,7 @@ namespace ZoDream.Reader
             router.RegisterRoute("rule/dictionary", typeof(DictionaryRulePage), true);
             router.RegisterRoute("creator/dictionary", typeof(CreateDictionaryPage), true);
             router.RegisterRoute("creator/novel", typeof(CreateNovelPage), true);
+            router.RegisterRoute("file/explorer", typeof(FileExplorerPage), true);
 
             router.RegisterRoute("read", typeof(ReadPage), RouteType.Single);
             services.AddSingleton<IRouter>(router);

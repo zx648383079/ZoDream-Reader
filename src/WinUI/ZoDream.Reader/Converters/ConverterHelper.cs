@@ -44,6 +44,11 @@ namespace ZoDream.Reader.Converters
         {
             return val ? Visibility.Visible : Visibility.Collapsed;
         }
+
+        public static Visibility VisibleIf(string val)
+        {
+            return VisibleIf(!string.IsNullOrWhiteSpace(val));
+        }
         public static Visibility CollapsedIf(bool val)
         {
             return VisibleIf(!val);

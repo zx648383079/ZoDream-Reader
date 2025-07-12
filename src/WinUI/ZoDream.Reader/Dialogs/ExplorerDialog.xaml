@@ -10,7 +10,7 @@
     mc:Ignorable="d">
 
     <ContentDialog.DataContext>
-        <vm:ExplorerDialogViewModel />
+        <vm:FileExplorerViewModel />
     </ContentDialog.DataContext>
 
     <Grid />

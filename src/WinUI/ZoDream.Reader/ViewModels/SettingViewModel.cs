@@ -24,6 +24,7 @@ namespace ZoDream.Reader.ViewModels
             BakCommand = new RelayCommand(TapBak);
             ThemeCommand = new RelayCommand(TapTheme);
             OtherCommand = new RelayCommand(TapOther);
+            FileCommand = new RelayCommand(TapFile);
         }
 
         public ICommand ChapterCommand { get; private set; }
@@ -32,6 +33,7 @@ namespace ZoDream.Reader.ViewModels
         public ICommand ReplaceCommand { get; private set; }
         public ICommand DictionaryCommand { get; private set; }
         public ICommand HistoryCommand { get; private set; }
+        public ICommand FileCommand { get; private set; }
         public ICommand AboutCommand { get; private set; }
         public ICommand BookmarkCommand { get; private set; }
         public ICommand BakCommand { get; private set; }
@@ -41,6 +43,14 @@ namespace ZoDream.Reader.ViewModels
         private void TapBookmark()
         {
             App.GetService<IRouter>().GoToAsync("bookmark");
+        }
+
+        private void TapFile()
+        {
+            App.GetService<IRouter>().GoToAsync("file/explorer", new Dictionary<string, object>()
+            {
+                {"folder", App.GetService<AppViewModel>().Storage.BaseFolder}
+            });
         }
 
         private void TapBak()
