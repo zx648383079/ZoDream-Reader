@@ -28,6 +28,7 @@
     <None Remove="Dialogs\ChapterMatchDialog.xaml" />
     <None Remove="Dialogs\ConfirmDialog.xaml" />
     <None Remove="Dialogs\ExplorerDialog.xaml" />
+    <None Remove="Dialogs\FindTextDialog.xaml" />
     <None Remove="Dialogs\FormDialog.xaml" />
     <None Remove="Dialogs\GroupDialog.xaml" />
     <None Remove="Dialogs\ImportDialog.xaml" />
@@ -311,6 +312,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="Pages\Settings\AppThemePage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Dialogs\FindTextDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Themes\ExplorerStyle.xaml">

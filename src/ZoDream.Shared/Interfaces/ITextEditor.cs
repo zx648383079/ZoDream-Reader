@@ -12,6 +12,7 @@ namespace ZoDream.Shared.Interfaces
         public bool CanUndo { get; }
         public bool CanRedo { get; }
         public int SelectionStart { get; }
+        public int SelectionLength { get; }
 
         public void Undo();
         public void Redo();
@@ -34,6 +35,5 @@ namespace ZoDream.Shared.Interfaces
         public void Unselect();
 
         public IDictionary<char, int> Count();
-        
     }
 }

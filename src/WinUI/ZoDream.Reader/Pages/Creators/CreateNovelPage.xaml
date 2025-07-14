@@ -136,11 +136,22 @@
                     Content="&#xE8A4;"
                     Style="{StaticResource LargeIconBtn}"
                     ToolTipService.ToolTip="目录" />
+                <AppBarSeparator />
                 <Button
                     Command="{Binding CheckAllCommand}"
                     Content="&#xE8FE;"
                     Style="{StaticResource LargeIconBtn}"
                     ToolTipService.ToolTip="字典字词检测全部内容" />
+                <Button
+                    Command="{Binding ReplaceCommand}"
+                    Content="&#xE773;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="批量替换" />
+                <Button
+                    Command="{Binding RepairCommand}"
+                    Content="&#xE90F;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="修正章节序号" />
             </StackPanel>
             <TextBox
                 Grid.Row="1"
@@ -208,6 +219,21 @@
                         Style="{StaticResource LargeIconBtn}"
                         ToolTipService.ToolTip="字典字词检测" />
 
+                    <Button
+                        Command="{Binding FindCommand}"
+                        Content="&#xE721;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="查找字符" />
+                    <Button
+                        Command="{Binding QuoteCommand}"
+                        Content="&#xE9B2;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="给选中添加双引号" />
+                    <Button
+                        Command="{Binding EnterCommand}"
+                        Content="&#xE751;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="插入换行" />
                     <AppBarSeparator />
 
                     <Button
@@ -251,6 +277,14 @@
                     Grid.Row="2"
                     Style="{StaticResource EditorStyle}"
                     Text="{Binding Content, Mode=TwoWay}" />
+                <ctl:FindPanel
+                    Grid.Row="2"
+                    FindCommand="{Binding ConfirmFindCommand}"
+                    IsOpen="{Binding FindOpen, Mode=TwoWay}"
+                    IsReplaceMode="True"
+                    ReplaceCommand="{Binding ConfirmReplaceCommand}"
+                    ReplaceText="{Binding ReplaceText, Mode=TwoWay}"
+                    SearchText="{Binding FindText, Mode=TwoWay}" />
             </Grid>
             <Pivot Grid.Row="1" Grid.Column="1">
                 <PivotItem Header="Catalog">

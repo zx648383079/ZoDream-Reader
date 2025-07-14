@@ -37,6 +37,8 @@ namespace ZoDream.Reader.Controls
 
         public int SelectionStart => _canvas?.SelectionStart ?? 0;
 
+        public int SelectionLength => _canvas?.SelectionLength ?? 0;
+
         public string Text { 
             get {
                 TrySave();

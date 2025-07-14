@@ -5,10 +5,12 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Behaviors;
+using ZoDream.Reader.Converters;
 using ZoDream.Reader.Dialogs;
 using ZoDream.Shared.Extensions;
 using ZoDream.Shared.Interfaces;
@@ -50,6 +52,14 @@ namespace ZoDream.Reader.ViewModels
             CheckCommand = new RelayCommand(TapCheck);
             SplitCommand = new RelayCommand(TapSplit);
             JumpToCommand = new RelayCommand<string>(TapJumpTo);
+
+            FindCommand = new RelayCommand(TapFind);
+            ReplaceCommand = new RelayCommand(TapReplace);
+            RepairCommand = new RelayCommand(TapRepair);
+            QuoteCommand = new RelayCommand(TapQuote);
+            ConfirmFindCommand = new RelayCommand(TapConfirmFind);
+            ConfirmReplaceCommand = new RelayCommand(TapConfirmReplace);
+            EnterCommand = new RelayCommand(TapEnter);
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
@@ -166,6 +176,28 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _redoEnabled, value);
         }
 
+        private bool _findOpen;
+
+        public bool FindOpen {
+            get => _findOpen;
+            set => SetProperty(ref _findOpen, value);
+        }
+
+        private string _findText = string.Empty;
+
+        public string FindText {
+            get => _findText;
+            set => SetProperty(ref _findText, value);
+        }
+
+        private string _replaceText = string.Empty;
+
+        public string ReplaceText {
+            get => _replaceText;
+            set => SetProperty(ref _replaceText, value);
+        }
+
+
 
         public ICommand OpenCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
@@ -193,6 +225,14 @@ namespace ZoDream.Reader.ViewModels
         public ICommand JumpToCommand { get; private set; }
 
         public ICommand SplitCommand { get; private set; }
+        public ICommand FindCommand { get; private set; }
+        public ICommand QuoteCommand { get; private set; }
+        public ICommand ReplaceCommand { get; private set; }
+        public ICommand RepairCommand { get; private set; }
+        public ICommand EnterCommand { get; private set; }
+
+        public ICommand ConfirmFindCommand { get; private set; }
+        public ICommand ConfirmReplaceCommand { get; private set; }
 
 
 
@@ -248,6 +288,11 @@ namespace ZoDream.Reader.ViewModels
         
         private async void TapSave()
         {
+            if (Items.Count == 0)
+            {
+                return;
+            }
+            SaveSection(_current);
             var picker = new FileSavePicker();
             picker.FileTypeChoices.Add("书籍", [".npk"]);
             picker.FileTypeChoices.Add("TXT书籍", [".txt"]);
@@ -329,7 +374,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 RawText = text[index..]
             };
-            SaveSection(_current);
+            SaveSection();
             var i = Items.IndexOf(_current);
             if (i < 0 || i >= Items.Count - 1)
             {
@@ -340,13 +385,148 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
+        private void TapConfirmFind()
+        {
+            if (string.IsNullOrWhiteSpace(FindText))
+            {
+                return;
+            }
+            Document?.FindNext(FindText);
+        }
+        private async void TapConfirmReplace()
+        {
+            if (string.IsNullOrWhiteSpace(FindText))
+            {
+                return;
+            }
+            Content = Content.Replace(FindText, ReplaceText);
+            await _app.ConfirmAsync("替换完成");
+        }
+        private void TapFind()
+        {
+            FindOpen = !FindOpen;
+        }
+
+        private void TapQuote()
+        {
+            if (Document is null || string.IsNullOrWhiteSpace(Content))
+            {
+                return;
+            }
+            var start = Document.SelectionStart;
+            var end = start + Document.SelectionLength;
+            if (start == end)
+            {
+                end = Content.IndexOf('\n', start + 1);
+                if (end == -1)
+                {
+                    end = Content.Length;
+                }
+            }
+            var text = Content[start..(end - 1)].Trim();
+            if (EncodingBuilder.IsQuote(text[0]))
+            {
+                text = text[1..];
+            }
+            if (EncodingBuilder.IsQuote(text[1]))
+            {
+                text = text[..^1];
+            }
+            Content = $"{Content[..start]}“{text}”{Content[end..]}";
+        }
+
+        private void TapEnter()
+        {
+            if (Document is null)
+            {
+                return;
+            }
+            var start = Document.SelectionStart;
+            Content = $"{Content[..start]}\n    {Content[start..]}";
+        }
+
+        private async void TapReplace()
+        {
+            if (!IsBasic)
+            {
+                TapFind();
+                return;
+            }
+            var picker = new FindTextDialog();
+            var model = picker.ViewModel;
+            if (!await _app.OpenFormAsync(picker))
+            {
+                return;
+            }
+            Content = Content.Replace(model.FindText, model.ReplaceText);
+            foreach (var item in Items)
+            {
+                if (item is not ChapterItemViewModel c)
+                {
+                    continue;
+                }
+                for (var i = 0; i < c.Items.Count; i++)
+                {
+                    if (c.Items[i] is INovelTextBlock t && t.Text.Contains(model.FindText))
+                    {
+                        c.Items[i] = new NovelTextBlock(t.Text.Replace(model.FindText, model.ReplaceText)); ;
+                    }
+                }
+            }
+            SaveSection();
+            await _app.ConfirmAsync("替换完成");
+        }
+
+        private async void TapRepair()
+        {
+            SaveSection(_current);
+            var index = 1;
+            var lastIsVolume = true;
+            foreach (var item in Items)
+            {
+                if (ConverterHelper.IsVolume(item))
+                {
+                    lastIsVolume = true;
+                    continue;
+                }
+                var match = Regex.Match(item.Title, @"$第\s?([0-9一二三四五六七八九十百千]{1,10})\s?章\s*");
+                if (!match.Success)
+                {
+                    continue;
+                }
+                if (!ChineseMath.TryParse(match.Groups[1].Value.Trim(), out var result))
+                {
+                    await _app.ConfirmAsync($"[{item.Title}]无法识别");
+                    return;
+                }
+                if (lastIsVolume && result == 1)
+                {
+                    index = (int)result;
+                }
+                if (result != index)
+                {
+                    item.Title = $"第{ChineseMath.Format(index)}章 {item.Title[match.Length..]}";
+                }
+                index++;
+                lastIsVolume = false;
+            }
+        }
+        private void SaveSection()
+        {
+            if (_current is null)
+            {
+                return;
+            }
+            _isUpdated = true;
+            SaveSection(_current);
+        }
         private void SaveSection(IEditableSection? section)
         {
             if (!_isUpdated || section is null)
             {
                 return;
             }
-            section.Title = Title;
+            section.Title = Title.Trim();
             section.IsWrong = false;
             if (section is ChapterItemViewModel o)
             {
@@ -355,7 +535,7 @@ namespace ZoDream.Reader.ViewModels
             _isUpdated = false;
         }
 
-        private void EditSection(IEditableSection model)
+        private async void EditSection(IEditableSection model)
         {
             if (_current == model)
             {
@@ -367,6 +547,8 @@ namespace ZoDream.Reader.ViewModels
             Content = _current is ChapterItemViewModel o ? o.Text : string.Empty;
             WrongItems.Clear();
             _isUpdated = false;
+            await Task.Delay(100);
+            Document?.ScrollTo(0);
             if (model.IsWrong)
             {
                 TapCheck();
@@ -606,7 +788,7 @@ namespace ZoDream.Reader.ViewModels
         public void TapNext()
         {
             var i = _current is null ? Items.Count : Items.IndexOf(_current);
-            if (i < Items.Count - 2)
+            if (i > Items.Count - 2)
             {
                 return;
             }
@@ -653,6 +835,8 @@ namespace ZoDream.Reader.ViewModels
             Brief = doc.Brief;
             Rating = doc.Rating / 2;
             Cover = doc.Cover?.ToBase64String();
+            _current = null;
+            Content = Title = string.Empty;
             Items.Clear();
             foreach (var item in doc.Items)
             {

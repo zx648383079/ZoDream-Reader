@@ -22,6 +22,8 @@ namespace ZoDream.Reader.Controls
 
         public int SelectionStart => control.SelectionStart;
 
+        public int SelectionLength => control.SelectionLength;
+
         private int SelectionEnd => control.SelectionStart + control.SelectionLength;
 
 
@@ -72,6 +74,7 @@ namespace ZoDream.Reader.Controls
 
         public void ScrollTo(int position)
         {
+            Select(position, 0);
         }
 
         public void Select(int start, int count)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using ZoDream.Reader.Converters;
 using ZoDream.Reader.ViewModels;
 
 namespace ZoDream.Reader.Controls
@@ -11,13 +12,9 @@ namespace ZoDream.Reader.Controls
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
-            if (item is VolumeItemViewModel)
+            if (item is IEditableSection s)
             {
-                return VolumeTemplate;
-            }
-            if (item is ChapterItemViewModel o)
-            {
-                return o.Items.Count == 0 ? VolumeTemplate : DefaultTemplate;
+                return ConverterHelper.IsVolume(s) ? VolumeTemplate : DefaultTemplate;
             }
             return base.SelectTemplateCore(item, container);
         }

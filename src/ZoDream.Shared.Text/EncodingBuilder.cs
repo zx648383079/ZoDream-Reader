@@ -238,6 +238,11 @@ namespace ZoDream.Shared.Text
             return res;
         }
 
+        public static bool IsQuote(char val)
+        {
+            return val is '\'' or '"' or '“' or '”' or '‘' or '’';
+        }
+
         /// <summary>
         /// 一些特别
         /// </summary>

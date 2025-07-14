@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Storage.Streams;
+using ZoDream.Reader.ViewModels;
 
 namespace ZoDream.Reader.Converters
 {
@@ -17,7 +18,6 @@ namespace ZoDream.Reader.Converters
             }
             return date.ToString("yyyy-MM-dd HH:mm");
         }
-
 
         public static string FormatSize(long size)
         {
@@ -95,6 +95,19 @@ namespace ZoDream.Reader.Converters
         {
             var rd = new Random();
             return $"Assets/cover{rd.Next(1, 11)}.jpg";
+        }
+
+        public static bool IsVolume(IEditableSection data)
+        {
+            if (data is VolumeItemViewModel)
+            {
+                return true;
+            }
+            if (data is ChapterItemViewModel o)
+            {
+                return o.Items.Count == 0;
+            }
+            return false;
         }
     }
 }
