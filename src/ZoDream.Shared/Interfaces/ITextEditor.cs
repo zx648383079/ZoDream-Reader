@@ -5,6 +5,7 @@ namespace ZoDream.Shared.Interfaces
 {
     public interface ITextEditor
     {
+        public char NewLine { get; }
         public string Text { get; set; }
 
         public bool CanBack { get; }

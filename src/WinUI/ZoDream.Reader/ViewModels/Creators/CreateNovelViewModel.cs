@@ -23,9 +23,9 @@ using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class CreateNovelViewModel : ObservableObject, IEditableSectionCommand
+    public partial class CreateNovelViewModel : ObservableObject, IEditableSectionCommand
     {
-
+        
         public CreateNovelViewModel()
         {
             OpenCommand = new RelayCommand(TapOpen);
@@ -417,13 +417,13 @@ namespace ZoDream.Reader.ViewModels
             var end = start + Document.SelectionLength;
             if (start == end)
             {
-                end = Content.IndexOf('\n', start + 1);
+                end = Content.IndexOf(Document.NewLine, start + 1);
                 if (end == -1)
                 {
                     end = Content.Length;
                 }
             }
-            var text = Content[start..(end - 1)].Trim();
+            var text = Content[start..end].Trim();
             if (EncodingBuilder.IsQuote(text[0]))
             {
                 text = text[1..];
@@ -442,7 +442,7 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             var start = Document.SelectionStart;
-            Content = $"{Content[..start]}\n    {Content[start..]}";
+            Content = $"{Content[..start]}{Document.NewLine}    {Content[start..]}";
         }
 
         private async void TapReplace()
@@ -489,7 +489,7 @@ namespace ZoDream.Reader.ViewModels
                     lastIsVolume = true;
                     continue;
                 }
-                var match = Regex.Match(item.Title, @"$第\s?([0-9一二三四五六七八九十百千]{1,10})\s?章\s*");
+                var match = ChapterOrderRegex().Match(item.Title);
                 if (!match.Success)
                 {
                     continue;
@@ -510,6 +510,7 @@ namespace ZoDream.Reader.ViewModels
                 index++;
                 lastIsVolume = false;
             }
+            await _app.ConfirmAsync($"修复成功");
         }
         private void SaveSection()
         {
@@ -886,5 +887,7 @@ namespace ZoDream.Reader.ViewModels
             return res;
         }
 
+        [GeneratedRegex(@"^第\s*([0-9一二三四五六七八九十百千]{1,10})\s*章\s*·?")]
+        private static partial Regex ChapterOrderRegex();
     }
 }

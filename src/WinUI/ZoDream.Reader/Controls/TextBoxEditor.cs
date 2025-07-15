@@ -10,6 +10,7 @@ namespace ZoDream.Reader.Controls
 {
     public class TextBoxEditor(TextBox control) : ITextEditor
     {
+        public char NewLine => '\r';
         public string Text { get => control.Text; set => control.Text = value; }
 
         public bool CanBack => false;

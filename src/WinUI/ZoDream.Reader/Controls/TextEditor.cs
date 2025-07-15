@@ -27,6 +27,8 @@ namespace ZoDream.Reader.Controls
         private string _source = string.Empty;
         private readonly List<int> _histories = [0];
 
+        public char NewLine => '\r';
+
         public bool CanBack => _cursor > 0;
         public bool CanForward => _cursorNext < Text.Length;
 
