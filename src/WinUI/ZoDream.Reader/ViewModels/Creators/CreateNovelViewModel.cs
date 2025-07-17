@@ -428,7 +428,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 text = text[1..];
             }
-            if (EncodingBuilder.IsQuote(text[1]))
+            if (EncodingBuilder.IsQuote(text[^1]))
             {
                 text = text[..^1];
             }
@@ -503,10 +503,7 @@ namespace ZoDream.Reader.ViewModels
                 {
                     index = (int)result;
                 }
-                if (result != index)
-                {
-                    item.Title = $"第{ChineseMath.Format(index)}章 {item.Title[match.Length..]}";
-                }
+                item.Title = $"第{ChineseMath.Format(index)}章 {item.Title[match.Length..]}";
                 index++;
                 lastIsVolume = false;
             }
