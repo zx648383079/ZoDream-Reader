@@ -503,9 +503,18 @@ namespace ZoDream.Reader.ViewModels
                 {
                     index = (int)result;
                 }
-                item.Title = $"第{ChineseMath.Format(index)}章 {item.Title[match.Length..]}";
+                var title = $"第{ChineseMath.Format(index)}章";
+                if (match.Length < item.Title.Length)
+                {
+                    title = $"{title} {item.Title[match.Length..]}";
+                }
+                item.Title = title;
                 index++;
                 lastIsVolume = false;
+            }
+            if (_current is not null)
+            {
+                Title = _current.Title;
             }
             await _app.ConfirmAsync($"修复成功");
         }

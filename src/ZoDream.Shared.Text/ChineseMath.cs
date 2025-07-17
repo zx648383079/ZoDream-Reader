@@ -68,7 +68,7 @@ namespace ZoDream.Shared.Text
             }
 
             // 处理"一十"开头的特殊情况，通常说"十"
-            if (result[0] == '一' && result[1] == '十')
+            if (result.Length > 1 && result[0] == '一' && result[1] == '十')
             {
                 result.Remove(0, 1);
             }
