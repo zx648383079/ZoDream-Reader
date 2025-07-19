@@ -139,12 +139,17 @@ namespace ZoDream.Reader.Controls
 
         public void Move(Vector2 point)
         {
-            throw new NotImplementedException();
+            Move(point.X, point.Y);
         }
 
         public void Resize(Vector4 bound)
         {
-            throw new NotImplementedException();
+            Resize(bound.X, bound.Y, bound.Z, bound.W);
+        }
+
+        public void Resize(Vector2 point, Vector2 size)
+        {
+            Resize(point.X, point.Y, size.X, size.Y);
         }
     }
 }

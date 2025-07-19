@@ -131,6 +131,7 @@ namespace ZoDream.Reader.ViewModels
                         Items.Add(new NovelTextBlock(item.Trim()));
                     }
                 }
+                OnPropertyChanged(nameof(Items));
             }
         }
 
@@ -168,6 +169,7 @@ namespace ZoDream.Reader.ViewModels
                         Items.Add(new NovelTextBlock(item.Trim()));
                     }
                 }
+                OnPropertyChanged(nameof(Items));
             }
         }
     }

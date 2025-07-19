@@ -74,10 +74,12 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <TextBox
+                                x:Name="PART_SearchInput"
                                 VerticalContentAlignment="Center"
                                 PlaceholderText="Search Text"
                                 Text="{TemplateBinding SearchText}" />
                             <TextBox
+                                x:Name="PART_ReplaceInput"
                                 Grid.Row="1"
                                 VerticalContentAlignment="Center"
                                 PlaceholderText="Replace Text"
