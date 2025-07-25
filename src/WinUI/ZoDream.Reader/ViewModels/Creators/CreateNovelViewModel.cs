@@ -644,6 +644,10 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
+            if (FindOpen)
+            {
+                FindText = arg;
+            }
             await Task.Delay(100);
             if (Document.FindNext(arg))
             {

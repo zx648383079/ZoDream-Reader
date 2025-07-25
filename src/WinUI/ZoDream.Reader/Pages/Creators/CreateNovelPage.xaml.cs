@@ -19,5 +19,11 @@ namespace ZoDream.Reader.Pages.Creators
         }
 
         public CreateNovelViewModel ViewModel => (CreateNovelViewModel)DataContext;
+
+        private void FindKeyboard_Invoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+        {
+            ViewModel.FindOpen = true;
+            ViewModel.FindText = PART_TextBox.SelectedText;
+        }
     }
 }

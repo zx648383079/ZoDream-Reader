@@ -276,7 +276,15 @@
                     x:Name="PART_TextBox"
                     Grid.Row="2"
                     Style="{StaticResource EditorStyle}"
-                    Text="{Binding Content, Mode=TwoWay}" />
+                    Text="{Binding Content, Mode=TwoWay}">
+                    <TextBox.KeyboardAccelerators>
+                        <KeyboardAccelerator
+                            Key="F"
+                            Invoked="FindKeyboard_Invoked"
+                            IsEnabled="True"
+                            Modifiers="Control" />
+                    </TextBox.KeyboardAccelerators>
+                </TextBox>
                 <ctl:FindPanel
                     Grid.Row="2"
                     FindCommand="{Binding ConfirmFindCommand}"

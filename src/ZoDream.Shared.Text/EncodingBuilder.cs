@@ -240,7 +240,8 @@ namespace ZoDream.Shared.Text
 
         public static bool IsQuote(char val)
         {
-            return val is '\'' or '"' or '“' or '”' or '‘' or '’';
+            return val is '\'' or '"' or '“' or '”' or '‘' or '’' 
+                or '「' or '」' or '『' or '』' or '【' or '〖' or '['or '】' or '〗' or ']';
         }
 
         /// <summary>
