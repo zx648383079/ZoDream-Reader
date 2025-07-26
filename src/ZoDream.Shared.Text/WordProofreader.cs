@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
-using ZoDream.Shared.Storage;
 
 namespace ZoDream.Shared.Text
 {
-    public partial class WordProofreader
+    public class WordProofreader
     {
         private readonly WordDictionary _correctItems = new();
         private readonly WordDictionary _mistakeItems = new();
@@ -14,31 +12,17 @@ namespace ZoDream.Shared.Text
 
         public void AppendFile(string fileName)
         {
-            using var reader = LocationStorage.Reader(fileName);
-            while (true)
+            foreach (var items in DictionaryBuilder.ReadFile(fileName))
             {
-                // [正确的字词][ \t][错误的字词][ \t][错误的字词]..
-                var line = reader.ReadLine()?.Trim();
-                if (line == null)
+                if (items[0].Length > 1)
                 {
-                    break;
+                    _correctItems.Insert(items[0]);
                 }
-                var args = HexRegex().Replace(line, match => {
-                    return ((char)Convert.ToInt32(match.Groups[1].Value, 16)).ToString();
-                }).Split([' ', '\t', '\r', '\n']);
-                if (args[0].Length > 1)
+                for (var i = 1; i < items.Length; i++)
                 {
-                    _correctItems.Insert(args[0]);
-                }
-                for (var i = 1; i < args.Length; i++)
-                {
-                    var item = args[i];
-                    if (string.IsNullOrEmpty(item) || item == args[0])
-                    {
-                        continue;
-                    }
+                    var item = items[i];
                     _mistakeItems.Insert(item);
-                    _mistakeToCorrect.TryAdd(item, args[0]);
+                    _mistakeToCorrect.TryAdd(item, items[0]);
                 }
             }
         }
@@ -72,7 +56,6 @@ namespace ZoDream.Shared.Text
             return sb.ToString();
         }
 
-        [GeneratedRegex(@"\\[uU]([0-9a-fA-F]+)")]
-        private static partial Regex HexRegex();
+
     }
 }
