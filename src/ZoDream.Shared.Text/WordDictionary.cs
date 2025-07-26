@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ZoDream.Shared.Text.Models;
 
 namespace ZoDream.Shared.Text
@@ -43,7 +44,7 @@ namespace ZoDream.Shared.Text
             return SearchNode(prefix) != null;
         }
 
-        private CharTrieNode? SearchNode(string word)
+        private CharTrieNode? SearchNode(ReadOnlySpan<char> word)
         {
             var currentNode = _root;
 
@@ -56,18 +57,41 @@ namespace ZoDream.Shared.Text
             }
             return currentNode;
         }
+        /// <summary>
+        /// 获取匹配的最大长度
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public string FindLongestWord(ReadOnlySpan<char> input)
+        {
+            var lastLength = 0;
+            var last = string.Empty;
+            foreach (var item in FindSimilarWords(input, 0))
+            {
+                if (lastLength == 0 || item.Length > lastLength)
+                {
+                    lastLength = item.Length;
+                    last = item;
+                }
+            }
+            return last;
+        }
 
         /// <summary>
         /// 查找所有可能的正确词语（用于错误词语建议）
         /// </summary>
-        public List<string> FindSimilarWords(string input, int maxDistance = 2)
+        /// <param name="input"></param>
+        /// <param name="maxDistance">允许不正确匹配的字个数</param>
+        /// <returns></returns>
+        public List<string> FindSimilarWords(ReadOnlySpan<char> input, int maxDistance = 2)
         {
             var results = new List<string>();
-            FindSimilarWords(_root, input, "", maxDistance, results);
+            FindSimilarWords(_root, input, string.Empty, maxDistance, results);
             return results;
         }
 
-        private void FindSimilarWords(CharTrieNode node, string remainingInput, string currentPath,
+        private void FindSimilarWords(CharTrieNode node, ReadOnlySpan<char> remainingInput, 
+            string currentPath,
                                     int remainingDistance, List<string> results)
         {
             // 如果已经找到完整词语且剩余距离允许
@@ -91,7 +115,7 @@ namespace ZoDream.Shared.Text
             }
 
             char nextChar = remainingInput[0];
-            string newRemainingInput = remainingInput.Substring(1);
+            var newRemainingInput = remainingInput[1..];
 
             // 1. 精确匹配情况
             if (node.TryGetValue(nextChar, out var next))

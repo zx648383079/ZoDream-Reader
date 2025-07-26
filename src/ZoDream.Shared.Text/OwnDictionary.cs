@@ -87,6 +87,10 @@ namespace ZoDream.Shared.Text
                 }
                 foreach (var item in line)
                 {
+                    if (item is '\t' or ' ')
+                    {
+                        break;
+                    }
                     if (item <= 0x7F)
                     {
                         continue;
@@ -94,7 +98,7 @@ namespace ZoDream.Shared.Text
                     items.Add(item);
                 }
             }
-            return new OwnDictionary(items.ToArray());
+            return new OwnDictionary([.. items]);
         }
 
 

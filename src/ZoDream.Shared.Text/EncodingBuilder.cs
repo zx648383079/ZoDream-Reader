@@ -228,6 +228,10 @@ namespace ZoDream.Shared.Text
                 }
                 foreach (var item in line)
                 {
+                    if (item is '\t' or ' ')
+                    {
+                        break;
+                    }
                     if (item <= 0x7F)
                     {
                         continue;
