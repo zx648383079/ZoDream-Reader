@@ -7,7 +7,7 @@ using ZoDream.Shared.Storage;
 
 namespace ZoDream.Shared.Text
 {
-    public class OwnDictionary(char[] extendItems)
+    public class OwnDictionary(char[] extendItems) : IEncodingDictionary
     {
         /// <summary>
         /// 是否包含字符
@@ -48,6 +48,23 @@ namespace ZoDream.Shared.Text
                 return res;
             }
             return (char)(Array.IndexOf(extendItems, value) + 0x80);
+        }
+
+        public bool TryDeserialize(char value, out char result)
+        {
+            if (value <= 0x7F)
+            {
+                result = EncodingBuilder.Deserialize(value);
+                return true;
+            }
+            var i = value - 0x80;
+            if (i < extendItems.Length)
+            {
+                result = extendItems[i];
+                return true;
+            }
+            result = value;
+            return false;
         }
 
         public char Deserialize(char value)

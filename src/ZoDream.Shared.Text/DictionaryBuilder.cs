@@ -8,7 +8,7 @@ using ZoDream.Shared.Storage;
 
 namespace ZoDream.Shared.Text
 {
-    public partial class DictionaryBuilder
+    public partial class DictionaryBuilder : IEncodingDictionary
     {
 
         private readonly HashSet<char> _source = [];
@@ -17,28 +17,100 @@ namespace ZoDream.Shared.Text
 
         private readonly Dictionary<string, string> _replaceItems = [];
 
+        public IEnumerable<KeyValuePair<string, string>> ReplaceItems => _replaceItems;
+
+        public IEnumerable<char> Items 
+        {
+            get {
+                foreach (var item in _source)
+                {
+                    yield return item;
+                }
+                foreach (var item in _counter.OrderByDescending(i => i.Value)
+                    .ThenBy(i => i.Key).Select(i => i.Key))
+                {
+                    if (_source.Contains(item))
+                    {
+                        continue;
+                    }
+                    yield return item;
+                }
+            }
+        }
+
+        public bool Contains(char value)
+        {
+            return _source.Contains(value);
+        }
+
+        private int IndexOf(char value)
+        {
+            var i = 0;
+            foreach (var item in _source)
+            {
+                if (item == value)
+                {
+                    return i;
+                }
+                i++;
+            }
+            return -1;
+        }
+
+        public bool TrySerialize(char value, out char result)
+        {
+            result = EncodingBuilder.Serialize(value);
+            if (result <= 0x7F)
+            {
+                return true;
+            }
+            var i = IndexOf(value);
+            if (i < 0)
+            {
+                return false;
+            }
+            result = (char)(i + 0x80);
+            return true;
+        }
+
+        public bool TryDeserialize(char value, out char result)
+        {
+            if (value <= 0x7F)
+            {
+                result = EncodingBuilder.Deserialize(value);
+                return true;
+            }
+            var i = value - 0x80;
+            if (i < _source.Count)
+            {
+                result = _source.ElementAt(i);
+                return true;
+            }
+            result = value;
+            return false;
+        }
 
         /// <summary>
         /// 追加字符串
         /// </summary>
         /// <param name="text"></param>
-        public void Append(string text)
+        public void Add(string text)
         {
             foreach (var item in text)
             {
-                Append(item);
+                Add(item);
             }
         }
         /// <summary>
         /// 追加字符，并处理一些字符
         /// </summary>
         /// <param name="code"></param>
-        public void Append(char code)
+        public void Add(char code)
         {
-            Append(code, 1);
+            Add(code, 1);
         }
 
-        public void Append(char code, int count)
+        public void Add(char code, int count)
         {
             var formatted = EncodingBuilder.Deserialize(EncodingBuilder.Serialize(code));
             if (formatted is '\t' or ' ' or '\n' or '\r')
@@ -51,12 +123,23 @@ namespace ZoDream.Shared.Text
             }
             _counter[formatted] += count;
         }
-
-        public void Append(IDictionary<char, int> items)
+        /// <summary>
+        /// 会先清除原始计数
+        /// </summary>
+        /// <param name="items"></param>
+        public void Add(EncodingBuilder items)
+        {
+            _counter.Clear();
+            foreach (var item in items)
+            {
+                Add(item.Key, item.Value);
+            }
+        }
+        public void Add(IDictionary<char, int> items)
         {
             foreach (var item in items)
             {
-                Append(item.Key, item.Value);
+                Add(item.Key, item.Value);
             }
         }
 
@@ -64,7 +147,7 @@ namespace ZoDream.Shared.Text
         /// 追加文件
         /// </summary>
         /// <param name="fileName"></param>
-        public void AppendFile(string fileName)
+        public void AddFile(string fileName)
         {
             using var reader = LocationStorage.Reader(fileName);
             while (true)
@@ -74,12 +157,16 @@ namespace ZoDream.Shared.Text
                 {
                     break;
                 }
-                Append(line);
+                Add(line);
             }
         }
         
         public void Replace(string search,  string replacement)
         {
+            if (search == replacement)
+            {
+                return;
+            }
             if (!_replaceItems.TryAdd(search, replacement))
             {
                 _replaceItems[search] = replacement;
@@ -199,5 +286,7 @@ namespace ZoDream.Shared.Text
 
         [GeneratedRegex(@"\\[uU]([0-9a-fA-F]+)")]
         private static partial Regex HexRegex();
+
+
     }
 }

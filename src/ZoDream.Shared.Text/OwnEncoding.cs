@@ -2,7 +2,7 @@
 
 namespace ZoDream.Shared.Text
 {
-    public class OwnEncoding(OwnDictionary dict) : Encoding
+    public class OwnEncoding(IEncodingDictionary dict) : Encoding
     {
         /// <summary>
         /// 保留 ascii 前 10 个字符 0x20 - 0x7E
@@ -74,7 +74,7 @@ namespace ZoDream.Shared.Text
                     var next = bytes.Length > n ? (bytes[n] - CodeBegin) : 0;
                     code = (char)((code - DoubleSplitTag) * CodeCount + next);
                 }
-                chars[charIndex + j++] = dict.Deserialize(code);
+                chars[charIndex + j++] = dict.TryDeserialize(code, out var res) ? res : code;
             }
             return j;
         }

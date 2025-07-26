@@ -39,11 +39,6 @@
                     Style="{StaticResource LargeIconBtn}"
                     ToolTipService.ToolTip="选择文件" />
                 <Button
-                    Command="{Binding SaveCommand}"
-                    Content="&#xE74E;"
-                    Style="{StaticResource LargeIconBtn}"
-                    ToolTipService.ToolTip="保存文件" />
-                <Button
                     Command="{Binding FindCommand}"
                     Content="&#xE721;"
                     Style="{StaticResource LargeIconBtn}" />
@@ -83,6 +78,11 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
+                <Button
+                    Command="{Binding OpenDictCommand}"
+                    Content="&#xE8DA;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="加载原始字典" />
                 <Button
                     Command="{Binding SaveDictCommand}"
                     Content="&#xE74E;"

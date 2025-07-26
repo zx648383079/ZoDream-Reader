@@ -18,19 +18,21 @@ namespace ZoDream.Reader.ViewModels
         public CreateDictionaryViewModel()
         {
             OpenCommand = new RelayCommand(TapOpen);
-            SaveCommand = new RelayCommand(TapSave);
             FindCommand = new RelayCommand(TapFind);
             FindNextCommand = new RelayCommand(TapFindNext);
             ExtractCommand = new RelayCommand(TapExtract);
             BackCommand = new RelayCommand(TapBack);
             ForwardCommand = new RelayCommand(TapForward);
 
+            OpenDictCommand = new RelayCommand(TapOpenDict);
             SaveDictCommand = new RelayCommand(TapSaveDict);
             OrderCommand = new RelayCommand(TapOrder);
             FindLetterCommand = new RelayCommand<WordItemViewModel>(TapFindLetter);
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
+        private string _dictFileName = string.Empty;
+        private DictionaryBuilder? _builder;
         private readonly EncodingBuilder _source = [];
         public ITextEditor? Editor { get; internal set; }
 
@@ -102,7 +104,6 @@ namespace ZoDream.Reader.ViewModels
         public string OrderIcon => IsDictOrder ? "\uE74B" : "\uE74A";
 
         public ICommand OpenCommand { get; private set; }
-        public ICommand SaveCommand { get; private set; }
         public ICommand FindCommand { get; private set; }
         public ICommand FindNextCommand { get; private set; }
         public ICommand ExtractCommand { get; private set; }
@@ -110,6 +111,7 @@ namespace ZoDream.Reader.ViewModels
         public ICommand ForwardCommand { get; private set; }
 
 
+        public ICommand OpenDictCommand { get; private set; }
         public ICommand SaveDictCommand { get; private set; }
         public ICommand OrderCommand { get; private set; }
 
@@ -126,18 +128,44 @@ namespace ZoDream.Reader.ViewModels
             TapFindNext();
         }
 
-        private async void TapSaveDict()
+        private async void TapOpenDict()
         {
-            var picker = new FileSavePicker();
-            picker.FileTypeChoices.Add("字典", [".bin"]);
+            var picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".bin");
             _app.InitializePicker(picker);
-            var file = await picker.PickSaveFileAsync();
+            var file = await picker.PickSingleFileAsync();
             if (file is null)
             {
                 return;
             }
-            using var fs = await file.OpenStreamForWriteAsync();
-            _source.SaveAs(fs);
+            _dictFileName = file.Path;
+            _builder = DictionaryBuilder.OpenFile(file.Path);
+        }
+
+        private async void TapSaveDict()
+        {
+            if (string.IsNullOrEmpty(_dictFileName) || !await _app.ConfirmAsync("是否覆盖？"))
+            {
+                var picker = new FileSavePicker();
+                picker.FileTypeChoices.Add("字典", [".bin"]);
+                picker.SuggestedFileName = "dict.bin";
+                _app.InitializePicker(picker);
+                var file = await picker.PickSaveFileAsync();
+                if (file is null)
+                {
+                    return;
+                }
+                _dictFileName = file.Path;
+            }
+            if (_builder is null)
+            {
+                _source.SaveAs(_dictFileName);
+            } 
+            else
+            {
+                _builder.Add(_source);
+                _builder.SaveAs(_dictFileName);
+            }
             await _app.ConfirmAsync("保存成功");
         }
 
@@ -225,21 +253,6 @@ namespace ZoDream.Reader.ViewModels
             }
             var res = await _app.ConfirmAsync("是否合并词频，否则替换？");
             ExtractWord(res);
-        }
-
-        private async void TapSave()
-        {
-            var picker = new FileSavePicker();
-            picker.FileTypeChoices.Add("字典文件", [".bin"]);
-            picker.SuggestedFileName = "dict.bin";
-            _app.InitializePicker(picker);
-            var file = await picker.PickSaveFileAsync();
-            if (file is null)
-            {
-                return;
-            }
-            OwnDictionary.WriteFile(await file.OpenStreamForWriteAsync(), 
-                WordItems.Select(i => i.Word[0]));
         }
 
         private void TapExtract()
