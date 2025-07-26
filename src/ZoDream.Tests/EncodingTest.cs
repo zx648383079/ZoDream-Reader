@@ -1,12 +1,6 @@
-﻿using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 using ZoDream.Shared.Text;
 
 namespace ZoDream.Tests
@@ -17,11 +11,10 @@ namespace ZoDream.Tests
         const string BaseFolder = "D:\\zodream";
         const string TxtFolder = BaseFolder + "\\txt";
 
-        [TestMethod]
+        //[TestMethod]
         public void TestBuilder()
         {
-            var fileName = Path.Combine(BaseFolder, "dict.bin");
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            var fileName = Path.Combine(BaseFolder, "words.bin");
             var builder = new EncodingBuilder();
             foreach (var item in Directory.GetFiles(TxtFolder, "*.txt"))
             {
@@ -36,8 +29,7 @@ namespace ZoDream.Tests
         //[TestMethod]
         public void TestConvert()
         {
-            var fileName = "dict.bin";
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            var fileName = Path.Combine(BaseFolder, "words.bin");
             var builder = OwnDictionary.OpenFile(fileName);
             var encoding = new OwnEncoding(builder);
             var buffer = new byte[2000];
@@ -47,6 +39,19 @@ namespace ZoDream.Tests
             text = "你也好";
             i = encoding.GetBytes(text, buffer);
             Assert.AreEqual(text, encoding.GetString(buffer, 0, i));
+        }
+
+        //[TestMethod]
+        public void TestProofreading()
+        {
+            var fileName = Path.Combine(BaseFolder, "words.bin");
+            var proofreader = new WordProofreader();
+            proofreader.AppendFile(fileName);
+            var source = "⼋八⼗十";
+            var res = proofreader.Proofreading(source);
+            Assert.AreEqual(res.Length, source.Length);
+            Assert.AreNotEqual(res, source);
+            Assert.AreEqual(res[0], res[1]);
         }
     }
 }

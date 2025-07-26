@@ -167,7 +167,6 @@ namespace ZoDream.Shared.Text
                 //'忆' => (char)0x81,
 
                 '·' => (char)0x7F,
-                '艹' => '草',
                 _ => value,
             };
         }

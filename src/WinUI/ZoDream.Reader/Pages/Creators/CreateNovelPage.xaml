@@ -142,6 +142,7 @@
                     Content="&#xE8FE;"
                     Style="{StaticResource LargeIconBtn}"
                     ToolTipService.ToolTip="字典字词检测全部内容" />
+
                 <Button
                     Command="{Binding ReplaceCommand}"
                     Content="&#xE773;"
@@ -152,6 +153,13 @@
                     Content="&#xE90F;"
                     Style="{StaticResource LargeIconBtn}"
                     ToolTipService.ToolTip="修正章节序号" />
+
+                <Button
+                    Command="{Binding ResetDictCommand}"
+                    Content="&#xE82E;"
+                    Style="{StaticResource LargeIconBtn}"
+                    ToolTipService.ToolTip="重新载入字典"
+                    Visibility="{Binding ResetDictEnabled}" />
             </StackPanel>
             <TextBox
                 Grid.Row="1"
@@ -275,6 +283,7 @@
                 <TextBox
                     x:Name="PART_TextBox"
                     Grid.Row="2"
+                    KeyboardAcceleratorPlacementMode="Hidden"
                     Style="{StaticResource EditorStyle}"
                     Text="{Binding Content, Mode=TwoWay}">
                     <TextBox.KeyboardAccelerators>

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -34,6 +35,7 @@ namespace ZoDream.Reader.ViewModels
             CatalogCommand = new RelayCommand(TapCatalog);
             AddImageCommand = new RelayCommand(TapAddImage);
 
+            ResetDictCommand = new RelayCommand(TapResetDict);
             CheckAllCommand = new RelayCommand(TapCheckAll);
 
             EditCommand = new RelayCommand<IEditableSection>(TapEdit);
@@ -63,6 +65,7 @@ namespace ZoDream.Reader.ViewModels
         }
 
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
+        private WordProofreader? _proofreader;
         private OwnDictionary? _dict;
         private IEditableSection? _current;
         private bool _isUpdated = false;
@@ -197,6 +200,12 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _replaceText, value);
         }
 
+        private Visibility _resetDictEnabled = Visibility.Collapsed;
+
+        public Visibility ResetDictEnabled {
+            get => _resetDictEnabled;
+            set => SetProperty(ref _resetDictEnabled, value);
+        }
 
 
         public ICommand OpenCommand { get; private set; }
@@ -230,11 +239,23 @@ namespace ZoDream.Reader.ViewModels
         public ICommand ReplaceCommand { get; private set; }
         public ICommand RepairCommand { get; private set; }
         public ICommand EnterCommand { get; private set; }
+        public ICommand ResetDictCommand { get; private set; }
 
         public ICommand ConfirmFindCommand { get; private set; }
         public ICommand ConfirmReplaceCommand { get; private set; }
 
 
+        private async void TapResetDict()
+        {
+            var old = _dict;
+            _dict = null;
+            if (!await LoadDictionaryAsync())
+            {
+                _dict = old;
+                return;
+            }
+            await _app.ConfirmAsync("重新载入字典完成!");
+        }
 
         private async void TapOpen()
         {
@@ -577,6 +598,9 @@ namespace ZoDream.Reader.ViewModels
                 return false;
             }
             _dict = OwnDictionary.OpenFile(await file.OpenStreamForReadAsync());
+            _proofreader = new WordProofreader();
+            _proofreader.AppendFile(file.Path);
+            ResetDictEnabled = Visibility.Visible;
             return true;
         }
 
@@ -671,14 +695,14 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            WrongItems.Clear();
+            var res = new HashSet<char>();
             foreach (var item in Title)
             {
                 if (_dict!.TrySerialize(item, out _))
                 {
                     continue;
                 }
-                WrongItems.Add(item.ToString());
+                res.Add(item);
             }
             foreach (var item in Document.Text)
             {
@@ -686,12 +710,23 @@ namespace ZoDream.Reader.ViewModels
                 {
                     continue;
                 }
+                res.Add(item);
+            }
+            WrongItems.Clear();
+            foreach (var item in res)
+            {
                 WrongItems.Add(item.ToString());
             }
-            if (WrongItems.Count > 0)
+            if (WrongItems.Count == 0)
+            {
+                return;
+            }
+            if (_proofreader is null || !await _app.ConfirmAsync("是否使用校对功能进行修复？"))
             {
                 TapJumpTo(WrongItems[0]);
+                return;
             }
+            Content = _proofreader.Proofreading(Content);
         }
 
         private void TapSort(DragItemsResult? data)

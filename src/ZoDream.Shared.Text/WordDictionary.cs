@@ -91,11 +91,10 @@ namespace ZoDream.Shared.Text
         }
 
         private void FindSimilarWords(CharTrieNode node, ReadOnlySpan<char> remainingInput, 
-            string currentPath,
-                                    int remainingDistance, List<string> results)
+            string currentPath, int remainingDistance, List<string> results)
         {
             // 如果已经找到完整词语且剩余距离允许
-            if (node.IsEndOfWord && remainingInput.Length <= remainingDistance)
+            if (node.IsEndOfWord)//&& remainingInput.Length <= remainingDistance)
             {
                 results.Add(node.Word);
             }

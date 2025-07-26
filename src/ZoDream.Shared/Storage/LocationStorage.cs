@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,11 +31,20 @@ namespace ZoDream.Shared.Storage
 
         public static StreamReader Reader(Stream input)
         {
-            return new StreamReader(input, TxtEncoder.GetEncoding(input, Encoding.GetEncoding("gb2312")));
+            Encoding encoding;
+            try
+            {
+                encoding = Encoding.GetEncoding("gb2312");
+            }
+            catch (ArgumentException)
+            {
+                encoding = Encoding.UTF8;
+            }
+            return new StreamReader(input, TxtEncoder.GetEncoding(input, encoding));
         }
 
         /// <summary>
-        /// 写文本文件 默认使用无bom 的UTF8编码
+        /// 写文本文件 默认使用无 bom 的UTF8编码
         /// </summary>
         /// <param name="file"></param>
         /// <param name="content"></param>

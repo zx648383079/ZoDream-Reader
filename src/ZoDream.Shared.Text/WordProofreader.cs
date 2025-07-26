@@ -37,6 +37,11 @@ namespace ZoDream.Shared.Text
             var i = 0;
             while(i < input.Length)
             {
+                if (!IsWord(input[i]))
+                {
+                    sb.Append(input[i++]);
+                    continue;
+                }
                 var current = input[i..];
                 var correct = _correctItems.FindLongestWord(current);
                 var mistake = _mistakeItems.FindLongestWord(current);
@@ -56,6 +61,17 @@ namespace ZoDream.Shared.Text
             return sb.ToString();
         }
 
-
+        private static bool IsWord(char value)
+        {
+            if (value is >= 'a' and <= 'z')
+            {
+                return true;
+            }
+            if (value is >= 'A' and <= 'Z')
+            {
+                return true;
+            }
+            return value > 0xFF;
+        }
     }
 }
