@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ZoDream.Shared.Text
@@ -12,7 +13,12 @@ namespace ZoDream.Shared.Text
 
         public void AppendFile(string fileName)
         {
-            foreach (var items in DictionaryBuilder.ReadFile(fileName))
+            using var fs = File.OpenRead(fileName);
+            AppendFile(fs);
+        }
+        public void AppendFile(Stream input)
+        {
+            foreach (var items in DictionaryBuilder.ReadFile(input))
             {
                 if (items[0].Length > 1)
                 {

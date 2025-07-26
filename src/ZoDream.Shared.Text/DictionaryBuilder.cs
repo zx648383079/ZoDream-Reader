@@ -249,8 +249,13 @@ namespace ZoDream.Shared.Text
 
         public static DictionaryBuilder OpenFile(string fileName)
         {
+            using var fs = File.OpenRead(fileName);
+            return OpenFile(fs);
+        }
+        public static DictionaryBuilder OpenFile(Stream input)
+        {
             var res = new DictionaryBuilder();
-            foreach (var items in ReadFile(fileName))
+            foreach (var items in ReadFile(input))
             {
                 res.AddWord(items[0]);
                 for (var i = 1; i < items.Length; i++)
@@ -263,7 +268,14 @@ namespace ZoDream.Shared.Text
 
         public static IEnumerable<string[]> ReadFile(string fileName)
         {
-            using var reader = LocationStorage.Reader(fileName);
+            using var fs = File.OpenRead(fileName);
+            return ReadFile(fs);
+        }
+
+        public static IEnumerable<string[]> ReadFile(Stream input)
+        {
+            input.Seek(0, SeekOrigin.Begin);
+            var reader = LocationStorage.Reader(input);
             while (true)
             {
                 // [正确的字词][ \t][错误的字词][ \t][错误的字词]..

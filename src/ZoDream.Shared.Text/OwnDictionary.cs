@@ -89,33 +89,25 @@ namespace ZoDream.Shared.Text
 
         public static OwnDictionary OpenFile(string fileName)
         {
-            return OpenFile(File.OpenRead(fileName));
+            using var fs = File.OpenRead(fileName);
+            return OpenFile(fs);
         }
         public static OwnDictionary OpenFile(Stream input)
         {
             using var reader = LocationStorage.Reader(input);
-            var items = new HashSet<char>();
-            while (true)
+            var res = new HashSet<char>();
+            foreach (var items in DictionaryBuilder.ReadFile(input))
             {
-                var line = reader.ReadLine();
-                if (line == null)
+                foreach (var item in items[0])
                 {
-                    break;
-                }
-                foreach (var item in line)
-                {
-                    if (item is '\t' or ' ')
-                    {
-                        break;
-                    }
-                    if (item <= 0x7F)
+                    if (EncodingBuilder.IsExclude(item))
                     {
                         continue;
                     }
-                    items.Add(item);
+                    res.Add(item);
                 }
             }
-            return new OwnDictionary([.. items]);
+            return new OwnDictionary([.. res]);
         }
 
 

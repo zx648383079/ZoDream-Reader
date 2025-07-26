@@ -216,27 +216,16 @@ namespace ZoDream.Shared.Text
         /// <returns></returns>
         public static EncodingBuilder OpenFile(string fileName)
         {
-            using var reader = LocationStorage.Reader(fileName);
+            using var fs = File.OpenRead(fileName);
+            return OpenFile(fs);
+        }
+
+        public static EncodingBuilder OpenFile(Stream input)
+        {
             var res = new EncodingBuilder();
-            while (true)
+            foreach (var items in DictionaryBuilder.ReadFile(input))
             {
-                var line = reader.ReadLine();
-                if (line == null)
-                {
-                    break;
-                }
-                foreach (var item in line)
-                {
-                    if (item is '\t' or ' ')
-                    {
-                        break;
-                    }
-                    if (item <= 0x7F)
-                    {
-                        continue;
-                    }
-                    res.TryAdd(item, 0);
-                }
+                res.Append(items[0]);
             }
             return res;
         }

@@ -597,9 +597,10 @@ namespace ZoDream.Reader.ViewModels
             {
                 return false;
             }
-            _dict = OwnDictionary.OpenFile(await file.OpenStreamForReadAsync());
+            using var fs = await file.OpenStreamForReadAsync();
+            _dict = OwnDictionary.OpenFile(fs);
             _proofreader = new WordProofreader();
-            _proofreader.AppendFile(file.Path);
+            _proofreader.AppendFile(fs);
             ResetDictEnabled = Visibility.Visible;
             return true;
         }
