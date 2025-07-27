@@ -77,6 +77,18 @@ namespace ZoDream.Reader.Controls
 
 
 
+        public ICommand FindBackCommand {
+            get { return (ICommand)GetValue(FindBackCommandProperty); }
+            set { SetValue(FindBackCommandProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for FindBackCommand.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty FindBackCommandProperty =
+            DependencyProperty.Register("FindBackCommand", typeof(ICommand), typeof(FindPanel), new PropertyMetadata(null));
+
+
+
+
         public ICommand ReplaceCommand {
             get { return (ICommand)GetValue(ReplaceCommandProperty); }
             set { SetValue(ReplaceCommandProperty, value); }
@@ -97,6 +109,19 @@ namespace ZoDream.Reader.Controls
         // Using a DependencyProperty as the backing store for ReplaceVisible.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ReplaceVisibleProperty =
             DependencyProperty.Register(nameof(ReplaceVisible), typeof(Visibility), typeof(FindPanel), new PropertyMetadata(Visibility.Collapsed));
+
+
+
+        public Visibility FindBackVisible {
+            get { return (Visibility)GetValue(FindBackVisibleProperty); }
+            set { SetValue(FindBackVisibleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for FindBackVisible.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty FindBackVisibleProperty =
+            DependencyProperty.Register("FindBackVisible", typeof(Visibility), typeof(FindPanel), new PropertyMetadata(Visibility.Collapsed));
+
+
 
         private static void OnReplaceVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

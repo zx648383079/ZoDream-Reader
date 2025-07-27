@@ -68,6 +68,7 @@
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="auto" />
                                 <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
@@ -87,6 +88,13 @@
                                 Visibility="{TemplateBinding ReplaceVisible}" />
                             <Button
                                 Grid.Column="1"
+                                Command="{TemplateBinding FindBackCommand}"
+                                Content="&#xE72B;"
+                                Style="{StaticResource ToolIconStyle}"
+                                ToolTipService.ToolTip="Find Previous Text"
+                                Visibility="{TemplateBinding FindBackVisible}" />
+                            <Button
+                                Grid.Column="2"
                                 Command="{TemplateBinding FindCommand}"
                                 Content="&#xE72A;"
                                 Style="{StaticResource ToolIconStyle}"
@@ -94,6 +102,7 @@
                             <Button
                                 Grid.Row="1"
                                 Grid.Column="1"
+                                Grid.ColumnSpan="2"
                                 Command="{TemplateBinding ReplaceCommand}"
                                 Content="&#xE75C;"
                                 Style="{StaticResource ToolIconStyle}"
@@ -101,7 +110,7 @@
                                 Visibility="{TemplateBinding ReplaceVisible}" />
                             <Button
                                 x:Name="PART_CloseButton"
-                                Grid.Column="2"
+                                Grid.Column="3"
                                 Content="&#xE8BB;"
                                 Style="{StaticResource ToolIconStyle}"
                                 ToolTipService.ToolTip="Close Finder" />

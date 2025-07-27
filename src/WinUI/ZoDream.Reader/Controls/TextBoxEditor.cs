@@ -47,6 +47,22 @@ namespace ZoDream.Reader.Controls
             return true;
         }
 
+        public bool FindBack(string text)
+        {
+            var lastIndex = SelectionStart;
+            if (lastIndex < text.Length)
+            {
+                return false;
+            }
+            var i = Text.LastIndexOf(text, lastIndex - 1);
+            if (i < 0)
+            {
+                return false;
+            }
+            Select(i, text.Length);
+            return true;
+        }
+
         public void GoBack()
         {
             

@@ -94,7 +94,6 @@ namespace ZoDream.Shared.Text
         }
         public static OwnDictionary OpenFile(Stream input)
         {
-            using var reader = LocationStorage.Reader(input);
             var res = new HashSet<char>();
             foreach (var items in DictionaryBuilder.ReadFile(input))
             {

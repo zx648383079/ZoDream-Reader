@@ -30,11 +30,13 @@ namespace ZoDream.Shared.Interfaces
         public void GoBack();
 
         public bool FindNext(string text);
+        public bool FindBack(string text);
 
         public void Select(int start, int count);
         public void ScrollTo(int position);
         public void Unselect();
 
         public IDictionary<char, int> Count();
+       
     }
 }

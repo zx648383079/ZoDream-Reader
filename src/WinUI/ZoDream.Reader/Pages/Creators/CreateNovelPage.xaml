@@ -29,50 +29,8 @@
                 <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
                 <Setter Property="CharacterSpacing" Value="30" />
             </Style>
-
-            <MenuFlyout x:Key="ItemContextMenu">
-                <MenuFlyoutItem
-                    Command="{Binding EditCommand}"
-                    CommandParameter="{Binding}"
-                    Icon="Edit"
-                    Text="编辑" />
-                <MenuFlyoutSubItem Text="排序">
-                    <MenuFlyoutItem
-                        Command="{Binding MoveTopCommand}"
-                        CommandParameter="{Binding}"
-                        Icon="Upload"
-                        Text="置顶" />
-                    <MenuFlyoutItem
-                        Command="{Binding MoveUpCommand}"
-                        CommandParameter="{Binding}"
-                        Icon="Up"
-                        Text="上移" />
-                    <MenuFlyoutItem
-                        Command="{Binding MoveDownCommand}"
-                        CommandParameter="{Binding}"
-                        Text="下移">
-                        <MenuFlyoutItem.Icon>
-                            <FontIcon Glyph="&#xE74B;" />
-                        </MenuFlyoutItem.Icon>
-                    </MenuFlyoutItem>
-                    <MenuFlyoutItem
-                        Command="{Binding MoveBottomCommand}"
-                        CommandParameter="{Binding}"
-                        Text="置底">
-                        <MenuFlyoutItem.Icon>
-                            <FontIcon Glyph="&#xE896;" />
-                        </MenuFlyoutItem.Icon>
-                    </MenuFlyoutItem>
-                </MenuFlyoutSubItem>
-                <MenuFlyoutItem
-                    Command="{Binding DeleteCommand}"
-                    CommandParameter="{Binding}"
-                    Icon="Delete"
-                    Text="删除" />
-            </MenuFlyout>
-
             <DataTemplate x:Key="SectionTemplate">
-                <Grid ContextFlyout="{StaticResource ItemContextMenu}">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition />
@@ -82,10 +40,52 @@
                         Glyph="&#xE7BA;"
                         Visibility="{Binding IsWrong, Converter={StaticResource ToggleCvt}}" />
                     <TextBlock Grid.Column="1" Text="{Binding Title}" />
+                    <Grid.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem
+                                Command="{Binding EditCommand}"
+                                CommandParameter="{Binding}"
+                                Icon="Edit"
+                                Text="编辑" />
+                            <MenuFlyoutSubItem Text="排序">
+                                <MenuFlyoutItem
+                                    Command="{Binding MoveTopCommand}"
+                                    CommandParameter="{Binding}"
+                                    Icon="Upload"
+                                    Text="置顶" />
+                                <MenuFlyoutItem
+                                    Command="{Binding MoveUpCommand}"
+                                    CommandParameter="{Binding}"
+                                    Icon="Up"
+                                    Text="上移" />
+                                <MenuFlyoutItem
+                                    Command="{Binding MoveDownCommand}"
+                                    CommandParameter="{Binding}"
+                                    Text="下移">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE74B;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem
+                                    Command="{Binding MoveBottomCommand}"
+                                    CommandParameter="{Binding}"
+                                    Text="置底">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE896;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutItem
+                                Command="{Binding DeleteCommand}"
+                                CommandParameter="{Binding}"
+                                Icon="Delete"
+                                Text="删除" />
+                        </MenuFlyout>
+                    </Grid.ContextFlyout>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="VolumeTemplate">
-                <Grid ContextFlyout="{StaticResource ItemContextMenu}">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="auto" />
@@ -98,6 +98,20 @@
                         Glyph="&#xE7BA;"
                         Visibility="{Binding IsWrong, Converter={StaticResource ToggleCvt}}" />
                     <TextBlock Grid.Column="2" Text="{Binding Title}" />
+                    <Grid.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem
+                                Command="{Binding EditCommand}"
+                                CommandParameter="{Binding}"
+                                Icon="Edit"
+                                Text="编辑" />
+                            <MenuFlyoutItem
+                                Command="{Binding DeleteCommand}"
+                                CommandParameter="{Binding}"
+                                Icon="Delete"
+                                Text="删除" />
+                        </MenuFlyout>
+                    </Grid.ContextFlyout>
                 </Grid>
             </DataTemplate>
 
@@ -296,6 +310,8 @@
                 </TextBox>
                 <ctl:FindPanel
                     Grid.Row="2"
+                    FindBackCommand="{Binding FindBackCommand}"
+                    FindBackVisible="Visible"
                     FindCommand="{Binding ConfirmFindCommand}"
                     IsOpen="{Binding FindOpen, Mode=TwoWay}"
                     IsReplaceMode="True"

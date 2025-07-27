@@ -189,6 +189,11 @@ namespace ZoDream.Reader.Controls
             return true;
         }
 
+        public bool FindBack(string text)
+        {
+            return false;
+        }
+
         public void Select(int start, int count)
         {
             if (_canvas is null)

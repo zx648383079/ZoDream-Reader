@@ -60,6 +60,7 @@ namespace ZoDream.Reader.ViewModels
             RepairCommand = new RelayCommand(TapRepair);
             QuoteCommand = new RelayCommand(TapQuote);
             ConfirmFindCommand = new RelayCommand(TapConfirmFind);
+            FindBackCommand = new RelayCommand(TapFindBack);
             ConfirmReplaceCommand = new RelayCommand(TapConfirmReplace);
             EnterCommand = new RelayCommand(TapEnter);
         }
@@ -242,6 +243,7 @@ namespace ZoDream.Reader.ViewModels
         public ICommand ResetDictCommand { get; private set; }
 
         public ICommand ConfirmFindCommand { get; private set; }
+        public ICommand FindBackCommand { get; private set; }
         public ICommand ConfirmReplaceCommand { get; private set; }
 
 
@@ -406,6 +408,14 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
+        private void TapFindBack()
+        {
+            if (string.IsNullOrWhiteSpace(FindText))
+            {
+                return;
+            }
+            Document?.FindBack(FindText);
+        }
         private void TapConfirmFind()
         {
             if (string.IsNullOrWhiteSpace(FindText))
