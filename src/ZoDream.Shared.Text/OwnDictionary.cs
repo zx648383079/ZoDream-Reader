@@ -1,14 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ZoDream.Shared.Storage;
 
 namespace ZoDream.Shared.Text
 {
-    public class OwnDictionary(char[] extendItems) : IEncodingDictionary
+    public class OwnDictionary : IEncodingDictionary
     {
+        public OwnDictionary(char[] items)
+        {
+            _charItems = items;
+            _charToIndex = items.Select((i, j) => KeyValuePair.Create(i, j))
+                .ToImmutableDictionary();
+        }
+
+        private readonly char[] _charItems;
+        private readonly ImmutableDictionary<char, int> _charToIndex;
         /// <summary>
         /// 是否包含字符
         /// </summary>
@@ -21,7 +29,7 @@ namespace ZoDream.Shared.Text
             {
                 return true;
             }
-            return extendItems.Contains(value);
+            return _charToIndex.ContainsKey(value);
         }
 
         public bool TrySerialize(char value, out char result)
@@ -31,8 +39,7 @@ namespace ZoDream.Shared.Text
             {
                 return true;
             }
-            var i = Array.IndexOf(extendItems, value);
-            if (i < 0)
+            if (!_charToIndex.TryGetValue(value, out var i))
             {
                 return false;
             }
@@ -42,12 +49,11 @@ namespace ZoDream.Shared.Text
 
         public char Serialize(char value)
         {
-            var res = EncodingBuilder.Serialize(value);
-            if (res <= 0x7F)
+            if (TrySerialize(value, out var res))
             {
                 return res;
             }
-            return (char)(Array.IndexOf(extendItems, value) + 0x80);
+            return res;
         }
 
         public bool TryDeserialize(char value, out char result)
@@ -58,9 +64,9 @@ namespace ZoDream.Shared.Text
                 return true;
             }
             var i = value - 0x80;
-            if (i < extendItems.Length)
+            if (i < _charItems.Length)
             {
-                result = extendItems[i];
+                result = _charItems[i];
                 return true;
             }
             result = value;
@@ -69,16 +75,8 @@ namespace ZoDream.Shared.Text
 
         public char Deserialize(char value)
         {
-            if (value <= 0x7F)
-            {
-                return EncodingBuilder.Deserialize(value);
-            }
-            var i = value - 0x80;
-            if (i < extendItems.Length)
-            {
-                return extendItems[i];
-            }
-            return value;
+            TryDeserialize(value, out var res);
+            return res;
         }
 
         
