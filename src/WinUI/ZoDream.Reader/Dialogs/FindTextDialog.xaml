@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     Title="查找"
-    PrimaryButtonText="确认"
+    PrimaryButtonText="确认替换"
     SecondaryButtonText="取消"
     mc:Ignorable="d">
 
@@ -16,8 +16,71 @@
         <vm:FindTextDialogViewModel />
     </ContentDialog.DataContext>
 
+    <ContentDialog.Resources>
+        <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
+    </ContentDialog.Resources>
+
     <StackPanel Orientation="Vertical">
-        <TextBox Header="Search" Text="{Binding FindText, Mode=TwoWay}" />
-        <TextBox Header="Replace" Text="{Binding ReplaceText, Mode=TwoWay}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <ComboBox SelectedIndex="{Binding FindMode, Mode=TwoWay}">
+                <ComboBoxItem>文本查找</ComboBoxItem>
+                <ComboBoxItem>正则查找</ComboBoxItem>
+            </ComboBox>
+            <TextBox Grid.Column="1" Text="{Binding FindText, Mode=TwoWay}" />
+            <Button
+                Grid.Column="2"
+                Command="{Binding MatchCommand}"
+                Content="&#xE721;"
+                Style="{StaticResource IconBtn}" />
+            <TextBlock
+                Grid.Row="1"
+                VerticalAlignment="Center"
+                Text="Replace" />
+            <TextBox
+                Grid.Row="1"
+                Grid.Column="1"
+                PlaceholderText="Replace as text"
+                Text="{Binding ReplaceText, Mode=TwoWay}" />
+        </Grid>
+
+        <ProgressBar
+            Height="5"
+            IsIndeterminate="{Binding Items.InProgress}"
+            ShowError="False"
+            ShowPaused="False"
+            Visibility="{Binding Items.InProgress, Converter={StaticResource ToggleCvt}}" />
+        <ListBox
+            MinHeight="160"
+            ItemsSource="{Binding Items}"
+            Style="{StaticResource CustomListBox}">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:MatchItemViewModel">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Style="{StaticResource HeaderLabelStyle}" Text="{x:Bind Text}" />
+                        <StackPanel
+                            Grid.Row="1"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="{x:Bind Index}" />
+                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="{x:Bind Header}" />
+                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="{x:Bind Offset}" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </StackPanel>
 </ContentDialog>

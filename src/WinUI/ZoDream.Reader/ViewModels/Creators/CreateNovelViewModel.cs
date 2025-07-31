@@ -24,7 +24,7 @@ using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public partial class CreateNovelViewModel : ObservableObject, IEditableSectionCommand
+    public partial class CreateNovelViewModel : ObservableObject, IEditableSectionCommand, IFinderSource
     {
         
         public CreateNovelViewModel()
@@ -485,6 +485,7 @@ namespace ZoDream.Reader.ViewModels
             }
             var picker = new FindTextDialog();
             var model = picker.ViewModel;
+            model.Load(this);
             if (!await _app.OpenFormAsync(picker))
             {
                 return;
@@ -943,7 +944,75 @@ namespace ZoDream.Reader.ViewModels
             return res;
         }
 
+        public Task FindAsync(IAsyncObservableCollection<MatchItemViewModel> items, string text)
+        {
+            var i = -1;
+            foreach (var item in Items)
+            {
+                i++;
+                if (item is not ChapterItemViewModel c)
+                {
+                    continue;
+                }
+                foreach (var it in c.Items)
+                {
+                    if (it is not INovelTextBlock t)
+                    {
+                        continue;
+                    }
+                    var index = t.Text.IndexOf(text);
+                    if (index >= 0)
+                    {
+                        items.Add(new MatchItemViewModel()
+                        {
+                            Source = t,
+                            Header = item.Title,
+                            Text = text,
+                            Offset = index,
+                            Index = i
+                        });
+                    }
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task FindAsync(IAsyncObservableCollection<MatchItemViewModel> items, Regex pattern)
+        {
+            var i = -1;
+            foreach (var item in Items)
+            {
+                i++;
+                if (item is not ChapterItemViewModel c)
+                {
+                    continue;
+                }
+                foreach (var it in c.Items)
+                {
+                    if (it is not INovelTextBlock t)
+                    {
+                        continue;
+                    }
+                    var match = pattern.Match(t.Text);
+                    if (match.Success)
+                    {
+                        items.Add(new MatchItemViewModel()
+                        {
+                            Source = t,
+                            Header = item.Title,
+                            Text = match.Value,
+                            Offset = match.Index,
+                            Index = i
+                        });
+                    }
+                }
+            }
+            return Task.CompletedTask;
+        }
+
         [GeneratedRegex(@"^第\s*([0-9一二三四五六七八九十百千]{1,10})\s*章\s*·?")]
         private static partial Regex ChapterOrderRegex();
+
+
     }
 }
