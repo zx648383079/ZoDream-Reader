@@ -7,20 +7,31 @@ namespace ZoDream.Reader.ViewModels
         /// <summary>
         /// 匹配到的内容
         /// </summary>
-        public string Text { get; set; }
+        public string MatchText => Source.Text[MatchBegin..MatchEnd];
         /// <summary>
         /// 在正文当中的开始位置
         /// </summary>
-        public int Offset { get; set; }
+        public int MatchBegin { get; private set; }
+        public int MatchLength { get; private set; }
+        public int MatchEnd => MatchBegin + MatchLength;
         /// <summary>
         /// 章节标题
         /// </summary>
-        public string Header { get; set; }
+        public string Header { get; set; } = string.Empty;
         /// <summary>
         /// 章节的编号
         /// </summary>
         public int Index { get; set; }
+        public int LineIndex { get; set; }
 
-        public INovelTextBlock Source { get; set; }
+        public INovelTextBlock Source { get; private set; }
+
+
+        public MatchItemViewModel(INovelTextBlock source, int index, int length)
+        {
+            Source = source;
+            MatchBegin = index;
+            MatchLength = length;
+        }
     }
 }

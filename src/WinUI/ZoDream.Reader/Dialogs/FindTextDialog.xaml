@@ -3,13 +3,17 @@
     x:Class="ZoDream.Reader.Dialogs.FindTextDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ctl="using:ZoDream.Reader.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:ZoDream.Reader.Dialogs"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     Title="查找"
+    CloseButtonText="取消"
+    IsPrimaryButtonEnabled="{Binding IsValid}"
+    IsSecondaryButtonEnabled="{Binding JumpEnabled}"
     PrimaryButtonText="确认替换"
-    SecondaryButtonText="取消"
+    SecondaryButtonText="跳转到"
     mc:Ignorable="d">
 
     <ContentDialog.DataContext>
@@ -20,7 +24,12 @@
         <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
     </ContentDialog.Resources>
 
-    <StackPanel Orientation="Vertical">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
@@ -43,24 +52,30 @@
                 Style="{StaticResource IconBtn}" />
             <TextBlock
                 Grid.Row="1"
+                HorizontalAlignment="Center"
                 VerticalAlignment="Center"
+                Style="{StaticResource MetaLabelStyle}"
                 Text="Replace" />
             <TextBox
                 Grid.Row="1"
                 Grid.Column="1"
+                Grid.ColumnSpan="2"
                 PlaceholderText="Replace as text"
                 Text="{Binding ReplaceText, Mode=TwoWay}" />
         </Grid>
 
         <ProgressBar
+            Grid.Row="1"
             Height="5"
             IsIndeterminate="{Binding Items.InProgress}"
             ShowError="False"
             ShowPaused="False"
             Visibility="{Binding Items.InProgress, Converter={StaticResource ToggleCvt}}" />
         <ListBox
+            Grid.Row="2"
             MinHeight="160"
             ItemsSource="{Binding Items}"
+            SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
             Style="{StaticResource CustomListBox}">
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:MatchItemViewModel">
@@ -69,18 +84,28 @@
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <TextBlock Style="{StaticResource HeaderLabelStyle}" Text="{x:Bind Text}" />
+                        <ctl:MatchTextBlock Source="{Binding}" />
                         <StackPanel
                             Grid.Row="1"
                             Orientation="Horizontal"
                             Spacing="8">
-                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="{x:Bind Index}" />
-                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="{x:Bind Header}" />
-                            <TextBlock Style="{StaticResource MetaLabelStyle}" Text="{x:Bind Offset}" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Style="{StaticResource MetaLabelStyle}"
+                                Text="{x:Bind Index}" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Style="{StaticResource MetaLabelStyle}"
+                                Text="{x:Bind Header}" />
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.ContextFlyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem Command="{Binding DeleteCommand}" />
+                </MenuFlyout>
+            </ListBox.ContextFlyout>
         </ListBox>
-    </StackPanel>
+    </Grid>
 </ContentDialog>

@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Text.RegularExpressions;
 using System.Windows.Input;
+using ZoDream.Reader.Controls;
+using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -10,6 +12,7 @@ namespace ZoDream.Reader.ViewModels
         public FindTextDialogViewModel()
         {
             MatchCommand = new RelayCommand(TapMatch);
+            DeleteCommand = UICommand.Delete(TapDelete);
         }
 
         private IFinderSource? _source;
@@ -46,10 +49,36 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _items, value);
         }
 
+        private MatchItemViewModel? _selectedItem;
+
+        public MatchItemViewModel? SelectedItem {
+            get => _selectedItem;
+            set {
+                SetProperty(ref _selectedItem, value);
+                OnPropertyChanged(nameof(JumpEnabled));
+            }
+        }
+
+        public bool JumpEnabled => SelectedItem is not null;
 
         public bool IsValid => !string.IsNullOrEmpty(FindText);
 
+        public ITextMatcher Matcher => FindMode > 0 ? new RegexMatcher(FindText, ReplaceText) : new TextMatcher(FindText, ReplaceText);
+
         public ICommand MatchCommand { get; private set; }
+        public ICommand DeleteCommand { get; private set; }
+
+
+        private void TapDelete()
+        {
+            var arg = SelectedItem;
+            if (arg is null)
+            {
+                return;
+            }
+            Items.Remove(arg);
+            SelectedItem = null;
+        }
 
         private async void TapMatch()
         {
@@ -58,14 +87,17 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            Items.Start();
-            if (FindMode > 0)
+            ITextMatcher matcher;
+            try
             {
-                await _source.FindAsync(Items, new Regex(FindText));
-            } else
-            {
-                await _source.FindAsync(Items, FindText);
+                matcher = FindMode > 0 ? new RegexMatcher(FindText) : new TextMatcher(FindText);
             }
+            catch (System.Exception)
+            {
+                return;
+            }
+            Items.Start();
+            await _source.FindAsync(Items, matcher);
             Items.Stop();
         }
 
@@ -73,5 +105,6 @@ namespace ZoDream.Reader.ViewModels
         {
             _source = source;
         }
+
     }
 }

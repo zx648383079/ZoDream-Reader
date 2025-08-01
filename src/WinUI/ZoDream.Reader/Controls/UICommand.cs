@@ -130,6 +130,7 @@ namespace ZoDream.Reader.Controls
             },
             Command = command
         };
+
         public static ICommand Setting(Action execute) => Setting(new RelayCommand(execute));
         public static ICommand Setting(ICommand command) => new XamlUICommand()
         {

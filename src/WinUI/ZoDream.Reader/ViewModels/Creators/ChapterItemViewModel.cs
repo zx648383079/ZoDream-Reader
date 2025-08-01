@@ -105,6 +105,7 @@ namespace ZoDream.Reader.ViewModels
 
     public class ChapterItemViewModel(IEditableSectionCommand host) : EditableSectionBase(host), INovelSection
     {
+        internal const string Indent = "    ";
 
         public IList<INovelBlock> Items { get; set; } = [];
         public string Text 
@@ -115,7 +116,7 @@ namespace ZoDream.Reader.ViewModels
                 {
                     if (item is INovelTextBlock o)
                     {
-                        sb.Append("    ");
+                        sb.Append(Indent);
                         sb.Append(o.Text);
                         sb.Append('\n');
                     }
@@ -144,7 +145,7 @@ namespace ZoDream.Reader.ViewModels
                 {
                     if (item is INovelTextBlock o)
                     {
-                        sb.Append("    ");
+                        sb.Append(Indent);
                         sb.Append(o.Text);
                         sb.Append('\n');
                     }

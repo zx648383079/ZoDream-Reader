@@ -65,6 +65,7 @@ namespace ZoDream.Reader.ViewModels
             EnterCommand = new RelayCommand(TapEnter);
         }
 
+        private readonly FindTextDialog _finder = new();
         private readonly AppViewModel _app = App.GetService<AppViewModel>();
         private WordProofreader? _proofreader;
         private OwnDictionary? _dict;
@@ -483,14 +484,47 @@ namespace ZoDream.Reader.ViewModels
                 TapFind();
                 return;
             }
-            var picker = new FindTextDialog();
+            SaveSection();
+            var picker = _finder;
             var model = picker.ViewModel;
             model.Load(this);
-            if (!await _app.OpenFormAsync(picker))
+            var res = await _app.OpenDialogAsync(picker);
+            if (res == Microsoft.UI.Xaml.Controls.ContentDialogResult.None || !model.IsValid)
             {
                 return;
             }
-            Content = Content.Replace(model.FindText, model.ReplaceText);
+            if (res == Microsoft.UI.Xaml.Controls.ContentDialogResult.Secondary)
+            {
+                JumpTo(model.SelectedItem ?? model.Items.FirstOrDefault());
+                return;
+            }
+            var matcher = model.Matcher;
+            if (model.Items.Count > 0)
+            {
+                ReplaceSelected(matcher, model.Items);
+                model.Items.Clear();
+            } else
+            {
+                ReplaceAll(matcher);
+            }
+            LoadSection(_current);
+            await _app.ConfirmAsync("替换完成");
+        }
+
+        private void ReplaceSelected(ITextMatcher matcher, IEnumerable<MatchItemViewModel> items)
+        {
+            foreach (var item in items)
+            {
+                var target = (ChapterItemViewModel)Items[item.Index];
+                if (target.Items[item.LineIndex] is INovelTextBlock t && matcher.TryReplace(t.Text, out var res))
+                {
+                    target.Items[item.LineIndex] = new NovelTextBlock(res);
+                }
+            }
+        }
+
+        private void ReplaceAll(ITextMatcher matcher)
+        {
             foreach (var item in Items)
             {
                 if (item is not ChapterItemViewModel c)
@@ -499,14 +533,38 @@ namespace ZoDream.Reader.ViewModels
                 }
                 for (var i = 0; i < c.Items.Count; i++)
                 {
-                    if (c.Items[i] is INovelTextBlock t && t.Text.Contains(model.FindText))
+                    if (c.Items[i] is INovelTextBlock t && matcher.TryReplace(t.Text, out var res))
                     {
-                        c.Items[i] = new NovelTextBlock(t.Text.Replace(model.FindText, model.ReplaceText)); ;
+                        c.Items[i] = new NovelTextBlock(res);
                     }
                 }
             }
-            SaveSection();
-            await _app.ConfirmAsync("替换完成");
+        }
+
+        private async void JumpTo(MatchItemViewModel? arg)
+        {
+            if (arg is null)
+            {
+                return;
+            }
+            IsBasic = false;
+            var model = (ChapterItemViewModel)Items[arg.Index];
+            LoadSection(model);
+            var position = 0;
+            foreach (var item in model.Items)
+            {
+                if (item == arg.Source)
+                {
+                    break;
+                }
+                position += ChapterItemViewModel.Indent.Length + 1;
+                if (item is INovelTextBlock t)
+                {
+                    position += t.Text.Length;
+                }
+            }
+            await Task.Delay(100);
+            Document?.Select(position + arg.MatchBegin, arg.MatchLength);
         }
 
         private async void TapRepair()
@@ -581,17 +639,23 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             SaveSection(_current);
-            _current = model;
-            Title = _current.Title;
-            Content = _current is ChapterItemViewModel o ? o.Text : string.Empty;
-            WrongItems.Clear();
-            _isUpdated = false;
+            LoadSection(model);
             await Task.Delay(100);
             Document?.ScrollTo(0);
             if (model.IsWrong)
             {
                 TapCheck();
             }
+        }
+
+        private void LoadSection(IEditableSection model)
+        {
+            _current = model;
+            Title = _current.Title;
+            Content = _current is ChapterItemViewModel o ? o.Text : string.Empty;
+            WrongItems.Clear();
+            _isUpdated = false;
+            
         }
 
         private async Task<bool> LoadDictionaryAsync()
@@ -944,65 +1008,27 @@ namespace ZoDream.Reader.ViewModels
             return res;
         }
 
-        public Task FindAsync(IAsyncObservableCollection<MatchItemViewModel> items, string text)
+        public Task FindAsync(IAsyncObservableCollection<MatchItemViewModel> items, ITextMatcher matcher)
         {
-            var i = -1;
-            foreach (var item in Items)
+            for (int i = 0; i < Items.Count; i++)
             {
-                i++;
-                if (item is not ChapterItemViewModel c)
+                if (Items[i] is not ChapterItemViewModel item)
                 {
                     continue;
                 }
-                foreach (var it in c.Items)
+                for (int j = 0; j < item.Items.Count; j++)
                 {
-                    if (it is not INovelTextBlock t)
+                    if (item.Items[j] is not INovelTextBlock line)
                     {
                         continue;
                     }
-                    var index = t.Text.IndexOf(text);
-                    if (index >= 0)
+                    if (matcher.TryMatch(line.Text, out var index, out var length))
                     {
-                        items.Add(new MatchItemViewModel()
+                        items.Add(new MatchItemViewModel(line, index, length)
                         {
-                            Source = t,
                             Header = item.Title,
-                            Text = text,
-                            Offset = index,
-                            Index = i
-                        });
-                    }
-                }
-            }
-            return Task.CompletedTask;
-        }
-
-        public Task FindAsync(IAsyncObservableCollection<MatchItemViewModel> items, Regex pattern)
-        {
-            var i = -1;
-            foreach (var item in Items)
-            {
-                i++;
-                if (item is not ChapterItemViewModel c)
-                {
-                    continue;
-                }
-                foreach (var it in c.Items)
-                {
-                    if (it is not INovelTextBlock t)
-                    {
-                        continue;
-                    }
-                    var match = pattern.Match(t.Text);
-                    if (match.Success)
-                    {
-                        items.Add(new MatchItemViewModel()
-                        {
-                            Source = t,
-                            Header = item.Title,
-                            Text = match.Value,
-                            Offset = match.Index,
-                            Index = i
+                            Index = i,
+                            LineIndex = j
                         });
                     }
                 }
