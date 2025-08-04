@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:bhv="using:ZoDream.Reader.Behaviors"
     xmlns:ctl="using:ZoDream.Reader.Controls"
+    xmlns:cvt="using:ZoDream.Reader.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ivy="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:ZoDream.Reader.Pages.Creators"
@@ -29,17 +30,28 @@
                 <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
                 <Setter Property="CharacterSpacing" Value="30" />
             </Style>
-            <DataTemplate x:Key="SectionTemplate">
+            <DataTemplate x:Key="SectionTemplate" x:DataType="vm:ChapterItemViewModel">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
                     <FontIcon
+                        Grid.RowSpan="2"
+                        VerticalAlignment="Center"
                         Foreground="Red"
                         Glyph="&#xE7BA;"
                         Visibility="{Binding IsWrong, Converter={StaticResource ToggleCvt}}" />
                     <TextBlock Grid.Column="1" Text="{Binding Title}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource MetaLabelStyle}"
+                        Text="{x:Bind cvt:ConverterHelper.FormatWord(WordCount)}" />
                     <Grid.ContextFlyout>
                         <MenuFlyout>
                             <MenuFlyoutItem
@@ -337,10 +349,34 @@
                     </ListView>
                 </PivotItem>
                 <PivotItem Header="Wrongs">
-                    <ListBox Background="Transparent" ItemsSource="{Binding WrongItems}">
+                    <ListBox
+                        ItemsSource="{Binding WrongItems}"
+                        SelectedItem="{Binding SelectedWord, Mode=TwoWay}"
+                        Style="{StaticResource CustomListBox}">
                         <ivy:Interaction.Behaviors>
                             <bhv:ListItemDoubleClickBehavior Command="{Binding JumpToCommand}" />
                         </ivy:Interaction.Behaviors>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:WordItemViewModel">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding Word}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        Text="{x:Bind cvt:ConverterHelper.ToHex(Word)}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Command="{Binding CopyWordCommand}" />
+                                <MenuFlyoutItem Command="{Binding DeleteWordCommand}" />
+                            </MenuFlyout>
+                        </ListBox.ContextFlyout>
                     </ListBox>
                 </PivotItem>
             </Pivot>

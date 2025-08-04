@@ -107,7 +107,15 @@ namespace ZoDream.Reader.ViewModels
     {
         internal const string Indent = "    ";
 
+        private int _wordCount;
+
+        public int WordCount {
+            get => _wordCount;
+            set => SetProperty(ref _wordCount, value);
+        }
+
         public IList<INovelBlock> Items { get; set; } = [];
+
         public string Text 
         {
             get {
@@ -133,6 +141,7 @@ namespace ZoDream.Reader.ViewModels
                     }
                 }
                 OnPropertyChanged(nameof(Items));
+                Update();
             }
         }
 
@@ -171,6 +180,18 @@ namespace ZoDream.Reader.ViewModels
                     }
                 }
                 OnPropertyChanged(nameof(Items));
+            }
+        }
+
+        public void Update()
+        {
+            WordCount = 0;
+            foreach (var item in Items)
+            {
+                if (item is INovelTextBlock text)
+                {
+                    WordCount += text.Text.Length;
+                }
             }
         }
     }

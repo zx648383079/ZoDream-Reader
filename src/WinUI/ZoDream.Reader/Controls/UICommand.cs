@@ -9,6 +9,11 @@ namespace ZoDream.Reader.Controls
 {
     internal static class UICommand
     {
+        public static ICommand Copy(Action execute) => Copy(new RelayCommand(execute));
+        public static ICommand Copy(ICommand command) => new StandardUICommand(StandardUICommandKind.Copy)
+        {
+            Command = command
+        };
         public static ICommand Delete(Action execute) => Delete(new RelayCommand(execute));
         public static ICommand Delete(ICommand command) => new StandardUICommand(StandardUICommandKind.Delete)
         {

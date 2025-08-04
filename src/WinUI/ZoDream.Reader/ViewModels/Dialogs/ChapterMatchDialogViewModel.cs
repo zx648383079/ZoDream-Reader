@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ZoDream.Shared.Plugins.Txt;
@@ -10,7 +9,7 @@ namespace ZoDream.Reader.ViewModels
 {
     public class ChapterMatchDialogViewModel : ObservableObject
     {
-        const string DefaultRule = @"^第\s*[0-9一二三四五六七八九十百千]{1,10}[章回|节|卷|集|幕|计]?.{0,20}$";
+        const string DefaultRule = @"^第\s*[0-9零一二三四五六七八九十百千]{1,10}[章回节卷集幕计]?.{0,20}$";
 
         public ChapterMatchDialogViewModel()
         {

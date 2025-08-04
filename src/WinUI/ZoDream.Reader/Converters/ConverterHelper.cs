@@ -109,5 +109,23 @@ namespace ZoDream.Reader.Converters
             }
             return false;
         }
+
+        public static string FormatWord(int count)
+        {
+            return string.Format("{0:0,0} 字", count);
+        }
+
+        public static string ToHex(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+            return ToHex(value[0]);
+        }
+        public static string ToHex(char value)
+        {
+            return ((int)value).ToString("X");
+        }
     }
 }

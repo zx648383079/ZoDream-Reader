@@ -9,8 +9,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using ZoDream.Reader.Behaviors;
+using ZoDream.Reader.Controls;
 using ZoDream.Reader.Converters;
 using ZoDream.Reader.Dialogs;
 using ZoDream.Shared.Extensions;
@@ -53,7 +55,9 @@ namespace ZoDream.Reader.ViewModels
             RedoCommand = new RelayCommand(TapRedo);
             CheckCommand = new RelayCommand(TapCheck);
             SplitCommand = new RelayCommand(TapSplit);
-            JumpToCommand = new RelayCommand<string>(TapJumpTo);
+            JumpToCommand = new RelayCommand<WordItemViewModel>(TapJumpTo);
+            CopyWordCommand = UICommand.Copy(TapCopyWord);
+            DeleteWordCommand = UICommand.Delete(TapDeleteWord);
 
             FindCommand = new RelayCommand(TapFind);
             ReplaceCommand = new RelayCommand(TapReplace);
@@ -144,11 +148,18 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _selectedItem, value);
         }
 
-        private ObservableCollection<string> _wrongItems = [];
+        private ObservableCollection<WordItemViewModel> _wrongItems = [];
 
-        public ObservableCollection<string> WrongItems {
+        public ObservableCollection<WordItemViewModel> WrongItems {
             get => _wrongItems;
             set => SetProperty(ref _wrongItems, value);
+        }
+
+        private WordItemViewModel? _selectedWord;
+
+        public WordItemViewModel? SelectedWord {
+            get => _selectedWord;
+            set => SetProperty(ref _selectedWord, value);
         }
 
 
@@ -246,6 +257,8 @@ namespace ZoDream.Reader.ViewModels
         public ICommand ConfirmFindCommand { get; private set; }
         public ICommand FindBackCommand { get; private set; }
         public ICommand ConfirmReplaceCommand { get; private set; }
+        public ICommand CopyWordCommand { get; private set; }
+        public ICommand DeleteWordCommand { get; private set; }
 
 
         private async void TapResetDict()
@@ -738,26 +751,54 @@ namespace ZoDream.Reader.ViewModels
             return true;
         }
 
-        private async void TapJumpTo(string? arg)
+        private async void TapCopyWord()
         {
-            if (string.IsNullOrWhiteSpace(arg) || Document is null)
+            var arg = SelectedWord;
+            if (arg is null)
+            {
+                return;
+            }
+            var package = new DataPackage();
+            package.SetText(arg.Word);
+            Clipboard.SetContent(package);
+            await _app.ConfirmAsync("已复制");
+        }
+
+        private async void TapDeleteWord()
+        {
+            var arg = SelectedWord;
+            if (arg is null || !await _app.ConfirmAsync($"确定删除[{arg.Word}]?"))
+            {
+                return;
+            }
+            Title = Title.Replace(arg.Word, string.Empty);
+            Content = Content.Replace(arg.Word, string.Empty);
+            WrongItems.Remove(arg);
+            SelectedWord = null;
+            await _app.ConfirmAsync("已删除");
+        }
+
+        private async void TapJumpTo(WordItemViewModel? arg)
+        {
+            var word = arg?.Word;
+            if (string.IsNullOrWhiteSpace(word) || Document is null)
             {
                 return;
             }
             if (FindOpen)
             {
-                FindText = arg;
+                FindText = word;
             }
             await Task.Delay(100);
-            if (Document.FindNext(arg))
+            if (Document.FindNext(word))
             {
                 return;
             }
-            var res = await _app.ConfirmAsync($"找不到下一个[{arg}]，是否从头开始找？");
+            var res = await _app.ConfirmAsync($"找不到下一个[{word}]，是否从头开始找？");
             if (res)
             {
                 Document.Unselect();
-                Document.FindNext(arg);
+                Document.FindNext(word);
             }
         }
 
@@ -791,7 +832,7 @@ namespace ZoDream.Reader.ViewModels
             WrongItems.Clear();
             foreach (var item in res)
             {
-                WrongItems.Add(item.ToString());
+                WrongItems.Add(new WordItemViewModel(item));
             }
             if (WrongItems.Count == 0)
             {
@@ -971,11 +1012,13 @@ namespace ZoDream.Reader.ViewModels
                 }
                 foreach (var it in item)
                 {
-                    Items.Add(new ChapterItemViewModel(this)
+                    var next = new ChapterItemViewModel(this)
                     {
                         Title = it.Title,
                         Items = it.Items
-                    });
+                    };
+                    next.Update();
+                    Items.Add(next);
                 }
             }
         }
@@ -1036,7 +1079,7 @@ namespace ZoDream.Reader.ViewModels
             return Task.CompletedTask;
         }
 
-        [GeneratedRegex(@"^第\s*([0-9一二三四五六七八九十百千]{1,10})\s*章\s*·?")]
+        [GeneratedRegex(@"^第\s*([0-9零一二三四五六七八九十百千]{1,10})\s*章\s*·?")]
         private static partial Regex ChapterOrderRegex();
 
 

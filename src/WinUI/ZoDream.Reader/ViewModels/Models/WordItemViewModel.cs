@@ -18,5 +18,10 @@ namespace ZoDream.Reader.ViewModels
             set => SetProperty(ref _count, value);
         }
 
+
+        public override string ToString()
+        {
+            return Word;
+        }
     }
 }
