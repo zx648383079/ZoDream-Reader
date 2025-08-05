@@ -56,8 +56,8 @@ namespace ZoDream.Reader.ViewModels
             CheckCommand = new RelayCommand(TapCheck);
             SplitCommand = new RelayCommand(TapSplit);
             JumpToCommand = new RelayCommand<WordItemViewModel>(TapJumpTo);
-            CopyWordCommand = UICommand.Copy(TapCopyWord);
-            DeleteWordCommand = UICommand.Delete(TapDeleteWord);
+            CopyWordCommand = UICommand.Copy(TapCopyWord, false);
+            DeleteWordCommand = UICommand.Delete(TapDeleteWord, false);
 
             FindCommand = new RelayCommand(TapFind);
             ReplaceCommand = new RelayCommand(TapReplace);
