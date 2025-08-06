@@ -38,7 +38,7 @@ namespace ZoDream.Shared.Plugins.EPub
             }
             var doc = Read(archive, rootFile);
             var opfNamespace = Opf;
-            var root = doc.Element(opfNamespace + "package");
+            var root = doc?.Element(opfNamespace + "package");
             if (root is null)
             {
                 return null;
@@ -77,6 +77,10 @@ namespace ZoDream.Shared.Plugins.EPub
             var ncx = maps[spine.Attribute("toc").Value];
             var ncxNamespace = Ncx;
             var ncxDoc = Read(archive, ncx);
+            if (ncxDoc is null)
+            {
+                return novel;
+            }
             var pointName = ncxNamespace + "navPoint";
             foreach (var item in ncxDoc.Element(ncxNamespace + "ncx")
                 .Element(ncxNamespace + "navMap").Elements(pointName))
@@ -150,20 +154,38 @@ namespace ZoDream.Shared.Plugins.EPub
             string fileName, string title)
         {
             var doc = Read(archive, fileName);
+            if (doc == null)
+            {
+                return new NovelSection(title, []);
+            }
             var xHtmlNamespace = XHtml;
             var root = doc.Root;
-            var res = new NovelSection(root?.Element(xHtmlNamespace + "head")
-                ?.Element(xHtmlNamespace + "title")?.Value ?? title);
+            var items = new List<INovelBlock>();
+            title = root?.Element(xHtmlNamespace + "head")
+                ?.Element(xHtmlNamespace + "title")?.Value ?? title;
+            if (title is nameof(title))
+            {
+                title = string.Empty;
+            }
             foreach (var item in root.Element(xHtmlNamespace + "body").Elements())
             {
-                var text = item.Value;
-                if (string.IsNullOrWhiteSpace(text))
+                var text = item.Value.Trim();
+                if (string.IsNullOrEmpty(text))
                 {
                     continue;
                 }
-                res.Items.Add(new NovelTextBlock(text));
+                if (string.IsNullOrWhiteSpace(title))
+                {
+                    title = text;
+                    continue;
+                }
+                if (items.Count == 0 && text == title)
+                {
+                    continue;
+                }
+                items.Add(new NovelTextBlock(text));
             }
-            return res;
+            return new NovelSection(title, items);
         }
 
         public void Dispose()
@@ -191,7 +213,12 @@ namespace ZoDream.Shared.Plugins.EPub
 
         internal static XDocument Read(ZipArchive archive, string fileName)
         {
-            return Read(archive.GetEntry(fileName));
+            var entry = archive.GetEntry(fileName);
+            if (entry == null)
+            {
+                return null;
+            }
+            return Read(entry);
         }
 
         internal static Stream GetImageResource(ZipArchive archive, string fileName)
