@@ -51,7 +51,7 @@
                         Grid.Row="1"
                         Grid.Column="1"
                         Style="{StaticResource MetaLabelStyle}"
-                        Text="{x:Bind cvt:ConverterHelper.FormatWord(WordCount)}" />
+                        Text="{x:Bind cvt:ConverterHelper.FormatWord(WordCount), Mode=OneWay}" />
                     <Grid.ContextFlyout>
                         <MenuFlyout>
                             <MenuFlyoutItem

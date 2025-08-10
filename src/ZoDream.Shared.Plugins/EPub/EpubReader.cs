@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Xml;
@@ -179,7 +180,7 @@ namespace ZoDream.Shared.Plugins.EPub
                     title = text;
                     continue;
                 }
-                if (items.Count == 0 && text == title)
+                if (items.Count == 0 && IsSameText(text, title))
                 {
                     continue;
                 }
@@ -191,6 +192,12 @@ namespace ZoDream.Shared.Plugins.EPub
         public void Dispose()
         {
             input.Dispose();
+        }
+
+        private static bool IsSameText(string source, string text)
+        {
+            return source.Replace(" ", string.Empty).Equals(
+                text.Replace(" ", string.Empty), StringComparison.OrdinalIgnoreCase);
         }
 
         internal static string? GetRootFileName(ZipArchive archive)

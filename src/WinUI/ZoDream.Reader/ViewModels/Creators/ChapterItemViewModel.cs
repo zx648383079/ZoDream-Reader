@@ -180,6 +180,7 @@ namespace ZoDream.Reader.ViewModels
                     }
                 }
                 OnPropertyChanged(nameof(Items));
+                Update();
             }
         }
 
