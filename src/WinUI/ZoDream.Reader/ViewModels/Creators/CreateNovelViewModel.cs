@@ -779,8 +779,15 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            Title = Title.Replace(arg.Word, string.Empty);
-            Content = Content.Replace(arg.Word, string.Empty);
+            if (_current is null || _isUpdated)
+            {
+                Title = Title.Replace(arg.Word, string.Empty);
+                Content = Content.Replace(arg.Word, string.Empty);
+            } else
+            {
+                Title = _current.Title.Replace(arg.Word, string.Empty);
+                Content = _current is ChapterItemViewModel o ? o.Text.Replace(arg.Word, string.Empty) : string.Empty;
+            }
             WrongItems.Remove(arg);
             SelectedWord = null;
             await _app.ConfirmAsync("已删除");
@@ -820,6 +827,58 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
+            var res = _current is null || _isUpdated ? CheckFromEdit() : CheckFromSource();
+            WrongItems.Clear();
+            foreach (var item in res)
+            {
+                WrongItems.Add(new WordItemViewModel(item));
+            }
+            if (WrongItems.Count == 0)
+            {
+                return;
+            }
+            if (_proofreader is null || !await _app.ConfirmAsync("是否使用校对功能进行修复？"))
+            {
+                TapJumpTo(WrongItems[0]);
+                return;
+            }
+            Content = _proofreader.Proofreading(Content);
+        }
+
+        private IEnumerable<char> CheckFromSource()
+        {
+            var model = _current;
+            var res = new HashSet<char>();
+            foreach (var item in model!.Title)
+            {
+                if (_dict!.TrySerialize(item, out _))
+                {
+                    continue;
+                }
+                res.Add(item);
+            }
+            if (model is ChapterItemViewModel c)
+            {
+                foreach (var block in c.Items)
+                {
+                    if (block is INovelTextBlock t)
+                    {
+                        foreach (var item in t.Text)
+                        {
+                            if (_dict!.TrySerialize(item, out _))
+                            {
+                                continue;
+                            }
+                            res.Add(item);
+                        }
+                    }
+                }
+            }
+            return res;
+        }
+
+        private IEnumerable<char> CheckFromEdit()
+        {
             var res = new HashSet<char>();
             foreach (var item in Title)
             {
@@ -837,21 +896,7 @@ namespace ZoDream.Reader.ViewModels
                 }
                 res.Add(item);
             }
-            WrongItems.Clear();
-            foreach (var item in res)
-            {
-                WrongItems.Add(new WordItemViewModel(item));
-            }
-            if (WrongItems.Count == 0)
-            {
-                return;
-            }
-            if (_proofreader is null || !await _app.ConfirmAsync("是否使用校对功能进行修复？"))
-            {
-                TapJumpTo(WrongItems[0]);
-                return;
-            }
-            Content = _proofreader.Proofreading(Content);
+            return res;
         }
 
         private void TapSort(DragItemsResult? data)
