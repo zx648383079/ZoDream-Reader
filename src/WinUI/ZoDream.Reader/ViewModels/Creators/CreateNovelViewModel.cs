@@ -334,6 +334,7 @@ namespace ZoDream.Reader.ViewModels
             picker.FileTypeChoices.Add("书籍", [".npk"]);
             picker.FileTypeChoices.Add("TXT书籍", [".txt"]);
             picker.FileTypeChoices.Add("EPUB书籍", [".epub"]);
+            picker.SuggestedFileName = Name;
             _app.InitializePicker(picker);
             var file = await picker.PickSaveFileAsync();
             if (file is null)
