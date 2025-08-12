@@ -527,7 +527,7 @@ namespace ZoDream.Reader.ViewModels
 
         private void ReplaceSelected(ITextMatcher matcher, IEnumerable<MatchItemViewModel> items)
         {
-            foreach (var item in items)
+            foreach (var item in items.Reverse())
             {
                 if (item.Section is not ChapterItemViewModel target)
                 {
@@ -538,10 +538,19 @@ namespace ZoDream.Reader.ViewModels
                 {
                     index = item.LineIndex;
                 }
-                if (target.Items[index] is INovelTextBlock t && matcher.TryReplace(t.Text, out var res))
+                if (target.Items[index] is not INovelTextBlock t || !matcher.TryReplace(t.Text, out var res))
+                {
+                    continue;
+                }
+                if (string.IsNullOrWhiteSpace(res))
+                {
+                    target.Items.RemoveAt(index);
+                }
+                else
                 {
                     target.Items[index] = new NovelTextBlock(res);
                 }
+                
             }
         }
 
@@ -553,9 +562,16 @@ namespace ZoDream.Reader.ViewModels
                 {
                     continue;
                 }
-                for (var i = 0; i < c.Items.Count; i++)
+                for (var i = c.Items.Count - 1; i >= 0; i--)
                 {
-                    if (c.Items[i] is INovelTextBlock t && matcher.TryReplace(t.Text, out var res))
+                    if (c.Items[i] is not INovelTextBlock t || !matcher.TryReplace(t.Text, out var res))
+                    {
+                        continue;
+                    }
+                    if (string.IsNullOrWhiteSpace(res))
+                    {
+                        c.Items.RemoveAt(i);
+                    } else
                     {
                         c.Items[i] = new NovelTextBlock(res);
                     }

@@ -58,6 +58,10 @@ namespace ZoDream.Shared.Tokenizers
         {
             foreach (var item in items)
             {
+                if (item is INovelTextBlock t && string.IsNullOrWhiteSpace(t.Text))
+                {
+                    continue;
+                }
                 Items.Add(item);
             }
         }
