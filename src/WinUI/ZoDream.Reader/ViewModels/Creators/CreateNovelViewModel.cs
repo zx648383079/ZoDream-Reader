@@ -528,10 +528,18 @@ namespace ZoDream.Reader.ViewModels
         {
             foreach (var item in items)
             {
-                var target = (ChapterItemViewModel)Items[item.Index];
-                if (target.Items[item.LineIndex] is INovelTextBlock t && matcher.TryReplace(t.Text, out var res))
+                if (item.Section is not ChapterItemViewModel target)
                 {
-                    target.Items[item.LineIndex] = new NovelTextBlock(res);
+                    continue;
+                }
+                var index = target.Items.IndexOf(item.Source);
+                if (index < 0)
+                {
+                    index = item.LineIndex;
+                }
+                if (target.Items[index] is INovelTextBlock t && matcher.TryReplace(t.Text, out var res))
+                {
+                    target.Items[index] = new NovelTextBlock(res);
                 }
             }
         }
@@ -556,12 +564,12 @@ namespace ZoDream.Reader.ViewModels
 
         private async void JumpTo(MatchItemViewModel? arg)
         {
-            if (arg is null)
+            if (arg is null || arg.Section is not ChapterItemViewModel v || !Items.Contains(v))
             {
                 return;
             }
             IsBasic = false;
-            var model = (ChapterItemViewModel)Items[arg.Index];
+            var model = v;
             LoadSection(model);
             var position = 0;
             foreach (var item in model.Items)
@@ -1070,7 +1078,8 @@ namespace ZoDream.Reader.ViewModels
                         items.Add(new MatchItemViewModel(line, index, length)
                         {
                             Header = item.Title,
-                            Index = i,
+                            Section = item,
+                            SectionIndex = i,
                             LineIndex = j
                         });
                     }

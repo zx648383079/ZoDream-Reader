@@ -58,9 +58,14 @@ namespace ZoDream.Shared.Text
 
         public bool TryDeserialize(char value, out char result)
         {
+            return TryDeserialize(value, false, out result);
+        }
+
+        public bool TryDeserialize(char value, bool lastIsAscii, out char result)
+        {
             if (value <= 0x7F)
             {
-                result = EncodingBuilder.Deserialize(value);
+                result = EncodingBuilder.Deserialize(value, lastIsAscii);
                 return true;
             }
             var i = value - 0x80;

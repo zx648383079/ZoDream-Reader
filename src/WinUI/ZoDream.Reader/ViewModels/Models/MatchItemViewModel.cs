@@ -18,11 +18,11 @@ namespace ZoDream.Reader.ViewModels
         /// 章节标题
         /// </summary>
         public string Header { get; set; } = string.Empty;
-        /// <summary>
-        /// 章节的编号
-        /// </summary>
-        public int Index { get; set; }
+
+        public int SectionIndex { get; set; }
         public int LineIndex { get; set; }
+
+        public INovelSection? Section { get; set; }
 
         public INovelTextBlock Source { get; private set; }
 

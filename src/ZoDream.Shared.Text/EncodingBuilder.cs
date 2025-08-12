@@ -170,7 +170,26 @@ namespace ZoDream.Shared.Text
                 _ => value,
             };
         }
-
+        public static char Deserialize(char value, bool lastIsAscii)
+        {
+            var res = Deserialize(value);
+            if (lastIsAscii)
+            {
+                return res;
+            }
+            // 根据语境切换符号
+            return res switch
+            {
+                ',' => '，',
+                '?' => '？',
+                '!' => '！',
+                ':' => '：',
+                ';' => '；',
+                ')' => '）',
+                '(' => '（',
+                _ => res
+            };
+        }
         public static char Deserialize(char value)
         {
             return value switch

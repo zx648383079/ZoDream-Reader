@@ -63,6 +63,7 @@ namespace ZoDream.Shared.Text
         {
             var j = 0;
             int n;
+            var lastIsAscii = false;
             for (int i = 0; i < byteCount; i++)
             {
                 n = byteIndex + i;
@@ -74,7 +75,9 @@ namespace ZoDream.Shared.Text
                     var next = bytes.Length > n ? (bytes[n] - CodeBegin) : 0;
                     code = (char)((code - DoubleSplitTag) * CodeCount + next);
                 }
-                chars[charIndex + j++] = dict.TryDeserialize(code, out var res) ? res : code;
+                var current = dict.TryDeserialize(code, lastIsAscii, out var res) ? res : code;
+                chars[charIndex + j++] = current;
+                lastIsAscii = current < 0x7F;
             }
             return j;
         }

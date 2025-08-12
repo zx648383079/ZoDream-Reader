@@ -92,11 +92,15 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource MetaLabelStyle}"
-                                Text="{x:Bind Index}" />
+                                Text="{x:Bind SectionIndex}" />
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource MetaLabelStyle}"
                                 Text="{x:Bind Header}" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Style="{StaticResource MetaLabelStyle}"
+                                Text="{x:Bind LineIndex}" />
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
