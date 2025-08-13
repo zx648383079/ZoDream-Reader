@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Input;
 using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Text;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
@@ -105,8 +105,6 @@ namespace ZoDream.Reader.ViewModels
 
     public class ChapterItemViewModel(IEditableSectionCommand host) : EditableSectionBase(host), INovelSection
     {
-        internal const string Indent = "    ";
-
         private int _wordCount;
 
         public int WordCount {
@@ -118,28 +116,10 @@ namespace ZoDream.Reader.ViewModels
 
         public string Text 
         {
-            get {
-                var sb = new StringBuilder();
-                foreach (var item in Items)
-                {
-                    if (item is INovelTextBlock o)
-                    {
-                        sb.Append(Indent);
-                        sb.Append(o.Text);
-                        sb.Append('\n');
-                    }
-                }
-                return sb.ToString();
-            }
+            get => Items.Format();
             set {
                 Items.Clear();
-                foreach (var item in value.Split(['\n', '\r']))
-                {
-                    if (!string.IsNullOrWhiteSpace(item))
-                    {
-                        Items.Add(new NovelTextBlock(item.Trim()));
-                    }
-                }
+                Items.Parse(value);
                 OnPropertyChanged(nameof(Items));
                 Update();
             }
@@ -147,20 +127,7 @@ namespace ZoDream.Reader.ViewModels
 
         public string RawText 
         {
-            get {
-                var sb = new StringBuilder();
-                sb.Append(Title).Append('\n').Append('\n');
-                foreach (var item in Items)
-                {
-                    if (item is INovelTextBlock o)
-                    {
-                        sb.Append(Indent);
-                        sb.Append(o.Text);
-                        sb.Append('\n');
-                    }
-                }
-                return sb.ToString();
-            }
+            get => this.Format();
             set {
                 Title = string.Empty;
                 Items.Clear();

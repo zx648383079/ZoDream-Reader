@@ -234,11 +234,11 @@
                 </Grid.RowDefinitions>
                 <TextBox Header="Title" Text="{Binding Title, Mode=TwoWay}" />
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <Button
+                    <!--<Button
                         Command="{Binding SaveCommand}"
                         Content="&#xE74E;"
                         Style="{StaticResource LargeIconBtn}"
-                        ToolTipService.ToolTip="保存为书籍" />
+                        ToolTipService.ToolTip="保存为书籍" />-->
                     <Button
                         Command="{Binding BasicCommand}"
                         Content="&#xE946;"
@@ -247,11 +247,25 @@
 
                     <AppBarSeparator />
 
-                    <Button
-                        Command="{Binding CheckCommand}"
-                        Content="&#xE8FE;"
-                        Style="{StaticResource LargeIconBtn}"
-                        ToolTipService.ToolTip="字典字词检测" />
+                    <SplitButton
+                        Padding="0"
+                        VerticalContentAlignment="Center"
+                        Background="Transparent"
+                        BorderBrush="Transparent">
+                        <Button
+                            Command="{Binding CheckCommand}"
+                            Content="&#xE8FE;"
+                            Style="{StaticResource LargeIconBtn}"
+                            ToolTipService.ToolTip="字典字词检测" />
+                        <SplitButton.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem Command="{Binding WordProofreadCommand}" />
+                                <MenuFlyoutItem Command="{Binding FormatProofreadCommand}" />
+                            </MenuFlyout>
+
+                        </SplitButton.Flyout>
+                    </SplitButton>
+
 
                     <Button
                         Command="{Binding FindCommand}"

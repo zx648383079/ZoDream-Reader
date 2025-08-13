@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,6 +25,7 @@ using ZoDream.Shared.Plugins.Txt;
 using ZoDream.Shared.Plugins.Umd;
 using ZoDream.Shared.Text;
 using ZoDream.Shared.Tokenizers;
+using static ABI.System.Windows.Input.ICommand_Delegates;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -67,6 +70,28 @@ namespace ZoDream.Reader.ViewModels
             FindBackCommand = new RelayCommand(TapFindBack);
             ConfirmReplaceCommand = new RelayCommand(TapConfirmReplace);
             EnterCommand = new RelayCommand(TapEnter);
+
+
+            WordProofreadCommand = new XamlUICommand()
+            {
+                Label = "字词修复",
+                Description = "对一些词语错误进行修复",
+                IconSource = new FontIconSource()
+                {
+                    Glyph = "\uE8C1"
+                },
+                Command = new RelayCommand(TapWordProofread)
+            };
+            FormatProofreadCommand = new XamlUICommand()
+            {
+                Label = "格式修复",
+                Description = "对段落错误、标点错误进行修复",
+                IconSource = new FontIconSource()
+                {
+                    Glyph = "\uEA37"
+                },
+                Command = new RelayCommand(TapFormatProofread)
+            };
         }
 
         private readonly FindTextDialog _finder = new();
@@ -260,7 +285,8 @@ namespace ZoDream.Reader.ViewModels
         public ICommand CopyWordCommand { get; private set; }
         public ICommand DeleteWordCommand { get; private set; }
 
-
+        public ICommand WordProofreadCommand { get; private set; }
+        public ICommand FormatProofreadCommand { get; private set; }
         private async void TapResetDict()
         {
             var old = _dict;
@@ -481,6 +507,25 @@ namespace ZoDream.Reader.ViewModels
             Content = $"{Content[..start]}“{text}”{Content[end..]}";
         }
 
+        private async void TapWordProofread()
+        {
+            if (_proofreader is null || !await _app.ConfirmAsync("是否使用校对功能进行修复字词错误？"))
+            {
+                return;
+            }
+            Content = _proofreader.Proofreading(Content);
+        }
+
+        private async void TapFormatProofread()
+        {
+            if (!await _app.ConfirmAsync("是否使用校对功能进行修复段落、字符错误？"))
+            {
+                return;
+            }
+            var proofreader = new TextFormatProofreader();
+            Content = proofreader.Proofreading(Content);
+        }
+
         private void TapEnter()
         {
             if (Document is null)
@@ -595,7 +640,7 @@ namespace ZoDream.Reader.ViewModels
                 {
                     break;
                 }
-                position += ChapterItemViewModel.Indent.Length + 1;
+                position += TextExtension.Indent.Length + 1;
                 if (item is INovelTextBlock t)
                 {
                     position += t.Text.Length;

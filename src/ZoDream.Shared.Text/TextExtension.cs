@@ -8,7 +8,11 @@ namespace ZoDream.Shared.Text
     public static class TextExtension
     {
         public const string Indent = "    ";
-
+        /// <summary>
+        /// 按行合并内容
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
         public static string Format(this IEnumerable<INovelBlock> items)
         {
             var sb = new StringBuilder();
@@ -37,9 +41,13 @@ namespace ZoDream.Shared.Text
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 拆分行，
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="text"></param>
         public static void Parse(this IList<INovelBlock> items, string text)
         {
-            items.Clear();
             foreach (var item in text.Split(['\n', '\r']))
             {
                 if (!string.IsNullOrWhiteSpace(item))
