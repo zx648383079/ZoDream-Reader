@@ -653,6 +653,10 @@ namespace ZoDream.Reader.ViewModels
         private async void TapRepair()
         {
             SaveSection(_current);
+            if (!await _app.ConfirmAsync("确定对章节序号进行修复？"))
+            {
+                return;
+            }
             var index = 1;
             var lastIsVolume = true;
             foreach (var item in Items)
@@ -1120,7 +1124,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 if (!string.IsNullOrWhiteSpace(item.Name))
                 {
-                    Items.Add(new VolumeItemViewModel(this)
+                    Items.Add(new ChapterItemViewModel(this)
                     {
                         Title = item.Name,
                     });
