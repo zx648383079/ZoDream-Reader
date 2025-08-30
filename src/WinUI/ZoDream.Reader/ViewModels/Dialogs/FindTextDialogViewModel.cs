@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Linq;
 using System.Windows.Input;
 using ZoDream.Reader.Controls;
 using ZoDream.Shared.Interfaces;
@@ -63,7 +65,16 @@ namespace ZoDream.Reader.ViewModels
 
         public bool IsValid => !string.IsNullOrEmpty(FindText);
 
-        public ITextMatcher Matcher => FindMode > 0 ? new RegexMatcher(FindText, ReplaceText) : new TextMatcher(FindText, ReplaceText);
+        public ITextMatcher Matcher {
+            get {
+                return FindMode switch
+                {
+                    2 => new TextMatcher(ParseHex(FindText), ReplaceText),
+                    1 => new RegexMatcher(FindText, ReplaceText),
+                    _ => new TextMatcher(FindText, ReplaceText),
+                };
+            }
+        }
 
         public ICommand MatchCommand { get; private set; }
         public ICommand DeleteCommand { get; private set; }
@@ -90,7 +101,7 @@ namespace ZoDream.Reader.ViewModels
             ITextMatcher matcher;
             try
             {
-                matcher = FindMode > 0 ? new RegexMatcher(FindText) : new TextMatcher(FindText);
+                matcher = Matcher;
             }
             catch (System.Exception)
             {
@@ -106,5 +117,39 @@ namespace ZoDream.Reader.ViewModels
             _source = source;
         }
 
+
+        private static string ParseHex(string text)
+        {
+            if (text.Contains("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Join(string.Empty, text.ToLower().Split("0x").Select(TryParseChar));
+            }
+            if (text.Contains("\\u", StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Join(string.Empty, text.ToLower().Split("\\u").Select(TryParseChar));
+            }
+            var res = string.Empty;
+            var i = 0;
+            while (i < text.Length)
+            {
+                var next = Math.Min(i + 4, text.Length);
+                res += TryParseChar(text[i..next]);
+                i = next;
+            }
+            return res;
+        }
+
+        private static string TryParseChar(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return string.Empty;
+            }
+            if (ushort.TryParse(text, System.Globalization.NumberStyles.HexNumber, null, out var res))
+            {
+                return ((char)res).ToString();
+            }
+            return string.Empty;
+        }
     }
 }

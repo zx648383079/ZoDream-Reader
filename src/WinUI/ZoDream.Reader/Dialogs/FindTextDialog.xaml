@@ -43,6 +43,7 @@
             <ComboBox SelectedIndex="{Binding FindMode, Mode=TwoWay}">
                 <ComboBoxItem>文本查找</ComboBoxItem>
                 <ComboBoxItem>正则查找</ComboBoxItem>
+                <ComboBoxItem>Hex字符</ComboBoxItem>
             </ComboBox>
             <TextBox Grid.Column="1" Text="{Binding FindText, Mode=TwoWay}" />
             <Button
