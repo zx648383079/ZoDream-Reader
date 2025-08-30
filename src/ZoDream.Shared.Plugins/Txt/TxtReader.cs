@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -7,6 +9,7 @@ using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
 using ZoDream.Shared.Storage;
 using ZoDream.Shared.Tokenizers;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ZoDream.Shared.Plugins.Txt
 {
@@ -71,13 +74,25 @@ namespace ZoDream.Shared.Plugins.Txt
                 {
                     continue;
                 }
-                if (splitRule.IsMatch(line))
+                var match = splitRule.Match(line);
+                if (match.Success)
                 {
+                    var volume = match.Groups.TryGetValue("volume", out var group) ? group.Value.Trim() : string.Empty;
+                    if (!string.IsNullOrEmpty(volume)
+                        && res.Items.LastOrDefault()?.Name != volume)
+                    {
+                        res.Add(new NovelVolume(volume));
+                    }
+                    var title = line.Trim();
+                    if (match.Groups.TryGetValue("section", out group))
+                    {
+                        title = group.Value.Trim();
+                    }
                     if (!string.IsNullOrWhiteSpace(last.Title) || last.Items.Count > 0)
                     {
                         res.Add(last);
                     }
-                    last = new NovelSection(line.Trim());
+                    last = new NovelSection(title);
                     bodyLength = 0;
                     isMatchRule = true;
                     continue;
@@ -114,6 +129,7 @@ namespace ZoDream.Shared.Plugins.Txt
             data.Start();
             input.Seek(0, SeekOrigin.Begin);
             var reader = new StreamReader(input, encoding);
+            var volumeItems = new HashSet<string>();
             while (!data.IsPaused)
             {
                 var line = await reader.ReadLineAsync();
@@ -125,11 +141,22 @@ namespace ZoDream.Shared.Plugins.Txt
                 {
                     continue;
                 }
-                if (splitRule.IsMatch(line))
+                var match = splitRule.Match(line);
+                if (!match.Success)
                 {
-                    data.Add(line.Trim());
                     continue;
                 }
+                if (match.Groups.TryGetValue("volume", out var group) && !volumeItems.Contains(group.Value))
+                {
+                    data.Add(group.Value);
+                    volumeItems.Add(group.Value);
+                }
+                if (match.Groups.TryGetValue("section", out group))
+                {
+                    data.Add(group.Value.Trim());
+                    continue;
+                }
+                data.Add(line.Trim());
             }
             data.Stop();
         }
