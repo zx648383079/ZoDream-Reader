@@ -77,7 +77,9 @@ namespace ZoDream.Reader.ViewModels
         {
             var items = await App.GetService<AppViewModel>().Database
                 .GetEnabledChapterRuleAsync();
-            RuleItems = [DefaultRule, ..items];
+            RuleItems = [DefaultRule,
+                @"(?<volume>第[0-9零一二三四五六七八九十百千]{1,10}卷.{0,20})\s*(?<section>第[0-9零一二三四五六七八九十百千]{1,10}[章集].{0,30})$", 
+                ..items];
         }
     }
 }

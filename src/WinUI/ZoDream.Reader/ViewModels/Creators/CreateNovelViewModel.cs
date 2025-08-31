@@ -971,7 +971,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            Items.Move(data.ItemsIndex[0], data.TargetIndex);
+            Items.Move(data.ItemsIndex[0], Math.Max(data.TargetIndex, 0));
         }
 
         private void TapAddNew(IEditableSection? arg)

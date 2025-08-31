@@ -9,7 +9,6 @@ using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Models;
 using ZoDream.Shared.Storage;
 using ZoDream.Shared.Tokenizers;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ZoDream.Shared.Plugins.Txt
 {
@@ -74,23 +73,17 @@ namespace ZoDream.Shared.Plugins.Txt
                 {
                     continue;
                 }
-                var match = splitRule.Match(line);
-                if (match.Success)
+                if (TryMatch(line, out var volume, out var title))
                 {
-                    var volume = match.Groups.TryGetValue("volume", out var group) ? group.Value.Trim() : string.Empty;
+                    
+                    if (!string.IsNullOrWhiteSpace(last.Title) || last.Items.Count > 0)
+                    {
+                        res.Add(last);
+                    }
                     if (!string.IsNullOrEmpty(volume)
                         && res.Items.LastOrDefault()?.Name != volume)
                     {
                         res.Add(new NovelVolume(volume));
-                    }
-                    var title = line.Trim();
-                    if (match.Groups.TryGetValue("section", out group))
-                    {
-                        title = group.Value.Trim();
-                    }
-                    if (!string.IsNullOrWhiteSpace(last.Title) || last.Items.Count > 0)
-                    {
-                        res.Add(last);
                     }
                     last = new NovelSection(title);
                     bodyLength = 0;
@@ -141,24 +134,49 @@ namespace ZoDream.Shared.Plugins.Txt
                 {
                     continue;
                 }
-                var match = splitRule.Match(line);
-                if (!match.Success)
+                if (!TryMatch(line, out var volume, out var title))
                 {
                     continue;
                 }
-                if (match.Groups.TryGetValue("volume", out var group) && !volumeItems.Contains(group.Value))
+                if (!string.IsNullOrEmpty(volume) && !volumeItems.Contains(volume))
                 {
-                    data.Add(group.Value);
-                    volumeItems.Add(group.Value);
+                    data.Add(volume);
+                    volumeItems.Add(volume);
                 }
-                if (match.Groups.TryGetValue("section", out group))
+                if (!string.IsNullOrEmpty(title))
                 {
-                    data.Add(group.Value.Trim());
-                    continue;
+                    data.Add(title);
                 }
-                data.Add(line.Trim());
             }
             data.Stop();
+        }
+
+        private bool TryMatch(string line, out string volume, out string section)
+        {
+            volume = string.Empty;
+            section = string.Empty;
+            var match = splitRule.Match(line);
+            if (!match.Success)
+            {
+                return false;
+            }
+            if (match.Groups.TryGetValue("volume", out var group))
+            {
+                volume = group.Value.Trim();
+            }
+            if (match.Groups.TryGetValue("section", out var next))
+            {
+                section = next.Value.Trim();
+            }
+            if (group is not null && string.IsNullOrEmpty(section))
+            {
+                section = line[(group.Index + group.Length)..].Trim();
+            }
+            if (group is null && string.IsNullOrEmpty(section))
+            {
+                section = line.Trim();
+            }
+            return true;
         }
 
         public void Dispose()
