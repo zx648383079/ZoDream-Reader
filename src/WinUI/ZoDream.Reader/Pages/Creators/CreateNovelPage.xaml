@@ -22,7 +22,7 @@
                 <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="EditorStyle" TargetType="TextBox">
+            <Style x:Key="EditorStyle" TargetType="RichEditBox">
                 <Setter Property="AcceptsReturn" Value="True" />
                 <Setter Property="FontSize" Value="25" />
                 <Setter Property="IsSpellCheckEnabled" Value="False" />
@@ -323,8 +323,14 @@
                 <RichEditBox
                     x:Name="PART_TextBox"
                     Grid.Row="2"
+                    AcceptsReturn="False"
+                    KeyDown="TextBox_KeyDown"
                     KeyboardAcceleratorPlacementMode="Hidden"
-                    Style="{StaticResource EditorStyle}">
+                    Loaded="TextBox_Loaded"
+                    Paste="TextBox_Paste"
+                    Style="{StaticResource EditorStyle}"
+                    TextChanged="TextBox_TextChanged"
+                    Unloaded="TextBox_Unloaded">
                     <RichEditBox.KeyboardAccelerators>
                         <KeyboardAccelerator
                             Key="F"

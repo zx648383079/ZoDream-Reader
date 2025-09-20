@@ -96,6 +96,19 @@ namespace ZoDream.Reader.Controls
             Select(position, 0);
         }
 
+        public void Paste(string text)
+        {
+            control.Focus(FocusState.Programmatic);
+            control.SelectedText = text;
+        }
+
+        public void AddNewLine()
+        {
+            control.Focus(FocusState.Programmatic);
+            control.SelectedText = $"{NewLine}    ";
+            Select(SelectionEnd, 0);
+        }
+
         public void Select(int start, int count)
         {
             control.Focus(FocusState.Programmatic);
@@ -111,5 +124,28 @@ namespace ZoDream.Reader.Controls
         {
             control.Select(0, 0);
         }
+        public void ResetUndo()
+        {
+            control.ClearUndoRedoHistory();
+        }
+        public void Focus()
+        {
+            control.Focus(FocusState.Programmatic);
+        }
+
+        public string Split(int position)
+        {
+            var text = control.Text;
+            var pos = SelectionStart;
+            control.Text = text[..pos];
+            ResetUndo();
+            return text[pos..];
+        }
+        public string Split()
+        {
+            return Split(SelectionStart);
+        }
+
+
     }
 }

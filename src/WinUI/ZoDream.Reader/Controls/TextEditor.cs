@@ -22,24 +22,25 @@ namespace ZoDream.Reader.Controls
         }
 
         private TextBox? _canvas;
+        private ITextEditor? _document;
         private int _cursor;
         private int _cursorNext;
         private string _source = string.Empty;
         private readonly List<int> _histories = [0];
 
-        public char NewLine => '\r';
+        public char NewLine => _document.NewLine;
 
         public bool CanBack => _cursor > 0;
         public bool CanForward => _cursorNext < Text.Length;
 
 
-        public bool CanUndo => _canvas?.CanUndo == true;
+        public bool CanUndo => _document?.CanUndo == true;
 
-        public bool CanRedo => _canvas?.CanRedo == true;
+        public bool CanRedo => _document?.CanRedo == true;
 
-        public int SelectionStart => _canvas?.SelectionStart ?? 0;
+        public int SelectionStart => _document?.SelectionStart ?? 0;
 
-        public int SelectionLength => _canvas?.SelectionLength ?? 0;
+        public int SelectionLength => _document?.SelectionLength ?? 0;
 
         public string Text { 
             get {
@@ -53,12 +54,13 @@ namespace ZoDream.Reader.Controls
             }
         }
 
-        public string SelectedText => _canvas?.SelectedText ?? string.Empty;
+        public string SelectedText => _document?.SelectedText ?? string.Empty;
 
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
             _canvas = GetTemplateChild(TextRender.CanvasElementName) as TextBox;
+            _document = new TextBoxEditor(_canvas);
         }
 
 
@@ -194,6 +196,16 @@ namespace ZoDream.Reader.Controls
             return false;
         }
 
+        public void Paste(string text)
+        {
+            _document?.Paste(text);
+        }
+
+        public void AddNewLine()
+        {
+            _document?.AddNewLine();
+        }
+
         public void Select(int start, int count)
         {
             if (_canvas is null)
@@ -281,12 +293,12 @@ namespace ZoDream.Reader.Controls
 
         public void Undo()
         {
-            _canvas?.Undo();
+            _document?.Undo();
         }
 
         public void Redo()
         {
-            _canvas?.Redo();
+            _document?.Redo();
         }
 
         public IDictionary<char, int> Count()
@@ -297,6 +309,24 @@ namespace ZoDream.Reader.Controls
             return data;
         }
 
+        public void ResetUndo()
+        {
+            _document?.ResetUndo();
+        }
 
+        public void Focus()
+        {
+            _document?.Focus();
+        }
+
+        public string Split(int position)
+        {
+            return _document?.Split(position) ?? string.Empty;
+        }
+
+        public string Split()
+        {
+            return _document?.Split() ?? string.Empty;
+        }
     }
 }

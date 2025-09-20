@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using Windows.UI;
 using ZoDream.Shared.Interfaces;
@@ -14,6 +13,7 @@ namespace ZoDream.Reader.Controls
 {
     public class RichTextBoxEditor(RichEditBox control) : ITextEditor
     {
+
         public char NewLine => '\r';
 
         public string Text {
@@ -44,9 +44,10 @@ namespace ZoDream.Reader.Controls
 
         public int SelectionStart => control.Document.Selection.StartPosition;
 
-        public int SelectionLength => control.Document.Selection.Length;
-
-
+        /// <summary>
+        /// 负数表示反方向选中
+        /// </summary>
+        public int SelectionLength => Math.Abs(control.Document.Selection.Length);
 
 
         public void GoBack()
@@ -71,6 +72,11 @@ namespace ZoDream.Reader.Controls
         public void Redo()
         {
             control.Document.Redo();
+        }
+
+        public void ResetUndo()
+        {
+            control.Document.ClearUndoRedoHistory();
         }
 
         public void ScrollTo(int position)
@@ -119,6 +125,45 @@ namespace ZoDream.Reader.Controls
             control.Focus(FocusState.Programmatic);
             range.SetRange(start, start + count);
             range.ScrollIntoView(PointOptions.Start);
+        }
+
+        public void Paste(string text)
+        {
+            var range = control.Document.Selection;
+            //var originalStart = range.StartPosition;
+            //var originalEnd = range.EndPosition;
+
+            // 插入纯文本
+            range.SetText(TextSetOptions.None, text);
+            if (text.Length > 500)
+            {
+                Select(range.EndPosition, 0);
+            }
+        }
+
+        public void AddNewLine()
+        {
+            var range = control.Document.Selection;
+            range.SetText(TextSetOptions.None, $"{NewLine}    ");
+            range.SetRange(range.EndPosition, range.EndPosition);
+        }
+
+        public void Focus()
+        {
+            control.Focus(FocusState.Programmatic);
+        }
+
+        public string Split(int position)
+        {
+            var range = control.Document.GetRange(position, TextConstants.MaxUnitCount);
+            range.GetText(TextGetOptions.None, out var text);
+            range.SetText(TextSetOptions.None, string.Empty);
+            ResetUndo();
+            return text;
+        }
+        public string Split()
+        {
+            return Split(SelectionStart);
         }
 
         public void Undo()

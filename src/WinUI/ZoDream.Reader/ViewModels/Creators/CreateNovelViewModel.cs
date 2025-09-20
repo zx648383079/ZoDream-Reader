@@ -148,18 +148,6 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        public string Content {
-            get => Document?.Text ?? string.Empty;
-            set {
-                if (Document is null)
-                {
-                    return;
-                }
-                Document.Text = value;
-                _isUpdated = true;
-            }
-        }
-
         private ObservableCollection<IEditableSection> _items = [];
 
         public ObservableCollection<IEditableSection> Items {
@@ -432,12 +420,9 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            var index = Document.SelectionStart;
-            var text = Document.Text;
-            Content = text[..index];
             var chapter = new ChapterItemViewModel(this)
             {
-                RawText = text[index..]
+                RawText = Document.Split()
             };
             SaveSection();
             var i = Items.IndexOf(_current);
@@ -472,7 +457,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            Content = Document.Text.Replace(FindText, ReplaceText);
+            Document.Text = Document.Text.Replace(FindText, ReplaceText);
             await _app.ConfirmAsync("替换完成");
         }
         private void TapFind()
@@ -506,7 +491,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 text = text[..^1];
             }
-            Content = $"{source[..start]}“{text}”{source[end..]}";
+            Document.Text = $"{source[..start]}“{text}”{source[end..]}";
         }
 
         private async void TapWordProofread()
@@ -515,7 +500,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            Content = _proofreader.Proofreading(Document.Text);
+            Document.Text = _proofreader.Proofreading(Document.Text);
         }
 
         private async void TapFormatProofread()
@@ -525,7 +510,7 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             var proofreader = new TextFormatProofreader();
-            Content = proofreader.Proofreading(Document.Text);
+            Document.Text = proofreader.Proofreading(Document.Text);
         }
 
         private void TapEnter()
@@ -534,9 +519,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            var source = Document.Text;
-            var start = Document.SelectionStart;
-            Content = $"{source[..start]}{Document.NewLine}    {source[start..]}";
+            Document.AddNewLine();
         }
 
         private async void TapReplace()
@@ -709,7 +692,7 @@ namespace ZoDream.Reader.ViewModels
         }
         private void SaveSection(IEditableSection? section)
         {
-            if (!_isUpdated || section is null)
+            if (!_isUpdated || section is null || Document is null)
             {
                 return;
             }
@@ -717,7 +700,7 @@ namespace ZoDream.Reader.ViewModels
             section.IsWrong = false;
             if (section is ChapterItemViewModel o)
             {
-                o.Text = Content;
+                o.Text = Document.Text;
             }
             _isUpdated = false;
         }
@@ -732,6 +715,10 @@ namespace ZoDream.Reader.ViewModels
             LoadSection(model);
             await Task.Delay(100);
             Document?.ScrollTo(0);
+            Document?.ResetUndo();
+            UndoEnabled = false;
+            RedoEnabled = false;
+            _isUpdated = false;
             if (model.IsWrong)
             {
                 TapCheck();
@@ -742,10 +729,9 @@ namespace ZoDream.Reader.ViewModels
         {
             _current = model;
             Title = _current.Title;
-            Content = _current is ChapterItemViewModel o ? o.Text : string.Empty;
+            Document!.Text = _current is ChapterItemViewModel o ? o.Text : string.Empty;
             WrongItems.Clear();
             _isUpdated = false;
-            
         }
 
         private async Task<bool> LoadDictionaryAsync()
@@ -851,11 +837,11 @@ namespace ZoDream.Reader.ViewModels
             if (_current is null || _isUpdated)
             {
                 Title = Title.Replace(arg.Word, string.Empty);
-                Content = Content.Replace(arg.Word, string.Empty);
+                Document!.Text = Document.Text.Replace(arg.Word, string.Empty);
             } else
             {
                 Title = _current.Title.Replace(arg.Word, string.Empty);
-                Content = _current is ChapterItemViewModel o ? o.Text.Replace(arg.Word, string.Empty) : string.Empty;
+                Document!.Text = _current is ChapterItemViewModel o ? o.Text.Replace(arg.Word, string.Empty) : string.Empty;
             }
             WrongItems.Remove(arg);
             SelectedWord = null;
@@ -911,7 +897,7 @@ namespace ZoDream.Reader.ViewModels
                 TapJumpTo(WrongItems[0]);
                 return;
             }
-            Content = _proofreader.Proofreading(Document.Text);
+            Document.Text = _proofreader.Proofreading(Document.Text);
         }
 
         private IEnumerable<char> CheckFromSource()
@@ -1043,7 +1029,7 @@ namespace ZoDream.Reader.ViewModels
             if (Items.Count <= 1)
             {
                 _current!.Title = Title = string.Empty;
-                Content = string.Empty;
+                Document!.Text = string.Empty;
                 return;
             }
             Items.RemoveAt(i);
@@ -1113,6 +1099,17 @@ namespace ZoDream.Reader.ViewModels
             //Document.Selection.TypeText("\n");
         }
 
+        internal void OnTextChanged()
+        {
+            if (Document is null)
+            {
+                return;
+            }
+            UndoEnabled = Document.CanUndo;
+            RedoEnabled = Document.CanRedo;
+            _isUpdated = true;
+        }
+
         private void Deserialize(INovelDocument doc)
         {
             Name = doc.Name;
@@ -1121,7 +1118,7 @@ namespace ZoDream.Reader.ViewModels
             Rating = doc.Rating / 2;
             Cover = doc.Cover?.ToBase64String();
             _current = null;
-            Content = Title = string.Empty;
+            Document!.Text = Title = string.Empty;
             Items.Clear();
             foreach (var item in doc.Items)
             {
@@ -1205,6 +1202,6 @@ namespace ZoDream.Reader.ViewModels
         [GeneratedRegex(@"^第\s*([0-9零一二三四五六七八九十百千]{1,10})\s*章\s*·?")]
         private static partial Regex ChapterOrderRegex();
 
-
+        
     }
 }
