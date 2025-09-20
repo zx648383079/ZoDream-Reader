@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 
 namespace ZoDream.Shared.Interfaces
@@ -7,6 +7,8 @@ namespace ZoDream.Shared.Interfaces
     {
         public char NewLine { get; }
         public string Text { get; set; }
+
+        public string SelectedText { get; }
 
         public bool CanBack { get; }
         public bool CanForward { get; }

@@ -310,30 +310,29 @@
                     <Button
                         Command="{Binding UndoCommand}"
                         Content="&#xE7A7;"
-                        IsEnabled="{Binding ElementName=PART_TextBox, Path=CanUndo}"
+                        IsEnabled="{Binding UndoEnabled}"
                         Style="{StaticResource LargeIconBtn}"
                         ToolTipService.ToolTip="Undo" />
                     <Button
                         Command="{Binding RedoCommand}"
                         Content="&#xE7A6;"
-                        IsEnabled="{Binding ElementName=PART_TextBox, Path=CanRedo}"
+                        IsEnabled="{Binding RedoEnabled}"
                         Style="{StaticResource LargeIconBtn}"
                         ToolTipService.ToolTip="Redo" />
                 </StackPanel>
-                <TextBox
+                <RichEditBox
                     x:Name="PART_TextBox"
                     Grid.Row="2"
                     KeyboardAcceleratorPlacementMode="Hidden"
-                    Style="{StaticResource EditorStyle}"
-                    Text="{Binding Content, Mode=TwoWay}">
-                    <TextBox.KeyboardAccelerators>
+                    Style="{StaticResource EditorStyle}">
+                    <RichEditBox.KeyboardAccelerators>
                         <KeyboardAccelerator
                             Key="F"
                             Invoked="FindKeyboard_Invoked"
                             IsEnabled="True"
                             Modifiers="Control" />
-                    </TextBox.KeyboardAccelerators>
-                </TextBox>
+                    </RichEditBox.KeyboardAccelerators>
+                </RichEditBox>
                 <ctl:FindPanel
                     Grid.Row="2"
                     FindBackCommand="{Binding FindBackCommand}"

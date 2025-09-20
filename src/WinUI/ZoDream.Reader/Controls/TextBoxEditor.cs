@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +12,8 @@ namespace ZoDream.Reader.Controls
     {
         public char NewLine => '\r';
         public string Text { get => control.Text; set => control.Text = value; }
+
+        public string SelectedText => control.SelectedText;
 
         public bool CanBack => false;
 

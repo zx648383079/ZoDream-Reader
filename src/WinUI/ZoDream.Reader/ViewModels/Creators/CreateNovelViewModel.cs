@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -25,7 +25,6 @@ using ZoDream.Shared.Plugins.Txt;
 using ZoDream.Shared.Plugins.Umd;
 using ZoDream.Shared.Text;
 using ZoDream.Shared.Tokenizers;
-using static ABI.System.Windows.Input.ICommand_Delegates;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -149,12 +148,14 @@ namespace ZoDream.Reader.ViewModels
             }
         }
 
-        private string _content = string.Empty;
-
         public string Content {
-            get => _content;
+            get => Document?.Text ?? string.Empty;
             set {
-                SetProperty(ref _content, value);
+                if (Document is null)
+                {
+                    return;
+                }
+                Document.Text = value;
                 _isUpdated = true;
             }
         }
@@ -467,11 +468,11 @@ namespace ZoDream.Reader.ViewModels
         }
         private async void TapConfirmReplace()
         {
-            if (string.IsNullOrWhiteSpace(FindText))
+            if (Document is null || string.IsNullOrWhiteSpace(FindText))
             {
                 return;
             }
-            Content = Content.Replace(FindText, ReplaceText);
+            Content = Document.Text.Replace(FindText, ReplaceText);
             await _app.ConfirmAsync("替换完成");
         }
         private void TapFind()
@@ -481,21 +482,22 @@ namespace ZoDream.Reader.ViewModels
 
         private void TapQuote()
         {
-            if (Document is null || string.IsNullOrWhiteSpace(Content))
+            if (Document is null)
             {
                 return;
             }
+            var source = Document.Text;
             var start = Document.SelectionStart;
             var end = start + Document.SelectionLength;
             if (start == end)
             {
-                end = Content.IndexOf(Document.NewLine, start + 1);
+                end = source.IndexOf(Document.NewLine, start + 1);
                 if (end == -1)
                 {
-                    end = Content.Length;
+                    end = source.Length;
                 }
             }
-            var text = Content[start..end].Trim();
+            var text = source[start..end].Trim();
             if (EncodingBuilder.IsQuote(text[0]))
             {
                 text = text[1..];
@@ -504,26 +506,26 @@ namespace ZoDream.Reader.ViewModels
             {
                 text = text[..^1];
             }
-            Content = $"{Content[..start]}“{text}”{Content[end..]}";
+            Content = $"{source[..start]}“{text}”{source[end..]}";
         }
 
         private async void TapWordProofread()
         {
-            if (_proofreader is null || !await _app.ConfirmAsync("是否使用校对功能进行修复字词错误？"))
+            if (Document is null || _proofreader is null || !await _app.ConfirmAsync("是否使用校对功能进行修复字词错误？"))
             {
                 return;
             }
-            Content = _proofreader.Proofreading(Content);
+            Content = _proofreader.Proofreading(Document.Text);
         }
 
         private async void TapFormatProofread()
         {
-            if (!await _app.ConfirmAsync("是否使用校对功能进行修复段落、字符错误？"))
+            if (Document is null || !await _app.ConfirmAsync("是否使用校对功能进行修复段落、字符错误？"))
             {
                 return;
             }
             var proofreader = new TextFormatProofreader();
-            Content = proofreader.Proofreading(Content);
+            Content = proofreader.Proofreading(Document.Text);
         }
 
         private void TapEnter()
@@ -532,8 +534,9 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
+            var source = Document.Text;
             var start = Document.SelectionStart;
-            Content = $"{Content[..start]}{Document.NewLine}    {Content[start..]}";
+            Content = $"{source[..start]}{Document.NewLine}    {source[start..]}";
         }
 
         private async void TapReplace()
@@ -548,11 +551,11 @@ namespace ZoDream.Reader.ViewModels
             var model = picker.ViewModel;
             model.Load(this);
             var res = await _app.OpenDialogAsync(picker);
-            if (res == Microsoft.UI.Xaml.Controls.ContentDialogResult.None || !model.IsValid)
+            if (res == ContentDialogResult.None || !model.IsValid)
             {
                 return;
             }
-            if (res == Microsoft.UI.Xaml.Controls.ContentDialogResult.Secondary)
+            if (res == ContentDialogResult.Secondary)
             {
                 JumpTo(model.SelectedItem ?? model.Items.FirstOrDefault());
                 return;
@@ -908,7 +911,7 @@ namespace ZoDream.Reader.ViewModels
                 TapJumpTo(WrongItems[0]);
                 return;
             }
-            Content = _proofreader.Proofreading(Content);
+            Content = _proofreader.Proofreading(Document.Text);
         }
 
         private IEnumerable<char> CheckFromSource()
@@ -954,7 +957,7 @@ namespace ZoDream.Reader.ViewModels
                 }
                 res.Add(item);
             }
-            foreach (var item in Document.Text)
+            foreach (var item in Document!.Text)
             {
                 if (_dict!.TrySerialize(item, out _))
                 {

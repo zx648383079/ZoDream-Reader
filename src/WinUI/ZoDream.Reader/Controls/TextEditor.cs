@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
@@ -53,7 +53,7 @@ namespace ZoDream.Reader.Controls
             }
         }
 
-
+        public string SelectedText => _canvas?.SelectedText ?? string.Empty;
 
         protected override void OnApplyTemplate()
         {
