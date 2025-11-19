@@ -11,7 +11,8 @@
     xmlns:vm="using:ZoDream.Reader.ViewModels"
     IsPrimaryButtonEnabled="{Binding Items.IsPaused}"
     PrimaryButtonText="{Binding OkText}"
-    SecondaryButtonText="取消"
+    SecondaryButtonText="{Binding SelectText}"
+    CloseButtonText="取消"
     mc:Ignorable="d">
 
     <ContentDialog.DataContext>
@@ -43,9 +44,17 @@
             ShowPaused="False"
             Visibility="{Binding Items.InProgress, Converter={StaticResource ToggleCvt}}" />
         <ListBox
+            x:Name="ItemsListView"
             Grid.Row="2"
             MinHeight="160"
+            SelectionMode="Extended"
             ItemsSource="{Binding Items}"
-            Style="{StaticResource CustomListBox}" />
+            Style="{StaticResource CustomListBox}">
+            <ivy:Interaction.Behaviors>
+                <ivy:EventTriggerBehavior EventName="SelectionChanged">
+                    <ivy:InvokeCommandAction Command="{x:Bind ViewModel.SelectItemsCommand, Mode=OneTime}" CommandParameter="{x:Bind ItemsListView.SelectedItems, Mode=OneTime}" />
+                </ivy:EventTriggerBehavior>
+            </ivy:Interaction.Behaviors>
+        </ListBox>
     </Grid>
 </ContentDialog>

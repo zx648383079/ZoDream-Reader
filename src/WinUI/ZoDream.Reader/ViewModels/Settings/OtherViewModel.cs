@@ -1,14 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.UI.Popups;
-using ZoDream.Reader.Dialogs;
-using ZoDream.Reader.Utils;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -32,7 +24,7 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             await app.InitializeWorkspaceAsync();
-            Toast.Show("清除数据完成");
+            app.ToastAsync("清除数据完成");
         }
     }
 }

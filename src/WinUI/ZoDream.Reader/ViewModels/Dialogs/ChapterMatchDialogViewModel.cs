@@ -1,76 +1,128 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml.Controls;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Input;
+using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Plugins.Txt;
+using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.ViewModels
 {
-    public class ChapterMatchDialogViewModel : ObservableObject
+    public partial class ChapterMatchDialogViewModel : ObservableObject
     {
         const string DefaultRule = @"^第\s*[0-9零一二三四五六七八九十百千]{1,10}[章回节卷集幕计]?.{0,20}$";
 
         public ChapterMatchDialogViewModel()
         {
-            MatchCommand = new RelayCommand<string>(TapMatch);
             _ = InitializeAsync();
         }
 
-        
+
+        private Stream? _input;
         private string _fileName = string.Empty;
+        private Encoding _encoding = Encoding.UTF8;
+        private string[] _selectedItems = [];
 
 
-        private string _ruleText = string.Empty;
+        [ObservableProperty]
+        public partial string RuleText { get; set; } = string.Empty;
 
-        public string RuleText {
-            get => _ruleText;
-            set => SetProperty(ref _ruleText, value);
-        }
-
-        private string[] _ruleItems = [];
-
-        public string[] RuleItems {
-            get => _ruleItems;
-            set => SetProperty(ref _ruleItems, value);
-        }
+        [ObservableProperty]
+        public partial string[] RuleItems { get; set; } = [];
 
 
-        private AsyncObservableCollection<string> _items = [];
+        [ObservableProperty]
+        public partial AsyncObservableCollection<string> Items { get; set; } = [];
+        [ObservableProperty]
+        public partial string OkText { get; set; } = "全部";
 
-        public AsyncObservableCollection<string> Items {
-            get => _items;
-            set => SetProperty(ref _items, value);
-        }
-
-        private string _okText = "确定";
-
-        public string OkText {
-            get => _okText;
-            set => SetProperty(ref _okText, value);
-        }
+        [ObservableProperty]
+        public partial string SelectText { get; set; } = "仅选中0章";
 
 
-        public ICommand MatchCommand { get; private set; }
-
-        private async void TapMatch(string? text)
+        [RelayCommand]
+        private async Task Match(string? text)
         {
             Items.Clear();
-            await LoadAsync(_fileName, text!);
+            await LoadAsync(text!);
         }
 
-        public Task LoadAsync(string fileName)
+        [RelayCommand]
+        private void SelectItems(IList<object>? selectedItems)
+        {
+            _selectedItems = selectedItems?.Select(i => (string)i)?.ToArray() ?? [];
+            SelectText = $"仅选中{selectedItems?.Count}章";
+        }
+
+        public INovelDocument Read(ContentDialogResult res)
+        {
+            if (res == ContentDialogResult.None)
+            {
+                return new RichDocument();
+            }
+            return Read(res == ContentDialogResult.Secondary);
+        }
+        public INovelDocument Read(bool onlySelected = false)
+        {
+            if (_input is null || (onlySelected && _selectedItems.Length == 0))
+            {
+                return new RichDocument();
+            }
+            var reader = new TxtReader(_input, _encoding, _fileName, new Regex(RuleText));
+            var res = reader.Read();
+            if (!onlySelected)
+            {
+                return res;
+            }
+            for (int i = res.Items.Count - 1; i >= 0; i--)
+            {
+                var group = res.Items[i];
+                for (var j = group.Count - 1; j >= 0; j--)
+                {
+                    if (_selectedItems.Contains(group[j].Title))
+                    {
+                        continue;
+                    }
+                    group.RemoveAt(j);
+                }
+                if (group.Count == 0)
+                {
+                    res.Items.RemoveAt(i);
+                }
+            }
+            return res;
+        }
+        public Task LoadAsync(string fileName, Stream input, Encoding encoding)
         {
             _fileName = fileName;
-            return LoadAsync(fileName, RuleText = DefaultRule);
+            _input = input;
+            _encoding = encoding;
+            return LoadAsync(RuleText = DefaultRule);
+        }
+        public Task LoadAsync(string fileName, Stream input)
+        {
+            return LoadAsync(fileName, input, TxtReader.GetEncoding(input));
+        }
+        public Task LoadAsync(Stream input, Encoding encoding)
+        {
+            return LoadAsync(string.Empty, input, encoding);
         }
 
-        public async Task LoadAsync(string fileName, string ruleText)
+        private async Task LoadAsync(string ruleText)
         {
-            using var fs = File.OpenRead(fileName);
-            using var reader = new TxtReader(fs, fileName, ruleText);
+            if (_input is null)
+            {
+                return;
+            }
+            _input.Seek(0, SeekOrigin.Begin);
+            var reader = new TxtReader(_input, _encoding, _fileName, new Regex(ruleText));
             await reader.ReadAsync(Items);
-            OkText = $"确认(共{Items.Count}章)";
+            OkText = $"全部(共{Items.Count}章)";
         }
 
         private async Task InitializeAsync()

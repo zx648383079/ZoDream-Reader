@@ -4,9 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.Storage.Pickers;
+using Microsoft.Windows.Storage.Pickers;
 using ZoDream.Reader.Controls;
 using ZoDream.Reader.Dialogs;
 using ZoDream.Shared.Interfaces.Route;
@@ -185,11 +184,10 @@ namespace ZoDream.Reader.ViewModels
 
         private async void LoadLocal()
         {
-            var picker = new FileOpenPicker();
+            var picker = new FileOpenPicker(_app.AppWindowId);
             picker.FileTypeFilter.Add(".txt");
             picker.FileTypeFilter.Add(".epub");
             picker.FileTypeFilter.Add(".umd");
-            _app.InitializePicker(picker);
             var file = await picker.PickSingleFileAsync();
             if (file is null)
             {

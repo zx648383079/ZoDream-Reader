@@ -4,10 +4,9 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Windows.Input;
-using Windows.Storage.Pickers;
+using Microsoft.Windows.Storage.Pickers;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.Text;
 
@@ -130,9 +129,8 @@ namespace ZoDream.Reader.ViewModels
 
         private async void TapOpenDict()
         {
-            var picker = new FileOpenPicker();
+            var picker = new FileOpenPicker(_app.AppWindowId);
             picker.FileTypeFilter.Add(".bin");
-            _app.InitializePicker(picker);
             var file = await picker.PickSingleFileAsync();
             if (file is null)
             {
@@ -146,10 +144,9 @@ namespace ZoDream.Reader.ViewModels
         {
             if (string.IsNullOrEmpty(_dictFileName) || !await _app.ConfirmAsync("是否覆盖？"))
             {
-                var picker = new FileSavePicker();
+                var picker = new FileSavePicker(_app.AppWindowId);
                 picker.FileTypeChoices.Add("字典", [".bin"]);
                 picker.SuggestedFileName = "dict.bin";
-                _app.InitializePicker(picker);
                 var file = await picker.PickSaveFileAsync();
                 if (file is null)
                 {
@@ -237,9 +234,8 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            var picker = new FileOpenPicker();
+            var picker = new FileOpenPicker(_app.AppWindowId);
             picker.FileTypeFilter.Add(".txt");
-            _app.InitializePicker(picker);
             var file = await picker.PickSingleFileAsync();
             if (file is null)
             {

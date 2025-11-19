@@ -22,6 +22,13 @@
                 <ResourceDictionary Source="ms-appx:///Themes/InputStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Style x:Key="ToolGroupStyle" TargetType="SplitButton">
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            </Style>
+
             <Style x:Key="EditorStyle" TargetType="RichEditBox">
                 <Setter Property="AcceptsReturn" Value="True" />
                 <Setter Property="FontSize" Value="25" />
@@ -147,11 +154,21 @@
                 <ColumnDefinition Width="200" />
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
-                <Button
-                    Command="{Binding OpenCommand}"
-                    Content="&#xE8E5;"
-                    Style="{StaticResource LargeIconBtn}"
-                    ToolTipService.ToolTip="打开书籍" />
+                
+                <SplitButton
+                    Style="{StaticResource ToolGroupStyle}">
+                    <Button
+                        Command="{Binding OpenCommand}"
+                        Content="&#xE8E5;"
+                        Style="{StaticResource LargeIconBtn}"
+                        ToolTipService.ToolTip="打开书籍" />
+                    <SplitButton.Flyout>
+                        <MenuFlyout Placement="Bottom">
+                            <MenuFlyoutItem Command="{Binding AppendFromFileCommand}" />
+                            <MenuFlyoutItem Command="{Binding AppendFromPasteCommand}" />
+                        </MenuFlyout>
+                    </SplitButton.Flyout>
+                </SplitButton>
                 <Button
                     Command="{Binding SaveCommand}"
                     Content="&#xE74E;"
@@ -248,10 +265,7 @@
                     <AppBarSeparator />
 
                     <SplitButton
-                        Padding="0"
-                        VerticalContentAlignment="Center"
-                        Background="Transparent"
-                        BorderBrush="Transparent">
+                        Style="{StaticResource ToolGroupStyle}">
                         <Button
                             Command="{Binding CheckCommand}"
                             Content="&#xE8FE;"

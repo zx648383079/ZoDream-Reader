@@ -1,20 +1,13 @@
 ﻿using Microsoft.UI;
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.Windows.AppNotifications;
+using Microsoft.Windows.AppNotifications.Builder;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Windows.Foundation;
-using Windows.Graphics;
-using Windows.UI;
 using WinRT.Interop;
-using ZoDream.Reader.Controls;
 using ZoDream.Reader.Dialogs;
-using ZoDream.Reader.Pages;
-using ZoDream.Reader.Repositories;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -22,10 +15,7 @@ namespace ZoDream.Reader.ViewModels
     {
         public XamlRoot BaseXamlRoot => _baseWindow!.Content.XamlRoot;
 
-        public void InitializePicker(object target)
-        {
-            InitializeWithWindow.Initialize(target, _baseWindowHandle);
-        }
+        public WindowId AppWindowId => BaseXamlRoot.ContentIslandEnvironment.AppWindowId;
 
         public async Task<bool> ConfirmAsync(string message, string title = "提示")
         {
@@ -35,6 +25,14 @@ namespace ZoDream.Reader.ViewModels
                 Content = message
             };
             return await OpenDialogAsync(dialog) == ContentDialogResult.Primary;
+        }
+
+        public void ToastAsync(string text)
+        {
+            var notification = new AppNotificationBuilder()
+                .AddText(text)
+                .BuildNotification();
+            AppNotificationManager.Default.Show(notification);
         }
 
         public IAsyncOperation<ContentDialogResult> OpenDialogAsync(ContentDialog target)

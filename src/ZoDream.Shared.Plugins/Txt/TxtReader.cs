@@ -277,7 +277,7 @@ namespace ZoDream.Shared.Plugins.Txt
         }
         #endregion
 
-        private static Encoding GetEncoding(Stream input)
+        public static Encoding GetEncoding(Stream input)
         {
             return TxtEncoder.GetEncoding(input, Encoding.GetEncoding("gb2312"));
         }

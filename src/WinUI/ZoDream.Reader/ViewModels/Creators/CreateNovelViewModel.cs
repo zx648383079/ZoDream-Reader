@@ -8,11 +8,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage.Pickers;
+using Microsoft.Windows.Storage.Pickers;
 using ZoDream.Reader.Behaviors;
 using ZoDream.Reader.Controls;
 using ZoDream.Reader.Converters;
@@ -70,6 +71,27 @@ namespace ZoDream.Reader.ViewModels
             ConfirmReplaceCommand = new RelayCommand(TapConfirmReplace);
             EnterCommand = new RelayCommand(TapEnter);
 
+
+            AppendFromFileCommand = new XamlUICommand()
+            {
+                Label = "追加自文件",
+                Description = "读取文件并合并到当前",
+                IconSource = new FontIconSource()
+                {
+                    Glyph = "\uE7AC"
+                },
+                Command = new RelayCommand(TapAppendFromFile)
+            };
+            AppendFromPasteCommand = new XamlUICommand()
+            {
+                Label = "追加自剪切板",
+                Description = "从剪切板读取内容并合并到当前",
+                IconSource = new FontIconSource()
+                {
+                    Glyph = "\uE413"
+                },
+                Command = new RelayCommand(TapAppendFromPaste)
+            };
 
             WordProofreadCommand = new XamlUICommand()
             {
@@ -236,6 +258,9 @@ namespace ZoDream.Reader.ViewModels
 
 
         public ICommand OpenCommand { get; private set; }
+
+        public ICommand AppendFromFileCommand { get; private set; }
+        public ICommand AppendFromPasteCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
         public ICommand CatalogCommand { get; private set; }
         public ICommand BasicCommand { get; private set; }
@@ -290,46 +315,7 @@ namespace ZoDream.Reader.ViewModels
 
         private async void TapOpen()
         {
-            var picker = new FileOpenPicker();
-            picker.FileTypeFilter.Add(".npk");
-            picker.FileTypeFilter.Add(".txt");
-            picker.FileTypeFilter.Add(".epub");
-            picker.FileTypeFilter.Add(".umd");
-            _app.InitializePicker(picker);
-            var file = await picker.PickSingleFileAsync();
-            if (file is null)
-            {
-                return;
-            }
-            INovelReader? reader = null;
-            var extension = Path.GetExtension(file.Path);
-            if (extension == ".txt")
-            {
-                var dialog = new ChapterMatchDialog();
-                _ = dialog.ViewModel.LoadAsync(file.Path);
-                if (!await _app.OpenFormAsync(dialog))
-                {
-                    return;
-                }
-                reader = new TxtReader(await file.OpenStreamForReadAsync(), 
-                    file.Path, dialog.ViewModel.RuleText);
-            } else if (extension == ".umd")
-            {
-                reader = new UmdReader(await file.OpenStreamForReadAsync());
-            }
-            else if (extension == ".epub")
-            {
-                reader = new EPubReader(await file.OpenStreamForReadAsync());
-            } else if (extension == ".npk")
-            {
-                if (!await LoadDictionaryAsync())
-                {
-                    return;
-                }
-                reader = new OwnReader(await file.OpenStreamForReadAsync(), new OwnEncoding(_dict!));
-            }
-            var doc = reader?.Read();
-            reader?.Dispose();
+            var doc = await DeserializeOpen();
             if (doc is null)
             {
                 return;
@@ -337,7 +323,84 @@ namespace ZoDream.Reader.ViewModels
             Deserialize(doc);
         }
 
-        
+        private async Task<INovelDocument?> DeserializeOpen()
+        {
+            var picker = new FileOpenPicker(_app.AppWindowId);
+            picker.FileTypeFilter.Add(".npk");
+            picker.FileTypeFilter.Add(".txt");
+            picker.FileTypeFilter.Add(".epub");
+            picker.FileTypeFilter.Add(".umd");
+            var file = await picker.PickSingleFileAsync();
+            if (file is null)
+            {
+                return null;
+            }
+            INovelReader? reader = null;
+            var extension = Path.GetExtension(file.Path);
+            using var fs = File.OpenRead(file.Path);
+            if (extension == ".txt")
+            {
+                var dialog = new ChapterMatchDialog();
+                _ = dialog.ViewModel.LoadAsync(file.Path, fs);
+                var res = await _app.OpenDialogAsync(dialog);
+                if (res == ContentDialogResult.None)
+                {
+                    return null;
+                }
+                return dialog.ViewModel.Read(res);
+            }
+            else if (extension == ".umd")
+            {
+                reader = new UmdReader(fs);
+            }
+            else if (extension == ".epub")
+            {
+                reader = new EPubReader(fs);
+            }
+            else if (extension == ".npk")
+            {
+                if (!await LoadDictionaryAsync())
+                {
+                    return null;
+                }
+                reader = new OwnReader(fs, new OwnEncoding(_dict!));
+            }
+            var doc = reader?.Read();
+            reader?.Dispose();
+            return doc;
+        }
+
+        private async void TapAppendFromFile()
+        {
+            SaveSection(_current);
+            var doc = await DeserializeOpen();
+            if (doc is null)
+            {
+                return;
+            }
+            DeserializeAppend(doc);
+        }
+
+        private async void TapAppendFromPaste()
+        {
+            SaveSection(_current);
+            var package = Clipboard.GetContent();
+            if (!package.Contains(StandardDataFormats.Text))
+            {
+                _app.ToastAsync("剪切板不能存在文本");
+                return;
+            }
+            var text = await package.GetTextAsync();
+            using var ms = new MemoryStream(Encoding.UTF8.GetBytes(text));
+            var dialog = new ChapterMatchDialog();
+            _ = dialog.ViewModel.LoadAsync(ms, Encoding.UTF8);
+            var res = await _app.OpenDialogAsync(dialog);
+            if (res == ContentDialogResult.None)
+            {
+                return;
+            }
+            DeserializeAppend(dialog.ViewModel.Read(res));
+        }
         private async void TapSave()
         {
             if (Items.Count == 0)
@@ -345,12 +408,12 @@ namespace ZoDream.Reader.ViewModels
                 return;
             }
             SaveSection(_current);
-            var picker = new FileSavePicker();
+            var picker = new FileSavePicker(_app.AppWindowId);
             picker.FileTypeChoices.Add("书籍", [".npk"]);
             picker.FileTypeChoices.Add("TXT书籍", [".txt"]);
             picker.FileTypeChoices.Add("EPUB书籍", [".epub"]);
             picker.SuggestedFileName = Name;
-            _app.InitializePicker(picker);
+            picker.SuggestedFolder = "";
             var file = await picker.PickSaveFileAsync();
             if (file is null)
             {
@@ -378,7 +441,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            using var fs = await file.OpenStreamForWriteAsync();
+            using var fs = File.Create(file.Path);
             writer.Write(fs);
             await _app.ConfirmAsync("保存成功");
         }
@@ -740,15 +803,14 @@ namespace ZoDream.Reader.ViewModels
             {
                 return true;
             }
-            var picker = new FileOpenPicker();
+            var picker = new FileOpenPicker(_app.AppWindowId);
             picker.FileTypeFilter.Add(".bin");
-            _app.InitializePicker(picker);
             var file = await picker.PickSingleFileAsync();
             if (file is null)
             {
                 return false;
             }
-            using var fs = await file.OpenStreamForReadAsync();
+            using var fs = File.OpenRead(file.Path);
             _dict = OwnDictionary.OpenFile(fs);
             _proofreader = new WordProofreader();
             _proofreader.AppendFile(fs);
@@ -1120,6 +1182,11 @@ namespace ZoDream.Reader.ViewModels
             _current = null;
             Document!.Text = Title = string.Empty;
             Items.Clear();
+            DeserializeAppend(doc);
+        }
+
+        private void DeserializeAppend(INovelDocument doc)
+        {
             foreach (var item in doc.Items)
             {
                 if (!string.IsNullOrWhiteSpace(item.Name))

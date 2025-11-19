@@ -1,18 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI.Helpers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.Storage;
 using Windows.Storage.AccessCache;
-using Windows.Storage.Pickers;
+using Microsoft.Windows.Storage.Pickers;
 using ZoDream.Reader.Repositories;
 using ZoDream.Shared.Interfaces.Route;
 using ZoDream.Shared.Repositories;
+using System.IO;
+using Windows.Storage;
 
 namespace ZoDream.Reader.ViewModels
 {
@@ -25,6 +21,8 @@ namespace ZoDream.Reader.ViewModels
             CreateCommand = new RelayCommand(TapCreate);
             Version = App.GetService<AppViewModel>().Version;
         }
+
+        private readonly AppViewModel _app = App.GetService<AppViewModel>();
 
         private string version;
 
@@ -46,39 +44,37 @@ namespace ZoDream.Reader.ViewModels
 
         private async void TapOpen()
         {
-            var picker = new FolderPicker();
-            picker.FileTypeFilter.Add("*");
+            var picker = new FolderPicker(_app.AppWindowId);
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-            App.GetService<AppViewModel>().InitializePicker(picker);
             var folder = await picker.PickSingleFolderAsync();
             if (folder is null)
             {
                 return;
             }
-            var checkFile = await folder.GetFileAsync(AppConstants.DatabaseFileName);
-            if (checkFile is null)
+            var checkFile = Path.Combine(folder.Path, AppConstants.DatabaseFileName);
+            if (!File.Exists(checkFile))
             {
                 // 不存在
                 return;
             }
-            StorageApplicationPermissions.FutureAccessList.AddOrReplace(AppConstants.WorkspaceToken, folder);
-            await App.GetService<AppViewModel>().InitializeWorkspaceAsync(folder);
+            var target = await StorageFolder.GetFolderFromPathAsync(folder.Path);
+            StorageApplicationPermissions.FutureAccessList.AddOrReplace(AppConstants.WorkspaceToken, target);
+            await _app.InitializeWorkspaceAsync(target);
             App.GetService<IRouter>().GoToAsync(Router.HomeRoute);
         }
 
         private async void TapCreate()
         {
-            var picker = new FolderPicker();
-            picker.FileTypeFilter.Add("*");
+            var picker = new FolderPicker(_app.AppWindowId);
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-            App.GetService<AppViewModel>().InitializePicker(picker);
             var folder = await picker.PickSingleFolderAsync();
             if (folder is null)
             {
                 return;
             }
-            StorageApplicationPermissions.FutureAccessList.AddOrReplace(AppConstants.WorkspaceToken, folder);
-            await App.GetService<AppViewModel>().InitializeWorkspaceAsync(folder, true);
+            var target = await StorageFolder.GetFolderFromPathAsync(folder.Path);
+            StorageApplicationPermissions.FutureAccessList.AddOrReplace(AppConstants.WorkspaceToken, target);
+            await _app.InitializeWorkspaceAsync(target, true);
             App.GetService<IRouter>().GoToAsync(Router.HomeRoute);
         }
     }
