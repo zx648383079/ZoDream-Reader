@@ -113,6 +113,16 @@ namespace ZoDream.Reader.ViewModels
                 },
                 Command = new RelayCommand(TapFormatProofread)
             };
+            JumpToWrongCommand = new XamlUICommand()
+            {
+                Label = "下一个错误",
+                Description = "跳转到下一个错误章节",
+                IconSource = new FontIconSource()
+                {
+                    Glyph = "\uE8D1"
+                },
+                Command = new RelayCommand(TapJumpToWrong)
+            };
         }
 
         private readonly FindTextDialog _finder = new();
@@ -120,6 +130,7 @@ namespace ZoDream.Reader.ViewModels
         private WordProofreader? _proofreader;
         private OwnDictionary? _dict;
         private IEditableSection? _current;
+        private string _fileName = string.Empty;
         private bool _isUpdated = false;
 
         public ITextEditor? Document { get; internal set; }
@@ -301,6 +312,7 @@ namespace ZoDream.Reader.ViewModels
 
         public ICommand WordProofreadCommand { get; private set; }
         public ICommand FormatProofreadCommand { get; private set; }
+        public ICommand JumpToWrongCommand { get; private set; }
         private async void TapResetDict()
         {
             var old = _dict;
@@ -315,7 +327,7 @@ namespace ZoDream.Reader.ViewModels
 
         private async void TapOpen()
         {
-            var doc = await DeserializeOpen();
+            var doc = await DeserializeOpen(true);
             if (doc is null)
             {
                 return;
@@ -323,7 +335,7 @@ namespace ZoDream.Reader.ViewModels
             Deserialize(doc);
         }
 
-        private async Task<INovelDocument?> DeserializeOpen()
+        private async Task<INovelDocument?> DeserializeOpen(bool isOpen = false)
         {
             var picker = new FileOpenPicker(_app.AppWindowId);
             picker.FileTypeFilter.Add(".npk");
@@ -334,6 +346,10 @@ namespace ZoDream.Reader.ViewModels
             if (file is null)
             {
                 return null;
+            }
+            if (isOpen)
+            {
+                _fileName = file.Path;
             }
             INovelReader? reader = null;
             var extension = Path.GetExtension(file.Path);
@@ -412,8 +428,12 @@ namespace ZoDream.Reader.ViewModels
             picker.FileTypeChoices.Add("书籍", [".npk"]);
             picker.FileTypeChoices.Add("TXT书籍", [".txt"]);
             picker.FileTypeChoices.Add("EPUB书籍", [".epub"]);
+            picker.DefaultFileExtension = ".npk";
             picker.SuggestedFileName = Name;
-            picker.SuggestedFolder = "";
+            if (!string.IsNullOrWhiteSpace(_fileName))
+            {
+                picker.SuggestedFolder = Path.GetDirectoryName(_fileName) ?? string.Empty;
+            }
             var file = await picker.PickSaveFileAsync();
             if (file is null)
             {
@@ -443,6 +463,7 @@ namespace ZoDream.Reader.ViewModels
             }
             using var fs = File.Create(file.Path);
             writer.Write(fs);
+            _fileName = file.Path;
             await _app.ConfirmAsync("保存成功");
         }
         private void TapBasic()
@@ -574,6 +595,32 @@ namespace ZoDream.Reader.ViewModels
             }
             var proofreader = new TextFormatProofreader();
             Document.Text = proofreader.Proofreading(Document.Text);
+        }
+
+        private async void TapJumpToWrong()
+        {
+            if (Document is null)
+            {
+                return;
+            }
+            foreach (var item in WrongItems)
+            {
+                Document.Unselect();
+                if (Document.FindNext(item.Word))
+                {
+                    return;
+                }
+            }
+            foreach (var item in Items)
+            {
+                if (!item.IsWrong || item == _current)
+                {
+                    continue;
+                }
+                EditSection(item);
+                return;
+            }
+            await _app.ConfirmAsync("没有错误了！");
         }
 
         private void TapEnter()

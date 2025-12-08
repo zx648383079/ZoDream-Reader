@@ -275,6 +275,7 @@
                             <MenuFlyout Placement="Bottom">
                                 <MenuFlyoutItem Command="{Binding WordProofreadCommand}" />
                                 <MenuFlyoutItem Command="{Binding FormatProofreadCommand}" />
+                                <MenuFlyoutItem Command="{Binding JumpToWrongCommand}" />
                             </MenuFlyout>
 
                         </SplitButton.Flyout>
