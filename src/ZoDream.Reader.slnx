@@ -1,0 +1,32 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/WinUI/">
+    <Project Path="WinUI/ZoDream.Reader/ZoDream.Reader.csproj">
+      <Platform Solution="*|Any CPU" Project="x64" />
+      <Platform Solution="*|ARM" Project="x64" />
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+      <Deploy />
+    </Project>
+  </Folder>
+  <Project Path="../shared/ZoDream.Shared.Controls/ZoDream.Shared.Controls.csproj" />
+  <Project Path="../shared/ZoDream.Shared.Http/ZoDream.Shared.Http.csproj" />
+  <Project Path="ZoDream.Reader/ZoDream.Reader.csproj" />
+  <Project Path="ZoDream.Resources/ZoDream.Resources.csproj" />
+  <Project Path="ZoDream.Shared.Animations/ZoDream.Shared.Animations.csproj" />
+  <Project Path="ZoDream.Shared.Database/ZoDream.Shared.Database.csproj" />
+  <Project Path="ZoDream.Shared.Font/ZoDream.Shared.Font.csproj" />
+  <Project Path="ZoDream.Shared.Plugins/ZoDream.Shared.Plugins.csproj" />
+  <Project Path="ZoDream.Shared.Repositories/ZoDream.Shared.Repositories.csproj" />
+  <Project Path="ZoDream.Shared.Script/ZoDream.Shared.Script.csproj" />
+  <Project Path="ZoDream.Shared.Text/ZoDream.Shared.Text.csproj" />
+  <Project Path="ZoDream.Shared/ZoDream.Shared.csproj" />
+  <Project Path="ZoDream.Tests/ZoDream.Tests.csproj" />
+</Solution>
