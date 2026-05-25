@@ -129,7 +129,10 @@ namespace ZoDream.Reader.ViewModels
         {
             
         }
-
+        private void TapDelete()
+        {
+            TapDelete(null);
+        }
         private async void TapDelete(NovelItemViewModel? arg)
         {
             NovelItemViewModel[] items;
@@ -193,7 +196,7 @@ namespace ZoDream.Reader.ViewModels
             {
                 return;
             }
-            await _app.Storage.AddBookAsync(file);
+            await _app.Storage.AddBookAsync(file.Path);
             LoadAsync();
         }
 

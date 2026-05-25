@@ -1,25 +1,26 @@
-﻿using System;
+﻿using Microsoft.Graphics.Canvas.Text;
+using Microsoft.UI.Xaml.Media.Imaging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Windows.Storage;
-using ZoDream.Shared.Interfaces;
-using ZoDream.Shared.Models;
-using ZoDream.Shared.Font;
-using Microsoft.Graphics.Canvas.Text;
-using ZoDream.Shared.Repositories;
-using ZoDream.Shared.Interfaces.Entities;
-using ZoDream.Shared.Repositories.Entities;
-using Windows.Graphics.Imaging;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.Storage.Streams;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.Graphics.Imaging;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using ZoDream.Reader.ViewModels;
+using ZoDream.Shared.Font;
+using ZoDream.Shared.Interfaces;
+using ZoDream.Shared.Interfaces.Entities;
+using ZoDream.Shared.Models;
 using ZoDream.Shared.Plugins.EPub;
-using ZoDream.Shared.Plugins.Umd;
 using ZoDream.Shared.Plugins.Pdf;
 using ZoDream.Shared.Plugins.Txt;
-using ZoDream.Reader.ViewModels;
+using ZoDream.Shared.Plugins.Umd;
+using ZoDream.Shared.Repositories;
+using ZoDream.Shared.Repositories.Entities;
+using ZoDream.Shared.Repositories.Extensions;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Reader.Repositories
@@ -43,15 +44,13 @@ namespace ZoDream.Reader.Repositories
         }
 
 
-        public async Task<FontItem?> AddFontAsync<T>(T file)
+        public async Task<FontItem?> AddFontAsync(string fileName)
         {
-            if (file is not StorageFile src)
-            {
-                return null;
-            }
-            var name = src.Name[..src.Name.IndexOf('.')];
-            var fileId = src.Name;
-            var tempFile = await src.CopyAsync(ThemeFolder, src.Name, NameCollisionOption.ReplaceExisting);
+            var srcName = Path.GetFileName(fileName);
+            var name = srcName[..srcName.IndexOf('.')];
+            var fileId = srcName;
+            var tempFile = Path.Combine(ThemeFolder.Path, srcName);
+            File.Copy(fileName, tempFile);
             //var factory = DWriteCreateFactory<IDWriteFactory>();
             //var fontRef = factory.CreateFontFileReference(tempFile.Path);
             //fontRef.Analyze(out var isSupported, out var fontFileType, out var fontFaceType, out var numberOfFaces);
@@ -60,7 +59,7 @@ namespace ZoDream.Reader.Repositories
             //    return null;
             //}
             //var fontFace = factory.CreateFontFace(fontFaceType, new []{ fontRef });
-            var items = await FontHelper.GetFontFamilyAsync(tempFile.Path);
+            var items = await FontHelper.GetFontFamilyAsync(tempFile);
             return new FontItem(items.FirstOrDefault().Name)
             {
                 FileName = fileId,
@@ -129,6 +128,13 @@ namespace ZoDream.Reader.Repositories
             return Task.FromResult(Path.Combine(BookFolder.Path, item.FileName));
         }
 
+        private static string CopyOrReplaceFile(string src, string folder)
+        {
+            var dist = Path.Combine(folder, Path.GetFileName(src));
+            File.Copy(src, dist, true);
+            return dist;
+        }
+
         private static async Task<IStorageFile> CopyOrReplaceFileAsync(IStorageFile src, IStorageFolder folder)
         {
             try
@@ -143,20 +149,17 @@ namespace ZoDream.Reader.Repositories
             return await src.CopyAsync(folder);
         }
 
-        public async Task<INovel?> AddBookAsync<T>(T file)
+        public async Task<INovel?> AddBookAsync(string fileName)
         {
-            if (file is not IStorageFile src)
+            var srcName = Path.GetFileName(fileName);
+            var name = srcName[..srcName.IndexOf('.')];
+            var fileId = srcName;
+            if (!fileName.StartsWith(BookFolder.Path))
             {
-                return null;
+                fileName = CopyOrReplaceFile(fileName, BookFolder.Path);
             }
-            var name = src.Name[..src.Name.IndexOf('.')];
-            var fileId = src.Name;
-            if (!src.Path.StartsWith(BookFolder.Path))
-            {
-                src = await CopyOrReplaceFileAsync(src, BookFolder);
-            }
-            var reader = await GetReaderAsync(src.Name, true);
-            var (novel, items) = await reader.LoadAsync(new FileSource(src.Path));
+            var reader = await GetReaderAsync(srcName, true);
+            var (novel, items) = await reader.LoadAsync(new FileSource(fileName));
             novel ??= new BookEntity();
             novel.Id = fileId;
             novel.FileName = fileId;
@@ -238,14 +241,23 @@ namespace ZoDream.Reader.Repositories
         }
 
 
-        public async Task<string?> AddImageAsync<T>(T file)
+        public Task<string?> AddImageAsync(string fileName)
         {
-            if (file is StorageFile f)
-            {
-                var img = await f.CopyAsync(ThemeFolder);
-                return img.Path;
-            }
-            return null;
+            return Task.Factory.StartNew(() => {
+                var info = new FileInfo(fileName);
+                if (!info.Exists)
+                {
+                    return null;
+                }
+                var name = info.Name.Replace(info.Extension, "");
+                var fileId = info.Name;
+                if (info.DirectoryName != null && info.DirectoryName.StartsWith(ThemeFolder.Path))
+                {
+                    return fileId;
+                }
+                var fileInfo = info.CopyTo(Path.Join(ThemeFolder.Path, info.Name), true);
+                return fileId;
+            });
         }
 
         public async Task AddImageAsync(string fileName, Stream stream)

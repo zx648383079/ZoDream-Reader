@@ -143,8 +143,16 @@
             </AppBarButton>
             <AppBarButton Command="{Binding MultipleCommand}" />
             <AppBarButton Command="{Binding SelectAllCommand}" Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
-            <AppBarButton Command="{Binding EditCommand}" Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
-            <AppBarButton Command="{Binding DeleteCommand}" Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
+            <AppBarButton
+                Command="{Binding EditCommand}"
+                Icon="Edit"
+                Label="Edit"
+                Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
+            <AppBarButton
+                Command="{Binding DeleteCommand}"
+                Icon="Delete"
+                Label="Delete"
+                Visibility="{x:Bind cvt:ConverterHelper.VisibleIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
             <AppBarButton Command="{Binding AddCommand}" Visibility="{x:Bind cvt:ConverterHelper.CollapsedIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />
             <CommandBar.SecondaryCommands>
                 <AppBarButton Command="{Binding GroupCommand}" Visibility="{x:Bind cvt:ConverterHelper.CollapsedIf(ViewModel.IsMultipleSelect), Mode=OneWay}" />

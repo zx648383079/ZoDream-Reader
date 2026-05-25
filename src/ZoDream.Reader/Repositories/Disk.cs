@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using ZoDream.Reader.ViewModels;
 using ZoDream.Shared.Font;
 using ZoDream.Shared.Interfaces;
@@ -222,12 +219,9 @@ namespace ZoDream.Reader.Repositories
             return Task.FromResult(Path.Combine(BookFolder, item.FileName));
         }
 
-        public async Task<INovel?> AddBookAsync<T>(T file)
+        public async Task<INovel?> AddBookAsync(string fileName)
         {
-            if (file is not string src)
-            {
-                return null;
-            }
+            var src = fileName;
             var name = Path.GetFileNameWithoutExtension(src);
             var fileId = Path.GetFileName(src);
             if (!src.StartsWith(BookFolder))
@@ -270,21 +264,6 @@ namespace ZoDream.Reader.Repositories
             File.Delete(file);
         }
 
-        public Task<FontItem?> AddFontAsync<T>(T file)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<string?> AddImageAsync<T>(T file)
-        {
-            if (file is string f)
-            {
-                var img = Path.Combine(ThemeFolder, Path.GetFileName(f));
-                File.Copy(f, img);
-                return img;
-            }
-            return null;
-        }
 
         public async Task AddImageAsync(string fileName, Stream stream)
         {

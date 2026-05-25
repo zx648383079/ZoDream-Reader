@@ -17,14 +17,14 @@ namespace ZoDream.Shared.Interfaces
         public Task<string> GetFileUriAsync(string fileName);
         public Task<string> GetFilePathAsync(string fileName);
 
-        public Task<INovel?> AddBookAsync<T>(T file);
+        public Task<INovel?> AddBookAsync(string fileName);
 
-        public Task<string?> AddImageAsync<T>(T file);
+        public Task<string?> AddImageAsync(string fileName);
 
         public Task DeleteBookAsync(INovel item);
 
 
-        public Task<FontItem?> AddFontAsync<T>(T file);
+        public Task<FontItem?> AddFontAsync(string fileName);
 
         public Task ClearThemeAsync();
 
