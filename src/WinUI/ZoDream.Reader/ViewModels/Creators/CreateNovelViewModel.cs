@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.Windows.Storage.Pickers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,7 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.ApplicationModel.DataTransfer;
-using Microsoft.Windows.Storage.Pickers;
+using Windows.Storage;
 using ZoDream.Reader.Behaviors;
 using ZoDream.Reader.Controls;
 using ZoDream.Reader.Converters;
@@ -35,6 +36,7 @@ namespace ZoDream.Reader.ViewModels
         public CreateNovelViewModel()
         {
             OpenCommand = new RelayCommand(TapOpen);
+            DragCommand = new RelayCommand<IEnumerable<IStorageItem>>(TapDrag);
             SaveCommand = new RelayCommand(TapSave);
             BasicCommand = new RelayCommand(TapBasic);
             CatalogCommand = new RelayCommand(TapCatalog);
@@ -270,6 +272,8 @@ namespace ZoDream.Reader.ViewModels
 
         public ICommand OpenCommand { get; private set; }
 
+        public ICommand DragCommand { get; private set; }
+
         public ICommand AppendFromFileCommand { get; private set; }
         public ICommand AppendFromPasteCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
@@ -335,6 +339,20 @@ namespace ZoDream.Reader.ViewModels
             Deserialize(doc);
         }
 
+        private async void TapDrag(IEnumerable<IStorageItem>? items)
+        {
+            if (items is null || !items.Any())
+            {
+                return;
+            }
+            var doc = await LoadFile(items.First().Path, true);
+            if (doc is null)
+            {
+                return;
+            }
+            Deserialize(doc);
+        }
+
         private async Task<INovelDocument?> DeserializeOpen(bool isOpen = false)
         {
             var picker = new FileOpenPicker(_app.AppWindowId);
@@ -347,17 +365,22 @@ namespace ZoDream.Reader.ViewModels
             {
                 return null;
             }
+            return await LoadFile(file.Path, isOpen);
+        }
+
+        private async Task<INovelDocument?> LoadFile(string filePath, bool isOpen = true)
+        {
             if (isOpen)
             {
-                _fileName = file.Path;
+                _fileName = filePath;
             }
             INovelReader? reader = null;
-            var extension = Path.GetExtension(file.Path);
-            using var fs = File.OpenRead(file.Path);
+            var extension = Path.GetExtension(filePath);
+            using var fs = File.OpenRead(filePath);
             if (extension == ".txt")
             {
                 var dialog = new ChapterMatchDialog();
-                _ = dialog.ViewModel.LoadAsync(file.Path, fs);
+                _ = dialog.ViewModel.LoadAsync(filePath, fs);
                 var res = await _app.OpenDialogAsync(dialog);
                 if (res == ContentDialogResult.None)
                 {

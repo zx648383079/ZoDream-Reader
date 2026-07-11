@@ -23,10 +23,10 @@
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="ToolGroupStyle" TargetType="SplitButton">
-                <Setter Property="Padding" Value="0"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
             </Style>
 
             <Style x:Key="EditorStyle" TargetType="RichEditBox">
@@ -154,9 +154,8 @@
                 <ColumnDefinition Width="200" />
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
-                
-                <SplitButton
-                    Style="{StaticResource ToolGroupStyle}">
+
+                <SplitButton Style="{StaticResource ToolGroupStyle}">
                     <Button
                         Command="{Binding OpenCommand}"
                         Content="&#xE8E5;"
@@ -236,7 +235,11 @@
                 IsSpellCheckEnabled="False"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 Text="{Binding Brief, Mode=TwoWay}"
-                TextWrapping="Wrap" />
+                TextWrapping="Wrap">
+                <ivy:Interaction.Behaviors>
+                    <bhv:DragFileBehavior Command="{Binding DragCommand}" />
+                </ivy:Interaction.Behaviors>
+            </TextBox>
         </Grid>
         <Grid Visibility="{Binding CatalogVisible}">
             <Grid.ColumnDefinitions>
@@ -264,8 +267,7 @@
 
                     <AppBarSeparator />
 
-                    <SplitButton
-                        Style="{StaticResource ToolGroupStyle}">
+                    <SplitButton Style="{StaticResource ToolGroupStyle}">
                         <Button
                             Command="{Binding CheckCommand}"
                             Content="&#xE8FE;"
