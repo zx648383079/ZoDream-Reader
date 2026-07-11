@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using ZoDream.Shared.Interfaces;
 using ZoDream.Shared.IO;
 using ZoDream.Shared.Models;
-using ZoDream.Shared.Text;
 using ZoDream.Shared.Tokenizers;
 
 namespace ZoDream.Shared.Plugins.Own
 {
-    public class OwnReader(Stream input, OwnEncoding encoding) : INovelReader
+    public class OwnReader(Stream input, Encoding encoding) : INovelReader
     {
         private readonly byte[] _buffer = new byte[1024 * 5];
         private int _last = -1;
