@@ -875,6 +875,8 @@ namespace ZoDream.Reader.ViewModels
             }
             var picker = new FileOpenPicker(_app.AppWindowId);
             picker.FileTypeFilter.Add(".bin");
+            picker.FileTypeFilter.Add(".dict");
+            picker.FileTypeFilter.Add(".txt");
             var file = await picker.PickSingleFileAsync();
             if (file is null)
             {
@@ -1029,6 +1031,7 @@ namespace ZoDream.Reader.ViewModels
                 TapJumpTo(WrongItems[0]);
                 return;
             }
+            Title = _proofreader.Proofreading(Title);
             Document.Text = _proofreader.Proofreading(Document.Text);
         }
 

@@ -66,7 +66,7 @@ namespace ZoDream.Shared.Plugins.Own
             WriteContent(output, section.Items);
         }
 
-        private void WriteTitle(Stream output,string title)
+        private void WriteTitle(Stream output, string title)
         {
             output.WriteByte(0x1);
             var buffer = encoding.GetBytes(title.Trim());

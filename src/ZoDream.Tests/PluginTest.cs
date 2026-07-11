@@ -1,17 +1,9 @@
-﻿using AngleSharp.Io;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 using ZoDream.Shared.Plugins.Own;
-using ZoDream.Shared.Storage;
 using ZoDream.Shared.Text;
 
 namespace ZoDream.Tests
@@ -32,14 +24,22 @@ namespace ZoDream.Tests
         public void TestConvert()
         {
             var baseFolder = "";
-            var oldEncoding = new OwnEncoding(OwnDictionary.OpenFile(
-                ""));
-            var newEncoding = new OwnEncoding(OwnDictionary.OpenFile(
-                ""));
+            var oldDict = "";
+            var newDict = "";
+            var maxTime = File.GetLastWriteTime(newDict);
+            var now = DateTime.Now;
+            var oldEncoding = new OwnEncoding(OwnDictionary.OpenFile(oldDict));
+            var newEncoding = new OwnEncoding(OwnDictionary.OpenFile(newDict));
             var i = 0;
             foreach (var item in Directory.GetFiles(baseFolder, "*.npk", SearchOption.AllDirectories))
             {
                 Debug.WriteLine("Processing file: " + item);
+                var current = File.GetLastWriteTime(item);
+                if (current > maxTime)
+                {
+                    Debug.WriteLine("Skipping file: " + item);
+                    continue;
+                }
                 using var fs = File.Open(item, FileMode.Open, FileAccess.ReadWrite);
                 var doc = new OwnReader(fs, oldEncoding).Read();
                 if (doc is null)
@@ -50,6 +50,7 @@ namespace ZoDream.Tests
                 new OwnWriter(doc, newEncoding).Write(fs);
                 fs.Flush();
                 fs.SetLength(fs.Position);
+                File.SetLastWriteTime(item, now);
                 i++;
             }
             Assert.IsTrue(i > 1);
